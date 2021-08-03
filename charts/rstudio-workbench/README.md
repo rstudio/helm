@@ -38,7 +38,7 @@ This chart requires the following in order to function:
     create your own `PersistentVolume` and `PersistentVolumeClaim`, then mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
   * If you cannot use a `PersistentVolume` to properly mount your users' home directories, you'll need to manually mount your NFS server via 
   * If not using `homeStorage.create`, you'll need to configure `config.serverDcf.launcher-mounts` to ensure that the correct mounts are used when users create new sessions.
-* If using load balancing (by setting `replicas` to a value higher than `1`), you will need similar storage defined for `sharedStorage` to store shared project configuration.
+* If using load balancing (by setting `replicas > 1`), you will need similar storage defined for `sharedStorage` to store shared project configuration.
 * A method to join the deployed `rstudio-workbench` container to your auth domain. The default `rstudio/rstudio-server-pro` image does not contain a way to join domains.
   We recommend creating your own Docker image that derives from this base image to provide domain joining that fits your needs. Your image can then use a process supervisor
   like [supervisord](http://supervisord.org/) to run multiple processes: in the most common case, `rstudio-server`, `rstudio-launcher`, and `sssd`. See 
