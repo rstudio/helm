@@ -6,7 +6,7 @@ Kubernetes deployment for RStudio Package Manager
 
 ## Disclaimer
 
-> This chart is "alpha" or "beta" quality at best. It is used primarily internally, is under-tested, and will undergo
+> This chart is "beta" quality. It will likely undergo
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
