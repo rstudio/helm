@@ -1,0 +1,42 @@
+apiVersion: v1
+entries:
+  rstudio-launcher-rbac:
+  - apiVersion: v2
+    appVersion: 0.2.1
+    created: "2021-08-04T17:11:08.670386965Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: RBAC definition for the RStudio Job Launcher
+    digest: c8d32859c6003dd5bf576fd589ed4dbdb0c3448eb0e49b3dfb5165e41cd99dbc
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-launcher-rbac
+    type: application
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-launcher-rbac-0.2.1/rstudio-launcher-rbac-0.2.1.tgz
+    version: 0.2.1
+  rstudio-pm:
+  - apiVersion: v2
+    appVersion: 1.2.2.1-17
+    created: "2021-08-04T17:11:08.829298987Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Package Manager
+    digest: e9b082426b0fd80aee0d26de76f819b84acdbc71e723f61de48cae8df58ae2e6
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc03/rstudio-pm-0.2.0-rc03.tgz
+    version: 0.2.0-rc03
+generated: "2021-08-04T17:11:08.829306584Z"
