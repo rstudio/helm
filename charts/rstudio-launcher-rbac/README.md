@@ -23,8 +23,8 @@ changes, as well as documentation below on how to use the chart
 To install the chart with the release name `my-release` at version 0.2.0:
 
 ```bash
-helm repo add rstudio-beta https://cdn.rstudio.com/sol-eng/helm/
-helm install my-release rstudio-beta/rstudio-launcher-rbac --version=0.2.0
+helm repo add rstudio-helm https://helm.rstudio.com
+helm install my-release rstudio-helm/rstudio-launcher-rbac --version=0.2.0
 ```
 
 ## Values
