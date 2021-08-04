@@ -18,10 +18,13 @@
 
 ## Support
 
-We have a few outlets for getting support with our projects:
+**IMPORTANT:** 
 
-- Bugs or feature requests should be opened in an [issue](https://github.com/rstudio/helm/issues/new/choose).
-- Professional support for our Helm charts can be obtained by emailing support@rstudio.com. Please note that email support is limited to our professional products customers.
+These charts are provided as a convenience to RStudio customers and are not formally supported by RStudio. If you
+have questions about these charts, you can ask them in the [issues](https://github.com/rstudio/helm/issues/new/choose) 
+in the repository or to your support representative, who will route them appropriately.
+
+Bugs or feature requests should be opened in an [issue](https://github.com/rstudio/helm/issues/new/choose).
 
 ## Contributing
 
