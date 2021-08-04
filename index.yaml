@@ -20,6 +20,41 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-launcher-rbac-0.2.1/rstudio-launcher-rbac-0.2.1.tgz
     version: 0.2.1
+  - apiVersion: v2
+    appVersion: 0.2.0
+    created: "2021-08-04T16:20:24.513479-04:00"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: RBAC definition for the RStudio Job Launcher
+    digest: 443f3c13a1a6b9c43785c596288314ec635f68b32847aa09a14dea6db6e8aef0
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-launcher-rbac
+    type: application
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-launcher-rbac-0.2.0/rstudio-launcher-rbac-0.2.0.tgz
+    version: 0.2.0
+  rstudio-library:
+  - apiVersion: v2
+    appVersion: 0.1.13-rc01
+    created: "2021-08-04T16:20:24.843688-04:00"
+    description: A Helm chart for RStudio helper functions
+    digest: b40634500ac23016333baf67649b933c3e2bd7821f5873f0a455cf77fe1f39af
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-library
+    type: library
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-library-0.1.13-rc01/rstudio-library-0.1.13-rc01.tgz
+    version: 0.1.13-rc01
   rstudio-pm:
   - apiVersion: v2
     appVersion: 1.2.2.1-17
@@ -39,4 +74,58 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc03/rstudio-pm-0.2.0-rc03.tgz
     version: 0.2.0-rc03
-generated: "2021-08-04T17:11:08.829306584Z"
+  - apiVersion: v2
+    appVersion: 1.2.2.1-17
+    created: "2021-08-04T16:20:25.392771-04:00"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Package Manager
+    digest: e76cc28542bb4d03056836b53f8e8360c3752f55b201f625df9c1d6ae234e260
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc03/rstudio-pm-0.2.0-rc03.tgz
+    version: 0.2.0-rc03
+  - apiVersion: v2
+    appVersion: 1.2.2.1-17
+    created: "2021-08-04T16:20:25.215146-04:00"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Package Manager
+    digest: fabd88362a0dedcb00340dc1c0a48ab7f4d87c3dc5952617b817de3f8a66cdd4
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc02/rstudio-pm-0.2.0-rc02.tgz
+    version: 0.2.0-rc02
+  - apiVersion: v2
+    appVersion: 1.2.2.1-17
+    created: "2021-08-04T16:20:25.024647-04:00"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Package Manager
+    digest: 7ee6d9e476b9a3cc2959d126fa339ed25c9c211f1cc528cd69f66f6916e10cf6
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
+    version: 0.2.0-rc01
+generated: "2021-08-04T16:20:25.392796-04:00"
