@@ -37,10 +37,6 @@ jobs:
             echo "::set-output name=changed::true"
           fi
 
-      - name: Set repo
-        run: |
-          helm repo add rstudio-helm https://helm.rstudio.com
-
       - name: Run chart-testing (lint changed)
         run: ct lint --target-branch main
 
@@ -74,10 +70,6 @@ jobs:
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
-
-      - name: Set repo
-        run: |
-          helm repo add rstudio-helm https://helm.rstudio.com
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.1.0
