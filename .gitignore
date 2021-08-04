@@ -1,3 +1,4 @@
 helm-docs
 charts/**/charts/
 /*.values
+/.cr-release-packages
