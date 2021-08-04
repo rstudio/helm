@@ -1,12 +1,6 @@
 name: Document Charts
 
-on:
-  push:
-    paths:
-      - '**/values.yaml'
-      - '**/Chart.yaml'
-      - '**/_templates.gotmpl'
-      - '**/README.md.gotmpl'
+on: push
 
 jobs:
   document:
