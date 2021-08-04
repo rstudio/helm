@@ -1,0 +1,3 @@
+includeReleaseNamespace: false
+targetNamespaces:
+  - default

@@ -1,0 +1,31 @@
+{{- $namespace := $.Release.Namespace }}
+{{- $allNamespaces := .Values.targetNamespaces}}
+{{- if .Values.includeReleaseNamespace }}
+  {{- $allNamespaces = append $allNamespaces $namespace}}
+{{- end }}
+{{- /* Error if targetNamespaces has length greater than 1 */}}
+{{- if (rest $allNamespaces ) }}
+  {{- fail (print "\n\nERROR: this chart currently does not support multiple namespaces. Got '" (print .Values.targetNamespaces) "'. \n\nKeep in mind that `.Values.includeReleaseNamespace` will affect this list." ) }}
+{{- end }}
+{{- /* Error if targetNamespaces is empty */}}
+{{- if not $allNamespaces }}
+  {{- fail (print "\n\nERROR: no namespace provided. You must provide a namespace in `.Values.targetNamespaces` or set `.Values.includeReleaseNamespace=true`") }}
+{{- end }}
+{{- $targetNamespace := (first $allNamespaces ) }}
+
+{{- $serviceAccountName := include "rstudio-launcher-rbac.serviceAccountName" . }}
+{{- $roleName := include "rstudio-launcher-rbac.fullname" . }}
+{{- $serviceAccountCreate := .Values.serviceAccount.create }}
+{{- $serviceAccountAnnotations := .Values.serviceAccount.annotations }}
+
+{{- $rbacValues1 := dict "namespace" ($namespace) "serviceAccountName" ($serviceAccountName) "targetNamespace" ($targetNamespace) }}
+{{- $rbacValues2 := dict "serviceAccountCreate" ($serviceAccountCreate) "serviceAccountAnnotations" ($serviceAccountAnnotations) }}
+{{- $rbacValues3 := dict "removeNamespaceReferences" (.Values.removeNamespaceReferences) "roleName" ($roleName) }}
+{{- $rbacValues := merge $rbacValues1 $rbacValues2 }}
+{{- $rbacValues = merge $rbacValues $rbacValues3 }}
+{{/*
+  For code-sharing, we use a shared library chart called "rstudio-library" to generate
+  rbac.yaml. You can either use `helm template` to see what is generated or look at the
+  "rstudio-library" chart source code (`_rbac.tpl`)
+*/}}
+{{- include "rstudio-library.rbac" $rbacValues }}
