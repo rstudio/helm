@@ -1,0 +1,28 @@
+{{ template "chart.header" . }}
+{{ template "chart.description" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "rstudio.disclaimer" . }}
+
+{{ template "rstudio.install" . }}
+
+## General Principles
+
+- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
+required by {{ template "chart.name" . }}.
+
+## Configuration File
+
+The configuration values all take the form of usual helm values
+so you can set the database password with something like:
+
+```
+... --set config.Postgres.Password=mypassword ...
+```
+
+The values are converted into configuration files in the necessary format via go-templating.
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

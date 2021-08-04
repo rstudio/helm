@@ -1,0 +1,14 @@
+license:
+  key: test
+nodePort: 32420
+metricsNodePort: 32112
+replicas: 1
+config:
+  HTTP:
+    Listen: :4242
+  Server:
+    DataDir: /var/lib/rstudio-pm
+    RVersion:
+      - /opt/R/3.6.2
+  Git:
+    BuilderDir: "/tmp/git"

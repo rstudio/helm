@@ -1,0 +1,151 @@
+# -- the name of the chart deployment (can be overridden)
+nameOverride: ""
+# -- the full name of the release (can be overridden)
+fullnameOverride: ""
+
+# -- A Package Manager version to override the "tag" for the RStudio Package Manager image. Necessary until https://github.com/helm/helm/issues/8194
+versionOverride: ""
+
+sharedStorage:
+  # -- whether to create the persistentVolumeClaim for shared storage
+  create: false
+  # -- the path to mount the sharedStorage claim within the pod
+  path: /var/lib/rstudio-pm
+  # -- storageClassName - the type of storage to use. Must allow ReadWriteMany
+  storageClassName: false
+  # -- accessModes defined for the storage PVC (represented as YAML)
+  accessModes:
+    - ReadWriteMany
+  requests:
+    # -- the volume of storage to request for this persistent volume claim
+    storage: "10Gi"
+
+image:
+  # -- the repository to use for the main pod image
+  repository: rstudio/rstudio-package-manager
+  # -- the tag to use for the main pod image
+  tag: ""
+  # -- the pullPolicy for the main pod image
+  pullPolicy: IfNotPresent
+
+strategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxSurge: "100%"
+    maxUnavailable: 0
+
+license:
+  # -- key is the license to use
+  key: null
+  # -- server is the <hostname>:<port> for a license server
+  server: false
+  # -- the file section is used for licensing with a license file
+  file:
+    # -- contents is an in-line license file
+    contents: false
+    # -- mountPath is the place the license file will be mounted into the container
+    mountPath: "/etc/rstudio-licensing"
+    # -- mountSubPath is whether to mount the subPath for the file secret.
+    # -- It can be preferable _not_ to enable this, because then updates propagate automatically
+    mountSubPath: false
+    # -- secretKey is the key for the secret to use for the license file
+    secretKey: "license.lic"
+    # -- secret is an existing secret with a license file in it
+    secret: false
+
+service:
+  # -- The service type (NodePort, LoadBalancer, etc.)
+  type: NodePort
+  # -- The annotations for the service
+  annotations: {}
+  # -- The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically
+  nodePort: false
+
+# -- replicas is the number of replica pods to maintain for this service
+replicas: 1
+# -- awsAccessKeyId is the access key id for s3 access, used also to gate file creation
+awsAccessKeyId: false
+# -- awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is
+awsSecretAccessKey:
+# -- rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service
+rstudioPMKey: false
+# -- command is the pod's run command. By default, it uses the container's default
+command: false
+# -- args is the pod's run arguments. By default, it uses the container's default
+args: false
+
+pod:
+  # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
+  env: []
+  # -- volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec
+  volumes: []
+  # -- volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec
+  volumeMounts: []
+  # -- serviceAccountName is a string representing the service account of the pod spec
+  serviceAccountName: false
+  # -- annotations is a map of keys / values that will be added as annotations to the pods
+  annotations: {}
+
+# -- resources define requests and limits for the rstudio-pm pod
+resources:
+  requests:
+    enabled: false
+    memory: "2Gi"
+    cpu: "100m"
+    ephemeralStorage: "100Mi"
+  limits:
+    enabled: false
+    memory: "4Gi"
+    cpu: "2000m"
+    ephemeralStorage: "200Mi"
+
+# -- livenessProbe is used to configure the container's livenessProbe
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 10
+# -- startupProbe is used to configure the container's startupProbe
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  # -- failureThreshold * periodSeconds should be strictly > worst case startup time
+  failureThreshold: 30
+# -- readinessProbe is used to configure the container's readinessProbe
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 3
+  periodSeconds: 3
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 3
+
+# -- the initContainer spec that will be used verbatim
+initContainers: false
+
+ingress:
+  enabled: false
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+  # - host: chart-example.local
+  #   paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+# -- config is a nested map of maps that generates the rstudio-pm.gcfg file
+config:
+  HTTP:
+    Listen: :4242
+  Metrics:
+    Enabled: true
+  Launcher:
+    ServerUser: root
+    AdminGroup: root

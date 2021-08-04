@@ -1,0 +1,51 @@
+{{- define "rstudio.disclaimer" }}
+
+## Disclaimer
+
+> This chart is "alpha" or "beta" quality at best. It is used primarily internally, is under-tested, and will undergo
+> breaking changes without warning as it moves towards stability.
+
+As a result, please:
+- Ensure you "pin" the version of the helm chart that you are using. You can do
+this using the `helm dependency` command and the associated "Chart.lock" files
+or the `--version` flag. IMPORTANT: This protects you from breaking changes
+- Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
+for breaking changes
+- Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
+changes, as well as documentation below on how to use the chart
+
+{{- end }}
+
+{{- define "rstudio.install" }}
+
+## Installing the Chart
+
+To install the chart with the release name `my-release` at version {{ template "chart.version" . }}:
+
+```bash
+helm repo add rstudio-helm https://helm.rstudio.com
+helm install my-release rstudio-helm/{{ template "chart.name" . }} --version={{ template "chart.version" . }}
+```
+
+{{- end }}
+
+
+{{ define "rstudio.examples" -}}
+{{ . }}
+{{ kindOf . }}
+{{ typeOf . }}
+{{ typeOf .Values }}
+{{ .ChartDirectory }}
+
+
+{{ $currentScope := . }}
+{{ range $path, $_ := $.Files.Glob "{{ .ChartDirectory }}/ci/*.yaml" }}
+  {{- with $currentScope }}
+    {{ $.Files.Get $path }}
+  {{- end }}
+{{ end }}
+
+
+{{ toPrettyJson . }}
+# Examples
+{{- end }}
