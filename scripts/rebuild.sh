@@ -14,7 +14,7 @@ GITHUB_OWNER=${GITHUB_OWNER:-rstudio}
 GITHUB_REPO=${GITHUB_REPO:-helm}
 
 # Run this script from the root of the helm repo, e.g.
-# bash scripts/rebuild.sh
+# ./scripts/rebuild.sh
 
 # List all tags oldest to newest, followed by the 'main' branch.
 tags="$(git tag -l  --sort=creatordate) main"
