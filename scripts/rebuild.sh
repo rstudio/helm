@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# Set this to something that does not exist if you want to regenerate
+# Set this to a valid URL *without* an index.yaml if you want to regenerate
 # a new index.html. If you want to append to an existing one, you can
 # use a real address like `https://helm.rstudio.com`. If an existing
 # index.yaml is found at this URL, then any packages we generate will
 # be appended, which can result in duplicates.
-HELM_REPO=${HELM_REPO:-https://dummy.rstudio.com}
+HELM_REPO=${HELM_REPO:-https://rstudio.com}
 
 PACKAGE_DIR=${PACKAGE_DIR:-./.cr-release-packages}
 CHARTS_DIR=${CHARTS_DIR:-charts}
