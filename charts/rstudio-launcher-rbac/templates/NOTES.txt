@@ -1,0 +1,5 @@
+{{ include "rstudio-launcher-rbac.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
+
+{{- if .Values.serviceAccount.create }}
+Created service account {{ include "rstudio-launcher-rbac.serviceAccountName" . }}
+{{- end }}
