@@ -1,0 +1,11 @@
+apiVersion: v2
+name: rstudio-library
+description: A Helm chart for RStudio helper functions
+type: library
+version: 0.1.13-rc01
+appVersion: 0.1.13-rc01
+icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+maintainers:
+  - name: sol-eng
+    email: docker@rstudio.com
+    url: https://github.com/rstudio/helm

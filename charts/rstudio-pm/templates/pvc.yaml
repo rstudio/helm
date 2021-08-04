@@ -1,0 +1,20 @@
+{{- if .Values.sharedStorage.create }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "rstudio-pm.fullname" . }}-shared-storage
+  namespace: {{ $.Release.Namespace }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+{{ .Values.sharedStorage.accessModes | toYaml | indent 4 }}
+  volumeMode: Filesystem
+  {{- if .Values.sharedStorage.storageClassName }}
+  storageClassName: {{ .Values.sharedStorage.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.sharedStorage.requests.storage }}
+---
+{{- end }}
