@@ -18,11 +18,15 @@
 {{- $serviceAccountCreate := .Values.serviceAccount.create }}
 {{- $serviceAccountAnnotations := .Values.serviceAccount.annotations }}
 
-{{- $rbacValues1 := dict "namespace" ($namespace) "serviceAccountName" ($serviceAccountName) "targetNamespace" ($targetNamespace) }}
-{{- $rbacValues2 := dict "serviceAccountCreate" ($serviceAccountCreate) "serviceAccountAnnotations" ($serviceAccountAnnotations) }}
-{{- $rbacValues3 := dict "removeNamespaceReferences" (.Values.removeNamespaceReferences) "roleName" ($roleName) }}
-{{- $rbacValues := merge $rbacValues1 $rbacValues2 }}
-{{- $rbacValues = merge $rbacValues $rbacValues3 }}
+{{- $rbacValues := dict
+  "namespace"                 ($namespace)
+  "serviceAccountName"        ($serviceAccountName)
+  "targetNamespace"           ($targetNamespace)
+  "serviceAccountCreate"      ($serviceAccountCreate)
+  "serviceAccountAnnotations" ($serviceAccountAnnotations)
+  "removeNamespaceReferences" (.Values.removeNamespaceReferences)
+  "roleName"                  ($roleName)
+}}
 {{/*
   For code-sharing, we use a shared library chart called "rstudio-library" to generate
   rbac.yaml. You can either use `helm template` to see what is generated or look at the
