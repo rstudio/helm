@@ -27,10 +27,12 @@ for tag in $tags; do
   git checkout "${tag}"
   charts=$(ls -1 ${CHARTS_DIR}/)
   for chart in $charts; do
-    if [ -d ${CHARTS_DIR}/$chart ]; then
-      if [ -f ${CHARTS_DIR}/$chart/Chart.yaml ]; then
-        echo "Packaging chart $chart for tag ${tag}"
-        cr package ${CHARTS_DIR}/$chart --package-path ${PACKAGE_DIR}
+    if [[ "${tag}" =~ ^${chart}.* ]]; then
+      if [ -d ${CHARTS_DIR}/$chart ]; then
+        if [ -f ${CHARTS_DIR}/$chart/Chart.yaml ]; then
+          echo "Packaging chart $chart for tag ${tag}"
+          cr package ${CHARTS_DIR}/$chart --package-path ${PACKAGE_DIR}
+        fi
       fi
     fi
   done
@@ -38,4 +40,4 @@ done
 
 echo "Writing index to ${INDEX}"
 rm ${INDEX}
-cr index --owner ${GITHUB_OWNER} --git-repo ${GITHUB_REPO} --charts-repo ${HELM_REPO} -i ${INDEX}
+cr index --owner ${GITHUB_OWNER} --git-repo ${GITHUB_REPO} --charts-repo ${HELM_REPO} -p ${PACKAGE_DIR} -i ${INDEX}
