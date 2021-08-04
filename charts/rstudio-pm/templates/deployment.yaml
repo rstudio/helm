@@ -41,7 +41,13 @@ spec:
         {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
         env:
-{{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-pm") "envVarPrefix" ("RSPM") "fullName" (include "rstudio-pm.fullname" .)) | indent 10 }}
+          {{ include "rstudio-library.license-env" (dict
+               "license" ( .Values.license )
+               "product" ("rstudio-pm")
+               "envVarPrefix" ("RSPM")
+               "fullName" (include "rstudio-pm.fullname" .)
+             ) | indent 10
+          }}
         {{- if .Values.pod.env }}
 {{ toYaml .Values.pod.env | indent 8 }}
         {{- end }}
@@ -74,7 +80,10 @@ spec:
           - name: rstudio-pm-data
             mountPath: "{{ .Values.sharedStorage.path }}"
           {{- end }}
-          {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
+          {{ include "rstudio-library.license-mount" (dict
+               "license" ( .Values.license )
+             ) | indent 10
+          }}
       {{- if .Values.pod.volumeMounts }}
 {{ toYaml .Values.pod.volumeMounts | indent 10 }}
       {{- end }}
@@ -145,7 +154,11 @@ spec:
         persistentVolumeClaim:
           claimName: {{ include "rstudio-pm.fullname" . }}-shared-storage
       {{- end }}
-      {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-pm.fullname" .)) | indent 6 }}
+      {{ include "rstudio-library.license-volume" (dict
+           "license" ( .Values.license )
+           "fullName" (include "rstudio-pm.fullname" .)
+         ) | indent 6
+      }}
       {{- if .Values.pod.volumes }}
 {{ toYaml .Values.pod.volumes | indent 6 }}
       {{- end }}

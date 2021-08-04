@@ -17,7 +17,13 @@
   {{- if $allOverrides }}
     {{- $allOverrides = $allOverrides | deepCopy }}
   {{- end }}
-  {{- include "rstudio-library.debug.type-check" (dict "name" "profiles defaults" "object" $allOverrides "expected" "slice" "description" "of jobJsonOverrides defaults") }}
+  {{- include "rstudio-library.debug.type-check" (dict
+        "name" "profiles defaults"
+        "object" $allOverrides
+        "expected" "slice"
+        "description" "of jobJsonOverrides defaults"
+      )
+  }}
   {{- $allOverridesNames := list -}}
   {{- /* Start the unique list of names from the names in .default */ -}}
   {{- range $item := $allOverrides -}}
@@ -30,12 +36,30 @@
   {{- if $data }}
     {{- $data = $data | deepCopy }}
   {{- end }}
-  {{- include "rstudio-library.debug.type-check" (dict "name" "config data" "object" $data "expected" "map" "description" "of section headers and configuration" ) }}
+  {{- include "rstudio-library.debug.type-check" (dict
+        "name" "config data"
+        "object" $data
+        "expected" "map"
+        "description" "of section headers and configuration"
+      )
+  }}
   {{- range $key, $config := $data -}}
-    {{- include "rstudio-library.debug.type-check" (dict "name" (print "[" $key "] section") "object" $config "expected" "map" "description" "of config data" ) }}
+    {{- include "rstudio-library.debug.type-check" (dict
+          "name" (print "[" $key "] section")
+          "object" $config
+          "expected" "map"
+          "description" "of config data"
+        )
+    }}
     {{- if hasKey $config "job-json-overrides" -}}
       {{- $overrides := get $config "job-json-overrides" -}}
-      {{- include "rstudio-library.debug.type-check" (dict "name" "[*].job-json-overrides" "object" $overrides "expected" "slice" "description" "of job-json-overrides definitions") }}
+      {{- include "rstudio-library.debug.type-check" (dict
+            "name" "[*].job-json-overrides"
+            "object" $overrides
+            "expected" "slice"
+            "description" "of job-json-overrides definitions"
+          )
+      }}
       {{ range $override := $overrides -}}
         {{- if not (has $override.name $allOverridesNames ) -}}
           {{- $allOverrides = append $allOverrides $override -}}
@@ -107,12 +131,24 @@
   {{- if hasKey $data "*" }}
     {{- $everyoneConfig = get $data "*" }}
   {{- end }}
-  {{- include "rstudio-library.debug.type-check" (dict "name" "[*] section" "object" $everyoneConfig "expected" "map" "description" "of config values") }}
+  {{- include "rstudio-library.debug.type-check" (dict
+        "name" "[*] section"
+        "object" $everyoneConfig
+        "expected" "map"
+        "description" "of config values"
+      )
+  }}
   {{- $defaultConfig := default (list) .default }}
   {{- if $defaultConfig }}
     {{- $defaultConfig = $defaultConfig | deepCopy }}
   {{- end }}
-  {{- include "rstudio-library.debug.type-check" (dict "name" "profiles defaults" "object" $defaultConfig "expected" "slice" "description" "of jobJsonOverrides defaults") }}
+  {{- include "rstudio-library.debug.type-check" (dict
+        "name" "profiles defaults"
+        "object" $defaultConfig
+        "expected" "slice"
+        "description" "of jobJsonOverrides defaults"
+      )
+  }}
   {{- $filePath := default "" .filePath }}
   {{- /* Create a "file" key from the "name" key */ -}}
   {{- range $entry := $defaultConfig }}
@@ -121,7 +157,13 @@
   {{- /* modify the defaultConfig value if "everyone" is defined (under "*"), by appending the everyone config to default */ -}}
   {{- if hasKey $everyoneConfig "job-json-overrides" }}
     {{- $everyone := get $everyoneConfig "job-json-overrides" }}
-    {{- include "rstudio-library.debug.type-check" (dict "name" "[*].job-json-overrides" "object" $everyone "expected" "slice" "description" "of job-json-overrides definitions") }}
+    {{- include "rstudio-library.debug.type-check" (dict
+          "name" "[*].job-json-overrides"
+          "object" $everyone
+          "expected" "slice"
+          "description" "of job-json-overrides definitions"
+        )
+    }}
     {{- range $entry := $everyone }}
       {{- $_ := set $entry "file" ( print $filePath ($entry.name | nospace) ".json" ) }}
     {{- end }}
@@ -134,10 +176,22 @@
   {{- /* loop over non-everyone config, prepending the default configuration */ -}}
   {{- $others := omit $data "*" }}
   {{- range $key, $one := $others }}
-    {{- include "rstudio-library.debug.type-check" (dict "name" (print "[" $key "] section" ) "object" $one "expected" "map" "description" "of config values") }}
+    {{- include "rstudio-library.debug.type-check" (dict
+          "name" (print "[" $key "] section" )
+          "object" $one
+          "expected" "map"
+          "description" "of config values"
+        )
+    }}
     {{- if hasKey $one "job-json-overrides" }}
       {{- $oneConfig := get $one "job-json-overrides" }}
-      {{- include "rstudio-library.debug.type-check" (dict "name" ( print "[" $key "].job-json-overrides" ) "object" $oneConfig "expected" "slice" "description" "of job-json-overrides definitions") }}
+      {{- include "rstudio-library.debug.type-check" (dict
+            "name" ( print "[" $key "].job-json-overrides" )
+            "object" $oneConfig
+            "expected" "slice"
+            "description" "of job-json-overrides definitions"
+          )
+      }}
       {{- range $entry := $oneConfig }}
         {{- $_ := set $entry "file" ( print $filePath ($entry.name | nospace) ".json" ) }}
       {{- end }}
@@ -198,14 +252,37 @@
 */}}
 {{- define "rstudio-library.profiles.ini.advanced" -}}
 {{- $jobJsonDefaults := default (list) .jobJsonDefaults }}
-{{- include "rstudio-library.debug.type-check" (dict "name" "profiles jobJsonDefaults" "object" $jobJsonDefaults "expected" "slice" "description" "of jobJsonOverrides defaults") }}
+{{- include "rstudio-library.debug.type-check" (dict
+      "name" "profiles jobJsonDefaults"
+      "object" $jobJsonDefaults
+      "expected" "slice"
+      "description" "of jobJsonOverrides defaults"
+    )
+}}
 {{- $filePath := default "" .filePath }}
 {{- $data := .data }}
-{{- include "rstudio-library.debug.type-check" (dict "name" "profiles data" "object" $data "expected" "map" "description" "of filenames and config data") }}
+{{- include "rstudio-library.debug.type-check" (dict
+      "name" "profiles data"
+      "object" $data
+      "expected" "map"
+      "description" "of filenames and config data"
+    )
+}}
 {{- range $file, $keys := $data -}}
-{{- include "rstudio-library.debug.type-check" (dict "name" (print "profiles content for file '" $file "'") "object" $keys "expected" "map" "description" "of section headers and configuration") }}
+{{- include "rstudio-library.debug.type-check" (dict
+      "name" (print "profiles content for file '" $file "'")
+      "object" $keys
+      "expected" "map"
+      "description" "of section headers and configuration"
+    )
+}}
 {{ $file }}: |
-{{- include "rstudio-library.profiles.apply-everyone-and-default-to-others" (dict "data" $keys "default" $jobJsonDefaults "filePath" $filePath) }}
+{{- include "rstudio-library.profiles.apply-everyone-and-default-to-others" (dict
+      "data" $keys
+      "default" $jobJsonDefaults
+      "filePath" $filePath
+    )
+}}
 
 {{ end }}
 {{- end }}
