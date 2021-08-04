@@ -6,7 +6,7 @@ RBAC definition for the RStudio Job Launcher
 
 ## Disclaimer
 
-> This chart is "alpha" or "beta" quality at best. It is used primarily internally, is under-tested, and will undergo
+> This chart is "beta" quality. It will likely undergo
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
@@ -23,8 +23,8 @@ changes, as well as documentation below on how to use the chart
 To install the chart with the release name `my-release` at version 0.2.0:
 
 ```bash
-helm repo add rstudio-beta https://cdn.rstudio.com/sol-eng/helm/
-helm install my-release rstudio-beta/rstudio-launcher-rbac --version=0.2.0
+helm repo add rstudio https://helm.rstudio.com
+helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.0
 ```
 
 ## Values
