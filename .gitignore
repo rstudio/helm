@@ -1,0 +1,3 @@
+helm-docs
+charts/**/charts/
+/*.values

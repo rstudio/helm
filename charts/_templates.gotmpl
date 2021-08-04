@@ -23,8 +23,8 @@ changes, as well as documentation below on how to use the chart
 To install the chart with the release name `my-release` at version {{ template "chart.version" . }}:
 
 ```bash
-helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/{{ template "chart.name" }} --version={{ template "chart.version" . }}
+helm repo add rstudio-helm https://helm.rstudio.com
+helm install my-release rstudio-helm/{{ template "chart.name" . }} --version={{ template "chart.version" . }}
 ```
 
 {{- end }}

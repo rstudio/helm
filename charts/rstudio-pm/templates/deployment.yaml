@@ -1,0 +1,152 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "rstudio-pm.fullname" . }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  strategy:
+    type: {{ .Values.strategy.type }}
+    {{- if eq .Values.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+    {{- end }}
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "rstudio-pm.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/aws-creds: {{ include (print $.Template.BasePath "/secret-aws-creds.yaml") . | sha256sum }}
+        checksum/key: {{ include (print $.Template.BasePath "/secret-rstudio-pm-key.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "2112"
+{{ include "rstudio-pm.pod.annotations" . | indent 8 }}
+      labels:
+        {{- include "rstudio-pm.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.pod.serviceAccountName }}
+      serviceAccountName: {{ .Values.pod.serviceAccountName }}
+      {{- end }}
+      {{- if .Values.initContainers }}
+      initContainers:
+{{ toYaml .Values.initContainers | indent 8 }}
+      {{- end }}
+      containers:
+      - name: rspm
+        {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
+        env:
+{{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-pm") "envVarPrefix" ("RSPM") "fullName" (include "rstudio-pm.fullname" .)) | indent 10 }}
+        {{- if .Values.pod.env }}
+{{ toYaml .Values.pod.env | indent 8 }}
+        {{- end }}
+        {{- if .Values.command }}
+        command: {{ .Values.command}}
+        {{- end }}
+        {{- if .Values.args }}
+        args: {{ .Values.args }}
+        {{- end }}
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        ports:
+        - containerPort: 4242
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: rstudio-pm-config
+            mountPath: "/etc/rstudio-pm/rstudio-pm.gcfg"
+            subPath: "rstudio-pm.gcfg"
+          {{- if .Values.awsAccessKeyId }}
+          - name: aws-creds
+            readOnly: true
+            mountPath: "/home/rstudio-pm/.aws"
+          {{- end }}
+          {{- if .Values.rstudioPMKey }}
+          - name: rstudio-pm-key
+            mountPath: "/var/lib/rstudio-pm/rstudio-pm.key"
+            subPath: rstudio-pm.key
+          {{- end }}
+          {{- if .Values.sharedStorage.create }}
+          - name: rstudio-pm-data
+            mountPath: "{{ .Values.sharedStorage.path }}"
+          {{- end }}
+          {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
+      {{- if .Values.pod.volumeMounts }}
+{{ toYaml .Values.pod.volumeMounts | indent 10 }}
+      {{- end }}
+        resources:
+          {{- if .Values.resources.requests.enabled }}
+          requests:
+            memory: "{{ .Values.resources.requests.memory }}"
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            ephemeral-storage: "{{ .Values.resources.requests.ephemeralStorage }}"
+          {{- end }}
+          {{- if .Values.resources.limits.enabled }}
+          limits:
+            memory: "{{ .Values.resources.limits.memory }}"
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            ephemeral-storage: "{{ .Values.resources.limits.ephemeralStorage }}"
+          {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /__ping__
+            port: 4242
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: /__ping__
+            port: 4242
+          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /__ping__
+            port: 4242
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
+      volumes:
+      - name: rstudio-pm-config
+        configMap:
+          name: {{ include "rstudio-pm.fullname" . }}-config
+          items:
+          - key: rstudio-pm.gcfg
+            path: "rstudio-pm.gcfg"
+      {{- if .Values.awsAccessKeyId }}
+      - name: aws-creds
+        secret:
+          secretName: {{ include "rstudio-pm.fullname" . }}-aws-creds
+      {{- end }}
+      {{- if .Values.rstudioPMKey }}
+      - name: rstudio-pm-key
+        secret:
+          secretName: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
+          defaultMode: 0600
+      {{- end }}
+      {{- if .Values.sharedStorage.create }}
+      - name: rstudio-pm-data
+        persistentVolumeClaim:
+          claimName: {{ include "rstudio-pm.fullname" . }}-shared-storage
+      {{- end }}
+      {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-pm.fullname" .)) | indent 6 }}
+      {{- if .Values.pod.volumes }}
+{{ toYaml .Values.pod.volumes | indent 6 }}
+      {{- end }}
+---
