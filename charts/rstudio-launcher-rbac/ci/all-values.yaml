@@ -1,0 +1,13 @@
+targetNamespaces:
+  - default
+includeReleaseNamespace: false
+removeNamespaceReferences: false
+nameOverride: "override"
+fullnameOverride: "alloverriding"
+
+serviceAccount:
+  create: true
+  annotations:
+    one: two
+    three: four
+  name: "my-service-account"

@@ -1,0 +1,22 @@
+# -- The targetNamespaces that the launcher will be able to launch sessions into
+targetNamespaces: []
+
+# -- Whether the helm release namespace should be a possible launcher target
+includeReleaseNamespace: true
+
+# -- remove explicit namespace references (problematic if targetNamespaces is defined)
+removeNamespaceReferences: false
+
+# -- The override for "ChartName" in the "FullName" which defaults to "ReleaseName-ChartName" or "ReleaseName" (if "ReleaseName" contains "ChartName")
+nameOverride: ""
+# -- The override for the "FullName" which defaults to "ReleaseName-ChartName" or "ReleaseName" (if "ReleaseName" contains "ChartName")
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set, a name is generated using the fullname template
+  name: ""
