@@ -18,7 +18,7 @@ To submit a contribution:
 
 3. Submit a [pull request](https://help.github.com/articles/using-pull-requests).
 
-We'll try to be as responsive as possible in reviewing and accepting pull requests. Appreciate your contributions very much!
+We'll try to be as responsive as possible in reviewing and accepting pull requests. We appreciate your contributions very much!
 
 ## Code of Conduct
 
@@ -33,4 +33,3 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening an issue or contacting one or more of the project maintainers.
 
 This Code of Conduct is adapted from the Contributor Covenant, version 1.0.0, available at <https://www.contributor-covenant.org/version/1/0/0/code-of-conduct.html>.
-
