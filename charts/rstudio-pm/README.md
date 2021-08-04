@@ -23,8 +23,8 @@ changes, as well as documentation below on how to use the chart
 To install the chart with the release name `my-release` at version 0.2.0-rc02:
 
 ```bash
-helm repo add rstudio-helm https://helm.rstudio.com
-helm install my-release rstudio-helm/rstudio-pm --version=0.2.0-rc02
+helm repo add rstudio https://helm.rstudio.com
+helm install my-release rstudio/rstudio-pm --version=0.2.0-rc02
 ```
 
 ## General Principles
