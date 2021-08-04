@@ -1,0 +1,97 @@
+{{ template "chart.header" . }}
+{{ template "chart.description" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "rstudio.disclaimer" . }}
+
+{{ template "rstudio.install" . }}
+
+## Required Configuration
+
+This chart requires the following in order to function:
+
+* A license key, license file, or address of a running license server. See the `license` configuration below.
+* A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the home directory for users.
+  * If `homeStorage.create` is set, a PVC that relies on the default storage class will be used. Most Kubernetes environments do not have a default
+    storage class that you can use with `ReadWriteMany` access mode out-of-the-box. In this case, we recommend you disable `homeStorage.create` and 
+    create your own `PersistentVolume` and `PersistentVolumeClaim`, then mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
+  * If you cannot use a `PersistentVolume` to properly mount your users' home directories, you'll need to manually mount your NFS server via 
+  * If not using `homeStorage.create`, you'll need to configure `config.serverDcf.launcher-mounts` to ensure that the correct mounts are used when users create new sessions.
+* If using load balancing (by setting `replicas > 1`), you will need similar storage defined for `sharedStorage` to store shared project configuration.
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `rstudio/rstudio-server-pro` image does not contain a way to join domains.
+  We recommend creating your own Docker image that derives from this base image to provide domain joining that fits your needs. Your image can then use a process supervisor
+  like [supervisord](http://supervisord.org/) to run multiple processes: in the most common case, `rstudio-server`, `rstudio-launcher`, and `sssd`. See 
+  [here](https://github.com/rstudio/sol-eng-demo-server/tree/main/helper/workbench) for an example of this.
+
+Additionally, some use-cases may require special PAM profiles to run. By default, no PAM profiles other than the basic `auth` profile will be used to authenticate users.
+If this is not sufficient then you will need to add your PAM profiles into the container (similar to adding `sssd.conf` as specified above).
+
+## General Principles
+
+- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.ini` or `.dcf` file formats
+required by RStudio Server Pro. Those config files and their mount locations are below.
+- If you need to modify the jobs launched by RStudio Server Pro, you want to use `job-json-overrides`. There is a section on this below
+  and [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
+  on the topic in general.
+- If you are running in an HA environment, there is [an experimental sidecar container](https://hub.docker.com/r/colearendt/rstudio-load-balancer-manager)
+  that maintains the `load-balancer` file and HUPs the rstudio-server service.
+- The prestart script for RStudio Server is highly customized to:
+  - Get the service account information off of the RStudio Server pod for use in launching jobs
+  - Generate `launcher.pub` as needed (if `launcher.pem` is provided). If it is not provided,
+  the helm chart will generate it (which changes each release)
+- RStudio Server Pro does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
+  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
+
+## Configuration files
+
+These configuration values all take the form of usual helm values
+so you can set the database password with something like:
+
+```
+... --set config.secret.database\.conf.password=mypassword ...
+```
+
+The files are converted into configuration files in the necessary format via go-templating.
+
+The names of files are dynamically used, so you can usually add new files as needed. Beware that
+some files have default values, so moving them can have adverse effects. Also, if you use a different
+mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment variable
+
+- Session Configuration
+  - These configuration files are mounted into the server and
+    will ideally be mounted into the session pods as well.
+  - `repos.conf`, `rsession.conf`, `notifications.conf`
+  - located in the `config.session.<< name of file >>` helm values
+  - mounted at `/mnt/session-configmap/rstudio/`
+- Secret Configuration
+  - These configuration files are mounted into the server with more restrictive permissions
+  - `database.conf`, `launcher.pem`
+  - They are located in the `config.secret.<< name of file >>` helm values
+  - mounted at `/mnt/secret-configmap/rstudio/`
+- Server Configuration
+  - These configuration files are mounted into the server (.ini file format)
+  - `rserver.conf`, `launcher.conf`, `jupyter.conf`, `launcher.kubernetes.profiles.conf`, `logging.conf`
+  - They are located at `config.server.<< name of file >>` helm values
+  - mounted at `/mnt/configmap/rstudio/`
+- Server DCF Configuration
+  - These configuration files are mounted into the server (.dcf file format)
+  - `launcher-mounts`, `launcher-env`
+  - They are located at `config.serverDcf.<< name of file >>` helm values
+  - included at `/mnt/configmap/rstudio/`
+- Load Balancer file
+  - If `replicas > 1` then we create and maintain a load balancer file at `/mnt/load-balancer/rstudio/`
+  - This is maintained by [a sidecar](https://hub.docker.com/r/colearendt/rstudio-load-balancer-manager) (written in bash)
+  that queries the Kubernetes API for other RStudio pods
+- Prestart
+  - This is provided by the helm chart in a configmap
+  - It is mounted into the pod at `/scripts/`
+- Job Json Overrides
+  - If you want to customize the job launch process, you will need to edit a few items:
+    - Set the `job-json-overrides` config values in `config.server.launcher\.kubernetes\.profiles\.conf`
+    - Set the `jobJsonOverridesFiles` helm value to be a map of files, which are translated verbatim from YAML to JSON
+    - These are written to `/mnt/job-json-overrides/<< key / file name >>`
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
