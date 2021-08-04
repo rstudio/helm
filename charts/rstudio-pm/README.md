@@ -2,11 +2,11 @@
 
 Kubernetes deployment for RStudio Package Manager
 
-![Version: 0.2.0-rc01](https://img.shields.io/badge/Version-0.2.0--rc01-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
+![Version: 0.2.0-rc02](https://img.shields.io/badge/Version-0.2.0--rc02-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
 
 ## Disclaimer
 
-> This chart is "alpha" or "beta" quality at best. It is used primarily internally, is under-tested, and will undergo
+> This chart is "beta" quality. It will likely undergo
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0-rc01:
+To install the chart with the release name `my-release` at version 0.2.0-rc02:
 
 ```bash
-helm repo add rstudio-helm https://helm.rstudio.com
-helm install my-release rstudio-helm/rstudio-pm --version=0.2.0-rc01
+helm repo add rstudio https://helm.rstudio.com
+helm install my-release rstudio/rstudio-pm --version=0.2.0-rc02
 ```
 
 ## General Principles
