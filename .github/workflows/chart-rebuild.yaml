@@ -15,10 +15,29 @@ jobs:
           version: v3.6.3
 
       - name: Set up chart-releaser
-        uses: helm/chart-releaser-action@v1.2.0
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          if [[ ! -d "$RUNNER_TOOL_CACHE" ]]; then
+              echo "Cache directory '$RUNNER_TOOL_CACHE' does not exist" >&2
+              exit 1
+          fi
+
+          local arch
+          arch=$(uname -m)
+
+          local cache_dir="$RUNNER_TOOL_CACHE/ct/$version/$arch"
+          if [[ ! -d "$cache_dir" ]]; then
+              mkdir -p "$cache_dir"
+
+              echo "Installing chart-releaser..."
+              curl -sSLo cr.tar.gz "https://github.com/helm/chart-releaser/releases/download/$version/chart-releaser_${version#v}_linux_amd64.tar.gz"
+              tar -xzf cr.tar.gz -C "$cache_dir"
+              rm -f cr.tar.gz
+
+              echo 'Adding cr directory to PATH...'
+              export PATH="$cache_dir:$PATH"
+          fi
 
       - name: Rebuild index.yaml
         run: |
-          echo "Hello Jon"
+          echo "Rebuilding index.yaml"
+          scripts/rebuild.sh
