@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}-config
+  namespace: {{ $.Release.Namespace }}
+data:
+  rstudio-connect.gcfg: |
+    {{- include "rstudio-connect.config" . | nindent 4 }}
+{{- if .Values.launcher.enabled }}
+  runtime.yaml: |
+    {{- include "rstudio-connect.runtimeYaml" . | nindent 4 }}
+
+  {{- /* configuration for job-json-overrides (also used below) */ -}}
+    {{- /* 1 - volume */ -}}
+      {{- $emptyRscVolume := dict "name" ("rsc-volume") "emptydir" (dict) }}
+      {{- $jobJsonRuntimeVolume := dict "target" ("/spec/template/spec/volumes/-") "name" ("defaultRuntimeConnectVolume") "json" ( $emptyRscVolume ) }}
+    {{- /* 2 - volumeMount */ -}}
+      {{- $rscVolumeMount := dict "name" ("rsc-volume") "mountPath" ("/opt/rstudio-connect") }}
+      {{- $jobJsonRuntimeMount := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMount") "json" ( $rscVolumeMount ) }}
+    {{- /* 3 - init container */ -}}
+      {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+      {{- $initContainerImage := print .Values.launcher.contentInitContainer.repository ":" ( .Values.launcher.contentInitContainer.tag | default $defaultVersion ) }}
+      {{- $initContainerVolumeMount := dict "name" ("rsc-volume") "mountPath" ("/mnt/rstudio-connect-runtime/") }}
+      {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "volumeMounts" ( list  $initContainerVolumeMount ) }}
+      {{- $jobJsonInitContainer := dict "target" ("/spec/template/spec/initContainers/0") "name" ("defaultInitContainer") "json" $initContainerJson }}
+    {{- /* set up job-json defaults */ -}}
+      {{- $jobJsonDefaults := list $jobJsonRuntimeVolume $jobJsonRuntimeMount $jobJsonInitContainer }}
+    {{- /* build the configuration */ -}}
+      {{- $profilesConfig := .Values.launcher.launcherKubernetesProfilesConf }}
+      {{- $completeProfilesConfig := dict "launcher.kubernetes.profiles.conf" ($profilesConfig) }}
+      {{- $jobJsonFilePath := "/mnt/job-json-overrides/" }}
+      {{- $profilesArg := dict "data" ($completeProfilesConfig | deepCopy) "jobJsonDefaults" ($jobJsonDefaults | deepCopy) "filePath" $jobJsonFilePath }}
+    {{- include "rstudio-library.profiles.ini.advanced" $profilesArg | nindent 2 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}-overrides
+  namespace: {{ $.Release.Namespace }}
+data:
+  {{- /* configuration _files_ for job-json-overrides (uses variables from above) */ -}}
+  {{- $configValue := dict "data" ($profilesConfig | deepCopy) "default" ($jobJsonDefaults | deepCopy) }}
+  {{- include "rstudio-library.profiles.json-from-overrides-config" $configValue | indent 2 }}
+{{- end }}
