@@ -40,3 +40,14 @@ jobs:
 
           echo "Rebuilding index.yaml"
           scripts/rebuild.sh
+
+      - name: Create Pull Request
+          uses: peter-evans/create-pull-request@v3
+          commit-message: Rebuild index.yaml
+          title: Rebuild index.yaml
+          base: gh-pages
+
+      - name: Check outputs
+        run: |
+          echo "Created Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
