@@ -3,9 +3,6 @@
 # Run this script from the root of the helm repo, e.g.
 # ./scripts/rebuild.sh
 
-# Determine the directory of this script
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-
 # Set this to a valid URL *without* an index.yaml if you want to regenerate
 # a new index.html. If you want to append to an existing one, you can
 # use a real address like `https://helm.rstudio.com`. If an existing
@@ -13,8 +10,17 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # be appended, which can result in duplicates.
 HELM_REPO=${HELM_REPO:-https://rstudio.com}
 
+# Create a temporary directory and clean it up when we're done.
+TMP_DIR=$(mktemp -d)
+function cleanup()
+{
+    echo "Removing temporary directory ${TMP_DIR}."
+    rm -rf $TMP_DIR
+}
+trap cleanup EXIT
+
 # Optional variables you can define in your env
-PACKAGE_DIR=${PACKAGE_DIR:-${SCRIPT_DIR}/.cr-release-packages}
+PACKAGE_DIR=${PACKAGE_DIR:-${TMP_DIR}}
 CHARTS_DIR=${CHARTS_DIR:-charts}
 INDEX=${INDEX:-index.yaml}
 GITHUB_OWNER=${GITHUB_OWNER:-rstudio}
