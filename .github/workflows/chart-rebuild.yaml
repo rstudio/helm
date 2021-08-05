@@ -41,9 +41,12 @@ jobs:
           fi
 
           echo "Rebuilding index.yaml"
+          echo "currently in $(pwd)"
+          cat index.yaml
           scripts/rebuild.sh
 
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v3
         with:
           commit-message: Rebuild index.yaml
