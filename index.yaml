@@ -1,9 +1,28 @@
 apiVersion: v1
 entries:
+  rstudio-connect:
+  - apiVersion: v2
+    appVersion: 1.9.0
+    created: "2021-08-05T16:54:45.82941387Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Connect
+    digest: b6393dfb8f2f06c8587f1e735afd27948337bb5802c9f726e86c9d26201f65a1
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-connect
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-connect-0.2.0-rc02/rstudio-connect-0.2.0-rc02.tgz
+    version: 0.2.0-rc02
   rstudio-launcher-rbac:
   - apiVersion: v2
     appVersion: 0.2.2
-    created: "2021-08-05T16:38:16.096575713Z"
+    created: "2021-08-05T16:54:46.043008645Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -22,7 +41,7 @@ entries:
     version: 0.2.2
   - apiVersion: v2
     appVersion: 0.2.1
-    created: "2021-08-05T08:04:52.345908-04:00"
+    created: "2021-08-05T16:54:45.967093227Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -41,7 +60,7 @@ entries:
     version: 0.2.1
   - apiVersion: v2
     appVersion: 0.2.0
-    created: "2021-08-05T08:04:52.273252-04:00"
+    created: "2021-08-05T16:54:45.891861867Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -61,7 +80,7 @@ entries:
   rstudio-library:
   - apiVersion: v2
     appVersion: 0.1.13-rc01
-    created: "2021-08-05T08:04:52.421658-04:00"
+    created: "2021-08-05T16:54:46.108043557Z"
     description: A Helm chart for RStudio helper functions
     digest: ca23958289e821d766e3c3da78e58703b20cc03d890fa429db36eb9e27b637f3
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
@@ -77,7 +96,7 @@ entries:
   rstudio-pm:
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T16:38:16.29744459Z"
+    created: "2021-08-05T16:54:46.386767452Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -95,7 +114,7 @@ entries:
     version: 0.2.0-rc04
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T08:04:52.668591-04:00"
+    created: "2021-08-05T16:54:46.320682753Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -113,7 +132,7 @@ entries:
     version: 0.2.0-rc03
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T08:04:52.589611-04:00"
+    created: "2021-08-05T16:54:46.244452109Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -131,7 +150,7 @@ entries:
     version: 0.2.0-rc02
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T08:04:52.512527-04:00"
+    created: "2021-08-05T16:54:46.182195028Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -147,4 +166,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
     version: 0.2.0-rc01
-generated: "2021-08-05T16:38:16.298190392Z"
+generated: "2021-08-05T16:54:46.386799555Z"
