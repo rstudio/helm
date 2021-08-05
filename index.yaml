@@ -3,13 +3,13 @@ entries:
   rstudio-launcher-rbac:
   - apiVersion: v2
     appVersion: 0.2.1
-    created: "2021-08-04T16:39:16.142779-04:00"
+    created: "2021-08-05T08:04:52.345908-04:00"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
       version: 0.1.13-rc01
     description: RBAC definition for the RStudio Job Launcher
-    digest: 0ab9c2be6e5ded80108cc95c89507cb0faee262d8429f39f4638b7906b78ca14
+    digest: c8d32859c6003dd5bf576fd589ed4dbdb0c3448eb0e49b3dfb5165e41cd99dbc
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
     maintainers:
     - email: docker@rstudio.com
@@ -22,13 +22,13 @@ entries:
     version: 0.2.1
   - apiVersion: v2
     appVersion: 0.2.0
-    created: "2021-08-04T16:39:16.019758-04:00"
+    created: "2021-08-05T08:04:52.273252-04:00"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
       version: 0.1.13-rc01
     description: RBAC definition for the RStudio Job Launcher
-    digest: 02dea588d526cc75c9c65c884fc0ebeda4fdbfd93b9e1bd5d44feadc7ca72ede
+    digest: c9880245742f1d98e26fcdb070686de0891ffd596c76700011b5482f92442b69
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
     maintainers:
     - email: docker@rstudio.com
@@ -42,9 +42,9 @@ entries:
   rstudio-library:
   - apiVersion: v2
     appVersion: 0.1.13-rc01
-    created: "2021-08-04T16:39:16.222968-04:00"
+    created: "2021-08-05T08:04:52.421658-04:00"
     description: A Helm chart for RStudio helper functions
-    digest: dfa557210b70127d954eed0e04f5be76c088c88b8b8a858a15a0e3b0dcb6d1a2
+    digest: ca23958289e821d766e3c3da78e58703b20cc03d890fa429db36eb9e27b637f3
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
     maintainers:
     - email: docker@rstudio.com
@@ -58,13 +58,13 @@ entries:
   rstudio-pm:
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-04T16:39:16.457756-04:00"
+    created: "2021-08-05T08:04:52.668591-04:00"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
       version: 0.1.13-rc01
     description: Kubernetes deployment for RStudio Package Manager
-    digest: a5cb11b4909123ba5ed25d5b57d73eee80e19b741eedaa1f2f403481ad255b58
+    digest: e9b082426b0fd80aee0d26de76f819b84acdbc71e723f61de48cae8df58ae2e6
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
     maintainers:
     - email: docker@rstudio.com
@@ -76,13 +76,13 @@ entries:
     version: 0.2.0-rc03
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-04T16:39:16.37528-04:00"
+    created: "2021-08-05T08:04:52.589611-04:00"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
       version: 0.1.13-rc01
     description: Kubernetes deployment for RStudio Package Manager
-    digest: eee534d3ddaed8b151061d159677bf1042e3b5b57fdd8a7c5b19667071732caf
+    digest: 30d9f19a89340f5239e1f81617c0cd289e64b37da8eef819d42fc4687e28f6b2
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
     maintainers:
     - email: docker@rstudio.com
@@ -94,13 +94,13 @@ entries:
     version: 0.2.0-rc02
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-04T16:39:16.305822-04:00"
+    created: "2021-08-05T08:04:52.512527-04:00"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
       version: 0.1.13-rc01
     description: Kubernetes deployment for RStudio Package Manager
-    digest: f1a4d5c7e8abe6b644b299e509cf0f0529672f0ec5e914dd9de7451d2f622e20
+    digest: b0c76f24aaab0ddd0ef039aed7dd7b5a663832c254dbd6569e72c5a41c5fb02f
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
     maintainers:
     - email: docker@rstudio.com
@@ -110,4 +110,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
     version: 0.2.0-rc01
-generated: "2021-08-04T16:39:16.457778-04:00"
+generated: "2021-08-05T08:04:52.668613-04:00"
