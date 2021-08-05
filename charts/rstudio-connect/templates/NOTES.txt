@@ -1,0 +1,15 @@
+
+{{ include "rstudio-connect.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
+
+{{- if hasKey .Values "config" }}
+{{- if hasKey .Values.config "Licensing" }}
+{{- if hasKey .Values.config.Licensing "LicenseType" }}
+
+NOTE: `.Values.config.Licensing.LicenseType` is configured manually. Normally, we automatically configure this value:
+  - When `license.server` is set, we set `LicenseType` to `remote`.
+  - Otherwise, `LicenseType` uses the default of `local`.
+Please consider removing this configuration value.
+
+{{- end }}
+{{- end }}
+{{- end }}

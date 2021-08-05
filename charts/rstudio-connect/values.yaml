@@ -1,0 +1,206 @@
+# -- The name of the chart deployment (can be overridden)
+nameOverride: ""
+# -- The full name of the release (can be overridden)
+fullnameOverride: ""
+
+# -- A Connect version to override the "tag" for the RStudio Connect image and the Content Init image. Necessary until https://github.com/helm/helm/issues/8194
+versionOverride: ""
+
+sharedStorage:
+  # -- Whether to create the persistentVolumeClaim for shared storage
+  create: false
+  # -- The name of the pvc. By default, computes a value from the release name
+  name: ""
+  # -- Whether the persistentVolumeClaim should be mounted (even if not created)
+  mount: false
+  # -- The path to mount the sharedStorage claim within the pod
+  path: /var/lib/rstudio-connect
+  # -- The type of storage to use. Must allow ReadWriteMany
+  storageClassName: false
+  # -- A list of accessModes that are defined for the storage PVC (represented as YAML)
+  accessModes:
+    - ReadWriteMany
+  requests:
+    # -- The volume of storage to request for this persistent volume claim
+    storage: "10Gi"
+
+rbac:
+  # -- Whether to create rbac. (also depends on launcher.enabled = true)
+  create: true
+  # -- The serviceAccount to be associated with rbac (also depends on launcher.enabled = true)
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+
+# -- Defines the RStudio Connect image to deploy
+image:
+  # -- The repository to use for the main pod image
+  repository: ghcr.io/rstudio/rstudio-connect
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+  # -- The imagePullPolicy for the main pod image
+  imagePullPolicy: "IfNotPresent"
+
+# -- Defines the update strategy for a deployment
+strategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxSurge: "100%"
+    maxUnavailable: 0
+
+service:
+  # -- Annotations that will be added onto the service
+  annotations: {}
+  # -- The service type (LoadBalancer, NodePort, etc.)
+  type: NodePort
+  # -- The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically
+  nodePort: false
+  # -- The port to use for the Connect service
+  port: 80
+
+pod:
+  # -- An array of maps that is injected as-is into the "env:" component of the pod.container spec
+  env: []
+  # -- An array of maps that is injected as-is into the "volumes:" component of the pod spec
+  volumes: []
+  # -- An array of maps that is injected as-is into the "volumeMounts" component of the pod spec
+  volumeMounts: []
+  # -- A string representing the service account of the pod spec
+  serviceAccountName: false
+  # -- A map of keys / values that will be added as annotations to the pods
+  annotations: {}
+  # -- An array of containers that will be run alongside the main pod
+  sidecar: false
+
+
+# -- The pod's run command. By default, it uses the container's default
+command: []
+# -- The pod's run arguments. By default, it uses the container's default
+args: []
+# -- The number of replica pods to maintain for this service
+replicas: 1
+
+license:
+  # -- key is the license to use
+  key: null
+  # -- server is the <hostname>:<port> for a license server
+  server: false
+  # -- the file section is used for licensing with a license file
+  file:
+    # -- contents is an in-line license file
+    contents: false
+    # -- mountPath is the place the license file will be mounted into the container
+    mountPath: "/etc/rstudio-licensing"
+    # -- mountSubPath is whether to mount the subPath for the file secret.
+    # -- It can be preferable _not_ to enable this, because then updates propagate automatically
+    mountSubPath: false
+    # -- secretKey is the key for the secret to use for the license file
+    secretKey: "license.lic"
+    # -- secret is an existing secret with a license file in it
+    secret: false
+
+prometheusExporter:
+  # -- Whether the  prometheus exporter sidecar should be enabled
+  enabled: true
+  image:
+    repository: "prom/graphite-exporter"
+    tag: "v0.9.0"
+    imagePullPolicy: IfNotPresent
+
+resources:
+  # -- Defines resource requests for the rstudio-connect pod
+  requests:
+    enabled: false
+    memory: "1Gi"
+    cpu: "100m"
+    ephemeralStorage: "100Mi"
+  # -- Defines resource limits for the rstudio-connect pod
+  limits:
+    enabled: false
+    memory: "2Gi"
+    cpu: "2000m"
+    ephemeralStorage: "200Mi"
+
+# -- Used to configure the container's livenessProbe
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 10
+
+# -- Used to configure the container's startupProbe
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  # -- failureThreshold * periodSeconds should be strictly > worst case startup time
+  failureThreshold: 30
+
+# -- Used to configure the container's readinessProbe
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 3
+  periodSeconds: 3
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 3
+
+# -- The initContainer spec that will be used verbatim
+initContainers: false
+
+ingress:
+  enabled: false
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+  # - host: chart-example.local
+  #   paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+launcher:
+  # -- Whether to enable the launcher
+  enabled: false
+  # -- The namespace to launch sessions into. Uses the Release namespace by default
+  namespace: ""
+  # -- Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "false," which pulls in the default
+  # runtime.yaml file. If changing this value, be careful to include the images that you have already used.
+  customRuntimeYaml: false
+  # -- User definition of launcher.kubernetes.profiles.conf for job customization
+  launcherKubernetesProfilesConf: {}
+  # -- Image definition for the RStudio Connect Content InitContainer
+  contentInitContainer:
+    # -- The repository to use for the Content InitContainer image
+    repository: ghcr.io/rstudio/rstudio-connect-content-init
+    # -- Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+# -- A nested map of maps that generates the rstudio-connect.gcfg file
+# @default -- [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/)
+config:
+  HTTP:
+    Listen: :3939
+  Authentication:
+    Provider: password
+  'RPackageRepository "CRAN"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  'RPackageRepository "RSPM"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  Server:
+    Address: http://localhost:3939
+    DataDir: /var/lib/rstudio-connect
+  Scheduler:
+    InitTimeout: 5m
+  Metrics:
+    Enabled: true
+    GraphiteEnabled: true
+    GraphiteHost: 127.0.0.1
+    GraphitePort: 9109
+    GraphiteClientId: rsconnect

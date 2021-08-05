@@ -1,0 +1,26 @@
+sharedStorage:
+  create: true
+  requests:
+    storage: "1Gi"
+license:
+  key: test
+nodePort: 32390
+replicas: 1
+config:
+  HTTP:
+    Listen: :3939
+  Authentication:
+    Provider: password
+  Python:
+    Enabled: true
+    Executable: /opt/python/3.6.5/bin/python
+  'RPackageRepository "CRAN"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  'RPackageRepository "RSPM"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  Server:
+    Address: http://localhost:3939
+    DataDir: /var/lib/rstudio-connect
+    RVersionScanning: false
+    RVersion:
+      - /opt/R/3.6.2
