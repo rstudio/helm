@@ -3,7 +3,7 @@ entries:
   rstudio-launcher-rbac:
   - apiVersion: v2
     appVersion: 0.2.1
-    created: "2021-08-05T08:04:52.345908-04:00"
+    created: "2021-08-05T15:16:57.714173583Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -22,7 +22,7 @@ entries:
     version: 0.2.1
   - apiVersion: v2
     appVersion: 0.2.0
-    created: "2021-08-05T08:04:52.273252-04:00"
+    created: "2021-08-05T15:16:57.648139562Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -42,7 +42,7 @@ entries:
   rstudio-library:
   - apiVersion: v2
     appVersion: 0.1.13-rc01
-    created: "2021-08-05T08:04:52.421658-04:00"
+    created: "2021-08-05T15:16:57.786860687Z"
     description: A Helm chart for RStudio helper functions
     digest: ca23958289e821d766e3c3da78e58703b20cc03d890fa429db36eb9e27b637f3
     icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
@@ -58,7 +58,7 @@ entries:
   rstudio-pm:
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T08:04:52.668591-04:00"
+    created: "2021-08-05T15:16:57.984937551Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -76,7 +76,7 @@ entries:
     version: 0.2.0-rc03
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T08:04:52.589611-04:00"
+    created: "2021-08-05T15:16:57.923453886Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -94,7 +94,7 @@ entries:
     version: 0.2.0-rc02
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T08:04:52.512527-04:00"
+    created: "2021-08-05T15:16:57.862501928Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -110,4 +110,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
     version: 0.2.0-rc01
-generated: "2021-08-05T08:04:52.668613-04:00"
+generated: "2021-08-05T15:16:57.984957351Z"
