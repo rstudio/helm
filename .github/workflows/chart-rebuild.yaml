@@ -43,9 +43,10 @@ jobs:
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
-        commit-message: Rebuild index.yaml
-        title: Rebuild index.yaml
-        base: gh-pages
+        with:
+          commit-message: Rebuild index.yaml
+          title: Rebuild index.yaml
+          base: gh-pages
 
       - name: Check outputs
         run: |
