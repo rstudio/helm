@@ -15,6 +15,8 @@ jobs:
           version: v3.6.3
 
       - name: Set up chart-releaser
+        env:
+          version: v1.2.1
         run: |
           if [[ ! -d "$RUNNER_TOOL_CACHE" ]]; then
               echo "Cache directory '$RUNNER_TOOL_CACHE' does not exist" >&2
