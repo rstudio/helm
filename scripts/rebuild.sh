@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# Run this script from the root of the helm repo, e.g.
-# ./scripts/rebuild.sh
+# Run this script from the root of the helm repo, e.g.,
+# ./scripts/rebuild.sh. You must have curl and cr installed. See
+# https://github.com/helm/chart-releaser#installation.
 
 # Set this to a valid URL *without* an index.yaml if you want to regenerate
 # a new index.html. If you want to append to an existing one, you can
