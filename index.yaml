@@ -96,7 +96,25 @@ entries:
   rstudio-pm:
   - apiVersion: v2
     appVersion: 1.2.2.1-17
-    created: "2021-08-05T16:54:46.386767452Z"
+    created: "2021-08-05T16:54:48.215012501Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Package Manager
+    digest: 59388d41ff17903eaadfa007f2228a0e678fc6a2f88767df9ccc92e16c59803a
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc05/rstudio-pm-0.2.0-rc05.tgz
+    version: 0.2.0-rc05
+  - apiVersion: v2
+    appVersion: 1.2.2.1-17
+    created: "2021-08-05T16:38:16.29744459Z"
     dependencies:
     - name: rstudio-library
       repository: file://../rstudio-library
@@ -166,4 +184,8 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
     version: 0.2.0-rc01
+<<<<<<< HEAD
 generated: "2021-08-05T16:54:46.386799555Z"
+=======
+generated: "2021-08-05T16:54:48.215129901Z"
+>>>>>>> origin/gh-pages
