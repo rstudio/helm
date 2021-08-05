@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  document:
+  rebuild:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,10 +21,9 @@ jobs:
               exit 1
           fi
 
-          local arch
           arch=$(uname -m)
+          cache_dir="$RUNNER_TOOL_CACHE/ct/$version/$arch"
 
-          local cache_dir="$RUNNER_TOOL_CACHE/ct/$version/$arch"
           if [[ ! -d "$cache_dir" ]]; then
               mkdir -p "$cache_dir"
 
