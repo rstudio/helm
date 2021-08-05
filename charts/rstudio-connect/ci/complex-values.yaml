@@ -1,0 +1,103 @@
+sharedStorage:
+  create: true
+  path: /var/lib/rstudio-connect
+  storageClassName: false
+  requests:
+    storage: "10Gi"
+strategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxSurge: "100%"
+    maxUnavailable: 0
+image:
+  repository: rstudio/rstudio-connect
+  tag: 1.8.4-11
+  imagePullPolicy: "IfNotPresent"
+
+service:
+  type: NodePort
+  nodePort: 32029
+  annotations:
+    testannotation: one
+
+pod:
+  env:
+    - name: RSTUDIO_CONNECT_HASTE
+      value: "true"
+  volumes:
+    - name: test
+      emptyDir: {}
+  volumeMounts:
+    - name: test
+      mountPath: /tmp/somepath/
+  annotations:
+    testannotation2: three
+  sidecar:
+    - name: test
+      image: "busybox"
+      imagePullPolicy: "IfNotPresent"
+
+initContainers:
+  - name: example-init
+    image: busybox
+    command: ["sleep"]
+    args: ["1"]
+    volumeMounts:
+      - mountPath: /testing
+        name: test
+
+license:
+  key: test
+replicas: 2
+
+resources:
+  requests:
+    enabled: false
+    memory: "1Gi"
+    cpu: "100m"
+    ephemeralStorage: "100Mi"
+  limits:
+    enabled: false
+    memory: "2Gi"
+    cpu: "2000m"
+    ephemeralStorage: "200Mi"
+
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 10
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  # failureThreshold * periodSeconds should be strictly > worst case startup time
+  failureThreshold: 30
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 3
+  periodSeconds: 3
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 3
+
+config:
+  HTTP:
+    Listen: :3939
+  Authentication:
+    Provider: password
+  Python:
+    Enabled: true
+    Executable: /opt/python/3.6.5/bin/python
+  'RPackageRepository "CRAN"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  'RPackageRepository "RSPM"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  Server:
+    Address: http://localhost:3939
+    DataDir: /var/lib/rstudio-connect
+    RVersionScanning: false
+    RVersion:
+      - /opt/R/3.6.2
