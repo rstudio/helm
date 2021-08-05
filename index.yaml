@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   rstudio-launcher-rbac:
   - apiVersion: v2
+    appVersion: 0.2.2
+    created: "2021-08-05T16:38:16.096575713Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: RBAC definition for the RStudio Job Launcher
+    digest: 77ebf21699ec54d2aa40dff710374db2abf7af4ddb69ee3c18afba3c858e2d84
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-launcher-rbac
+    type: application
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-launcher-rbac-0.2.2/rstudio-launcher-rbac-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
     appVersion: 0.2.1
     created: "2021-08-05T08:04:52.345908-04:00"
     dependencies:
@@ -58,6 +77,24 @@ entries:
   rstudio-pm:
   - apiVersion: v2
     appVersion: 1.2.2.1-17
+    created: "2021-08-05T16:38:16.29744459Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Package Manager
+    digest: 6df2301f0e3eda13122357effb7e3212922a25705e04631a431c0c20aae5c486
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc04/rstudio-pm-0.2.0-rc04.tgz
+    version: 0.2.0-rc04
+  - apiVersion: v2
+    appVersion: 1.2.2.1-17
     created: "2021-08-05T08:04:52.668591-04:00"
     dependencies:
     - name: rstudio-library
@@ -110,4 +147,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
     version: 0.2.0-rc01
-generated: "2021-08-05T08:04:52.668613-04:00"
+generated: "2021-08-05T16:38:16.298190392Z"
