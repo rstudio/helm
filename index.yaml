@@ -3,6 +3,24 @@ entries:
   rstudio-connect:
   - apiVersion: v2
     appVersion: 1.9.0
+    created: "2021-08-05T21:07:28.271698942Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Connect
+    digest: 5e818aeff9977fa90caef8662c0d4912e10b89a66833413a3c9879f158c52e35
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-connect
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-connect-0.2.0-rc03/rstudio-connect-0.2.0-rc03.tgz
+    version: 0.2.0-rc03
+  - apiVersion: v2
+    appVersion: 1.9.0
     created: "2021-08-05T17:27:25.80807104Z"
     dependencies:
     - name: rstudio-library
@@ -184,4 +202,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
     version: 0.2.0-rc01
-generated: "2021-08-05T17:27:27.06898633Z"
+generated: "2021-08-05T21:07:28.271745442Z"
