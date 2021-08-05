@@ -27,6 +27,19 @@ helm repo add rstudio https://helm.rstudio.com
 helm install my-release rstudio/rstudio-connect --version=0.2.0-rc02
 ```
 
+## Required Configuration
+
+This chart requires the following in order to function:
+
+* A license key, license file, or address of a running license server. See the `license` configuration below.
+* A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for Connect.
+  * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
+    Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
+    In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then
+    mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
+  * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
+    by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
+
 ## General Principles
 
 - In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
