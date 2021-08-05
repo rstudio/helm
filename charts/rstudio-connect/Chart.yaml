@@ -1,0 +1,14 @@
+name: rstudio-connect
+description: Kubernetes deployment for RStudio Connect
+version: 0.2.0-rc02
+apiVersion: v2
+appVersion: 1.9.0
+icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+maintainers:
+  - name: sol-eng
+    email: docker@rstudio.com
+    url: https://github.com/sol-eng
+dependencies:
+  - name: rstudio-library
+    version: 0.1.13-rc01
+    repository: file://../rstudio-library

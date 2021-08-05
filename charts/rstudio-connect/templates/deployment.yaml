@@ -1,0 +1,191 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  strategy:
+    type: {{ .Values.strategy.type }}
+    {{- if eq .Values.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+    {{- end }}
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "rstudio-connect.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/config-graphite: {{ include (print $.Template.BasePath "/configmap-graphite-exporter.yaml") . | sha256sum }}
+        {{- if .Values.launcher.enabled }}
+        checksum/config-prestart: {{ include (print $.Template.BasePath "/configmap-prestart.yaml") . | sha256sum }}
+        {{- end }}
+      {{- if .Values.prometheusExporter.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9108"
+      {{- end }}
+{{ include "rstudio-connect.pod.annotations" . | indent 8 }}
+      labels:
+        {{- include "rstudio-connect.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if and .Values.rbac.create .Values.launcher.enabled }}
+      {{ $serviceAccountName := default .Values.rbac.serviceAccount.name (include "rstudio-connect.fullname" .) }}
+      serviceAccountName: {{ $serviceAccountName }}
+      {{- else if .Values.pod.serviceAccountName }}
+      serviceAccountName: {{ .Values.pod.serviceAccountName }}
+      {{- end }}
+      {{- if .Values.initContainers }}
+      initContainers:
+{{ toYaml .Values.initContainers | indent 8 }}
+      {{- end }}
+      containers:
+      - name: connect
+        {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
+        env:
+        - name: RSTUDIO_CONNECT_HASTE
+          value: enabled
+{{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-connect") "envVarPrefix" ("RSC") "fullName" (include "rstudio-connect.fullname" .)) | indent 8 }}
+        {{- if .Values.pod.env }}
+{{ toYaml .Values.pod.env | indent 8 }}
+        {{- end }}
+        {{- if .Values.command }}
+        command:
+{{ toYaml .Values.command | indent 10 }}
+        {{- else if .Values.launcher.enabled }}
+        command:
+          - tini
+          - -s
+          - --
+        {{- end }}
+        {{- if .Values.args }}
+        args:
+{{ toYaml .Values.args | indent 10 }}
+        {{- else if .Values.launcher.enabled }}
+        args:
+          - /scripts/prestart.bash
+          - /usr/local/bin/startup.sh
+        {{- end }}
+        imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
+        ports:
+        - containerPort: 3939
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: rstudio-connect-config
+            mountPath: "/etc/rstudio-connect/rstudio-connect.gcfg"
+            subPath: "rstudio-connect.gcfg"
+          {{- if .Values.launcher.enabled }}
+          - name: rstudio-connect-config
+            mountPath: "/etc/rstudio-connect/runtime.yaml"
+            subPath: "runtime.yaml"
+          - name: rstudio-connect-config
+            mountPath: "/etc/rstudio-connect/launcher.kubernetes.profiles.conf"
+            subPath: "launcher.kubernetes.profiles.conf"
+          {{- end }}
+          {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
+          - name: rstudio-connect-data
+            mountPath: "{{ .Values.sharedStorage.path }}"
+          {{- end }}
+          {{- if .Values.launcher.enabled }}
+          - name: overrides
+            mountPath: "/mnt/job-json-overrides/"
+          - name: rstudio-connect-prestart
+            mountPath: "/scripts/"
+          {{- end }}
+          {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
+      {{- if .Values.pod.volumeMounts }}
+{{ toYaml .Values.pod.volumeMounts | indent 10 }}
+      {{- end }}
+        resources:
+          {{- if .Values.resources.requests.enabled }}
+          requests:
+            memory: "{{ .Values.resources.requests.memory }}"
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            ephemeral-storage: "{{ .Values.resources.requests.ephemeralStorage }}"
+          {{- end }}
+          {{- if .Values.resources.limits.enabled }}
+          limits:
+            memory: "{{ .Values.resources.limits.memory }}"
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            ephemeral-storage: "{{ .Values.resources.limits.ephemeralStorage }}"
+          {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /__ping__
+            port: 3939
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: /__ping__
+            port: 3939
+          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /__ping__
+            port: 3939
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
+      {{- if .Values.prometheusExporter.enabled }}
+      - name: exporter
+        image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
+        imagePullPolicy: "{{ .Values.prometheusExporter.image.imagePullPolicy }}"
+        args:
+          - "--graphite.mapping-config=/mnt/graphite/graphite-mapping.yaml"
+        volumeMounts:
+          - name: graphite-exporter-config
+            mountPath: "/mnt/graphite"
+      {{- end }}
+      {{- if .Values.pod.sidecar }}
+{{ toYaml .Values.pod.sidecar | indent 6 }}
+      {{- end }}
+      volumes:
+      - name: rstudio-connect-config
+        configMap:
+          name: {{ include "rstudio-connect.fullname" . }}-config
+      {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
+      - name: rstudio-connect-data
+        persistentVolumeClaim:
+          claimName: {{default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
+      {{- end }}
+      {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-connect.fullname" .)) | indent 6 }}
+      {{- if .Values.prometheusExporter.enabled }}
+      - name: graphite-exporter-config
+        configMap:
+          name: {{ include "rstudio-connect.fullname" . }}-graphite
+          defaultMode: 0755
+      {{- end }}
+      {{- if .Values.pod.volumes }}
+{{ toYaml .Values.pod.volumes | indent 6 }}
+      {{- end }}
+      {{- if .Values.launcher.enabled }}
+      - name: overrides
+        configMap:
+          name: {{ include "rstudio-connect.fullname" . }}-overrides
+          defaultMode: 0644
+      - name: rstudio-connect-prestart
+        configMap:
+          name: {{ include "rstudio-connect.fullname" . }}-prestart
+          defaultMode: 0755
+      {{- end }}
+---

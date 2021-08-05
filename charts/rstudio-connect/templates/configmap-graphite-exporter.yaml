@@ -1,0 +1,60 @@
+{{- if .Values.prometheusExporter.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}-graphite
+  namespace: {{ $.Release.Namespace }}
+data:
+  graphite-mapping.yaml: |-
+    mappings:
+      - match: "rsconnect\\.([\\w-]+)\\.content-(\\d+)\\.(.*)"
+        match_type: regex
+        name: "rsconnect_content_$3"
+        labels:
+          host: $1
+          appid: $2
+      - match: "rsconnect\\.([\\w-]+)\\.system-(\\w+)\\.(.*)"
+        match_type: regex
+        name: "rsconnect_system_${2}_${3}"
+        labels:
+          host: $1
+      - match: "rsconnect\\.([\\w-]+)\\.license-(\\w+)\\.(.*)"
+        match_type: regex
+        name: "rsconnect_license_$3"
+        labels:
+          host: $1
+          type: $2
+      - match: "rsconnect\\.([\\w-]+)\\.cpu-(\\d+)\\.(.*)"
+        match_type: regex
+        name: "rsconnect_cpu_$3"
+        labels:
+          host: $1
+          cpu: $2
+      - match: "rsconnect\\.([\\w-]+)\\.system\\.load\\.(.*)"
+        match_type: regex
+        name: "rsconnect_system_load"
+        labels:
+          host: $1
+          duration: $2
+      - match: "rsconnect\\.([\\w-]+)\\.system\\.cpu\\.usage\\.(.*)"
+        match_type: regex
+        name: "rsconnect_system_cpu_$2"
+        labels:
+          host: $1
+      - match: "rsconnect\\.([\\w-]+)\\.system\\.memory\\.(.*)"
+        match_type: regex
+        name: "rsconnect_system_memory_$2"
+        labels:
+          host: $1
+      - match: "rsconnect\\.([\\w-]+)\\.system\\.swap\\.(.*)"
+        match_type: regex
+        name: "rsconnect_system_swap_$2"
+        labels:
+          host: $1
+      - match: "rsconnect\\.([\\w-]+)\\.(.*)"
+        match_type: regex
+        name: "rsconnect_$2"
+        labels:
+          host: "$1"
+{{- end }}

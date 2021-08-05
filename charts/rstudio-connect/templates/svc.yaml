@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "rstudio-connect.labels" . | nindent 4 }}
+  annotations:
+{{ include "rstudio-connect.annotations" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "rstudio-connect.selectorLabels" . | nindent 4 }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.service.port }}
+    {{- if .Values.service.nodePort }}
+    nodePort: {{ .Values.service.nodePort }}
+    {{- end }}
+    targetPort: 3939
+---
