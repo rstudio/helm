@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Package Manager
 
-![Version: 0.2.0-rc04](https://img.shields.io/badge/Version-0.2.0--rc04-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
+![Version: 0.2.0-rc05](https://img.shields.io/badge/Version-0.2.0--rc05-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,44 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0-rc04:
+To install the chart with the release name `my-release` at version 0.2.0-rc05:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.0-rc04
+helm install my-release rstudio/rstudio-pm --version=0.2.0-rc05
+```
+
+## Required Configuration
+
+This chart requires the following in order to function:
+
+* A license key, license file, or address of a running license server. See the `license` configuration below.
+* A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for RSPM.
+  * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
+    Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
+    In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then
+    mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
+  * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
+    by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
+  * Alternatively, S3 storage can be used. See the next section for details.
+
+## S3 Configuration
+
+Package Manager can be configured to store data in S3 buckets (see the [Admin Guide](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations)
+for more details). When configured this way, AWS access credentials are required. You must set the `awsAccessKeyId` and `awsSecretAccessKey` chart values
+to ensure that RSPM will be able to authenticate with your configured S3 buckets.
+
+Configuring Package Manager to use S3 requires modifying the `.gfcg` configuration file as explained below. A sample chart values configuration might look like the following:
+
+```
+awsAccessKeyId: your-access-key-id
+awsSecretAccessKey: your-secret-access-key
+
+config:
+  Storage:
+    Default: s3
+  S3Storage:
+    Bucket: your-s3-bucket
 ```
 
 ## General Principles
