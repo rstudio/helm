@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Run this script from the root of the helm repo, e.g.
+# bash scripts/rebuild.sh
+
+# Determine the directory of this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
 # Set this to a valid URL *without* an index.yaml if you want to regenerate
 # a new index.html. If you want to append to an existing one, you can
 # use a real address like `https://helm.rstudio.com`. If an existing
@@ -7,14 +13,15 @@
 # be appended, which can result in duplicates.
 HELM_REPO=${HELM_REPO:-https://rstudio.com}
 
-PACKAGE_DIR=${PACKAGE_DIR:-./.cr-release-packages}
+# Optional variables you can define in your env
+PACKAGE_DIR=${PACKAGE_DIR:-${SCRIPT_DIR}/.cr-release-packages}
 CHARTS_DIR=${CHARTS_DIR:-charts}
 INDEX=${INDEX:-index.yaml}
 GITHUB_OWNER=${GITHUB_OWNER:-rstudio}
 GITHUB_REPO=${GITHUB_REPO:-helm}
 
-# Run this script from the root of the helm repo, e.g.
-# bash scripts/rebuild.sh
+# Calculated variables
+DOWNLOADS_BASE="https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download"
 
 # List all tags oldest to newest, followed by the 'main' branch.
 tags="$(git tag -l  --sort=creatordate) main"
@@ -23,19 +30,18 @@ tags="$(git tag -l  --sort=creatordate) main"
 mkdir -p ${PACKAGE_DIR}
 rm -rf ${PACKAGE_DIR}/*
 
+# Download existing assets from Github
 for tag in $tags; do
-  git checkout "${tag}"
-  charts=$(ls -1 ${CHARTS_DIR}/)
-  for chart in $charts; do
-    if [[ "${tag}" =~ ^${chart}.* ]]; then
-      if [ -d ${CHARTS_DIR}/$chart ]; then
-        if [ -f ${CHARTS_DIR}/$chart/Chart.yaml ]; then
-          echo "Packaging chart $chart for tag ${tag}"
-          cr package ${CHARTS_DIR}/$chart --package-path ${PACKAGE_DIR}
-        fi
-      fi
-    fi
-  done
+  dl_url="${DOWNLOADS_BASE}/${tag}/${tag}.tgz"
+  cd ${PACKAGE_DIR}
+  curl -LOs --fail ${dl_url}
+  result=$?
+  if [[ ${result} -eq 0 ]]; then
+    echo "Downloaded $dl_url".
+  else
+    echo "Could not download $dl_url".
+  fi
+  cd -
 done
 
 echo "Writing index to ${INDEX}"
