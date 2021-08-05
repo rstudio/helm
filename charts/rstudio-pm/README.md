@@ -44,7 +44,7 @@ This chart requires the following in order to function:
 ## S3 Configuration
 
 Package Manager can be configured to store data in S3 buckets (see the [Admin Guide](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations)
-for more details). When configured this way, AWS access credentials are required. You must set the `awsAccessKeyId` and `awsSeretAccessKey` chart values
+for more details). When configured this way, AWS access credentials are required. You must set the `awsAccessKeyId` and `awsSecretAccessKey` chart values
 to ensure that RSPM will be able to authenticate with your configured S3 buckets.
 
 Configuring Package Manager to use S3 requires modifying the `.gfcg` configuration file as explained below. A sample chart values configuration might look like the following:
