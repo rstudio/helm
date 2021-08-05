@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Run this script from the root of the helm repo, e.g.
-# bash scripts/rebuild.sh
+# ./scripts/rebuild.sh
 
 # Determine the directory of this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
