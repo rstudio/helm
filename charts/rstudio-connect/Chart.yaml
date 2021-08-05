@@ -1,6 +1,6 @@
 name: rstudio-connect
 description: Kubernetes deployment for RStudio Connect
-version: 0.2.0-rc02
+version: 0.2.0-rc03
 apiVersion: v2
 appVersion: 1.9.0
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
