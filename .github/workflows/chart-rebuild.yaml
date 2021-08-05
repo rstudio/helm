@@ -43,8 +43,6 @@ jobs:
 
           echo "Rebuilding index.yaml"
           scripts/rebuild.sh
-          echo "currently in $(pwd)"
-          cat index.yaml
 
       - name: Create Pull Request
         id: cpr
