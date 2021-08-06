@@ -36,7 +36,7 @@ This chart requires the following in order to function:
   * If `homeStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
     In this case, we recommend you disable `homeStorage.create` and  create your own `PersistentVolume` and `PersistentVolumeClaim`, then mount them
-    into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
+    into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `homeStorage.name` and `homeStorage.mount`.
   * If you cannot use a `PersistentVolume` to properly mount your users' home directories, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes/#nfs), specified in `pod.volumes` and `pod.volumeMounts`.
   * If you cannot use a `Volume` to mount the directories, you'll need to manually mount them during container startup  with a mechanism similar to what
