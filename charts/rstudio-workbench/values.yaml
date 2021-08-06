@@ -46,6 +46,10 @@ launcherNamespace: false
 homeStorage:
   # -- whether to create the persistentVolumeClaim for homeStorage
   create: false
+  # -- The name of the pvc. By default, computes a value from the release name
+  name: ""
+  # -- Whether the persistentVolumeClaim should be mounted (even if not created)
+  mount: false
   # -- the path to mount the homeStorage claim within the pod
   path: /home
   # -- storageClassName - the type of storage to use. Must allow ReadWriteMany

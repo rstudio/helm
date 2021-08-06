@@ -61,8 +61,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 */}}
 {{- define "rstudio-workbench.config.launcherMounts" -}}
 {{ $currentMounts := index $.Values.config.serverDcf "launcher-mounts"  }}
-{{- if and ( empty $currentMounts ) ( $.Values.homeStorage.create ) -}}
-{{- $claimName := printf "%s-home-storage" (include "rstudio-workbench.fullname" . ) }}
+{{- if and ( empty $currentMounts ) ( or $.Values.homeStorage.create $.Values.homeStorage.mount ) -}}
+{{- $claimNameDefault := printf "%s-home-storage" (include "rstudio-workbench.fullname" . ) }}
+{{- $claimName := default $claimNameDefault $.Values.homeStorage.name }}
 {{- $defaultMounts := (dict "launcher-mounts" (dict "MountType" "KubernetesPersistentVolumeClaim" "MountPath" $.Values.homeStorage.path "ClaimName" $claimName ) ) }}
 {{ include "rstudio-library.config.dcf" $defaultMounts }}
 {{- else }}

@@ -22,7 +22,7 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ include "rstudio-workbench.fullname" . }}-home-storage
+  name: {{default (print (include "rstudio-workbench.fullname" .) "-home-storage" ) .Values.homeStorage.name }}
   namespace: {{ $.Release.Namespace }}
   annotations:
     "helm.sh/resource-policy": keep
