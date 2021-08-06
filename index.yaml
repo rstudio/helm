@@ -202,4 +202,23 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc01/rstudio-pm-0.2.0-rc01.tgz
     version: 0.2.0-rc01
-generated: "2021-08-05T21:07:28.271745442Z"
+  rstudio-workbench:
+  - apiVersion: v2
+    appVersion: 1.4.1717-3
+    created: "2021-08-06T15:31:21.163177672Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Workbench
+    digest: 7a9d021fab34781bdb3f3d80c3ba78f5d8ed4ff1cd368feccb8138a8cad1ac7a
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
+    version: 0.4.0-rc09
+generated: "2021-08-06T15:31:21.163205574Z"
