@@ -54,7 +54,7 @@ so you can set the database password with something like:
 ... --set config.Postgres.Password=mypassword ...
 ```
 
-The values are converted into configuration files in the necessary format via go-templating.
+The Helm `config` values are converted into the `rstudio-pm.gcfg` service configuration file via go-templating.
 
 {{ template "chart.valuesSection" . }}
 

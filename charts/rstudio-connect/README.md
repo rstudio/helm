@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Connect
 
-![Version: 0.2.0-rc04](https://img.shields.io/badge/Version-0.2.0--rc04-informational?style=flat-square) ![AppVersion: 1.9.0](https://img.shields.io/badge/AppVersion-1.9.0-informational?style=flat-square)
+![Version: 0.2.0-rc05](https://img.shields.io/badge/Version-0.2.0--rc05-informational?style=flat-square) ![AppVersion: 1.9.0](https://img.shields.io/badge/AppVersion-1.9.0-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0-rc04:
+To install the chart with the release name `my-release` at version 0.2.0-rc05:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.0-rc04
+helm install my-release rstudio/rstudio-connect --version=0.2.0-rc05
 ```
 
 ## Required Configuration
@@ -56,7 +56,7 @@ so you can set the database password with something like:
 ... --set config.Postgres.Password=mypassword ...
 ```
 
-The values are converted into configuration files in the necessary format via go-templating.
+The Helm `config` values are converted into the `rstudio-connect.gcfg` service configuration file via go-templating.
 
 ## Values
 
