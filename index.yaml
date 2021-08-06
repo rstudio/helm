@@ -3,6 +3,24 @@ entries:
   rstudio-connect:
   - apiVersion: v2
     appVersion: 1.9.0
+    created: "2021-08-06T16:01:37.982027167Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Connect
+    digest: a829cdbdc7704ec91010d973177007cdfbf795faa133070d90a2015e443291c0
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-connect
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-connect-0.2.0-rc04/rstudio-connect-0.2.0-rc04.tgz
+    version: 0.2.0-rc04
+  - apiVersion: v2
+    appVersion: 1.9.0
     created: "2021-08-05T21:07:28.271698942Z"
     dependencies:
     - name: rstudio-library
@@ -114,6 +132,24 @@ entries:
   rstudio-pm:
   - apiVersion: v2
     appVersion: 1.2.2.1-17
+    created: "2021-08-06T16:01:38.112602817Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.13-rc01
+    description: Kubernetes deployment for RStudio Package Manager
+    digest: e970b73fed8cbb0cfb06c6b13eb71e69c118e78dcc6031f213f784971307ab32
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.2.0-rc06/rstudio-pm-0.2.0-rc06.tgz
+    version: 0.2.0-rc06
+  - apiVersion: v2
+    appVersion: 1.2.2.1-17
     created: "2021-08-05T17:27:27.068869926Z"
     dependencies:
     - name: rstudio-library
@@ -221,4 +257,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2021-08-06T15:31:21.163205574Z"
+generated: "2021-08-06T16:01:38.112653519Z"
