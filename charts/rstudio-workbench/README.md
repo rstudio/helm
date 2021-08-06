@@ -171,6 +171,8 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | global.secureCookieKey | string | `""` |  |
 | homeStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | homeStorage.create | bool | `false` | whether to create the persistentVolumeClaim for homeStorage |
+| homeStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
+| homeStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | homeStorage.path | string | `"/home"` | the path to mount the homeStorage claim within the pod |
 | homeStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | homeStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
