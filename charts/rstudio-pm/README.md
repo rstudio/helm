@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Package Manager
 
-![Version: 0.2.0-rc05](https://img.shields.io/badge/Version-0.2.0--rc05-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
+![Version: 0.2.0-rc06](https://img.shields.io/badge/Version-0.2.0--rc06-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0-rc05:
+To install the chart with the release name `my-release` at version 0.2.0-rc06:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.0-rc05
+helm install my-release rstudio/rstudio-pm --version=0.2.0-rc06
 ```
 
 ## Required Configuration
@@ -118,6 +118,8 @@ The values are converted into configuration files in the necessary format via go
 | service.type | string | `"NodePort"` | The service type (NodePort, LoadBalancer, etc.) |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |
+| sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
+| sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | sharedStorage.path | string | `"/var/lib/rstudio-pm"` | the path to mount the sharedStorage claim within the pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
