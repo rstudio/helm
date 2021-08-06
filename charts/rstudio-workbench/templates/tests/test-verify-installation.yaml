@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-verify-installation-test"
+  annotations:
+   "helm.sh/hook": test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: {{ include "rstudio-workbench.fullname" . }}
+      image:  {{ .Values.image.repository }}
+      securityContext:
+       privileged: true
+      env:
+        - name: RSW_TESTUSER
+          value: {{ .Values.userName }}
+      command: ["/bin/bash", "-c", "rstudio-launcher start ;  useradd -m rstudio ; rstudio-server verify-installation --verify-user=$RSW_TESTUSER"]

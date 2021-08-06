@@ -1,0 +1,36 @@
+license:
+  key: real
+replicas: 1
+rbac:
+  create: true
+homeStorage:
+  create: true
+userCreate: true
+
+config:
+  profiles:
+    launcher.kubernetes.profiles.conf:
+      "*":
+        container-images:
+          - some-image:tag
+          - another-image:tag
+        job-json-overrides:
+          - target: "/spec/template/spec/volumes/-"
+            name: volumes
+            json:
+              configMap:
+                defaultMode: 0755
+                name: session-config
+                items:
+                  - path: startup.sh
+                    key: startup.sh
+              name: session-config
+          - target: "/spec/template/spec/containers/0/volumeMounts/-"
+            name: volumeMounts
+            json:
+              mountPath: /usr/local/bin/startup.sh
+              name: session-config
+              subPath: startup.sh
+          - target: "/spec/template/spec/containers/0/command/0"
+            name: entrypoint
+            json: "/usr/local/bin/startup.sh"

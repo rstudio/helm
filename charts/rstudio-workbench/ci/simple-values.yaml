@@ -1,0 +1,11 @@
+license:
+  key: real
+replicas: 1
+rbac:
+  create: true
+homeStorage:
+  create: true
+userCreate: true
+
+securityContext:
+  privileged: false

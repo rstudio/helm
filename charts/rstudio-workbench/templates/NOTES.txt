@@ -1,0 +1,40 @@
+
+{{ include "rstudio-workbench.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
+
+{{- if eq .Values.launcherPem "" }}
+
+NOTE: Using auto-generated value for "launcher.pem"
+  - We recommend making this value persistent by setting `.Values.launcherPem`
+  - If the value changes, sessions started before the change will not be accessible
+  - You can get the current value with:
+```
+kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fullname" . }}-secret --template='{{print "{{" }}index .data "launcher.pem" | base64decode {{print "}}" }}'
+```
+{{- end }}
+{{- if eq (default .Values.secureCookieKey .Values.global.secureCookieKey) "" }}
+
+NOTE: Using an auto-generated value for "secure-cookie-key"
+  - We recommend making this value persistent by setting `.Values.global.secureCookieKey`
+  - If the value changes, authenticated sessions will be invalidated (all users will be logged out) and some old sessions will not be accessible
+  - You can get the current value with:
+```
+kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fullname" . }}-secret --template='{{print "{{" }}index .data "secure-cookie-key" | base64decode{{ print "}}" }}'
+```
+{{- end }}
+
+{{- if hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
+
+NOTE: `.Values.config.server.launcher\.kubernetes\.profiles\.conf` is superseded
+  - Instead, we recommend using `.Values.config.profiles.launcher\.kubernetes\.profiles\.conf
+  - Please note, `job-json-overrides` behaves differently for this new location. See NEWS.md for details.
+
+{{- end }}
+
+{{- if hasKey (get .Values.config.server "rserver.conf") "server-license-type" }}
+
+NOTE: `.Values.config.server.rserver\.conf.server-license-type` is configured manually. Normally, we automatically configure this value:
+  - When `license.server` is set, we set `server-license-type` to `remote`.
+  - Otherwise, `server-license-type` uses the default of `local`.
+Please consider removing this configuration value.
+
+{{- end }}

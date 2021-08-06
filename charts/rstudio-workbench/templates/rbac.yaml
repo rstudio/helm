@@ -1,0 +1,39 @@
+{{- if .Values.rbac.create }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-job-launcher
+  namespace: {{ .Release.Namespace }}
+
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-api-access
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - '*'
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-api-access
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "rstudio-workbench.fullname" . }}-api-access
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "rstudio-workbench.fullname" . }}-job-launcher
+    namespace: {{ .Release.Namespace }}
+{{- end }}

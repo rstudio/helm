@@ -1,0 +1,22 @@
+{{- if .Values.prometheusExporter.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-graphite
+  namespace: {{ $.Release.Namespace }}
+data:
+  graphite-mapping.yaml: |-
+    mappings:
+    - match: "rstudio\\.(\\w+)\\.system\\.load\\.(.*)"
+      match_type: regex
+      name: "rstudio_system_load"
+      labels:
+        host: "$1"
+        duration: "$2"
+    - match: "rstudio\\.(\\w+)\\.(.*)"
+      match_type: regex
+      name: "rstudio_$2"
+      labels:
+        host: "$1"
+{{- end }}

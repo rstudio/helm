@@ -33,19 +33,19 @@ This chart requires the following in order to function:
 
 * A license key, license file, or address of a running license server. See the `license` configuration below.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the home directory for users.
-  * If `homeStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume. 
-    Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box. 
-    In this case, we recommend you disable `homeStorage.create` and  create your own `PersistentVolume` and `PersistentVolumeClaim`, then mount them 
+  * If `homeStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
+    Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
+    In this case, we recommend you disable `homeStorage.create` and  create your own `PersistentVolume` and `PersistentVolumeClaim`, then mount them
     into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
   * If you cannot use a `PersistentVolume` to properly mount your users' home directories, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes/#nfs), specified in `pod.volumes` and `pod.volumeMounts`.
-  * If you cannot use a `Volume` to mount the directories, you'll need to manually mount them during container startup  with a mechanism similar to what 
+  * If you cannot use a `Volume` to mount the directories, you'll need to manually mount them during container startup  with a mechanism similar to what
     is described below for joining to auth domains.
   * If not using `homeStorage.create`, you'll need to configure `config.serverDcf.launcher-mounts` to ensure that the correct mounts are used when users create new sessions.
 * If using load balancing (by setting `replicas > 1`), you will need similar storage defined for `sharedStorage` to store shared project configuration.
 * A method to join the deployed `rstudio-workbench` container to your auth domain. The default `rstudio/rstudio-server-pro` image does not contain a way to join domains.
   We recommend creating your own Docker image that derives from this base image to provide domain joining that fits your needs. Your image can then use a process supervisor
-  like [supervisord](http://supervisord.org/) to run multiple processes: in the most common case, `rstudio-server`, `rstudio-launcher`, and `sssd`. See 
+  like [supervisord](http://supervisord.org/) to run multiple processes: in the most common case, `rstudio-server`, `rstudio-launcher`, and `sssd`. See
   [here](https://github.com/rstudio/sol-eng-demo-server/tree/main/helper/workbench) for an example of this.
 
 ## Recommended Configuration
@@ -53,7 +53,7 @@ This chart requires the following in order to function:
 In addition to the above required configuration, we recommend setting the following to ensure a reliable deployment:
 
 * Set the `launcherPem` value to ensure that it stays the same between releases.
-  This will ensure that users can continue to properly connect to older sessions even after a redeployment of the chart. See the 
+  This will ensure that users can continue to properly connect to older sessions even after a redeployment of the chart. See the
   [RSW Admin Guide](https://docs.rstudio.com/ide/server-pro/job-launcher.html#authentication) for details on generating the file.
 * Set the `global.secureCookieKey` so that user authentication continues to work between deployments. A valid value can be obtained
   by simply running the `uuid` command.
