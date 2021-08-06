@@ -88,7 +88,7 @@ spec:
         securityContext:
 {{ toYaml .Values.securityContext | indent 10 }}
         volumeMounts:
-          {{- if .Values.sharedStorage.create }}
+          {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-shared-storage
             mountPath: "{{ .Values.sharedStorage.path }}"
           {{- end }}
@@ -201,10 +201,10 @@ spec:
 {{ toYaml .Values.pod.sidecar | indent 6 }}
       {{- end }}
       volumes:
-      {{- if .Values.sharedStorage.create }}
+      {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
       - name: rstudio-shared-storage
         persistentVolumeClaim:
-          claimName: {{ include "rstudio-workbench.fullname" . }}-shared-storage
+          claimName: {{default (print (include "rstudio-workbench.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- end }}
       {{- if .Values.homeStorage.create }}
       - name: rstudio-home-storage
