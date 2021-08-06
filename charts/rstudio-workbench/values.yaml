@@ -1,0 +1,278 @@
+# -- the name of the chart deployment (can be overridden)
+nameOverride: ""
+# -- the full name of the release (can be overridden)
+fullnameOverride: ""
+
+# -- A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194
+versionOverride: ""
+
+session:
+  defaultConfigMount: true
+  image:
+    # -- A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined
+    tagPrefix: bionic-
+    # -- The repository to use for the session image
+    repository: "rstudio/r-session-complete"
+    # -- A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}`
+    tag: ""
+
+sharedStorage:
+  # -- whether to create the persistentVolumeClaim for shared storage
+  create: false
+  # -- the path to mount the sharedStorage claim within the pod
+  path: /var/lib/rstudio-server
+  # -- storageClassName - the type of storage to use. Must allow ReadWriteMany
+  storageClassName: false
+  # -- accessModes defined for the storage PVC (represented as YAML)
+  accessModes:
+    - ReadWriteMany
+  requests:
+    # -- the volume of storage to request for this persistent volume claim
+    storage: "10Gi"
+
+strategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxSurge: "100%"
+    maxUnavailable: 0
+
+# -- allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today
+launcherNamespace: false
+
+homeStorage:
+  # -- whether to create the persistentVolumeClaim for homeStorage
+  create: false
+  # -- the path to mount the homeStorage claim within the pod
+  path: /home
+  # -- storageClassName - the type of storage to use. Must allow ReadWriteMany
+  storageClassName: false
+  # -- accessModes defined for the storage PVC (represented as YAML)
+  accessModes:
+    - ReadWriteMany
+  requests:
+    # -- the volume of storage to request for this persistent volume claim
+    storage: "10Gi"
+
+image:
+  # -- the repository to use for the main pod image
+  repository: rstudio/rstudio-server-pro
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ''
+  # -- the imagePullPolicy for the main pod image
+  imagePullPolicy: IfNotPresent
+
+# -- the initContainer spec that will be used verbatim
+initContainers: false
+
+ingress:
+  enabled: false
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+  # - host: chart-example.local
+  #   paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# -- whether to provide `shareProcessNamespace` to the pod. Important for HA environments for the sidecar
+shareProcessNamespace: true
+
+service:
+  # -- annotations for the service definition
+  annotations: {}
+  # -- the service type (i.e. NodePort, LoadBalancer, etc.)
+  type: NodePort
+  # -- the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically
+  nodePort: false
+
+# -- resources define requests and limits for the rstudio-server pod
+resources:
+  requests:
+    enabled: false
+    memory: "2Gi"
+    cpu: "100m"
+    ephemeralStorage: "100Mi"
+  limits:
+    enabled: false
+    memory: "4Gi"
+    cpu: "2000m"
+    ephemeralStorage: "200Mi"
+
+# -- livenessProbe is used to configure the container's livenessProbe
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 10
+# -- startupProbe is used to configure the container's startupProbe
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  # -- failureThreshold * periodSeconds should be strictly > worst case startup time
+  failureThreshold: 30
+# -- readinessProbe is used to configure the container's readinessProbe
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 3
+  periodSeconds: 3
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 3
+
+loadBalancer:
+  # -- whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node
+  forceEnabled: false
+  appLabelKey: "app.kubernetes.io/name"
+  sleepDuration: 15
+  # -- env is an array of maps that is injected as-is into the "env:" component of the loadBalancer sidecar spec
+  env: []
+  securityContext:
+    capabilities:
+      add:
+        # necessary for sidecar container to function properly in HA
+        - SYS_PTRACE
+  image:
+    # -- the repository to use for the side-car pod image
+    repository: rstudio/rstudio-server-load-balancer-manager
+    # -- the tag to use for the side-car pod image
+    tag: "2.2"
+    # -- the imagePullPolicy to use for the side-car pod image
+    imagePullPolicy: IfNotPresent
+
+# -- command is the pod container's run command.
+command: [tini, -s, --]
+# -- args is the pod container's run arguments. By default, it uses a kubernetes-specific prestart script that exec's the default container startup script.
+args:
+  - /scripts/prestart.bash
+  - /usr/local/bin/startup.sh
+
+license:
+  # -- key is the license to use
+  key: null
+  # -- server is the <hostname>:<port> for a license server
+  server: false
+  # -- the file section is used for licensing with a license file
+  file:
+    # -- contents is an in-line license file
+    contents: false
+    # -- mountPath is the place the license file will be mounted into the container
+    mountPath: "/etc/rstudio-licensing"
+    # -- mountSubPath is whether to mount the subPath for the file secret.
+    # -- It can be preferable _not_ to enable this, because then updates propagate automatically
+    mountSubPath: false
+    # -- secretKey is the key for the secret to use for the license file
+    secretKey: "license.lic"
+    # -- secret is an existing secret with a license file in it
+    secret: false
+
+# -- replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA
+replicas: 1
+
+# -- launcher determines whether the launcher should be started in the container
+launcher: "true"
+
+# -- userCreate determines whether a user should be created at startup (if true)
+userCreate: false
+# -- userName determines the username of the created user
+userName: "rstudio"
+# -- userUid determines the UID of the created user
+userUid: "10000"
+# -- userPassword determines the password of the created user
+userPassword: "rstudio"
+
+# -- The XDG config dirs (directories where configuration will be read from). Do not change without good reason.
+xdgConfigDirs: "/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"
+
+# -- A list of additional XDG config dir paths
+xdgConfigDirsExtra: []
+
+securityContext: {}
+
+pod:
+  # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
+  env: []
+  # -- volumes is injected as-is into the "volumes:" component of the pod.container spec
+  volumes: []
+  # -- volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec
+  volumeMounts: []
+  # -- podAnnotations is a map of keys / values that will be added as annotations to the rstudio-pm pods
+  annotations: {}
+  # -- sidecar is an array of containers that will be run alongside the main container
+  sidecar: false
+
+prometheusExporter:
+  # -- whether the  prometheus exporter sidecar should be enabled
+  enabled: true
+  image:
+    repository: "prom/graphite-exporter"
+    tag: "v0.9.0"
+    imagePullPolicy: IfNotPresent
+
+rbac:
+  # -- rbac.create specifies whether to create the ServiceAccount required for the Job Launcher to have appropriate permissions
+  create: true
+# -- serviceAccountName is the service account used to launch pods into Kubernetes (into launcherNamespace)
+serviceAccountName: false
+
+# -- jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents
+jobJsonOverridesFiles: {}
+
+launcherPem: ''
+launcherPub: false
+secureCookieKey: ''
+dangerRegenerateAutomatedValues: false
+
+global:
+  secureCookieKey: ''
+
+config:
+  session:
+    repos.conf:
+      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+      CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+    rsession.conf: {}
+    notifications.conf: {}
+  secret:
+    "database.conf": {}
+  server:
+    rserver.conf:
+      server-health-check-enabled: 1
+      admin-enabled: 1
+      www-port: 8787
+      server-project-sharing: 1
+      launcher-address: 127.0.0.1
+      launcher-port: 5559
+      launcher-sessions-enabled: 1
+      launcher-default-cluster: Kubernetes
+      launcher-sessions-callback-address: http://127.0.0.1:8787
+      monitor-graphite-enabled: 1
+      monitor-graphite-host: 127.0.0.1
+      monitor-graphite-port: 9109
+      monitor-graphite-client-id: rstudio
+    launcher.conf:
+      server:
+        address: 127.0.0.1
+        port: 5559
+        server-user: rstudio-server
+        admin-group: rstudio-server
+        authorization-enabled: 1
+        thread-pool-size: 4
+        enable-debug-logging: 1
+      cluster:
+        name: Kubernetes
+        type: Kubernetes
+    "jupyter.conf":
+      jupyter-exe: /opt/python/3.6.5/bin/jupyter
+      notebooks-enabled: 1
+      labs-enabled: 1
+      default-session-cluster: Kubernetes
+    logging.conf: {}
+  profiles: {}
+  serverDcf:
+    launcher-mounts: []

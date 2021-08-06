@@ -1,0 +1,75 @@
+{{/* Define the default values that will be merged over */}}
+{{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+{{- $sessionTag := .Values.session.image.tag | default (printf "%s%s" .Values.session.image.tagPrefix $defaultVersion ) }}
+{{- $defaultImages := list (printf "%s:%s" .Values.session.image.repository $sessionTag) }}
+{{- $defaultOverrides := list }}
+{{- if .Values.session.defaultConfigMount }}
+  {{/* default session config mount */}}
+  {{- $sessionVolume := dict "configMap" ( dict "name" (printf "%s-session" ( include "rstudio-workbench.fullname" . ) ) ) "name" "session-config" }}
+  {{- $sessionVolumeMount := dict "mountPath" "/mnt/session-configmap" "name" "session-config" }}
+  {{- $sessionVolumeOverride := dict "name" "defaultSessionVolume" "target" "/spec/template/spec/volumes/-" "json" $sessionVolume }}
+  {{- $sessionVolumeMountOverride := dict "name" "defaultSessionVolumeMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionVolumeMount }}
+  {{- $defaultOverrides = concat $defaultOverrides ( list $sessionVolumeOverride $sessionVolumeMountOverride ) }}
+{{- end }}
+{{- $defaultProfiles := dict "default-container-image" (first $defaultImages) "container-images" $defaultImages "allow-unknown-images" 1 }}
+{{- if $defaultOverrides }}
+  {{/* if defaultOverrides exist - add them */}}
+  {{- $defaultProfiles = mergeOverwrite $defaultProfiles ( dict "job-json-overrides" $defaultOverrides ) }}
+{{- end }}
+{{- $defaultProfilesConfig := dict "*" $defaultProfiles }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-config
+  namespace: {{ $.Release.Namespace }}
+data:
+{{/* generate the server configuration, setting remote licensing if applicable */}}
+{{- $overrideDict := .Values.config.server | deepCopy }}
+{{- if .Values.license.server }}
+  {{- $licenseParam := dict "server-license-type" "remote" }}
+  {{- $licenseServerConf := dict "rserver.conf" $licenseParam}}
+  {{- $overrideDict = mergeOverwrite $overrideDict $licenseServerConf}}
+{{- end }}
+{{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
+{{/* helper variables to make things here a bit more sane */}}
+{{- $profilesConfig := .Values.config.profiles }}
+{{- $profilesConfig = mergeOverwrite (dict "launcher.kubernetes.profiles.conf" $defaultProfilesConfig) $profilesConfig }}
+{{- $useLegacyProfiles := hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
+{{- $jobJsonFilePath := "/mnt/job-json-overrides-new/" }}
+{{- if not $useLegacyProfiles }}
+  {{- $profilesDict := dict "data" ($profilesConfig | deepCopy) "filePath" $jobJsonFilePath }}
+  {{/* generate the profiles configuration */}}
+  {{- include "rstudio-library.profiles.ini.advanced" $profilesDict | nindent 2 }}
+{{- end }}
+{{/* generate the server configuration (dcf files) minus launcher-mounts */}}
+{{ include "rstudio-library.config.dcf" ( omit .Values.config.serverDcf "launcher-mounts" ) | indent 2 }}
+{{/* generate the launcher-mounts file */}}
+{{ include "rstudio-workbench.config.launcherMounts" . | indent 2 }}
+---
+{{/* The old pattern for job-json-overrides "json" files */}}
+{{- if .Values.jobJsonOverridesFiles }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-overrides-old
+  namespace: {{ $.Release.Namespace }}
+data:
+{{- range $file,$content := $.Values.jobJsonOverridesFiles }}
+  {{ $file }}: |
+    {{- $content | toPrettyJson | nindent 4 }}
+{{- end }}
+---
+{{- end }}
+{{/* The new pattern for job-json-overrides "json" files */}}
+{{- if not $useLegacyProfiles }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-overrides-new
+  namespace: {{ $.Release.Namespace }}
+data:
+  {{/* TODO: need to make the json-from-overrides-config take more than one file... only using launcher.kubernetes.profiles.conf today */}}
+  {{- $configValue := dict "data" (get $profilesConfig "launcher.kubernetes.profiles.conf" | deepCopy) "default" (list) }}
+  {{- include "rstudio-library.profiles.json-from-overrides-config" $configValue | indent 2 }}
+{{- end }}

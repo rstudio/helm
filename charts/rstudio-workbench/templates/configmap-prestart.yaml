@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-prestart
+  namespace: {{ $.Release.Namespace }}
+data:
+  prestart.bash: |
+    {{- .Files.Get "prestart.bash" | nindent 4 }}

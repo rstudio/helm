@@ -1,0 +1,29 @@
+license:
+  key: real
+replicas: 1
+rbac:
+  create: true
+homeStorage:
+  create: true
+userCreate: true
+jobJsonOverridesFiles:
+  entrypoint.json: "/usr/local/bin/startup.sh"
+  volumes.json:
+    configMap:
+      defaultMode: 0755
+      name: session-config
+      items:
+        - path: startup.sh
+          key: startup.sh
+    name: session-config
+  volumeMounts.json:
+    mountPath: /usr/local/bin/startup.sh
+    name: session-config
+    subPath: startup.sh
+
+config:
+  server:
+    launcher.kubernetes.profiles.conf:
+      "*":
+        job-json-overrides: '"/spec/template/spec/volumes/-":"/mnt/job-json-overrides/volumes.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides/volumeMounts.json","/spec/template/spec/containers/0/command/0":"/mnt/job-json-overrides/entrypoint.json"'
+        # job-json-overrides: '"/spec/template/spec/volumes/-":"/mnt/job-json-overrides/volumes.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides/volumeMounts.json"'

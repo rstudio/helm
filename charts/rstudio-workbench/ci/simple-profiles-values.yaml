@@ -1,0 +1,19 @@
+license:
+  key: real
+replicas: 1
+rbac:
+  create: true
+homeStorage:
+  create: true
+userCreate: true
+
+securityContext:
+  privileged: false
+
+config:
+  profiles:
+    launcher.kubernetes.profiles.conf:
+      "*":
+        allow-unknown-images: 0
+      "cole":
+        allow-unknown-images: 1
