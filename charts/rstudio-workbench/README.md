@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Workbench
 
-![Version: 0.4.0-rc09](https://img.shields.io/badge/Version-0.4.0--rc09-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
+![Version: 0.4.0-rc11](https://img.shields.io/badge/Version-0.4.0--rc11-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.4.0-rc09:
+To install the chart with the release name `my-release` at version 0.4.0-rc11:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc09
+helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc11
 ```
 
 ## Required Configuration
@@ -72,8 +72,8 @@ required by RStudio Server Pro. Those config files and their mount locations are
 - The prestart script for RStudio Server is highly customized to:
   - Get the service account information off of the RStudio Server pod for use in launching jobs
   - Generate `launcher.pub` as needed (if `launcher.pem` is provided). If it is not provided,
-  the helm chart will generate it automatically but this information will be lost for subsequent deployments
-  and can cause users to be locked out sessions started by a previous deployment.
+  the helm chart will generate it automatically but this information will be lost for subsequent deployments and
+  can cause users to be locked out sessions started by a previous deployment.
 - RStudio Server Pro does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
@@ -175,7 +175,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | homeStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | homeStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
-| image.repository | string | `"rstudio/rstudio-server-pro"` | the repository to use for the main pod image |
+| image.repository | string | `"rstudio/rstudio-workbench"` | the repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
@@ -183,8 +183,8 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | ingress.tls | list | `[]` |  |
 | initContainers | bool | `false` | the initContainer spec that will be used verbatim |
 | jobJsonOverridesFiles | object | `{}` | jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents |
-| launcher | string | `"true"` | launcher determines whether the launcher should be started in the container |
-| launcherNamespace | bool | `false` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
+| launcher.enabled | bool | `true` | determines whether the launcher should be started in the container |
+| launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
 | launcherPem | string | `""` |  |
 | launcherPub | bool | `false` |  |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
@@ -214,7 +214,8 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |
-| rbac.create | bool | `true` | rbac.create specifies whether to create the ServiceAccount required for the Job Launcher to have appropriate permissions |
+| rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
+| rbac.serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |
@@ -223,7 +224,6 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | service.annotations | object | `{}` | annotations for the service definition |
 | service.nodePort | bool | `false` | the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically |
 | service.type | string | `"NodePort"` | the service type (i.e. NodePort, LoadBalancer, etc.) |
-| serviceAccountName | bool | `false` | serviceAccountName is the service account used to launch pods into Kubernetes (into launcherNamespace) |
 | session.defaultConfigMount | bool | `true` |  |
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
 | session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |
