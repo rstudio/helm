@@ -1,5 +1,7 @@
 # 0.4.0
 
+- BREAKING: `serviceAccountName` is now `rbac.serviceAccount.name` for consistency with our other charts
+- BREAKING: `launcher=true` is now `launcher.enabled = true` and `launcherNamespace` is now `launcher.namespace` for consistency with our other charts
 - Breaking: Licensing configuration now uses a `license` section. For example,
   `license: my-key` should be changed to
   ```yaml
@@ -20,7 +22,6 @@ config:
         container-images: rstudio/r-session-complete:bionic-1.4.1106-5
         allow-unknown-images: 1
 ```  
-
 - BREAKING: we now automatically mount session configuration into the session pod
   - This adds default `job-json-overrides` using the mechanism above
   - This can be disabled by setting `session.defaultConfigMount=false`

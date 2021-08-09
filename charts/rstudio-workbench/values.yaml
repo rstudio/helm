@@ -40,8 +40,11 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 
-# -- allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today
-launcherNamespace: false
+launcher:
+  # -- determines whether the launcher should be started in the container
+  enabled: true
+  # -- allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today
+  namespace: ""
 
 homeStorage:
   # -- whether to create the persistentVolumeClaim for homeStorage
@@ -63,9 +66,9 @@ homeStorage:
 
 image:
   # -- the repository to use for the main pod image
-  repository: rstudio/rstudio-server-pro
+  repository: rstudio/rstudio-workbench
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: ''
+  tag: ""
   # -- the imagePullPolicy for the main pod image
   imagePullPolicy: IfNotPresent
 
@@ -179,11 +182,9 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
+
 # -- replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA
 replicas: 1
-
-# -- launcher determines whether the launcher should be started in the container
-launcher: "true"
 
 # -- userCreate determines whether a user should be created at startup (if true)
 userCreate: false
@@ -223,10 +224,13 @@ prometheusExporter:
     imagePullPolicy: IfNotPresent
 
 rbac:
-  # -- rbac.create specifies whether to create the ServiceAccount required for the Job Launcher to have appropriate permissions
+  # -- Whether to create rbac. (also depends on launcher.enabled = true)
   create: true
-# -- serviceAccountName is the service account used to launch pods into Kubernetes (into launcherNamespace)
-serviceAccountName: false
+  # -- The serviceAccount to be associated with rbac (also depends on launcher.enabled = true)
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
 
 # -- jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents
 jobJsonOverridesFiles: {}

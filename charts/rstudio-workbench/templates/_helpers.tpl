@@ -24,6 +24,226 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{- define "rstudio-workbench.containers" -}}
+{{- $useLegacyProfiles := hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
+containers:
+- name: rstudio
+  {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+  image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
+  env:
+  {{- if .Values.enableDiagnostics }}
+  - name: DIAGNOSTIC_DIR
+    value: "/var/log/rstudio"
+  - name: DIAGNOSTIC_ONLY
+    value: "true"
+  - name: DIAGNOSTIC_ENABLE
+    value: "true"
+  {{- end }}
+  - name: RSTUDIO_LAUNCHER_NAMESPACE
+    value: "{{ $.Release.Namespace }}"
+{{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-workbench") "envVarPrefix" ("RSW") "fullName" (include "rstudio-workbench.fullname" .)) | indent 2 }}
+  - name: RSP_LAUNCHER
+    value: "{{ .Values.launcher.enabled }}"
+  {{- if .Values.userCreate }}
+  - name: RSP_TESTUSER
+    value: "{{ .Values.userName }}"
+  - name: RSP_TESTUSER_UID
+    value: "{{ .Values.userUid }}"
+  - name: RSP_TESTUSER_PASSWD
+    value: "{{ .Values.userPassword }}"
+  {{- else }}
+  - name: RSP_TESTUSER
+    value: ""
+  {{- end }}
+  - name: XDG_CONFIG_DIRS
+    value: "{{ template "rstudio-workbench.xdg-config-dirs" .}}"
+  {{- if or ( gt (int .Values.replicas) 1 ) ( .Values.loadBalancer.forceEnabled ) }}
+  - name: PRESTART_LOAD_BALANCER_CONFIGURATION
+    value: enabled
+  {{- end }}
+  {{- if .Values.pod.env }}
+{{ toYaml .Values.pod.env | indent 2 }}
+  {{- end }}
+  {{- if .Values.command }}
+  command:
+{{ toYaml .Values.command | indent 4 }}
+ {{- end }}
+  {{- if .Values.args }}
+  args:
+{{ toYaml .Values.args | indent 4 }}
+  {{- end }}
+  imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
+  ports:
+  - containerPort: 8787
+  securityContext:
+{{ toYaml .Values.securityContext | indent 4 }}
+  volumeMounts:
+    {{- if .Values.sharedStorage.create }}
+    - name: rstudio-shared-storage
+      mountPath: "{{ .Values.sharedStorage.path }}"
+    {{- end }}
+    {{- if .Values.homeStorage.create }}
+    - name: rstudio-home-storage
+      mountPath: "{{ .Values.homeStorage.path }}"
+    {{- end }}
+    - name: rstudio-prestart
+      mountPath: "/scripts/"
+    - name: rstudio-config
+      mountPath: "/mnt/configmap/rstudio/"
+    - name: rstudio-session-config
+      mountPath: "/mnt/session-configmap/rstudio/"
+    - name: rstudio-secret
+      mountPath: "/mnt/secret-configmap/rstudio/"
+    - name: etc-rstudio
+      mountPath: "/etc/rstudio"
+    - name: shared-data
+      mountPath: "/mnt/load-balancer/rstudio"
+{{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 4 }}
+{{/* TODO: path collision problems... would be ideal to not have to maintain both long term */}}
+{{- if .Values.jobJsonOverridesFiles }}
+    - name: rstudio-job-overrides-old
+      mountPath: "/mnt/job-json-overrides"
+{{- end }}
+{{- if not $useLegacyProfiles }}
+    - name: rstudio-job-overrides-new
+      mountPath: "/mnt/job-json-overrides-new"
+{{- end }}
+{{- if .Values.pod.volumeMounts }}
+{{ toYaml .Values.pod.volumeMounts | indent 4 }}
+{{- end }}
+  resources:
+    {{- if .Values.resources.requests.enabled }}
+    requests:
+      memory: "{{ .Values.resources.requests.memory }}"
+      cpu: "{{ .Values.resources.requests.cpu }}"
+      ephemeral-storage: "{{ .Values.resources.requests.ephemeralStorage }}"
+    {{- end }}
+    limits:
+    {{- if .Values.resources.limits.enabled }}
+      memory: "{{ .Values.resources.limits.memory }}"
+      cpu: "{{ .Values.resources.limits.cpu }}"
+      ephemeral-storage: "{{ .Values.resources.limits.ephemeralStorage }}"
+    {{- end }}
+  {{- if .Values.livenessProbe.enabled }}
+  livenessProbe:
+    httpGet:
+      path: /health-check
+      port: 8787
+    initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+    periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+    timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+    failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+  {{- end }}
+  {{- if .Values.startupProbe.enabled }}
+  startupProbe:
+    httpGet:
+      path: /health-check
+      port: 8787
+    initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+    periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+    timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+    failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+  {{- end }}
+  {{- if .Values.readinessProbe.enabled }}
+  readinessProbe:
+    httpGet:
+      path: /health-check
+      port: 8787
+    initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+    periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+    timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+    successThreshold: {{ .Values.readinessProbe.successThreshold }}
+    failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+  {{- end }}
+{{- if or (gt (int .Values.replicas) 1) (.Values.loadBalancer.forceEnabled) }}
+- name: sidecar
+  image: "{{ .Values.loadBalancer.image.repository }}:{{ .Values.loadBalancer.image.tag }}"
+  imagePullPolicy: "{{ .Values.loadBalancer.image.imagePullPolicy }}"
+  {{- if .Values.loadBalancer.env }}
+  env:
+    {{- toYaml .Values.loadBalancer.env | nindent 2 }}
+  {{- end }}
+  args:
+    - "{{ include "rstudio-workbench.fullname" . }}"
+    - "{{ $.Release.Namespace }}"
+    - "/mnt/load-balancer/rstudio/"
+    - "{{ .Values.loadBalancer.sleepDuration }}"
+    - "{{ .Values.loadBalancer.appLabelKey }}"
+  {{- if .Values.loadBalancer.securityContext }}
+  securityContext:
+    {{- toYaml .Values.loadBalancer.securityContext | nindent 4 }}
+  {{- end }}
+  volumeMounts:
+  - name: shared-data
+    mountPath: "/mnt/load-balancer/rstudio/"
+{{- end }}
+{{- if .Values.prometheusExporter.enabled }}
+- name: exporter
+  image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
+  imagePullPolicy: "{{ .Values.prometheusExporter.image.imagePullPolicy }}"
+  args:
+    - "--graphite.mapping-config=/mnt/graphite/graphite-mapping.yaml"
+  volumeMounts:
+    - name: graphite-exporter-config
+      mountPath: "/mnt/graphite/"
+{{- end }}
+{{- if .Values.pod.sidecar }}
+{{ toYaml .Values.pod.sidecar }}
+{{- end }}
+volumes:
+{{- if .Values.sharedStorage.create }}
+- name: rstudio-shared-storage
+  persistentVolumeClaim:
+    claimName: {{ include "rstudio-workbench.fullname" . }}-shared-storage
+{{- end }}
+{{- if .Values.homeStorage.create }}
+- name: rstudio-home-storage
+  persistentVolumeClaim:
+    claimName: {{ include "rstudio-workbench.fullname" . }}-home-storage
+{{- end }}
+{{- if .Values.jobJsonOverridesFiles }}
+- name: rstudio-job-overrides-old
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-overrides-old
+    defaultMode: 0644
+{{- end }}
+{{- if not $useLegacyProfiles }}
+- name: rstudio-job-overrides-new
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-overrides-new
+    defaultMode: 0644
+{{- end }}
+- name: etc-rstudio
+  emptyDir: {}
+- name: shared-data
+  emptyDir: {}
+- name: rstudio-config
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-config
+    defaultMode: 0644
+- name: rstudio-session-config
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-session
+    defaultMode: 0644
+- name: rstudio-prestart
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-prestart
+    defaultMode: 0755
+- name: rstudio-secret
+  secret:
+    secretName: {{ include "rstudio-workbench.fullname" . }}-secret
+    defaultMode: 0600
+{{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-workbench.fullname" .)) }}
+{{- if .Values.prometheusExporter.enabled }}
+- name: graphite-exporter-config
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-graphite
+    defaultMode: 0755
+{{- end }}
+{{- if .Values.pod.volumes }}
+{{ toYaml .Values.pod.volumes }}
+{{- end }}
+{{- end }}
 
 {{/*
 Create chart name and version as used by the chart label.
