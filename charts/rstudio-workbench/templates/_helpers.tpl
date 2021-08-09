@@ -78,11 +78,11 @@ containers:
   securityContext:
 {{ toYaml .Values.securityContext | indent 4 }}
   volumeMounts:
-    {{- if .Values.sharedStorage.create }}
+    {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
     - name: rstudio-shared-storage
       mountPath: "{{ .Values.sharedStorage.path }}"
     {{- end }}
-    {{- if .Values.homeStorage.create }}
+    {{- if or .Values.homeStorage.create .Values.homeStorage.mount }}
     - name: rstudio-home-storage
       mountPath: "{{ .Values.homeStorage.path }}"
     {{- end }}
@@ -191,15 +191,15 @@ containers:
 {{ toYaml .Values.pod.sidecar }}
 {{- end }}
 volumes:
-{{- if .Values.sharedStorage.create }}
+{{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
 - name: rstudio-shared-storage
   persistentVolumeClaim:
-    claimName: {{ include "rstudio-workbench.fullname" . }}-shared-storage
+    claimName: {{default (print (include "rstudio-workbench.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
 {{- end }}
-{{- if .Values.homeStorage.create }}
+{{- if or .Values.homeStorage.create .Values.homeStorage.mount }}
 - name: rstudio-home-storage
   persistentVolumeClaim:
-    claimName: {{ include "rstudio-workbench.fullname" . }}-home-storage
+    claimName: {{default (print (include "rstudio-workbench.fullname" .) "-home-storage" ) .Values.homeStorage.name }}
 {{- end }}
 {{- if .Values.jobJsonOverridesFiles }}
 - name: rstudio-job-overrides-old
@@ -281,8 +281,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 */}}
 {{- define "rstudio-workbench.config.launcherMounts" -}}
 {{ $currentMounts := index $.Values.config.serverDcf "launcher-mounts"  }}
-{{- if and ( empty $currentMounts ) ( $.Values.homeStorage.create ) -}}
-{{- $claimName := printf "%s-home-storage" (include "rstudio-workbench.fullname" . ) }}
+{{- if and ( empty $currentMounts ) ( or $.Values.homeStorage.create $.Values.homeStorage.mount ) -}}
+{{- $claimNameDefault := printf "%s-home-storage" (include "rstudio-workbench.fullname" . ) }}
+{{- $claimName := default $claimNameDefault $.Values.homeStorage.name }}
 {{- $defaultMounts := (dict "launcher-mounts" (dict "MountType" "KubernetesPersistentVolumeClaim" "MountPath" $.Values.homeStorage.path "ClaimName" $claimName ) ) }}
 {{ include "rstudio-library.config.dcf" $defaultMounts }}
 {{- else }}

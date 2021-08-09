@@ -19,6 +19,10 @@ session:
 sharedStorage:
   # -- whether to create the persistentVolumeClaim for shared storage
   create: false
+  # -- The name of the pvc. By default, computes a value from the release name
+  name: ""
+  # -- Whether the persistentVolumeClaim should be mounted (even if not created)
+  mount: false
   # -- the path to mount the sharedStorage claim within the pod
   path: /var/lib/rstudio-server
   # -- storageClassName - the type of storage to use. Must allow ReadWriteMany
@@ -45,6 +49,10 @@ launcher:
 homeStorage:
   # -- whether to create the persistentVolumeClaim for homeStorage
   create: false
+  # -- The name of the pvc. By default, computes a value from the release name
+  name: ""
+  # -- Whether the persistentVolumeClaim should be mounted (even if not created)
+  mount: false
   # -- the path to mount the homeStorage claim within the pod
   path: /home
   # -- storageClassName - the type of storage to use. Must allow ReadWriteMany
