@@ -70,7 +70,7 @@ spec:
             mountPath: "/var/lib/rstudio-pm/rstudio-pm.key"
             subPath: rstudio-pm.key
           {{- end }}
-          {{- if .Values.sharedStorage.create }}
+          {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-pm-data
             mountPath: "{{ .Values.sharedStorage.path }}"
           {{- end }}
@@ -140,10 +140,10 @@ spec:
           secretName: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
           defaultMode: 0600
       {{- end }}
-      {{- if .Values.sharedStorage.create }}
+      {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
       - name: rstudio-pm-data
         persistentVolumeClaim:
-          claimName: {{ include "rstudio-pm.fullname" . }}-shared-storage
+          claimName: {{default (print (include "rstudio-pm.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- end }}
       {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-pm.fullname" .)) | indent 6 }}
       {{- if .Values.pod.volumes }}

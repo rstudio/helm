@@ -16,7 +16,7 @@ This chart requires the following in order to function:
   * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume. 
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box. 
     In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then 
-    mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
+    mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
   * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
 
@@ -36,7 +36,7 @@ so you can set the database password with something like:
 ... --set config.Postgres.Password=mypassword ...
 ```
 
-The values are converted into configuration files in the necessary format via go-templating.
+The Helm `config` values are converted into the `rstudio-connect.gcfg` service configuration file via go-templating.
 
 {{ template "chart.valuesSection" . }}
 

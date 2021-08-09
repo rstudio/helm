@@ -2,7 +2,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ include "rstudio-pm.fullname" . }}-shared-storage
+  name: {{default (print (include "rstudio-pm.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
   namespace: {{ $.Release.Namespace }}
   annotations:
     "helm.sh/resource-policy": keep

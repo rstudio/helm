@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Package Manager
 
-![Version: 0.2.0-rc05](https://img.shields.io/badge/Version-0.2.0--rc05-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
+![Version: 0.2.0-rc07](https://img.shields.io/badge/Version-0.2.0--rc07-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0-rc05:
+To install the chart with the release name `my-release` at version 0.2.0-rc07:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.0-rc05
+helm install my-release rstudio/rstudio-pm --version=0.2.0-rc07
 ```
 
 ## Required Configuration
@@ -36,7 +36,7 @@ This chart requires the following in order to function:
   * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
     In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then
-    mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
+    mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
   * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
   * Alternatively, S3 storage can be used. See the next section for details.
@@ -74,7 +74,7 @@ so you can set the database password with something like:
 ... --set config.Postgres.Password=mypassword ...
 ```
 
-The values are converted into configuration files in the necessary format via go-templating.
+The Helm `config` values are converted into the `rstudio-pm.gcfg` service configuration file via go-templating.
 
 ## Values
 
@@ -118,6 +118,8 @@ The values are converted into configuration files in the necessary format via go
 | service.type | string | `"NodePort"` | The service type (NodePort, LoadBalancer, etc.) |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |
+| sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
+| sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | sharedStorage.path | string | `"/var/lib/rstudio-pm"` | the path to mount the sharedStorage claim within the pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
