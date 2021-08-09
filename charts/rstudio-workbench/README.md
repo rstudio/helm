@@ -36,7 +36,7 @@ This chart requires the following in order to function:
   * If `homeStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
     In this case, we recommend you disable `homeStorage.create` and  create your own `PersistentVolume` and `PersistentVolumeClaim`, then mount them
-    into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters.
+    into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `homeStorage.name` and `homeStorage.mount`.
   * If you cannot use a `PersistentVolume` to properly mount your users' home directories, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes/#nfs), specified in `pod.volumes` and `pod.volumeMounts`.
   * If you cannot use a `Volume` to mount the directories, you'll need to manually mount them during container startup  with a mechanism similar to what
@@ -171,6 +171,8 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | global.secureCookieKey | string | `""` |  |
 | homeStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | homeStorage.create | bool | `false` | whether to create the persistentVolumeClaim for homeStorage |
+| homeStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
+| homeStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | homeStorage.path | string | `"/home"` | the path to mount the homeStorage claim within the pod |
 | homeStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | homeStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
@@ -231,6 +233,8 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | shareProcessNamespace | bool | `true` | whether to provide `shareProcessNamespace` to the pod. Important for HA environments for the sidecar |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |
+| sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
+| sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | sharedStorage.path | string | `"/var/lib/rstudio-server"` | the path to mount the sharedStorage claim within the pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
