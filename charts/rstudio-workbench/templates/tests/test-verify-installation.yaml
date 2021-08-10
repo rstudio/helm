@@ -16,8 +16,11 @@ spec:
   {{- $overrideDict := . | deepCopy }}
   {{- $_ := set $overrideDict.Values "enableDiagnostics" true }}
   {{- $_ := set $overrideDict.Values "userCreate" true }}
-  {{- $_ := set $overrideDict.Values "readinessProbe.enabled" false }}
-  {{- $_ := set $overrideDict.Values "livenessProbe.enabled" false }}
-  {{- $_ := set $overrideDict.Values "startupProbe.enabled" false }}
-  {{- $_ := set $overrideDict.Values ".Values.prometheusExporter.enabled" false }}
+  {{- $disabledObject := dict "enabled" false }}
+  {{- $readinessProbe := dict "readinessProbe" $disabledObject }}
+  {{- $livenessProbe := dict "livenessProbe" $disabledObject }}
+  {{- $startupProbe := dict "startupProbe" $disabledObject }}
+  {{- $prometheusExporter := dict "prometheusExporter" $disabledObject }}
+  {{- $overrideValues := mergeOverwrite $overrideDict.Values $prometheusExporter $startupProbe $livenessProbe $readinessProbe }}
+  {{- $_ := set $overrideDict "Values" $overrideValues }}
 {{ include "rstudio-workbench.containers" $overrideDict | indent 2 }}
