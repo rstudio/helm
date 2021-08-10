@@ -13,11 +13,12 @@ spec:
   {{- end }}
   shareProcessNamespace: {{ .Values.shareProcessNamespace }}
   restartPolicy: Never
+  {{- $topLevelParams := dict "enableDiagnostics" true "userCreate" true }}
+  {{- $disabledObject := dict "enabled" false }}
+  {{- $readinessProbe := dict "readinessProbe" $disabledObject }}
+  {{- $livenessProbe := dict "livenessProbe" $disabledObject }}
+  {{- $startupProbe := dict "startupProbe" $disabledObject }}
+  {{- $prometheusExporter := dict "prometheusExporter" $disabledObject }}
   {{- $overrideDict := . | deepCopy }}
-  {{- $_ := set $overrideDict.Values "enableDiagnostics" true }}
-  {{- $_ := set $overrideDict.Values "userCreate" true }}
-  {{- $_ := set $overrideDict.Values "readinessProbe.enabled" false }}
-  {{- $_ := set $overrideDict.Values "livenessProbe.enabled" false }}
-  {{- $_ := set $overrideDict.Values "startupProbe.enabled" false }}
-  {{- $_ := set $overrideDict.Values ".Values.prometheusExporter.enabled" false }}
+  {{- $_ := mergeOverwrite $overrideDict.Values $prometheusExporter $startupProbe $livenessProbe $readinessProbe $topLevelParams }}
 {{ include "rstudio-workbench.containers" $overrideDict | indent 2 }}
