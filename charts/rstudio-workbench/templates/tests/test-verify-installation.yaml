@@ -6,7 +6,7 @@ metadata:
    "helm.sh/hook": test
 spec:
   {{- if .Values.rbac.create }}
-  serviceAccountName: {{ include "rstudio-workbench.fullname" . }}-job-launcher
+  serviceAccountName: {{ include "rstudio-workbench.fullname" . }}
   {{- end }}
   {{- if and (not .Values.rbac.create) (.Values.serviceAccountName) }}
   serviceAccountName: {{ .Values.serviceAccountName }}
@@ -16,4 +16,8 @@ spec:
   {{- $overrideDict := . | deepCopy }}
   {{- $_ := set $overrideDict.Values "enableDiagnostics" true }}
   {{- $_ := set $overrideDict.Values "userCreate" true }}
+  {{- $_ := set $overrideDict.Values "readinessProbe.enabled" false }}
+  {{- $_ := set $overrideDict.Values "livenessProbe.enabled" false }}
+  {{- $_ := set $overrideDict.Values "startupProbe.enabled" false }}
+  {{- $_ := set $overrideDict.Values ".Values.prometheusExporter.enabled" false }}
 {{ include "rstudio-workbench.containers" $overrideDict | indent 2 }}
