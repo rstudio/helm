@@ -7,6 +7,7 @@ fullnameOverride: ""
 versionOverride: ""
 
 session:
+  # -- Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this
   defaultConfigMount: true
   image:
     # -- A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined
@@ -262,7 +263,6 @@ config:
       launcher-port: 5559
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
-      launcher-sessions-callback-address: http://127.0.0.1:8787
       monitor-graphite-enabled: 1
       monitor-graphite-host: 127.0.0.1
       monitor-graphite-port: 9109
@@ -275,7 +275,7 @@ config:
         admin-group: rstudio-server
         authorization-enabled: 1
         thread-pool-size: 4
-        enable-debug-logging: 1
+        enable-debug-logging: 0
       cluster:
         name: Kubernetes
         type: Kubernetes

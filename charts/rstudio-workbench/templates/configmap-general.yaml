@@ -1,4 +1,4 @@
-{{/* Define the default values that will be merged over */}}
+{{- /* Define the default values that will be merged over */}}
 {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
 {{- $sessionTag := .Values.session.image.tag | default (printf "%s%s" .Values.session.image.tagPrefix $defaultVersion ) }}
 {{- $defaultImages := list (printf "%s:%s" .Values.session.image.repository $sessionTag) }}
@@ -12,11 +12,12 @@
   {{- $defaultOverrides = concat $defaultOverrides ( list $sessionVolumeOverride $sessionVolumeMountOverride ) }}
 {{- end }}
 {{- $defaultProfiles := dict "default-container-image" (first $defaultImages) "container-images" $defaultImages "allow-unknown-images" 1 }}
-{{- if $defaultOverrides }}
-  {{/* if defaultOverrides exist - add them */}}
-  {{- $defaultProfiles = mergeOverwrite $defaultProfiles ( dict "job-json-overrides" $defaultOverrides ) }}
-{{- end }}
 {{- $defaultProfilesConfig := dict "*" $defaultProfiles }}
+{{- /* Define the default rserver values - point to the launcher and IDE services in Kubernetes */}}
+{{- $defaultIDEServiceName := include "rstudio-workbench.fullname" . }}
+{{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
+{{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
+{{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -29,8 +30,9 @@ data:
 {{- if .Values.license.server }}
   {{- $licenseParam := dict "server-license-type" "remote" }}
   {{- $licenseServerConf := dict "rserver.conf" $licenseParam}}
-  {{- $overrideDict = mergeOverwrite $overrideDict $licenseServerConf}}
+  {{- $overrideDict = mergeOverwrite $licenseServerConf $overrideDict }}
 {{- end }}
+{{- $overrideDict = mergeOverwrite $defaultRServerConfig $overrideDict }}
 {{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
 {{- $profilesConfig := .Values.config.profiles }}
@@ -38,14 +40,14 @@ data:
 {{- $useLegacyProfiles := hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
 {{- $jobJsonFilePath := "/mnt/job-json-overrides-new/" }}
 {{- if not $useLegacyProfiles }}
-  {{- $profilesDict := dict "data" ($profilesConfig | deepCopy) "filePath" $jobJsonFilePath }}
+  {{- $profilesDict := dict "data" ($profilesConfig | deepCopy) "filePath" ($jobJsonFilePath) "jobJsonDefaults" ($defaultOverrides) }}
   {{/* generate the profiles configuration */}}
   {{- include "rstudio-library.profiles.ini.advanced" $profilesDict | nindent 2 }}
 {{- end }}
-{{/* generate the server configuration (dcf files) minus launcher-mounts */}}
-{{ include "rstudio-library.config.dcf" ( omit .Values.config.serverDcf "launcher-mounts" ) | indent 2 }}
-{{/* generate the launcher-mounts file */}}
-{{ include "rstudio-workbench.config.launcherMounts" . | indent 2 }}
+  {{- /* generate the server configuration (dcf files) minus launcher-mounts */}}
+  {{- include "rstudio-library.config.dcf" ( omit .Values.config.serverDcf "launcher-mounts" ) | nindent 2 }}
+  {{- /* generate the launcher-mounts file */}}
+  {{- include "rstudio-workbench.config.launcherMounts" . | nindent 2 }}
 ---
 {{/* The old pattern for job-json-overrides "json" files */}}
 {{- if .Values.jobJsonOverridesFiles }}
@@ -70,6 +72,6 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 data:
   {{/* TODO: need to make the json-from-overrides-config take more than one file... only using launcher.kubernetes.profiles.conf today */}}
-  {{- $configValue := dict "data" (get $profilesConfig "launcher.kubernetes.profiles.conf" | deepCopy) "default" (list) }}
+  {{- $configValue := dict "data" (get $profilesConfig "launcher.kubernetes.profiles.conf" | deepCopy) "default" ($defaultOverrides) }}
   {{- include "rstudio-library.profiles.json-from-overrides-config" $configValue | indent 2 }}
 {{- end }}

@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Workbench
 
-![Version: 0.4.0-rc14](https://img.shields.io/badge/Version-0.4.0--rc14-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
+![Version: 0.4.0-rc15](https://img.shields.io/badge/Version-0.4.0--rc15-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.4.0-rc14:
+To install the chart with the release name `my-release` at version 0.4.0-rc15:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc14
+helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc15
 ```
 
 ## Required Configuration
@@ -143,7 +143,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | config.server."launcher.conf".server.address | string | `"127.0.0.1"` |  |
 | config.server."launcher.conf".server.admin-group | string | `"rstudio-server"` |  |
 | config.server."launcher.conf".server.authorization-enabled | int | `1` |  |
-| config.server."launcher.conf".server.enable-debug-logging | int | `1` |  |
+| config.server."launcher.conf".server.enable-debug-logging | int | `0` |  |
 | config.server."launcher.conf".server.port | int | `5559` |  |
 | config.server."launcher.conf".server.server-user | string | `"rstudio-server"` |  |
 | config.server."launcher.conf".server.thread-pool-size | int | `4` |  |
@@ -152,7 +152,6 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | config.server."rserver.conf".launcher-address | string | `"127.0.0.1"` |  |
 | config.server."rserver.conf".launcher-default-cluster | string | `"Kubernetes"` |  |
 | config.server."rserver.conf".launcher-port | int | `5559` |  |
-| config.server."rserver.conf".launcher-sessions-callback-address | string | `"http://127.0.0.1:8787"` |  |
 | config.server."rserver.conf".launcher-sessions-enabled | int | `1` |  |
 | config.server."rserver.conf".monitor-graphite-client-id | string | `"rstudio"` |  |
 | config.server."rserver.conf".monitor-graphite-enabled | int | `1` |  |
@@ -226,7 +225,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | service.annotations | object | `{}` | annotations for the service definition |
 | service.nodePort | bool | `false` | the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically |
 | service.type | string | `"NodePort"` | the service type (i.e. NodePort, LoadBalancer, etc.) |
-| session.defaultConfigMount | bool | `true` |  |
+| session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
 | session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |
 | session.image.tagPrefix | string | `"bionic-"` | A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined |

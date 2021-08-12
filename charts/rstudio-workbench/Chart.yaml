@@ -1,6 +1,6 @@
 name: rstudio-workbench
 description: Kubernetes deployment for RStudio Workbench
-version: 0.4.0-rc14
+version: 0.4.0-rc15
 apiVersion: v2
 appVersion: 1.4.1717-3
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png

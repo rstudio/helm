@@ -1,11 +1,46 @@
 {{- if .Values.rbac.create }}
-{{ $namespace := $.Release.Namespace }}
-{{ $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
-{{ $serviceAccountName := default (include "rstudio-workbench.fullname" .) .Values.rbac.serviceAccount.name }}
-{{ $serviceAccountCreate := .Values.rbac.create }}
-{{ $serviceAccountAnnotations := .Values.serviceAccountAnnotations }}
-{{ $rbacValues1 := dict "namespace" $namespace "serviceAccountName" $serviceAccountName "targetNamespace" $targetNamespace }}
-{{ $rbacValues2 := dict "serviceAccountCreate" $.Values.rbac.create "serviceAccountAnnotations" $serviceAccountAnnotations }}
-{{ $rbacValues := merge $rbacValues1 $rbacValues2 }}
-{{ include "rstudio-library.rbac" $rbacValues }}
+{{- $namespace := $.Release.Namespace }}
+{{- $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
+{{- $serviceAccountName := default (include "rstudio-workbench.fullname" .) .Values.rbac.serviceAccount.name }}
+{{- $serviceAccountCreate := .Values.rbac.create }}
+{{- $roleName := $serviceAccountName }}
+{{- $serviceAccountAnnotations := .Values.serviceAccountAnnotations }}
+{{- $rbacValues1 := dict "namespace" $namespace "serviceAccountName" $serviceAccountName "targetNamespace" $targetNamespace }}
+{{- $rbacValues2 := dict "serviceAccountCreate" $.Values.rbac.create "serviceAccountAnnotations" $serviceAccountAnnotations "roleName" ($roleName) }}
+{{- $rbacValues := merge $rbacValues1 $rbacValues2 }}
+{{- include "rstudio-library.rbac" $rbacValues }}
+{{- if ne $namespace $targetNamespace }}
+{{- /*
+  Allow listing pods for the namespace the ServiceAccount is in
+  TODO: can remove this once the load-balancer sidecar is not needed
+*/}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $roleName }}
+  namespace: {{ $namespace }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+    verbs:
+      - "get"
+      - "list"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $roleName }}
+  namespace: {{ $namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $roleName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $serviceAccountName }}
+    namespace: {{ $namespace }}
+{{- end }}
 {{- end }}

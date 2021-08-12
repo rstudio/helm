@@ -40,8 +40,8 @@ containers:
     value: "true"
   {{- end }}
   - name: RSTUDIO_LAUNCHER_NAMESPACE
-    value: "{{ $.Release.Namespace }}"
-{{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-workbench") "envVarPrefix" ("RSW") "fullName" (include "rstudio-workbench.fullname" .)) | indent 2 }}
+    value: "{{ default $.Release.Namespace .Values.launcher.namespace }}"
+  {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-workbench") "envVarPrefix" ("RSW") "fullName" (include "rstudio-workbench.fullname" .)) | nindent 2 }}
   - name: RSP_LAUNCHER
     value: "{{ .Values.launcher.enabled }}"
   {{- if .Values.userCreate }}
@@ -98,19 +98,19 @@ containers:
       mountPath: "/etc/rstudio"
     - name: shared-data
       mountPath: "/mnt/load-balancer/rstudio"
-{{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 4 }}
-{{/* TODO: path collision problems... would be ideal to not have to maintain both long term */}}
-{{- if .Values.jobJsonOverridesFiles }}
+    {{- include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | nindent 4 }}
+    {{- /* TODO: path collision problems... would be ideal to not have to maintain both long term */}}
+    {{- if .Values.jobJsonOverridesFiles }}
     - name: rstudio-job-overrides-old
       mountPath: "/mnt/job-json-overrides"
-{{- end }}
-{{- if not $useLegacyProfiles }}
+    {{- end }}
+    {{- if not $useLegacyProfiles }}
     - name: rstudio-job-overrides-new
       mountPath: "/mnt/job-json-overrides-new"
-{{- end }}
-{{- if .Values.pod.volumeMounts }}
-{{ toYaml .Values.pod.volumeMounts | indent 4 }}
-{{- end }}
+    {{- end }}
+    {{- if .Values.pod.volumeMounts }}
+    {{- toYaml .Values.pod.volumeMounts | nindent 4 }}
+    {{- end }}
   resources:
     {{- if .Values.resources.requests.enabled }}
     requests:

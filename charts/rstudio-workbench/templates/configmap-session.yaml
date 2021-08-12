@@ -5,5 +5,23 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-session
   namespace: {{ $.Release.Namespace }}
 data:
-{{ include "rstudio-library.config.ini" .Values.config.session | indent 2 }}
+  {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
+
+{{- /*
+  if session/target namespace differs - duplicate session configuration there
+    - when .Values.session.defaultConfigMount is true, we mount session configuration into the session pods
+    - however, configmaps cannot be mounted across namespaces
+    - so the session configmap should live in both the .Values.launcher.namespace and in the Release Namespace
+  we create this value regardless of the value of .Values.session.defaultConfigMount, in case it is needed for other reasons
+*/}}
+{{- $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
+{{- if ne $targetNamespace $.Release.Namespace }}
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-session
+  namespace: {{ $targetNamespace }}
+data:
+  {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
+{{- end }}

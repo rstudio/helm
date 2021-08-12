@@ -19,20 +19,3 @@ spec:
     nodePort: {{ .Values.service.nodePort }}
     {{- end }}
     targetPort: 8787
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "rstudio-workbench.fullname" . }}-launcher
-  namespace: {{ $.Release.Namespace }}
-  labels:
-    {{- include "rstudio-workbench.labels" . | nindent 4 }}
-spec:
-  type: NodePort
-  selector:
-    {{- include "rstudio-workbench.selectorLabels" . | nindent 4 }}
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 5559
----
