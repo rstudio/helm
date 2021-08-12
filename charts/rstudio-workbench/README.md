@@ -143,7 +143,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | config.server."launcher.conf".server.address | string | `"127.0.0.1"` |  |
 | config.server."launcher.conf".server.admin-group | string | `"rstudio-server"` |  |
 | config.server."launcher.conf".server.authorization-enabled | int | `1` |  |
-| config.server."launcher.conf".server.enable-debug-logging | int | `1` |  |
+| config.server."launcher.conf".server.enable-debug-logging | int | `0` |  |
 | config.server."launcher.conf".server.port | int | `5559` |  |
 | config.server."launcher.conf".server.server-user | string | `"rstudio-server"` |  |
 | config.server."launcher.conf".server.thread-pool-size | int | `4` |  |
