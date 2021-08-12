@@ -225,7 +225,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | service.annotations | object | `{}` | annotations for the service definition |
 | service.nodePort | bool | `false` | the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically |
 | service.type | string | `"NodePort"` | the service type (i.e. NodePort, LoadBalancer, etc.) |
-| session.defaultConfigMount | bool | `true` |  |
+| session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
 | session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |
 | session.image.tagPrefix | string | `"bionic-"` | A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined |
