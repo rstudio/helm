@@ -3,7 +3,7 @@
 {{- $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
 {{- $serviceAccountName := default (include "rstudio-workbench.fullname" .) .Values.rbac.serviceAccount.name }}
 {{- $serviceAccountCreate := .Values.rbac.create }}
-{{- $roleName := $serviceAccountCreate }}
+{{- $roleName := $serviceAccountName }}
 {{- $serviceAccountAnnotations := .Values.serviceAccountAnnotations }}
 {{- $rbacValues1 := dict "namespace" $namespace "serviceAccountName" $serviceAccountName "targetNamespace" $targetNamespace }}
 {{- $rbacValues2 := dict "serviceAccountCreate" $.Values.rbac.create "serviceAccountAnnotations" $serviceAccountAnnotations "roleName" ($roleName) }}
@@ -13,7 +13,7 @@
 {{- /*
   Allow listing pods for the namespace the ServiceAccount is in
   TODO: can remove this once the load-balancer sidecar is not needed
-*/ }}
+*/}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
