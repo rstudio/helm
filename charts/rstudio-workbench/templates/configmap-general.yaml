@@ -16,9 +16,7 @@
 {{- /* Define the default rserver values - point to the launcher and IDE services in Kubernetes */}}
 {{- $defaultIDEServiceName := include "rstudio-workbench.fullname" . }}
 {{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
-{{- $defaultLauncherServiceName :=  print "%s-launcher" (include "rstudio-workbench.fullname" .) }}
-{{- $defaultLauncherServiceURL := printf "%s.%s.svc.cluster.local" $defaultLauncherServiceName $.Release.Namespace }}
-{{- $defaultRServerConfigValues := dict "launcher-address" ($defaultLauncherServiceURL) "launcher-port" ("80") "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
+{{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
 ---
 apiVersion: v1
@@ -46,10 +44,10 @@ data:
   {{/* generate the profiles configuration */}}
   {{- include "rstudio-library.profiles.ini.advanced" $profilesDict | nindent 2 }}
 {{- end }}
-{{/* generate the server configuration (dcf files) minus launcher-mounts */}}
-{{ include "rstudio-library.config.dcf" ( omit .Values.config.serverDcf "launcher-mounts" ) | indent 2 }}
-{{/* generate the launcher-mounts file */}}
-{{ include "rstudio-workbench.config.launcherMounts" . | indent 2 }}
+  {{- /* generate the server configuration (dcf files) minus launcher-mounts */}}
+  {{- include "rstudio-library.config.dcf" ( omit .Values.config.serverDcf "launcher-mounts" ) | nindent 2 }}
+  {{- /* generate the launcher-mounts file */}}
+  {{- include "rstudio-workbench.config.launcherMounts" . | nindent 2 }}
 ---
 {{/* The old pattern for job-json-overrides "json" files */}}
 {{- if .Values.jobJsonOverridesFiles }}
