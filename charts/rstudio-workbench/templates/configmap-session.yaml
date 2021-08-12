@@ -5,5 +5,17 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-session
   namespace: {{ $.Release.Namespace }}
 data:
-{{ include "rstudio-library.config.ini" .Values.config.session | indent 2 }}
+  {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
+
+{{- /* if session/target namespace differs - duplicate session configuration there */}}
+{{- $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
+{{- if ne $targetNamespace $.Release.Namespace }}
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-session
+  namespace: {{ $targetNamespace }}
+data:
+  {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
+{{- end }}
