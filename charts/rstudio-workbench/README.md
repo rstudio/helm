@@ -140,7 +140,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | config.server."jupyter.conf".notebooks-enabled | int | `1` |  |
 | config.server."launcher.conf".cluster.name | string | `"Kubernetes"` |  |
 | config.server."launcher.conf".cluster.type | string | `"Kubernetes"` |  |
-| config.server."launcher.conf".server.address | string | `"0.0.0.0"` |  |
+| config.server."launcher.conf".server.address | string | `"127.0.0.1"` |  |
 | config.server."launcher.conf".server.admin-group | string | `"rstudio-server"` |  |
 | config.server."launcher.conf".server.authorization-enabled | int | `1` |  |
 | config.server."launcher.conf".server.enable-debug-logging | int | `0` |  |
@@ -149,7 +149,9 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | config.server."launcher.conf".server.thread-pool-size | int | `4` |  |
 | config.server."logging.conf" | object | `{}` |  |
 | config.server."rserver.conf".admin-enabled | int | `1` |  |
+| config.server."rserver.conf".launcher-address | string | `"127.0.0.1"` |  |
 | config.server."rserver.conf".launcher-default-cluster | string | `"Kubernetes"` |  |
+| config.server."rserver.conf".launcher-port | int | `5559` |  |
 | config.server."rserver.conf".launcher-sessions-enabled | int | `1` |  |
 | config.server."rserver.conf".monitor-graphite-client-id | string | `"rstudio"` |  |
 | config.server."rserver.conf".monitor-graphite-enabled | int | `1` |  |
