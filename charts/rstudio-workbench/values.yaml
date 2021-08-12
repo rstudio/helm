@@ -258,18 +258,15 @@ config:
       admin-enabled: 1
       www-port: 8787
       server-project-sharing: 1
-      launcher-address: 127.0.0.1
-      launcher-port: 5559
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
-      launcher-sessions-callback-address: http://127.0.0.1:8787
       monitor-graphite-enabled: 1
       monitor-graphite-host: 127.0.0.1
       monitor-graphite-port: 9109
       monitor-graphite-client-id: rstudio
     launcher.conf:
       server:
-        address: 127.0.0.1
+        address: 0.0.0.0
         port: 5559
         server-user: rstudio-server
         admin-group: rstudio-server
