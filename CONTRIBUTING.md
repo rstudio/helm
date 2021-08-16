@@ -20,6 +20,20 @@ To submit a contribution:
 
 We'll try to be as responsive as possible in reviewing and accepting pull requests. We highly appreciate your contributions!
 
+## Assumptions / Common Dev Workflows
+
+- Changes to the `rstudio-library` chart will update all downstream charts at
+  the same time (via the `file://` syntax in `Chart.yaml`)
+- CI only runs on local branches (i.e. not from forks). This can make
+  evaluating code from contributors tricky. By creating a duplicate branch
+  locally, we can "trick" CI into running on the same commits
+- CI requires that the chart version get bumped for any change in the directory
+  (including README)
+- READMEs are generated in CI by [Go templating](./charts/_templates.gotmpl)
+  and `helm-docs`
+- If `index.yaml` gets out of date on the repository, see
+  [`./scripts/`](./scripts) for a workflow to fix
+
 ## Code of Conduct
 
 As contributors and maintainers of this project, we pledge to respect all people who contribute through reporting issues, posting feature requests, updating documentation, submitting pull requests or patches, and other activities.
