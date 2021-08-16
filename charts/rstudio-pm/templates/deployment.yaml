@@ -25,7 +25,7 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "2112"
-{{ include "rstudio-pm.pod.annotations" . | indent 8 }}
+        {{- include "rstudio-pm.pod.annotations" . | nindent 8 }}
       labels:
         {{- include "rstudio-pm.selectorLabels" . | nindent 8 }}
     spec:
@@ -34,16 +34,16 @@ spec:
       {{- end }}
       {{- if .Values.initContainers }}
       initContainers:
-{{ toYaml .Values.initContainers | indent 8 }}
+        {{- toYaml .Values.initContainers | nindent 8 }}
       {{- end }}
       containers:
       - name: rspm
         {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
         env:
-{{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-pm") "envVarPrefix" ("RSPM") "fullName" (include "rstudio-pm.fullname" .)) | indent 10 }}
+        {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-pm") "envVarPrefix" ("RSPM") "fullName" (include "rstudio-pm.fullname" .)) | nindent 8 }}
         {{- if .Values.pod.env }}
-{{ toYaml .Values.pod.env | indent 8 }}
+        {{- toYaml .Values.pod.env | nindent 8 }}
         {{- end }}
         {{- if .Values.command }}
         command: {{ .Values.command}}
@@ -74,10 +74,10 @@ spec:
           - name: rstudio-pm-data
             mountPath: "{{ .Values.sharedStorage.path }}"
           {{- end }}
-          {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
-      {{- if .Values.pod.volumeMounts }}
-{{ toYaml .Values.pod.volumeMounts | indent 10 }}
-      {{- end }}
+          {{- include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | nindent 10 }}
+          {{- if .Values.pod.volumeMounts }}
+          {{- toYaml .Values.pod.volumeMounts | nindent 10 }}
+          {{- end }}
         resources:
           {{- if .Values.resources.requests.enabled }}
           requests:
@@ -147,6 +147,6 @@ spec:
       {{- end }}
       {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-pm.fullname" .)) | indent 6 }}
       {{- if .Values.pod.volumes }}
-{{ toYaml .Values.pod.volumes | indent 6 }}
+      {{- toYaml .Values.pod.volumes | nindent 6 }}
       {{- end }}
 ---
