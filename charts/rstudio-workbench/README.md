@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Workbench
 
-![Version: 0.4.0-rc15](https://img.shields.io/badge/Version-0.4.0--rc15-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
+![Version: 0.4.0-rc16](https://img.shields.io/badge/Version-0.4.0--rc16-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.4.0-rc15:
+To install the chart with the release name `my-release` at version 0.4.0-rc16:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc15
+helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc16
 ```
 
 ## Required Configuration
