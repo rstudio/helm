@@ -115,7 +115,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
   - included at `/mnt/configmap/rstudio/`
 - Load Balancer file
   - If `replicas > 1` then we create and maintain a load balancer file at `/mnt/load-balancer/rstudio/`
-  - This is maintained by [a sidecar](https://hub.docker.com/r/colearendt/rstudio-load-balancer-manager) (written in bash)
+  - This is maintained by [a sidecar](https://hub.docker.com/r/rstudio/rstudio-server-load-balancer-manager)
   that queries the Kubernetes API for other RStudio pods
 - Prestart
   - This is provided by the helm chart in a configmap
