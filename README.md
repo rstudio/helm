@@ -16,6 +16,14 @@
    helm search repo rstudio
    ```
 
+## Contents
+
+Individual charts have their own documentation
+
+- [RStudio Connect](./charts/rstudio-connect)
+- [RStudio Workbench](./charts/rstudio-workbench)
+- [RStudio Package Manager](./charts/rstudio-pm)
+
 ## Support
 
 **IMPORTANT:** 
