@@ -1,0 +1,98 @@
+## This example requires the NGINX Ingress Controller to be installed ##
+#
+# For this example, we assume the following resources already exist. They are not created by the chart:
+# - A valid TLS secret named `connect-tls` for the host `connect.rstudio.com`
+# - A postgres database: `postgres://connect@postgres.rstudio.com:5432/rsc_k8s`
+# - An NFS share: `nfs.rstudio.com:/rstudio-connect`
+
+# Controls how many instances of RStudio Connect will be created.
+replicas: 3
+
+# Configures shared storage for the Connect pod. Note that `sharedStorage.path` has the
+#   same value as `config.Server.DataDir`.
+pod:
+  volumes:
+    - name: data-dir
+      nfs:
+        path: "/rstudio-connect"
+        server: "nfs.rstudio.com"
+  # Note: this volume is mounted in the location specified by `config.Server.DataDir`
+  volumeMounts:
+    - name: data-dir
+      mountPath: "/var/lib/rstudio-connect"
+
+# If you have an existing NFS volume provisioner, you can use a config like the
+#   following instead of setting `pod.volumes` / `pod.volumeMounts`.
+#   If `sharedStorage.create` is true, then this chart will create a PVC using the
+#   specified StorageClass, or the default StorageClass if non is provided. The
+#   resulting PVC will then be mounted to the Connect pod at `sharedStorage.path`.
+#   Also note that the storage provisioned here MUST be available to the content execution pod
+#   when `launcher.enabled` is true. The NFS PVC can be exposed to the content pod
+#   using the `config.Launcher.DataDir` setting.
+# sharedStorage:
+#   create: true
+#   mount: true
+#   path: /var/lib/rstudio-connect
+#   storageClassName: connect-nfs
+#   requests:
+#     storage: 100G
+
+ingress:
+  enabled: true
+
+  # For High Availability installations of RStudio Connect, where multiple `replicas`
+  #   of the Connect pod are in play, it is necessary to enable "sticky sessions" so that
+  #   traffic for a single connection is always routed to the same Connect pod.
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/affinity-mode: persistent
+    nginx.ingress.kubernetes.io/session-cookie-name: RSC-SESSION-COOKIE
+
+  # Defines our virtual hosts in the NGINX configuration.
+  hosts:
+    - host: connect.rstudio.com
+      paths:
+        - /
+
+  # Tell the ingress controller to use the TLS
+  #   secret for connections to connect.rstudio.com.
+  tls:
+    - secretName: connect-tls
+      hosts:
+        - connect.rstudio.com
+
+# Enables building and executing content in separate Kubernetes pods
+launcher:
+  enabled: true
+
+# rstudio-connect.gcfg
+config:
+  Server:
+    # Server.Address matches the FQDN in our TLS certificate.
+    Address: "https://connect.rstudio.com"
+
+    # Note: `DataDir` has the same value as `pod.volumeMounts.mountPath`.
+    DataDir: "/var/lib/rstudio-connect"
+
+  # Enables building and executing Python content.
+  Python:
+    Enabled: true
+    # Note: this setting will no longer be required in a future version of Connect.
+    #   When running Connect with launcher enabled, Python installations should be defined in
+    #   runtime.yaml files, specified by Launcher.ClusterDefinition.
+    Executable:
+      - "/opt/python/3.6.5/bin/python"
+
+  Database:
+    Provider: "Postgres"
+
+  Postgres:
+    URL: "postgres://connect@postgres.rstudio.com:5432/rsc_k8s"
+
+  # Note: the value of `config.Launcher.DataDir`
+  #   is the same NFS export location that is used by the Connect pod
+  #   config.Server.DataDir: "/var/lib/rstudio-connect".  This allows the content
+  #   pods to share data with the Connect pod.
+  Launcher:
+    DataDir: "nfs.rstudio.com:/rstudio-connect"
