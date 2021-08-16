@@ -1,6 +1,6 @@
 # rstudio-library
 
-![Version: 0.1.13-rc01](https://img.shields.io/badge/Version-0.1.13--rc01-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.1.13-rc01](https://img.shields.io/badge/AppVersion-0.1.13--rc01-informational?style=flat-square)
+![Version: 0.1.13](https://img.shields.io/badge/Version-0.1.13-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.1.13](https://img.shields.io/badge/AppVersion-0.1.13-informational?style=flat-square)
 
 A Helm chart for RStudio helper functions
 
