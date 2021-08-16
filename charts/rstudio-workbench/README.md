@@ -2,7 +2,7 @@
 
 Kubernetes deployment for RStudio Workbench
 
-![Version: 0.4.0-rc15](https://img.shields.io/badge/Version-0.4.0--rc15-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
+![Version: 0.4.0-rc16](https://img.shields.io/badge/Version-0.4.0--rc16-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
 ## Disclaimer
 
@@ -20,11 +20,11 @@ changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.4.0-rc15:
+To install the chart with the release name `my-release` at version 0.4.0-rc16:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc15
+helm install my-release rstudio/rstudio-workbench --version=0.4.0-rc16
 ```
 
 ## Required Configuration
@@ -115,7 +115,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
   - included at `/mnt/configmap/rstudio/`
 - Load Balancer file
   - If `replicas > 1` then we create and maintain a load balancer file at `/mnt/load-balancer/rstudio/`
-  - This is maintained by [a sidecar](https://hub.docker.com/r/colearendt/rstudio-load-balancer-manager) (written in bash)
+  - This is maintained by [a sidecar](https://hub.docker.com/r/rstudio/rstudio-server-load-balancer-manager)
   that queries the Kubernetes API for other RStudio pods
 - Prestart
   - This is provided by the helm chart in a configmap
