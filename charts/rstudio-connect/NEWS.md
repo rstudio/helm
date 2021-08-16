@@ -6,6 +6,7 @@
     key: my-key
   ```
 - Added support for floating licenses and license files.
+- Default RStudio Connect version is now 1.9.0.1
 - Add a `prestart.bash` script for use when `launcher.enabled=true`
   - when `launcher.enabled=true`, the chart changes `command` and `args` dynamically to use this script
   - if you set `command` and `args` yourself, we will use your settings instead. Be sure:
