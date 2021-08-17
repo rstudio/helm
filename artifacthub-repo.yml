@@ -1,0 +1,10 @@
+# from https://github.com/artifacthub/hub/blob/master/docs/metadata/artifacthub-repo.yml
+repositoryID: 2e4468ce-cda6-492e-a7a9-04c572b1450b
+owners:
+  - name: colearendt
+    email: cole@rstudio.com
+  - name: sol-eng
+    email: docker@rstudio.com
+ignore:
+  - name: rstudio-library
+  - name: rstudio-launcher-rbac
