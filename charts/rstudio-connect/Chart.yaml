@@ -1,5 +1,5 @@
 name: rstudio-connect
-description: Kubernetes deployment for RStudio Connect
+description: Official helm chart for RStudio Connect
 version: 0.2.0
 apiVersion: v2
 appVersion: 1.9.0.1
