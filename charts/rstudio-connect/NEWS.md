@@ -1,3 +1,7 @@
+# 0.2.1
+
+- Update docs
+
 # 0.2.0
 - BREAKING: Licensing configuration now uses a `license` section. For example,
   `license: my-key` should be changed to
