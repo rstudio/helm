@@ -5,6 +5,9 @@ apiVersion: v2
 appVersion: 1.9.0.1
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
+sources:
+  - https://github.com/rstudio/helm
+  - https://github.com/rstudio/rstudio-docker-products
 maintainers:
   - name: sol-eng
     email: docker@rstudio.com
@@ -13,3 +16,15 @@ dependencies:
   - name: rstudio-library
     version: 0.1.14
     repository: file://../rstudio-library
+artifacthub.io/images: |
+  - name: rstudio-connect
+    image: rstudio/rstudio-connect:1.9.0.1
+artifacthub.io/license: MIT
+keywords:
+  - "data science"
+  - "machine learning"
+  - "r"
+  - "rstats"
+  - "python"
+  - "deploy"
+  - "rstudio"
