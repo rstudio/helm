@@ -1,6 +1,6 @@
 # rstudio-pm
 
-Kubernetes deployment for RStudio Package Manager
+Official helm chart for RStudio Package Manager
 
 ![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
 

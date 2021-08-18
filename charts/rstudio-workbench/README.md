@@ -1,6 +1,6 @@
 # rstudio-workbench
 
-Kubernetes deployment for RStudio Workbench
+Official helm chart for RStudio Workbench
 
 ![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
@@ -63,18 +63,18 @@ In addition to the above required configuration, we recommend setting the follow
 ## General Principles
 
 - In most places, we opt to pass helm values over configmaps. We translate these into the valid `.ini` or `.dcf` file formats
-required by RStudio Server Pro. Those config files and their mount locations are below.
-- If you need to modify the jobs launched by RStudio Server Pro, you want to use `job-json-overrides`. There is a section on this below
+required by RStudio Workbench. Those config files and their mount locations are below.
+- If you need to modify the jobs launched by RStudio Workbench, you want to use `job-json-overrides`. There is a section on this below
   and [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
   on the topic in general.
 - If you are running in an HA environment, there is [an experimental sidecar container](https://hub.docker.com/r/colearendt/rstudio-load-balancer-manager)
   that maintains the `load-balancer` file and HUPs the rstudio-server service.
-- The prestart script for RStudio Server is highly customized to:
-  - Get the service account information off of the RStudio Server pod for use in launching jobs
+- The prestart script for RStudio Workbench is highly customized to:
+  - Get the service account information off of the RStudio Workbench pod for use in launching jobs
   - Generate `launcher.pub` as needed (if `launcher.pem` is provided). If it is not provided,
   the helm chart will generate it automatically but this information will be lost for subsequent deployments and
   can cause users to be locked out sessions started by a previous deployment.
-- RStudio Server Pro does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
+- RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
 ## Configuration files
