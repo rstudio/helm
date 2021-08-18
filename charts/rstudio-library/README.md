@@ -10,13 +10,13 @@ Helm library helpers for use by Official RStudio charts
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
-- Ensure you "pin" the version of the helm chart that you are using. You can do
-this using the `helm dependency` command and the associated "Chart.lock" files
-or the `--version` flag. IMPORTANT: This protects you from breaking changes
-- Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-for breaking changes
-- Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-changes, as well as documentation below on how to use the chart
+* Ensure you "pin" the version of the helm chart that you are using. You can do
+  this using the `helm dependency` command and the associated "Chart.lock" files
+  or the `--version` flag. IMPORTANT: This protects you from breaking changes
+* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
+  for breaking changes
+* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
+  changes, as well as documentation below on how to use the chart
 
 # Usage
 
