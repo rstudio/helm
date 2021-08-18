@@ -5,6 +5,7 @@ type: library
 version: 0.1.14
 appVersion: 0.1.14
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+home: https://www.rstudio.com
 maintainers:
   - name: sol-eng
     email: docker@rstudio.com
