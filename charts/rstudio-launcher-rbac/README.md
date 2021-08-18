@@ -27,6 +27,18 @@ helm repo add rstudio https://helm.rstudio.com
 helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.3
 ```
 
+## Common Usage
+
+> NOTE: this chart is intended primarily for use by individuals who _do not_
+> want to use our other helm charts. This chart ONLY deploys RBAC or generates RBAC yaml directly
+>
+> It is _not needed_ if you are using other RStudio helm charts
+
+To generate RBAC yaml for use with `kubectl apply`:
+```
+helm template -n rstudio rstudio-launcher-rbac rstudio/rstudio-launcher-rbac
+```
+
 ## Values
 
 | Key | Type | Default | Description |
