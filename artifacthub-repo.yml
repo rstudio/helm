@@ -6,5 +6,4 @@ owners:
   - name: sol-eng
     email: docker@rstudio.com
 ignore:
-  - name: rstudio-library
   - name: rstudio-launcher-rbac
