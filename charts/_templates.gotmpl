@@ -1,11 +1,13 @@
 {{- define "rstudio.blurb" }}
   {{- if eq .Name "rstudio-connect" -}}
-Business Users and Collaborators use R and Python data products on RStudio Connect that are published by Data Scientists.
+Business Users and Collaborators use R and Python data products on [RStudio Connect](https://www.rstudio.com/products/connect/)
+that are published by Data Scientists.
   {{- else if eq .Name "rstudio-pm" -}}
-IT Administrators use RStudio Package Manager to control and manage R and Python packages that Data Scientists need
-to create and share data products.
+IT Administrators use [RStudio Package Manager](https://www.rstudio.com/products/package-manager/) to control and manage
+R and Python packages that Data Scientists need to create and share data products.
   {{- else if eq .Name "rstudio-workbench" -}}
-Data Scientists use RStudio Workbench to analyze data and create data products using R and Python.
+Data Scientists use [RStudio Workbench](https://www.rstudio.com/products/workbench/) to analyze data and create data
+products using R and Python.
   {{- end -}}
 {{- end }}
 
