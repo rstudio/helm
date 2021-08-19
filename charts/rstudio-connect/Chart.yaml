@@ -24,6 +24,8 @@ annotations:
   artifacthub.io/links: |
     - name: RStudio Community
       url: https://community.rstudio.com/c/r-admin/5
+    - name: About Connect
+      url: https://www.rstudio.com/products/connect/
 keywords:
   - "data science"
   - "machine learning"

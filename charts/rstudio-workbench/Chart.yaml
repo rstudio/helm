@@ -26,6 +26,10 @@ annotations:
   artifacthub.io/links: |
     - name: RStudio Community
       url: https://community.rstudio.com/c/r-admin/5
+    - name: About Workbench
+      url: https://www.rstudio.com/products/workbench/
+    - name: About RStudio Team
+      url: https://www.rstudio.com/products/team/
 keywords:
   - "data science"
   - "machine learning"

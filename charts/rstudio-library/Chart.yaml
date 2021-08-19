@@ -17,6 +17,8 @@ annotations:
   artifacthub.io/links: |
     - name: RStudio Community
       url: https://community.rstudio.com/c/r-admin/5
+    - name: About RStudio Team
+      url: https://www.rstudio.com/products/team/
 keywords:
   - "rstudio"
   - "library"

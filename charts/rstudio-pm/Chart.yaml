@@ -24,6 +24,10 @@ annotations:
   artifacthub.io/links: |
     - name: RStudio Community
       url: https://community.rstudio.com/c/r-admin/5
+    - name: About Package Manager
+      url: https://www.rstudio.com/products/package-manager/
+    - name: About RStudio Team
+      url: https://www.rstudio.com/products/team/
 keywords:
   - "data science"
   - "machine learning"
