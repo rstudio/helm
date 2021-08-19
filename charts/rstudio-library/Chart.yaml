@@ -12,7 +12,11 @@ maintainers:
   - name: sol-eng
     email: docker@rstudio.com
     url: https://github.com/rstudio/helm
-artifacthub.io/license: MIT
+annotations:
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: RStudio Community
+      url: https://community.rstudio.com/c/r-admin/5
 keywords:
   - "rstudio"
   - "library"

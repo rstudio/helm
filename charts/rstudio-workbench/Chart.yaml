@@ -16,12 +16,16 @@ dependencies:
   - name: rstudio-library
     version: 0.1.14
     repository: file://../rstudio-library
-artifacthub.io/images: |
-  - name: rstudio-workbench
-    image: rstudio/rstudio-workbench:1.4.1717-3
-  - name: r-session-complete
-    image: rstudio/r-session-complete:bionic-1.4.1717-3
-artifacthub.io/license: MIT
+annotations:
+  artifacthub.io/images: |
+    - name: rstudio-workbench
+      image: rstudio/rstudio-workbench:1.4.1717-3
+    - name: r-session-complete
+      image: rstudio/r-session-complete:bionic-1.4.1717-3
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: RStudio Community
+      url: https://community.rstudio.com/c/r-admin/5
 keywords:
   - "data science"
   - "machine learning"

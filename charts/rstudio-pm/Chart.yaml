@@ -16,10 +16,14 @@ dependencies:
   - name: rstudio-library
     version: 0.1.14
     repository: file://../rstudio-library
-artifacthub.io/images: |
-  - name: rstudio-package-manager
-    image: rstudio/rstudio-package-manager:1.2.2.1-17
-artifacthub.io/license: MIT
+annotations:
+  artifacthub.io/images: |
+    - name: rstudio-package-manager
+      image: rstudio/rstudio-package-manager:1.2.2.1-17
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: RStudio Community
+      url: https://community.rstudio.com/c/r-admin/5
 keywords:
   - "data science"
   - "machine learning"
