@@ -1,5 +1,5 @@
 name: rstudio-pm
-description: Official helm chart for RStudio Package Manager
+description: Official Helm chart for RStudio Package Manager
 version: 0.2.1
 apiVersion: v2
 appVersion: 1.2.2.1-17

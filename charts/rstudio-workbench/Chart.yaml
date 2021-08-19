@@ -1,5 +1,5 @@
 name: rstudio-workbench
-description: Official helm chart for RStudio Workbench
+description: Official Helm chart for RStudio Workbench
 version: 0.4.1
 apiVersion: v2
 appVersion: 1.4.1717-3

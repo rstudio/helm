@@ -39,8 +39,8 @@ YAML top-level keys, specifying the different areas of configuration:
   - This section configures which storage provisioner to use with the
     deployment, the size of the storage, which access modes it has, and what
     will be the mounting point. The example assigns an empty string as that
-    means the deployment will use the cluster's supported storage provisioner.
-    To find more about the different storage provisioners you can read about it
+    means the deployment will use the cluster's default supported storage provisioner.
+    To find more about the different storage provisioners, see
     in the [Kubernetes
     documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner).
     
@@ -57,7 +57,7 @@ YAML top-level keys, specifying the different areas of configuration:
 
   - This section configures how many pods to deploy of your application. The
     example uses 1 because it's for a single deployment. However this doesn't
-    mean that by increasing replicas to be higher than one you will have a High
+    mean that by increasing replicas `> 1` you will have a High
     Availability deployment configured. If you want to deploy a High
     Availability setup you can read about all of the requirements in the
     [product's Admin Guide](https://docs.rstudio.com/connect/admin/)
