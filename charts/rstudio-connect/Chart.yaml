@@ -1,14 +1,38 @@
 name: rstudio-connect
-description: Kubernetes deployment for RStudio Connect
-version: 0.2.0
+description: Official Helm chart for RStudio Connect
+version: 0.2.1
 apiVersion: v2
 appVersion: 1.9.0.1
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+home: https://www.rstudio.com
+sources:
+  - https://github.com/rstudio/helm
+  - https://github.com/rstudio/rstudio-docker-products
 maintainers:
   - name: sol-eng
     email: docker@rstudio.com
     url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
-    version: 0.1.13
+    version: 0.1.14
     repository: file://../rstudio-library
+annotations:
+  artifacthub.io/images: |
+    - name: rstudio-connect
+      image: rstudio/rstudio-connect:1.9.0.1
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: RStudio Community
+      url: https://community.rstudio.com/c/r-admin/5
+    - name: About Connect
+      url: https://www.rstudio.com/products/connect/
+    - name: About RStudio Team
+      url: https://www.rstudio.com/products/team/
+keywords:
+  - "data science"
+  - "machine learning"
+  - "r"
+  - "rstats"
+  - "python"
+  - "deploy"
+  - "rstudio"

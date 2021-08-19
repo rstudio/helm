@@ -1,0 +1,32 @@
+#### values.yaml file for standalone deployment of RStudio Connect ####
+
+# Storage
+sharedStorage:
+  create: true
+  storageClassName: ""
+  path: /var/lib/rstudio-connect
+  accessModes:
+    - ReadWriteMany
+  requests:
+    storage: "10Gi"
+
+# Docker Image
+image:
+  repository: rstudio/rstudio-connect
+  tag: "1.8.6.2"
+
+# Replicas
+replicas: 1
+
+# RStudio Connect configuration
+config:
+  Python:
+    Enabled: true
+    Executable:
+      - /opt/python/3.6.5/bin/python
+  'RPackageRepository "CRAN"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  'RPackageRepository "RSPM"':
+    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  Server:
+    DefaultContentListView: expanded

@@ -1,8 +1,11 @@
-# rstudio-connect
+# RStudio Connect
 
-Kubernetes deployment for RStudio Connect
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 1.9.0.1](https://img.shields.io/badge/AppVersion-1.9.0.1-informational?style=flat-square)
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![AppVersion: 1.9.0.1](https://img.shields.io/badge/AppVersion-1.9.0.1-informational?style=flat-square)
+#### _Official Helm chart for RStudio Connect_
+
+Business Users and Collaborators use R and Python data products on [RStudio Connect](https://www.rstudio.com/products/connect/)
+that are published by Data Scientists.
 
 ## Disclaimer
 
@@ -10,21 +13,21 @@ Kubernetes deployment for RStudio Connect
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
-- Ensure you "pin" the version of the helm chart that you are using. You can do
-this using the `helm dependency` command and the associated "Chart.lock" files
-or the `--version` flag. IMPORTANT: This protects you from breaking changes
-- Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-for breaking changes
-- Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-changes, as well as documentation below on how to use the chart
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
+  this using the `helm dependency` command and the associated "Chart.lock" files
+  or the `--version` flag. IMPORTANT: This protects you from breaking changes
+* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
+  for breaking changes
+* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
+  changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0:
+To install the chart with the release name `my-release` at version 0.2.1:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.0
+helm install my-release rstudio/rstudio-connect --version=0.2.1
 ```
 
 ## Required Configuration

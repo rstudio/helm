@@ -1,5 +1,8 @@
 # RStudio Helm charts
 
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/rstudio)](https://artifacthub.io/packages/search?repo=rstudio)
+[![GitHub license](https://img.shields.io/github/license/rstudio/helm.svg)](https://github.com/rstudio/helm/blob/main/LICENSE)
+
 ## Usage
 
 1. Install [Helm](https://helm.sh). Please refer to Helm's [documentation](https://helm.sh/docs/) for more information on getting started.

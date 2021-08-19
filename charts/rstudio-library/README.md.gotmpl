@@ -1,0 +1,23 @@
+{{ template "rstudio.header" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "rstudio.description" . }}
+
+{{ template "rstudio.disclaimer" . }}
+
+# Usage
+
+> The `rstudio-library` chart _cannot be installed_
+
+A ["library" chart](https://helm.sh/docs/topics/library_charts/) exists to provide helper functions for use by other
+helm charts.
+
+The functions and helpers defined in the `rstudio-library` chart are utilized by the other RStudio Helm charts.
+
+It cannot be used directly. 
+
+If you are curious about its usage, take a look at the other charts (i.e. `rstudio-connect`, etc.) and look
+for `rstudio-library` in the `templates/` directory.
+
+{{ template "helm-docs.versionFooter" . }}

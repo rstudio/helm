@@ -1,8 +1,11 @@
-# rstudio-pm
+# RStudio Package Manager
 
-Kubernetes deployment for RStudio Package Manager
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
+#### _Official Helm chart for RStudio Package Manager_
+
+IT Administrators use [RStudio Package Manager](https://www.rstudio.com/products/package-manager/) to control and manage
+R and Python packages that Data Scientists need to create and share data products.
 
 ## Disclaimer
 
@@ -10,21 +13,21 @@ Kubernetes deployment for RStudio Package Manager
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
-- Ensure you "pin" the version of the helm chart that you are using. You can do
-this using the `helm dependency` command and the associated "Chart.lock" files
-or the `--version` flag. IMPORTANT: This protects you from breaking changes
-- Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-for breaking changes
-- Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-changes, as well as documentation below on how to use the chart
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
+  this using the `helm dependency` command and the associated "Chart.lock" files
+  or the `--version` flag. IMPORTANT: This protects you from breaking changes
+* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
+  for breaking changes
+* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
+  changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0:
+To install the chart with the release name `my-release` at version 0.2.1:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.0
+helm install my-release rstudio/rstudio-pm --version=0.2.1
 ```
 
 ## Required Configuration

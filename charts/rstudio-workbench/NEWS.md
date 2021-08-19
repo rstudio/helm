@@ -1,3 +1,7 @@
+# 0.4.1
+
+- Update docs
+
 # 0.4.0
 
 - BREAKING: `serviceAccountName` is now `rbac.serviceAccount.name` for consistency with our other charts
