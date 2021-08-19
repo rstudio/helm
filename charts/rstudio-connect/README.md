@@ -4,7 +4,8 @@
 
 #### _Official helm chart for RStudio Connect_
 
-Business Users and Collaborators use R and Python data products on RStudio Connect that are published by Data Scientists.
+Business Users and Collaborators use R and Python data products on [RStudio Connect](https://www.rstudio.com/products/connect/)
+that are published by Data Scientists.
 
 ## Disclaimer
 

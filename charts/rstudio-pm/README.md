@@ -4,8 +4,8 @@
 
 #### _Official helm chart for RStudio Package Manager_
 
-IT Administrators use RStudio Package Manager to control and manage R and Python packages that Data Scientsts need
-to create and share data products.
+IT Administrators use [RStudio Package Manager](https://www.rstudio.com/products/package-manager/) to control and manage
+R and Python packages that Data Scientists need to create and share data products.
 
 ## Disclaimer
 

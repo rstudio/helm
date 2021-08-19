@@ -4,7 +4,8 @@
 
 #### _Official helm chart for RStudio Workbench_
 
-Data Scientists use RStudio Workbench to analyze data and create data products using R and Python.
+Data Scientists use [RStudio Workbench](https://www.rstudio.com/products/workbench/) to analyze data and create data
+products using R and Python.
 
 ## Disclaimer
 
