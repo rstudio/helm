@@ -1,8 +1,10 @@
-# rstudio-connect
-
-Official helm chart for RStudio Connect
+# RStudio Connect
 
 ![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 1.9.0.1](https://img.shields.io/badge/AppVersion-1.9.0.1-informational?style=flat-square)
+
+#### _Official helm chart for RStudio Connect_
+
+Business Users and Collaborators use R and Python data products on RStudio Connect that are published by Data Scientists.
 
 ## Disclaimer
 

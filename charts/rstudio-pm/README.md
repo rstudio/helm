@@ -1,8 +1,11 @@
-# rstudio-pm
-
-Official helm chart for RStudio Package Manager
+# RStudio Package Manager
 
 ![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
+
+#### _Official helm chart for RStudio Package Manager_
+
+IT Administrators use RStudio Package Manager to control and manage R and Python packages that Data Scientsts need
+to create and share data products.
 
 ## Disclaimer
 
