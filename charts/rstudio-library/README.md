@@ -10,7 +10,7 @@
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
-* Ensure you "pin" the version of the helm chart that you are using. You can do
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
   this using the `helm dependency` command and the associated "Chart.lock" files
   or the `--version` flag. IMPORTANT: This protects you from breaking changes
 * Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
@@ -25,7 +25,7 @@ As a result, please:
 A ["library" chart](https://helm.sh/docs/topics/library_charts/) exists to provide helper functions for use by other
 helm charts.
 
-The functions and helpers defined in the `rstudio-library` chart are utilized by the other RStudio helm charts.
+The functions and helpers defined in the `rstudio-library` chart are utilized by the other RStudio Helm charts.
 
 It cannot be used directly.
 

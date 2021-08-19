@@ -2,7 +2,7 @@
 
 ![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 1.9.0.1](https://img.shields.io/badge/AppVersion-1.9.0.1-informational?style=flat-square)
 
-#### _Official helm chart for RStudio Connect_
+#### _Official Helm chart for RStudio Connect_
 
 Business Users and Collaborators use R and Python data products on [RStudio Connect](https://www.rstudio.com/products/connect/)
 that are published by Data Scientists.
@@ -13,7 +13,7 @@ that are published by Data Scientists.
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
-* Ensure you "pin" the version of the helm chart that you are using. You can do
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
   this using the `helm dependency` command and the associated "Chart.lock" files
   or the `--version` flag. IMPORTANT: This protects you from breaking changes
 * Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check

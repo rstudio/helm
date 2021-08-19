@@ -10,7 +10,7 @@
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
-* Ensure you "pin" the version of the helm chart that you are using. You can do
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
   this using the `helm dependency` command and the associated "Chart.lock" files
   or the `--version` flag. IMPORTANT: This protects you from breaking changes
 * Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
@@ -30,9 +30,9 @@ helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.4
 ## Common Usage
 
 > NOTE: this chart is intended primarily for use by individuals who _do not_
-> want to use our other helm charts. This chart ONLY deploys RBAC or generates RBAC yaml directly
+> want to use our other Helm charts. This chart ONLY deploys RBAC or generates RBAC yaml directly
 >
-> It is _not needed_ if you are using other RStudio helm charts
+> It is _not needed_ if you are using other RStudio Helm charts
 
 To generate RBAC yaml for use with `kubectl apply`:
 ```

@@ -2,7 +2,7 @@
 
 ![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
-#### _Official helm chart for RStudio Workbench_
+#### _Official Helm chart for RStudio Workbench_
 
 Data Scientists use [RStudio Workbench](https://www.rstudio.com/products/workbench/) to analyze data and create data
 products using R and Python.
@@ -13,7 +13,7 @@ products using R and Python.
 > breaking changes without warning as it moves towards stability.
 
 As a result, please:
-* Ensure you "pin" the version of the helm chart that you are using. You can do
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
   this using the `helm dependency` command and the associated "Chart.lock" files
   or the `--version` flag. IMPORTANT: This protects you from breaking changes
 * Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
@@ -65,7 +65,7 @@ In addition to the above required configuration, we recommend setting the follow
 
 ## General Principles
 
-- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.ini` or `.dcf` file formats
+- In most places, we opt to pass Helm values directly into ConfigMaps. We translate these into the valid `.ini` or `.dcf` file formats
 required by RStudio Workbench. Those config files and their mount locations are below.
 - If you need to modify the jobs launched by RStudio Workbench, you want to use `job-json-overrides`. There is a section on this below
   and [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
@@ -75,7 +75,7 @@ required by RStudio Workbench. Those config files and their mount locations are 
 - The prestart script for RStudio Workbench is highly customized to:
   - Get the service account information off of the RStudio Workbench pod for use in launching jobs
   - Generate `launcher.pub` as needed (if `launcher.pem` is provided). If it is not provided,
-  the helm chart will generate it automatically but this information will be lost for subsequent deployments and
+  the Helm chart will generate it automatically but this information will be lost for subsequent deployments and
   can cause users to be locked out sessions started by a previous deployment.
 - RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
