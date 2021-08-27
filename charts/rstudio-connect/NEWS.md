@@ -1,3 +1,7 @@
+# 0.2.2
+
+- Set `0600` file mode for rstudio-connect.gcfg
+
 # 0.2.1
 
 - Update docs
@@ -21,7 +25,7 @@
 - Change default configuration when launcher is enabled
 - Add the ability to more easily customize `launcher.kubernetes.profiles.conf`
   - Set up the profiles defaults to include the init container
-- Allow more easily mounting a named PVC that was not created by the chart  
+- Allow more easily mounting a named PVC that was not created by the chart
 - Make the "target" launcher namespace configurable
 - Add a default value for `service.port: 80`
 

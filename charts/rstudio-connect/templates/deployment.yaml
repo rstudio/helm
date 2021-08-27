@@ -163,6 +163,7 @@ spec:
       - name: rstudio-connect-config
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-config
+          defaultMode: 0600
       {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
       - name: rstudio-connect-data
         persistentVolumeClaim:
