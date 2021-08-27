@@ -24,7 +24,7 @@ pod:
 # If you have an existing NFS volume provisioner, you can use a config like the
 #   following instead of setting `pod.volumes` / `pod.volumeMounts`.
 #   If `sharedStorage.create` is true, then this chart will create a PVC using the
-#   specified StorageClass, or the default StorageClass if non is provided. The
+#   specified StorageClass, or the default StorageClass if none is provided. The
 #   resulting PVC will then be mounted to the Connect pod at `sharedStorage.path`.
 #   Also note that the storage provisioned here MUST be available to the content execution pod
 #   when `launcher.enabled` is true. The NFS PVC can be exposed to the content pod
@@ -87,10 +87,13 @@ config:
     #   When running Connect with launcher enabled, Python installations should be defined in
     #   runtime.yaml files, specified by Launcher.ClusterDefinition.
     Executable:
-      - "/opt/python/3.6.5/bin/python"
+      - "/opt/python/3.9.5/bin/python"
 
   Database:
     Provider: "Postgres"
 
   Postgres:
     URL: "postgres://connect@postgres.rstudio.com:5432/rsc_k8s"
+    # While it is possible to set a Postgres password here in the values file, we recommend providing
+    #   the password at runtime using helm install's --set argument instead
+    #   (e.g. --set config.Postgres.Password=<your-postgres-database-password>)
