@@ -81,10 +81,10 @@ spec:
             mountPath: "/etc/rstudio-connect/rstudio-connect.gcfg"
             subPath: "rstudio-connect.gcfg"
           {{- if .Values.launcher.enabled }}
-          - name: rstudio-connect-config
+          - name: runtime
             mountPath: "/etc/rstudio-connect/runtime.yaml"
             subPath: "runtime.yaml"
-          - name: rstudio-connect-config
+          - name: runtime
             mountPath: "/etc/rstudio-connect/launcher.kubernetes.profiles.conf"
             subPath: "launcher.kubernetes.profiles.conf"
           {{- end }}
@@ -183,6 +183,10 @@ spec:
       - name: overrides
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-overrides
+          defaultMode: 0644
+      - name: runtime
+        configMap:
+          name: {{ include "rstudio-connect.fullname" . }}-runtime
           defaultMode: 0644
       - name: rstudio-connect-prestart
         configMap:

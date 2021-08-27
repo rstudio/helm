@@ -8,6 +8,13 @@ data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
 {{- if .Values.launcher.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}-runtime
+  namespace: {{ $.Release.Namespace }}
+data:
   runtime.yaml: |
     {{- include "rstudio-connect.runtimeYaml" . | nindent 4 }}
 
