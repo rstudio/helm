@@ -27,7 +27,7 @@ spec:
       {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
-        prometheus.io/port: "9109"
+        prometheus.io/port: "9108"
       {{- end }}
 {{ include "rstudio-workbench.pod.annotations" . | indent 8 }}
       labels:

@@ -50,11 +50,11 @@ homeStorage:
     storage: "500Gi"
 
 prometheusExporter:
-  mappingYaml:
+  mappingYaml: |
     mappings:
       - match: "rstudio\\.([\\w-]+)\\.system\\.load\\.(.*)"
         match_type: regex
-        name: "rstudio_system_load_test"
+        name: "rstudio_system_load_other_test"
         labels:
           host: "$1"
           duration: "$2"

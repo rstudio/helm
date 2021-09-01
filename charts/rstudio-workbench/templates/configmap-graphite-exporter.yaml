@@ -7,16 +7,24 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 data:
   graphite-mapping.yaml: |-
+  {{- if .Values.prometheusExporter.mappingYaml }}
+    {{- if kindIs "string" .Values.prometheusExporter.mappingYaml }}
+      {{- .Values.prometheusExporter.mappingYaml | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.prometheusExporter.mappingYaml | nindent 4 }}
+    {{- end }}
+  {{- else }}
     mappings:
-    - match: "rstudio\\.(\\w+)\\.system\\.load\\.(.*)"
+    - match: "rstudio\\.([\\w-]+)\\.system\\.load\\.(.*)"
       match_type: regex
       name: "rstudio_system_load"
       labels:
         host: "$1"
         duration: "$2"
-    - match: "rstudio\\.(\\w+)\\.(.*)"
+    - match: "rstudio\\.([\\w-]+)\\.(.*)"
       match_type: regex
       name: "rstudio_$2"
       labels:
         host: "$1"
+  {{- end }}
 {{- end }}

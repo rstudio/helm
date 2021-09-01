@@ -1,13 +1,12 @@
 name: rstudio-workbench
 description: Official Helm chart for RStudio Workbench
-version: 0.4.1
+version: 0.4.2
 apiVersion: v2
 appVersion: 1.4.1717-3
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
 sources:
   - https://github.com/rstudio/helm
-  - https://github.com/rstudio/rstudio-docker-products
 maintainers:
   - name: sol-eng
     email: docker@rstudio.com
@@ -24,6 +23,8 @@ annotations:
       image: rstudio/r-session-complete:bionic-1.4.1717-3
   artifacthub.io/license: MIT
   artifacthub.io/links: |
+    - name: Docker Images
+      url: https://github.com/rstudio/rstudio-docker-products
     - name: RStudio Community
       url: https://community.rstudio.com/c/r-admin/5
     - name: About Workbench

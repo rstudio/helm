@@ -6,7 +6,7 @@
 {{- if .Values.session.defaultConfigMount }}
   {{/* default session config mount */}}
   {{- $sessionVolume := dict "configMap" ( dict "name" (printf "%s-session" ( include "rstudio-workbench.fullname" . ) ) ) "name" "session-config" }}
-  {{- $sessionVolumeMount := dict "mountPath" "/mnt/session-configmap" "name" "session-config" }}
+  {{- $sessionVolumeMount := dict "mountPath" "/mnt/session-configmap/rstudio" "name" "session-config" }}
   {{- $sessionVolumeOverride := dict "name" "defaultSessionVolume" "target" "/spec/template/spec/volumes/-" "json" $sessionVolume }}
   {{- $sessionVolumeMountOverride := dict "name" "defaultSessionVolumeMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionVolumeMount }}
   {{- $defaultOverrides = concat $defaultOverrides ( list $sessionVolumeOverride $sessionVolumeMountOverride ) }}

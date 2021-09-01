@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
+![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.4.1:
+To install the chart with the release name `my-release` at version 0.4.2:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.4.1
+helm install my-release rstudio/rstudio-workbench --version=0.4.2
 ```
 
 ## Required Configuration
@@ -218,6 +218,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |
+| prometheusExporter.mappingYaml | string | `nil` | Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file |
 | rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
 | rbac.serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
