@@ -219,7 +219,7 @@ pod:
 prometheusExporter:
   # -- whether the  prometheus exporter sidecar should be enabled
   enabled: true
-  # -- Yaml defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
+  # -- Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
   mappingYaml: null
   image:
     repository: "prom/graphite-exporter"
