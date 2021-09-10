@@ -1,3 +1,7 @@
+# 0.2.2
+
+- Update default RStudio Connect version to 2021.08.0
+
 # 0.2.1
 
 - Update docs
