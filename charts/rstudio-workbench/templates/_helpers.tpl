@@ -164,7 +164,7 @@ containers:
     {{- toYaml .Values.loadBalancer.env | nindent 2 }}
   {{- end }}
   args:
-    - "{{ include "rstudio-workbench.fullname" . }}"
+    - "{{ include "rstudio-workbench.name" . }}"
     - "{{ $.Release.Namespace }}"
     - "/mnt/load-balancer/rstudio/"
     - "{{ .Values.loadBalancer.sleepDuration }}"
@@ -343,7 +343,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ end }}
 
 {{- define "rstudio-workbench.annotations" -}}
-{{- range $key,$value := $.Values.service.annotations -}}
+{{- range $key,$value := .Values.service.annotations -}}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
 {{- end -}}
