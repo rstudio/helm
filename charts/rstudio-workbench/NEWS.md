@@ -1,3 +1,14 @@
+# 0.4.3
+
+- BUGFIX: The load-balancer sidecar container was not selecting app labels properly. This is now fixed. It could have been causing issues in load-balanced setups
+
+# 0.4.2
+
+- BUGFIX: session configuration is now mounted to the proper location on session pods
+- BUGFIX: Prometheus annotations are now properly defined (they were using the wrong port)
+- BUGFIX: The Graphite Exporter regex had a bug that did not handle certain hostnames
+- Customizing the graphite exporter "mapping.yaml" is now configurable by defining `.Values.prometheusExporter.mappingYaml`
+
 # 0.4.1
 
 - Update docs
