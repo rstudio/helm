@@ -506,6 +506,54 @@ entries:
           url: https://www.rstudio.com/products/team/
     apiVersion: v2
     appVersion: 1.4.1717-3
+    created: "2021-09-10T18:16:50.101379139Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.14
+    description: Official Helm chart for RStudio Workbench
+    digest: d026601e261cb54ee572af2fabe55c48bd638163c78d8b191476d28cdb7d5585
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - ide
+    - editor
+    - jupyter
+    - vscode
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.3/rstudio-workbench-0.4.3.tgz
+    version: 0.4.3
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-workbench
+          image: rstudio/rstudio-workbench:1.4.1717-3
+        - name: r-session-complete
+          image: rstudio/r-session-complete:bionic-1.4.1717-3
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Workbench
+          url: https://www.rstudio.com/products/workbench/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 1.4.1717-3
     created: "2021-09-01T12:57:31.724789862Z"
     dependencies:
     - name: rstudio-library
@@ -709,4 +757,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2021-09-01T12:57:31.724902563Z"
+generated: "2021-09-10T18:16:50.10150504Z"
