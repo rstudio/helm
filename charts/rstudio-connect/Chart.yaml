@@ -1,6 +1,6 @@
 name: rstudio-connect
 description: Official Helm chart for RStudio Connect
-version: 0.2.1
+version: 0.2.2
 apiVersion: v2
 appVersion: 1.9.0.1
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
@@ -14,7 +14,7 @@ maintainers:
     url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
-    version: 0.1.14
+    version: 0.1.15
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |

@@ -1,3 +1,15 @@
+# 0.1.15
+
+- Added a new parameter `clusterRoleCreate` to `rstudio-library.rbac` to allow for disabling the creation of the 
+  `ClusterRole` that allows for access to the nodes API. This API is used to ensure that all of the IP addresses
+  for nodes are available when reporting the addresses of the node that is running a particular job so that 
+  clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is 
+  usually sufficient, so it is disabled by default. 
+
+# 0.1.12 - 0.1.14
+
+- Various descriptive changes to prepare for official release to the public
+
 # 0.1.11
 
 - Fix whitespace issue in `.ini` for arrays

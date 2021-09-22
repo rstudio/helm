@@ -234,6 +234,10 @@ rbac:
     create: true
     name: ""
     annotations: {}
+  # -- Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher
+  # to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can
+  # be disabled as the node's internal address is sufficient to allow proper functionality.
+  clusterRoleCreate: false
 
 # -- jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents
 jobJsonOverridesFiles: {}

@@ -1,3 +1,7 @@
+# 0.2.2
+
+- Update `rstudio-library` dependency
+
 # 0.2.1
 
 - Update docs
