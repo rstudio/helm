@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
+![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square) ![AppVersion: 1.2.2.1-17](https://img.shields.io/badge/AppVersion-1.2.2.1--17-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.1:
+To install the chart with the release name `my-release` at version 0.2.2:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.1
+helm install my-release rstudio/rstudio-pm --version=0.2.2
 ```
 
 ## Required Configuration
