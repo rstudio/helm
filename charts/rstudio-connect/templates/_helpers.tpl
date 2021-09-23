@@ -64,7 +64,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $namespace := default $.Release.Namespace .Values.launcher.namespace }}
     {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher.kubernetes.profiles.conf") }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
-    {{- $defaultConfig = merge $defaultConfig $launcherDict }}
+    {{- $pythonSettingsDict := dict "Enabled" ("true") }}
+    {{- $pythonDict := dict "Python" ( $pythonSettingsDict ) }}
+    {{- $defaultConfig = merge $defaultConfig $launcherDict $pythonDict }}
   {{- end }}
   {{- /* default licensing configuration */}}
   {{- if .Values.license.server }}

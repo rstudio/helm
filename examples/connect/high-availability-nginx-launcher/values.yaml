@@ -75,10 +75,6 @@ config:
     # Note: `DataDir` has the same value as `pod.volumeMounts.mountPath`.
     DataDir: "/var/lib/rstudio-connect"
 
-  # Enables building and executing Python content.
-  Python:
-    Enabled: true
-
   Database:
     Provider: "Postgres"
 

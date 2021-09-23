@@ -1,13 +1,17 @@
+# 0.2.4
+
+- Enabled Python support in Connect by default when `launcher.enabled=true`
+
 # 0.2.3
 
 - Update default RStudio Connect version to 2021.08.2
 
 # 0.2.2
 
-- Added a new parameter `rbac.clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the 
+- Added a new parameter `rbac.clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the
   `ClusterRole` that allows for access to the nodes API. This API is used to ensure that all of the IP addresses
-  for nodes are available when reporting the addresses of the node that is running a particular job so that 
-  clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is 
+  for nodes are available when reporting the addresses of the node that is running a particular job so that
+  clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is
   usually sufficient, so it is disabled by default.
 
 # 0.2.1
@@ -33,7 +37,7 @@
 - Change default configuration when launcher is enabled
 - Add the ability to more easily customize `launcher.kubernetes.profiles.conf`
   - Set up the profiles defaults to include the init container
-- Allow more easily mounting a named PVC that was not created by the chart  
+- Allow more easily mounting a named PVC that was not created by the chart
 - Make the "target" launcher namespace configurable
 - Add a default value for `service.port: 80`
 
