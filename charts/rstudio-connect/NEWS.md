@@ -1,3 +1,7 @@
+# 0.2.3
+
+- Update default RStudio Connect version to 2021.08.2
+
 # 0.2.2
 
 - Added a new parameter `rbac.clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the 
