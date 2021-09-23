@@ -73,7 +73,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $licenseDict := dict "Licensing" ( dict "LicenseType" ("Remote") ) }}
     {{- $defaultConfig = merge $defaultConfig $licenseDict }}
   {{- end }}
-  {{- include "rstudio-library.config.gcfg" (merge .Values.config $defaultConfig) }}
+  {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig .Values.config ) }}
 {{- end -}}
 
 {{- define "rstudio-connect.annotations" -}}

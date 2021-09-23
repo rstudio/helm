@@ -1,6 +1,8 @@
 # 0.2.4
 
 - Enabled Python support in Connect by default when `launcher.enabled=true`
+- Any values defined in the `config` section now take precendence over
+  those that are set by the Helm chart's logic.
 
 # 0.2.3
 
