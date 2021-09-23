@@ -8,6 +8,7 @@
     "removeNamespaceReferences": "whether to remove namespace references"
     "serviceAccountCreate": "whether to create the service account"
     "serviceAccountAnnotations": "annotation object for the serviceAccount"
+    "clusterRoleCreate": "whether or not to create the ClusterRole that allows access to the nodes API"
 */ -}}
 {{- define "rstudio-library.rbac" -}}
 {{- $serviceAccountAnnotations := default (dict) .serviceAccountAnnotations }}
@@ -18,6 +19,8 @@
 {{- $namespace := default "default" .namespace }}
 {{- $targetNamespace := default $namespace .targetNamespace }}
 {{- $allNamespaces := list $targetNamespace }}
+{{- $clusterRoleCreate := default false .clusterRoleCreate }}
+{{- if $clusterRoleCreate }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -45,6 +48,7 @@ subjects:
   - kind: ServiceAccount
     name: {{ $serviceAccountName }}
     namespace: {{ $namespace }}
+{{- end }}
 {{- if $serviceAccountCreate }}
 ---
 apiVersion: v1
