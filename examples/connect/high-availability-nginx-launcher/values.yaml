@@ -75,15 +75,6 @@ config:
     # Note: `DataDir` has the same value as `pod.volumeMounts.mountPath`.
     DataDir: "/var/lib/rstudio-connect"
 
-  # Enables building and executing Python content.
-  Python:
-    Enabled: true
-    # Note: this setting will no longer be required in a future version of Connect.
-    #   When running Connect with launcher enabled, Python installations should be defined in
-    #   runtime.yaml files, specified by Launcher.ClusterDefinition.
-    Executable:
-      - "/opt/python/3.9.5/bin/python"
-
   Database:
     Provider: "Postgres"
 
