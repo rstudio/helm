@@ -17,6 +17,49 @@ entries:
           url: https://www.rstudio.com/products/team/
     apiVersion: v2
     appVersion: 2021.08.2
+    created: "2021-09-27T18:17:35.063179503Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.15
+    description: Official Helm chart for RStudio Connect
+    digest: 91aa046ee58c59af82ab71f11ba1baf5e3df4d37f710abba1b56c176fdea6d34
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - deploy
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-connect
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-connect-0.2.4/rstudio-connect-0.2.4.tgz
+    version: 0.2.4
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-connect
+          image: rstudio/rstudio-connect:2021.08.2
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Connect
+          url: https://www.rstudio.com/products/connect/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 2021.08.2
     created: "2021-09-23T14:11:19.550078006Z"
     dependencies:
     - name: rstudio-library
@@ -1037,4 +1080,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2021-09-23T16:47:48.56728144Z"
+generated: "2021-09-27T18:17:35.063791504Z"
