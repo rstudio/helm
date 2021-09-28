@@ -1,6 +1,6 @@
 # rstudio-launcher-rbac
 
-![Version: 0.2.4](https://img.shields.io/badge/Version-0.2.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.4](https://img.shields.io/badge/AppVersion-0.2.4-informational?style=flat-square)
+![Version: 0.2.5](https://img.shields.io/badge/Version-0.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.5](https://img.shields.io/badge/AppVersion-0.2.5-informational?style=flat-square)
 
 #### _RBAC definition for the RStudio Job Launcher_
 
@@ -20,11 +20,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.4:
+To install the chart with the release name `my-release` at version 0.2.5:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.4
+helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.5
 ```
 
 ## Common Usage
@@ -43,6 +43,7 @@ helm template -n rstudio rstudio-launcher-rbac rstudio/rstudio-launcher-rbac
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
 | fullnameOverride | string | `""` | The override for the "FullName" which defaults to "ReleaseName-ChartName" or "ReleaseName" (if "ReleaseName" contains "ChartName") |
 | includeReleaseNamespace | bool | `true` | Whether the helm release namespace should be a possible launcher target |
 | nameOverride | string | `""` | The override for "ChartName" in the "FullName" which defaults to "ReleaseName-ChartName" or "ReleaseName" (if "ReleaseName" contains "ChartName") |

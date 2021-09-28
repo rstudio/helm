@@ -17,6 +17,7 @@
 {{- $roleName := include "rstudio-launcher-rbac.fullname" . }}
 {{- $serviceAccountCreate := .Values.serviceAccount.create }}
 {{- $serviceAccountAnnotations := .Values.serviceAccount.annotations }}
+{{- $clusterRoleCreate := .Values.clusterRoleCreate }}
 
 {{- $rbacValues := dict
   "namespace"                 ($namespace)
@@ -26,6 +27,7 @@
   "serviceAccountAnnotations" ($serviceAccountAnnotations)
   "removeNamespaceReferences" (.Values.removeNamespaceReferences)
   "roleName"                  ($roleName)
+  "clusterRoleCreate"         ($clusterRoleCreate)
 }}
 {{/*
   For code-sharing, we use a shared library chart called "rstudio-library" to generate

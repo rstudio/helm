@@ -5,9 +5,11 @@
 {{- $serviceAccountCreate := .Values.rbac.create }}
 {{- $roleName := $serviceAccountName }}
 {{- $serviceAccountAnnotations := .Values.serviceAccountAnnotations }}
+{{- $clusterRoleCreate := .Values.rbac.clusterRoleCreate }}
 {{- $rbacValues1 := dict "namespace" $namespace "serviceAccountName" $serviceAccountName "targetNamespace" $targetNamespace }}
 {{- $rbacValues2 := dict "serviceAccountCreate" $.Values.rbac.create "serviceAccountAnnotations" $serviceAccountAnnotations "roleName" ($roleName) }}
-{{- $rbacValues := merge $rbacValues1 $rbacValues2 }}
+{{- $rbacValues3 := dict "clusterRoleCreate" $clusterRoleCreate }}
+{{- $rbacValues := merge $rbacValues1 $rbacValues2 $rbacValues3 }}
 {{- include "rstudio-library.rbac" $rbacValues }}
 {{- if ne $namespace $targetNamespace }}
 {{- /*
