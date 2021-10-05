@@ -1,3 +1,7 @@
+# 0.2.5
+
+- Update default RStudio Connect version to 2021.09.0
+
 # 0.2.4
 
 - Enabled Python support in Connect by default when `launcher.enabled=true`
