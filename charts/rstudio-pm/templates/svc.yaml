@@ -1,3 +1,4 @@
+{{- $svcPort := .Values.service.port -}}
 ---
 apiVersion: v1
 kind: Service
@@ -15,7 +16,7 @@ spec:
   ports:
   - protocol: TCP
     name: rspm
-    port: 80
+    port: {{ $svcPort }}
     {{- if .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
     {{- end }}
