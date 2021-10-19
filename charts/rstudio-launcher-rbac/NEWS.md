@@ -1,7 +1,7 @@
 # 0.2.6
 
 - Update `rstudio-library` dependency. This adds `pods/exec` access to the API
-  - This is important for VSCode sessions to quit properly
+  - This is important for quitting sessions properly.
 
 # 0.2.5
 
