@@ -101,7 +101,7 @@ service:
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80
-  
+
 # -- resources define requests and limits for the rstudio-server pod
 resources:
   requests:
