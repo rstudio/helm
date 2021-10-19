@@ -1,6 +1,10 @@
 name: Document Charts
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   document:
