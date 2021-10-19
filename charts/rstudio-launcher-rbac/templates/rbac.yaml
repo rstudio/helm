@@ -1,3 +1,4 @@
+---
 {{- $namespace := $.Release.Namespace }}
 {{- $allNamespaces := .Values.targetNamespaces}}
 {{- if .Values.includeReleaseNamespace }}
