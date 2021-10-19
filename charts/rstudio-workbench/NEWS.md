@@ -1,3 +1,7 @@
+# 0.4.6
+
+- Updated svc.yml to remove hardcoded port 80 and add .Values.service.port in its place. Updated values.yaml to include .Values.service.port (previously missing).
+
 # 0.4.5
 
 - Update `rstudio-library` chart version. This adds `pods/exec` privilege to RBAC
