@@ -1,7 +1,7 @@
 # 0.4.5
 
 - Update `rstudio-library` chart version. This adds `pods/exec` privilege to RBAC
-  - This is important for VSCode sessions to exit properly
+  - This is important for sessions to exit properly
 
 # 0.4.4
 
