@@ -1,3 +1,6 @@
+# 0.2.5
+
+- Updated svc.yml to remove hardcoded port 80 and add .Values.service.port in its place. Updated values.yaml to include .Values.service.port (previously missing). 
 # 0.2.4
 
 - Update `rstudio-library` dependency
