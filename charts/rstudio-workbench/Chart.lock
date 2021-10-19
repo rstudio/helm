@@ -1,6 +1,6 @@
 dependencies:
 - name: rstudio-library
   repository: file://../rstudio-library
-  version: 0.1.15
-digest: sha256:b3c5cbc4bdacc6bb80b907eb50ec360640bdd5ff97efb22a3f91f8dfe4af8bbc
-generated: "2021-09-21T15:43:10.930036774-05:00"
+  version: 0.1.16
+digest: sha256:2385ad652ee69c7d6619e2238e1da5bf99004f94152c06fef0d0a6795951621e
+generated: "2021-10-19T10:39:14.34912-04:00"

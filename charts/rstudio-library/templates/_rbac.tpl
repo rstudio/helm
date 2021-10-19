@@ -79,6 +79,7 @@ rules:
       - "pods"
       - "pods/log"
       - "pods/attach"
+      - "pods/exec"
     verbs:
       - "get"
       - "create"
