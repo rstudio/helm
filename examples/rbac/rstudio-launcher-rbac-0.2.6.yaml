@@ -1,5 +1,6 @@
 ---
 # Source: rstudio-launcher-rbac/templates/rbac.yaml
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
