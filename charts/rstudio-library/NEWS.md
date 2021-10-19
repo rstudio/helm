@@ -1,3 +1,7 @@
+# 0.1.16
+
+- add `pods/exec` API access
+
 # 0.1.15
 
 - Added a new parameter `clusterRoleCreate` to `rstudio-library.rbac` to allow for disabling the creation of the 

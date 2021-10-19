@@ -1,6 +1,10 @@
 name: Document Charts
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   document:
@@ -51,6 +55,8 @@ jobs:
       - name: Compute and update dependent files
         run: |
           set -xe
+          # pull latest updates (i.e. if the document step above updated things)
+          git pull
           cd ./charts/rstudio-launcher-rbac && helm dependency build && cd -
           helm template -n rstudio rstudio-launcher-rbac ./charts/rstudio-launcher-rbac --set removeNamespaceReferences=true > examples/rbac/rstudio-launcher-rbac.yaml
           CHART_VERSION=$(helm show chart ./charts/rstudio-launcher-rbac | grep '^version' | cut -d ' ' -f 2)
