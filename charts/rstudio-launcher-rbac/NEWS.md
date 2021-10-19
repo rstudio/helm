@@ -1,3 +1,8 @@
+# 0.2.6
+
+- Update `rstudio-library` dependency. This adds `pods/exec` access to the API
+  - This is important for VSCode sessions to quit properly
+
 # 0.2.5
 
 - Added a new parameter `clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the         

@@ -1,3 +1,7 @@
+# 0.2.4
+
+- Update `rstudio-library` dependency
+
 # 0.2.3
 
 - Update default RStudio Package Manager version to 2021.09.0-1
