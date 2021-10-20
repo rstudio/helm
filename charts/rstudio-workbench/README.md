@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.4.5](https://img.shields.io/badge/Version-0.4.5-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
+![Version: 0.4.6](https://img.shields.io/badge/Version-0.4.6-informational?style=flat-square) ![AppVersion: 1.4.1717-3](https://img.shields.io/badge/AppVersion-1.4.1717--3-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.4.5:
+To install the chart with the release name `my-release` at version 0.4.6:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.4.5
+helm install my-release rstudio/rstudio-workbench --version=0.4.6
 ```
 
 ## Required Configuration
@@ -229,6 +229,7 @@ mounting paradigm, you will need to change the `XDG_CONFIG_DIRS` environment var
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` | annotations for the service definition |
 | service.nodePort | bool | `false` | the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically |
+| service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.type | string | `"NodePort"` | the service type (i.e. NodePort, LoadBalancer, etc.) |
 | session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
