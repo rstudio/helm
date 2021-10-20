@@ -14,7 +14,7 @@ spec:
     {{- include "rstudio-workbench.selectorLabels" . | nindent 4 }}
   ports:
   - protocol: TCP
-    port: 80
+    port: {{ .Values.service.port }}
     {{- if .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
     {{- end }}
