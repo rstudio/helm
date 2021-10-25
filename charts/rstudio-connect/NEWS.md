@@ -1,3 +1,7 @@
+# 0.2.7
+
+- Update default RStudio Connect version to 2021.10.0
+
 # 0.2.6
 
 - Update `rstudio-library` chart version
