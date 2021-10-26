@@ -99,6 +99,8 @@ service:
   type: NodePort
   # -- the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically
   nodePort: false
+  # -- The Service port. This is the port your service will run under.
+  port: 80
 
 # -- resources define requests and limits for the rstudio-server pod
 resources:
