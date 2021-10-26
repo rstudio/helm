@@ -266,6 +266,7 @@ config:
     notifications.conf: {}
   secret:
     "database.conf": {}
+  sssd: {}
   server:
     rserver.conf:
       server-health-check-enabled: 1
