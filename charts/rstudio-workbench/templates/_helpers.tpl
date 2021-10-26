@@ -94,6 +94,10 @@ containers:
       mountPath: "/mnt/session-configmap/rstudio/"
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
+    {{- if .Values.config.sssd }}
+    - name: rstudio-sssd
+      mountPath: "/etc/sssd/conf.d/"
+    {{- end }}
     - name: etc-rstudio
       mountPath: "/etc/rstudio"
     - name: shared-data
@@ -233,6 +237,12 @@ volumes:
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-secret
     defaultMode: 0600
+{{- if .Values.config.sssd }}
+- name: rstudio-sssd
+  secret:
+    secretName: {{ include "rstudio-workbench.fullname" . }}-sssd
+    defaultMode: 0600
+{{- end }}
 {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-workbench.fullname" .)) }}
 {{- if .Values.prometheusExporter.enabled }}
 - name: graphite-exporter-config
