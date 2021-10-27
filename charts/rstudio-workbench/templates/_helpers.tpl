@@ -94,12 +94,27 @@ containers:
       mountPath: "/mnt/session-configmap/rstudio/"
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
-    {{- if .Values.config.sssd }}
+    {{- if .Values.config.userProvisioning }}
     - name: rstudio-sssd
       mountPath: "/etc/sssd/conf.d/"
     {{- end }}
     - name: etc-rstudio
       mountPath: "/etc/rstudio"
+    - name: rstudio-rsw-startup
+      mountPath: "/startup/base"
+    {{- if .Values.launcher.enabled }}
+    - name: rstudio-launcher-startup
+      mountPath: "/startup/launcher"
+    {{- end }}
+    {{- if .Values.config.userProvisioning }}
+    - name: rstudio-user-startup
+      mountPath: "/startup/user-provisioning"
+    {{- end }}
+    {{- if .Values.config.startup }}
+    - name: rstudio-custom-startup
+      mountPath: "/startup/custom"
+    {{- end }}
+    - name: rstudio-rsw-startup
     - name: shared-data
       mountPath: "/mnt/load-balancer/rstudio"
     {{- include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | nindent 4 }}
@@ -233,6 +248,28 @@ volumes:
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-prestart
     defaultMode: 0755
+- name: rstudio-rsw-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-rsw
+    defaultMode: 0755
+{{- if .Values.launcher.enabled }}
+- name: rstudio-launcher-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
+    defaultMode: 0755
+{{- end }}
+{{-if .Values.config.userProvisioning }}
+- name: rstudio-user-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-sssd
+    defaultMode: 0755
+{{- end }}
+{{- if .Values.config.startup }}
+- name: rstudio-custom-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-custom
+    defaultMode: 0755
+{{- end }}
 - name: rstudio-secret
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-secret
