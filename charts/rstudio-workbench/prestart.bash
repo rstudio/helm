@@ -12,7 +12,6 @@ main() {
   local launcher_pem='/mnt/secret-configmap/rstudio/launcher.pem'
   local launcher_pub="${dyn_dir}/launcher.pub"
   local launcher_ns="${RSTUDIO_LAUNCHER_NAMESPACE:-rstudio}"
-  local lb_conf='/mnt/load-balancer/rstudio/load-balancer'
 
   _logf 'Loading service account token'
   local sa_token
@@ -24,21 +23,6 @@ main() {
 
   _logf 'Ensuring %s exists' "${dyn_dir}"
   mkdir -p "${dyn_dir}"
-
-  if [[ "${PRESTART_LOAD_BALANCER_CONFIGURATION}" == enabled ]]; then
-    _logf 'Generating %s' "${lb_conf}"
-    cat >"${lb_conf}" <<EOF
-
-[config]
-
-balancer = sessions
-
-[nodes]
-$(hostname -i)
-EOF
-    _logf 'Current load-balancer file:'
-    cat "${lb_conf}" | _indent
-  fi
 
   if [[ ! -s "${launcher_pub}" ]] && [[ -f "${launcher_pem}" ]]; then
     _logf 'Generating %s from %s' "${launcher_pub}" "${launcher_pem}"

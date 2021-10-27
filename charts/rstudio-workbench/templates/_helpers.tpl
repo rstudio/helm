@@ -57,10 +57,6 @@ containers:
   {{- end }}
   - name: XDG_CONFIG_DIRS
     value: "{{ template "rstudio-workbench.xdg-config-dirs" .}}"
-  {{- if or ( gt (int .Values.replicas) 1 ) ( .Values.loadBalancer.forceEnabled ) }}
-  - name: PRESTART_LOAD_BALANCER_CONFIGURATION
-    value: enabled
-  {{- end }}
   {{- if .Values.pod.env }}
 {{ toYaml .Values.pod.env | indent 2 }}
   {{- end }}
@@ -114,8 +110,6 @@ containers:
     - name: rstudio-custom-startup
       mountPath: "/startup/custom"
     {{- end }}
-    - name: shared-data
-      mountPath: "/mnt/load-balancer/rstudio"
     {{- include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | nindent 4 }}
     {{- /* TODO: path collision problems... would be ideal to not have to maintain both long term */}}
     {{- if .Values.jobJsonOverridesFiles }}
@@ -173,28 +167,6 @@ containers:
     successThreshold: {{ .Values.readinessProbe.successThreshold }}
     failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
   {{- end }}
-{{- if or (gt (int .Values.replicas) 1) (.Values.loadBalancer.forceEnabled) }}
-- name: sidecar
-  image: "{{ .Values.loadBalancer.image.repository }}:{{ .Values.loadBalancer.image.tag }}"
-  imagePullPolicy: "{{ .Values.loadBalancer.image.imagePullPolicy }}"
-  {{- if .Values.loadBalancer.env }}
-  env:
-    {{- toYaml .Values.loadBalancer.env | nindent 2 }}
-  {{- end }}
-  args:
-    - "{{ include "rstudio-workbench.name" . }}"
-    - "{{ $.Release.Namespace }}"
-    - "/mnt/load-balancer/rstudio/"
-    - "{{ .Values.loadBalancer.sleepDuration }}"
-    - "{{ .Values.loadBalancer.appLabelKey }}"
-  {{- if .Values.loadBalancer.securityContext }}
-  securityContext:
-    {{- toYaml .Values.loadBalancer.securityContext | nindent 4 }}
-  {{- end }}
-  volumeMounts:
-  - name: shared-data
-    mountPath: "/mnt/load-balancer/rstudio/"
-{{- end }}
 {{- if .Values.prometheusExporter.enabled }}
 - name: exporter
   image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
@@ -232,8 +204,6 @@ volumes:
     defaultMode: 0644
 {{- end }}
 - name: etc-rstudio
-  emptyDir: {}
-- name: shared-data
   emptyDir: {}
 - name: rstudio-config
   configMap:
