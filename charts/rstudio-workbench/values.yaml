@@ -159,12 +159,10 @@ loadBalancer:
     # -- the imagePullPolicy to use for the side-car pod image
     imagePullPolicy: IfNotPresent
 
-# -- command is the pod container's run command.
-command: [tini, -s, --]
-# -- args is the pod container's run arguments. By default, it uses a kubernetes-specific prestart script that exec's the default container startup script.
-args:
-  - /scripts/prestart.bash
-  - /usr/local/bin/startup.sh
+# -- command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup
+command: []
+# -- args is the pod container's run arguments.
+args: []
 
 license:
   # -- key is the license to use
@@ -302,3 +300,4 @@ config:
   profiles: {}
   serverDcf:
     launcher-mounts: []
+  startup: {}
