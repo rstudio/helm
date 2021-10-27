@@ -6,13 +6,14 @@ metadata:
 data:
   rstudio-workbench.conf: |
     [program:rstudio-workbench]
-    command=/usr/local/bin/startup.sh
+    command=/scripts/prestart.bash /usr/local/bin/startup.sh
     autorestart=false
     numprocs=1
     stdout_logfile=/dev/stdout
     stdout_logfile_maxbytes=0
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
+{{- if .Values.launcher.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -20,8 +21,6 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
   namespace: {{ $.Release.Namespace }}
 data:
-  empty.txt: ''
-  {{- if .Values.launcher.enabled }}
   rstudio-launcher.conf: |
     [program:rstudio-launcher]
     command=/usr/lib/rstudio-server/bin/rstudio-launcher
@@ -31,7 +30,8 @@ data:
     stdout_logfile_maxbytes=0
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
-  {{- end }}
+{{- end }}
+{{- if .Values.config.userProvisioning }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -39,8 +39,6 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-start-user
   namespace: {{ $.Release.Namespace }}
 data:
-  .empty.txt: ''
-  {{- if .Values.config.sssd }}
   sssd.conf: |
     [program:sssd]
     command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
@@ -52,7 +50,8 @@ data:
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
     stderr_logfile_backups=0
-  {{- end }}
+{{- end }}
+{{- if .Values.config.startup }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -60,7 +59,5 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-start-custom
   namespace: {{ $.Release.Namespace }}
 data:
-  .empty.txt: ''
-  {{- if .Values.config.startup }}
   {{- include "rstudio-library.config.ini" .Values.config.startup | nindent 2}}
-  {{- end }}
+{{- end }}
