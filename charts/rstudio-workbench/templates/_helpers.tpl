@@ -114,7 +114,6 @@ containers:
     - name: rstudio-custom-startup
       mountPath: "/startup/custom"
     {{- end }}
-    - name: rstudio-rsw-startup
     - name: shared-data
       mountPath: "/mnt/load-balancer/rstudio"
     {{- include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | nindent 4 }}
