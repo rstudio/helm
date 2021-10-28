@@ -262,6 +262,7 @@ config:
       CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
     rsession.conf: {}
     notifications.conf: {}
+  sessionSecret: {}
   secret:
     "database.conf": {}
   userProvisioning: {}
