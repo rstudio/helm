@@ -95,7 +95,7 @@ containers:
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- if .Values.config.userProvisioning }}
-    - name: rstudio-sssd
+    - name: rstudio-user
       mountPath: "/etc/sssd/conf.d/"
     {{- end }}
     - name: etc-rstudio
@@ -239,7 +239,7 @@ volumes:
 {{- if .Values.config.userProvisioning }}
 - name: rstudio-user-startup
   configMap:
-    name: {{ include "rstudio-workbench.fullname" . }}-start-sssd
+    name: {{ include "rstudio-workbench.fullname" . }}-start-user
     defaultMode: 0755
 {{- end }}
 {{- if .Values.config.startupCustom }}
@@ -252,10 +252,10 @@ volumes:
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-secret
     defaultMode: 0600
-{{- if .Values.config.sssd }}
-- name: rstudio-sssd
+{{- if .Values.config.userProvisioning }}
+- name: rstudio-user
   secret:
-    secretName: {{ include "rstudio-workbench.fullname" . }}-sssd
+    secretName: {{ include "rstudio-workbench.fullname" . }}-user
     defaultMode: 0600
 {{- end }}
 {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-workbench.fullname" .)) }}
