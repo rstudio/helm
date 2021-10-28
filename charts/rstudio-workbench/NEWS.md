@@ -1,10 +1,13 @@
 # 0.5.0
 
 - Bump RStudio version to Ghost Orchid (2021.09.0+351.pro6)
+  - This version of the chart is no longer compatible (by default) with older versions (1.4 and previous).
+  - Previous versions of the chart are not compatible (by default) with 2021.09 or later
+  - If you want to use charts across versions, you will need to change `command`, `args`, and some configmaps.
 - Change RStudio Workbench execution model to use supervisord
 - Add config-maps to configure startup behavior
 - Add a config setting for `sssd` (now in the container by default)
-- Add a "secret" configmap for session components (useful for shared database credentials, etc.)
+- Add a "secret" configmap for session components (useful for shared database credentials, `odbc.ini`, etc.)
 
 # 0.4.6
 
