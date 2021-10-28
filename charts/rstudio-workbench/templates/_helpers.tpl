@@ -88,6 +88,10 @@ containers:
       mountPath: "/mnt/configmap/rstudio/"
     - name: rstudio-session-config
       mountPath: "/mnt/session-configmap/rstudio/"
+    {{- if .Values.config.sessionSecret }}
+    - name: rstudio-session-secret
+      mountPath: "/mnt/session-secret/"
+    {{- end }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- if .Values.config.userProvisioning }}
@@ -213,6 +217,11 @@ volumes:
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-session
     defaultMode: 0644
+{{- if .Values.config.sessionSecret }}
+- name: rstudio-session-secret
+  secret:
+    name: {{ include "rstudio-workbench.fullname" . }}-session-secret
+{{- end }}
 - name: rstudio-prestart
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-prestart
