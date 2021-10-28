@@ -23,7 +23,7 @@ main() {
 
   _logf 'Preparing dirs'
   mkdir -p \
-    /var/lib/rstudio-server/monitor/log \
+    /var/lib/rstudio-server/monitor/log
   chown -v -R \
     rstudio-server:rstudio-server \
     /var/lib/rstudio-server 2>&1 | _indent
