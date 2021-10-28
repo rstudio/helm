@@ -14,7 +14,7 @@
   {{- if .Values.config.sessionSecret}}
     {{/* default session secret config mount */}}
     {{- $sessionSecretVolume := dict "secret" ( dict "name" (printf "%s-session-secret" ( include "rstudio-workbench.fullname" . ) ) ) "secretName" "session-secret" }}
-    {{- $sessionSecretVolumeMount := dict "mountPath" "/mnt/session-secret/" "name" "session-secret" }}
+    {{- $sessionSecretVolumeMount := dict "mountPath" .Values.session.defaultSecretMountPath "name" "session-secret" }}
     {{- $sessionSecretVolumeOverride := dict "name" "defaultSessionSecretVolume" "target" "/spec/template/spec/volumes/-" "json" $sessionVolume }}
     {{- $sessionSecretVolumeMountOverride := dict "name" "defaultSessionVolumeMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionVolumeMount }}
     {{/* build the actual overrides */}}

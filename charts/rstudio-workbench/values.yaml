@@ -9,6 +9,8 @@ versionOverride: ""
 session:
   # -- Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this
   defaultConfigMount: true
+  # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
+  defaultSecretMountPath: /mnt/session-secret/
   image:
     # -- A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined
     tagPrefix: bionic-

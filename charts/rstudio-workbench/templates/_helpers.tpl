@@ -90,7 +90,7 @@ containers:
       mountPath: "/mnt/session-configmap/rstudio/"
     {{- if .Values.config.sessionSecret }}
     - name: rstudio-session-secret
-      mountPath: "/mnt/session-secret/"
+      mountPath: {{ .Values.session.defaultSecretMountPath }}
     {{- end }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
