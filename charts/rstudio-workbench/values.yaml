@@ -37,6 +37,8 @@ sharedStorage:
     # -- the volume of storage to request for this persistent volume claim
     storage: "10Gi"
 
+# -- How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but
+# will not work well if your license only allows a single activation.
 strategy:
   type: "RollingUpdate"
   rollingUpdate:
@@ -249,25 +251,34 @@ rbac:
 # -- jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents
 jobJsonOverridesFiles: {}
 
+# -- An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details.
 launcherPem: ''
+# -- An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem`
 launcherPub: false
+
 secureCookieKey: ''
+
 dangerRegenerateAutomatedValues: false
 
 global:
   secureCookieKey: ''
 
 config:
+  # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:
       RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
       CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
     rsession.conf: {}
     notifications.conf: {}
+  # -- a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default
   sessionSecret: {}
+  # -- a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions
   secret:
     "database.conf": {}
+  # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
   userProvisioning: {}
+  # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
   server:
     rserver.conf:
       server-health-check-enabled: 1
@@ -300,7 +311,10 @@ config:
       labs-enabled: 1
       default-session-cluster: Kubernetes
     logging.conf: {}
+  # -- a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information.
   profiles: {}
+  # -- a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.)
   serverDcf:
     launcher-mounts: []
+  # -- a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/
   startupCustom: {}
