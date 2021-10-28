@@ -303,4 +303,4 @@ config:
   profiles: {}
   serverDcf:
     launcher-mounts: []
-  startup: {}
+  startupCustom: {}

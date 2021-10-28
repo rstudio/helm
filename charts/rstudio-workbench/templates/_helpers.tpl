@@ -110,7 +110,7 @@ containers:
     - name: rstudio-user-startup
       mountPath: "/startup/user-provisioning"
     {{- end }}
-    {{- if .Values.config.startup }}
+    {{- if .Values.config.startupCustom }}
     - name: rstudio-custom-startup
       mountPath: "/startup/custom"
     {{- end }}
@@ -242,7 +242,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-start-sssd
     defaultMode: 0755
 {{- end }}
-{{- if .Values.config.startup }}
+{{- if .Values.config.startupCustom }}
 - name: rstudio-custom-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-custom
