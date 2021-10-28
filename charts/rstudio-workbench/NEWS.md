@@ -1,3 +1,11 @@
+# 0.5.0
+
+- Bump RStudio version to Ghost Orchid (2021.09.0+351.pro6)
+- Change RStudio Workbench execution model to use supervisord
+- Add config-maps to configure startup behavior
+- Add a config setting for `sssd` (now in the container by default)
+- Add a "secret" configmap for session components (useful for shared database credentials, etc.)
+
 # 0.4.6
 
 - Updated svc.yml to remove hardcoded port 80 and add .Values.service.port in its place. Updated values.yaml to include .Values.service.port (previously missing).
