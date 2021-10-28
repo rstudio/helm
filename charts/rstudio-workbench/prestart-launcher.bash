@@ -3,7 +3,7 @@ set -o errexit
 set -o pipefail
 
 main() {
-  local startup_script="${1:-/usr/local/bin/startup.sh}"
+  local startup_script="${1:-/usr/lib/rstudio-server/bin/rstudio-launcher}"
   local dyn_dir='/mnt/dynamic/rstudio'
 
   local cacert='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
