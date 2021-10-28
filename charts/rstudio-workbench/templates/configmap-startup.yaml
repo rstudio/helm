@@ -6,7 +6,7 @@ metadata:
 data:
   rstudio-workbench.conf: |
     [program:rstudio-workbench]
-    command=/scripts/prestart.bash /usr/local/bin/startup.sh
+    command=/scripts/prestart-workbench.bash /usr/local/bin/startup.sh
     autorestart=false
     numprocs=1
     stdout_logfile=/dev/stdout
@@ -23,7 +23,7 @@ metadata:
 data:
   rstudio-launcher.conf: |
     [program:rstudio-launcher]
-    command=/usr/lib/rstudio-server/bin/rstudio-launcher
+    command=/scripts/prestart-launcher.bash /usr/lib/rstudio-server/bin/rstudio-launcher
     autorestart=false
     numprocs=1
     stdout_logfile=/dev/stdout
