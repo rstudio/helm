@@ -227,7 +227,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
     defaultMode: 0755
 {{- end }}
-{{-if .Values.config.userProvisioning }}
+{{- if .Values.config.userProvisioning }}
 - name: rstudio-user-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-sssd
