@@ -5,5 +5,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-prestart
   namespace: {{ $.Release.Namespace }}
 data:
-  prestart.bash: |
-    {{- .Files.Get "prestart.bash" | nindent 4 }}
+  prestart-workbench.bash: |
+    {{- .Files.Get "prestart-workbench.bash" | nindent 4 }}
+  prestart-launcher.bash: |
+    {{- .Files.Get "prestart-launcher.bash" | nindent 4 }}
