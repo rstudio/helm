@@ -1,3 +1,7 @@
+# 0.2.7
+
+- Update `rstudio-library` chart dependency
+
 # 0.2.6
 
 - Update `rstudio-library` dependency. This adds `pods/exec` access to the API

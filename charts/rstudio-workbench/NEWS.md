@@ -9,6 +9,7 @@
 - Add a config setting for `sssd` (now in the container by default) - `config.userProvisioning`
 - Add a "secret" configmap for session components (useful for shared database credentials, `odbc.ini`, etc.)
 - Update README to make `job-json-overrides`, profiles, etc. more clear
+- Update `rstudio-library` chart dependency
 
 # 0.4.6
 
