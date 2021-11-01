@@ -38,7 +38,7 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git commit charts/*/README.md -m 'Update helm-docs and README.md' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
+          git push origin $GITHUB_REF || echo "No changes to commit"
   rbac:
     runs-on: ubuntu-latest
     name: rbac
@@ -69,4 +69,4 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add examples/rbac/rstudio-launcher-rbac*.yaml || echo "No files to add"
           git commit examples/rbac/rstudio-launcher-rbac*.yaml -m 'Update rbac yaml' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
+          git push origin $GITHUB_REF || echo "No changes to commit"
