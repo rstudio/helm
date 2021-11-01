@@ -163,7 +163,37 @@ the `XDG_CONFIG_DIRS` environment variable
   - `supervisord` service / unit definition `.conf` files
   - Located at `config.startupCustom.<< name of file >>` helm values
   - Will use the `.ini` file format, by default
-  -
+  - As with all config files above, can override with a verbatim string if desired, like so:
+```yaml
+config:
+  startupCustom:
+    myfile.conf: |
+      file-used-verbatim
+```
+   
+## User Provisioning
+
+Provisioning users in RStudio Workbench containers is challenging. Session images have users created automatically (with
+consistent UIDs / GIDs), but creating users in the Workbench containers is a responsibility that falls to the
+administrator today.
+
+The most common way to provision users is via `sssd`. The [latest RStudio Workbench container]() has `sssd` included and
+running by default (see `userProvisioning` configuration files above).
+
+The other way that this can be managed is via a lightweight "startup service" (runs once at startup and then sleeps forever)
+or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.
+However, it is important to be careful of a few points:
+
+- UID / GID consistency: linux usernames and their matching to UID/GID must be consistent across all nodes and across
+  time. Failing this can cause security issues and access by some users to files they should not be allowed to see
+- usernames cannot have `@`. The `@` sign (often used in emails with SSO) is a problem for RStudio Workbench because
+  some operating systems disallow `@` signs in linux usernames
+- `supervisord` is configured by default to exit if any of its child processes exit. If you use `config.startupCustom`
+  to configure a user management service, be careful that it does not exist unnecessarily
+
+We do not provide such a service out of the box because we intend for RStudio Workbench to solve this problem in a
+future release. Please get in touch with your account representative if you have feedback or questions about this
+workflow.
    
 ## RStudio Profiles
 
