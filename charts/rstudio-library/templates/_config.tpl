@@ -21,6 +21,27 @@
 {{ end }}
 {{- end -}}
 
+{{- /*
+  Takes a map of maps, turns each into a generic text file
+
+  Config data is passed into `.data`
+  A comment delimiter (used for keys) is passed as `.commentDelimiter`
+*/ -}}
+{{- define "rstudio-library.config.txt" -}}
+{{- $commentDelim := .commentDelimiter | default "#" }}
+{{- range $file, $keys := .data -}}
+{{- printf "%s: |" $file | nindent 0 }}
+{{- if kindIs "string" $keys }}
+  {{- $keys | nindent 2 }}
+{{- else }}
+{{- range $parent, $child := $keys -}}
+  {{- printf "%s %s" (toString $commentDelim) (toString $parent) | nindent 2 }}
+  {{- printf "%s" (toString $child) | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "rstudio-library.config.ini" -}}
 {{- range $file, $keys := . -}}
 {{- printf "%s: |" $file | nindent 0 }}

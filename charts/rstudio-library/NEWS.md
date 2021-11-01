@@ -1,3 +1,20 @@
+# 0.1.17
+
+- Add a `rstudio-library.config.txt` helper
+  - Creates a generic text output
+  - Allows comments (if using `key=value` pairs) and customizing the comment "delimiter" (`#` by default)
+  - Example usage:
+```
+{{- $config := dict "data" (dict "some-file.txt" (dict "key" "value")) }} 
+{{- include "rstudio-library.config.txt" $config }}
+
+# results in
+some-file.txt: |
+  # key
+  value
+```
+
+
 # 0.1.16
 
 - add `pods/exec` API access
