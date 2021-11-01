@@ -156,8 +156,9 @@ Provisioning users in RStudio Workbench containers is challenging. Session image
 consistent UIDs / GIDs), but creating users in the Workbench containers is a responsibility that falls to the
 administrator today.
 
-The most common way to provision users is via `sssd`. The [latest RStudio Workbench container]() has `sssd` included and
-running by default (see `userProvisioning` configuration files above).
+The most common way to provision users is via `sssd`.
+The [latest RStudio Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
+has `sssd` included and running by default (see `userProvisioning` configuration files above).
 
 The other way that this can be managed is via a lightweight "startup service" (runs once at startup and then sleeps forever)
 or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.
