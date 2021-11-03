@@ -1,9 +1,6 @@
 name: Document Charts
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
 
 jobs:
@@ -13,6 +10,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - uses: r-lib/actions/pr-fetch@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v1
@@ -38,7 +39,11 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git commit charts/*/README.md -m 'Update helm-docs and README.md' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
+
+      - uses: r-lib/actions/pr-push@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
   rbac:
     runs-on: ubuntu-latest
     name: rbac
@@ -46,6 +51,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - uses: r-lib/actions/pr-fetch@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v1
@@ -69,4 +78,7 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add examples/rbac/rstudio-launcher-rbac*.yaml || echo "No files to add"
           git commit examples/rbac/rstudio-launcher-rbac*.yaml -m 'Update rbac yaml' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
+
+      - uses: r-lib/actions/pr-push@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
