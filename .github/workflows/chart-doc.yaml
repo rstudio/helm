@@ -41,6 +41,7 @@ jobs:
           git config --local user.name "GitHub Actions"
           git commit charts/*/README.md -m 'Update helm-docs and README.md' || echo "No changes to commit"
           git checkout -b tmp-branch
+          git pull --set-upstream origin $GITHUB_HEAD_REF
           git push origin tmp-branch:$GITHUB_HEAD_REF || echo "No changes to commit"
   rbac:
     runs-on: ubuntu-latest
@@ -75,4 +76,5 @@ jobs:
           git add examples/rbac/rstudio-launcher-rbac*.yaml || echo "No files to add"
           git commit examples/rbac/rstudio-launcher-rbac*.yaml -m 'Update rbac yaml' || echo "No changes to commit"
           git checkout -b tmp-branch
+          git pull --set-upstream origin $GITHUB_HEAD_REF
           git push origin tmp-branch:$GITHUB_HEAD_REF || echo "No changes to commit"
