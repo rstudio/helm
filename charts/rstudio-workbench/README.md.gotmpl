@@ -142,6 +142,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `supervisord` service / unit definition `.conf` files
   - Located at `config.startupCustom.<< name of file >>` helm values
   - Will use the `.ini` file format, by default
+  - Mounted at `/startup/custom`
   - As with all config files above, can override with a verbatim string if desired, like so:
 ```yaml
 config:
@@ -149,7 +150,11 @@ config:
     myfile.conf: |
       file-used-verbatim
 ```
-    
+- PAM configuration
+  - `pam` configuration files
+  - Located at `config.pam.<< name of file >>` helm values
+  - Will be mounted verbatim as individual files (using `subPath` mounts) at `/etc/pam.d/<< name of file >>`
+
 ## User Provisioning
 
 Provisioning users in RStudio Workbench containers is challenging. Session images have users created automatically (with
