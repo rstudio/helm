@@ -32,6 +32,10 @@ spec:
       {{- if .Values.pod.serviceAccountName }}
       serviceAccountName: {{ .Values.pod.serviceAccountName }}
       {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.initContainers }}
       initContainers:
         {{- toYaml .Values.initContainers | nindent 8 }}
@@ -51,7 +55,7 @@ spec:
         {{- if .Values.args }}
         args: {{ .Values.args }}
         {{- end }}
-        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
         ports:
         - containerPort: 4242
         securityContext:

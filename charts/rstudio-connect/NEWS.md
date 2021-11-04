@@ -1,3 +1,7 @@
+# 0.2.9
+
+- Add `imagePullSecrets` value option ([#57](https://github.com/rstudio/helm/issues/57))
+
 # 0.2.8
 
 - Bump `rstudio-library` chart version
