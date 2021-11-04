@@ -40,6 +40,22 @@ spec:
       serviceAccountName: {{ .Values.serviceAccountName }}
       {{- end }}
       shareProcessNamespace: {{ .Values.shareProcessNamespace }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.initContainers }}
       {{- with .Values.imagePullSecrets }}
         imagePullSecrets:

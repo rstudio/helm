@@ -89,6 +89,10 @@ config:
         Path: /opt/R/3.6.3
       - Label: other
         Path: /opt/R/4.0.2
+  sessionSecret:
+    odbc.ini: |
+      [hello]
+      uid=someval
   secret:
     "database.conf": {}
   server:
@@ -134,3 +138,11 @@ config:
         Environment:
           TESTA: A
           TESTB: B
+  userProvisioning:
+    # fake .test ending to avoid killing the image
+    some-value.conf.test: |
+      some-value
+  startupCustom:
+    # fake .test ending to avoid killing the image
+    somefile.conf.test: |
+      some-value

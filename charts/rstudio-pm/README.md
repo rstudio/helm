@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.2.3](https://img.shields.io/badge/Version-0.2.3-informational?style=flat-square) ![AppVersion: 2021.09.0-1](https://img.shields.io/badge/AppVersion-2021.09.0--1-informational?style=flat-square)
+![Version: 0.2.6](https://img.shields.io/badge/Version-0.2.6-informational?style=flat-square) ![AppVersion: 2021.09.0-1](https://img.shields.io/badge/AppVersion-2021.09.0--1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.3:
+To install the chart with the release name `my-release` at version 0.2.6:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.3
+helm install my-release rstudio/rstudio-pm --version=0.2.6
 ```
 
 ## Required Configuration
@@ -118,6 +118,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | rstudioPMKey | bool | `false` | rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service |
 | service.annotations | object | `{}` | The annotations for the service |
 | service.nodePort | bool | `false` | The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically |
+| service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.type | string | `"NodePort"` | The service type (NodePort, LoadBalancer, etc.) |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |

@@ -64,6 +64,8 @@ service:
   annotations: {}
   # -- The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically
   nodePort: false
+  # -- The Service port. This is the port your service will run under.
+  port: 80
 
 # -- replicas is the number of replica pods to maintain for this service
 replicas: 1

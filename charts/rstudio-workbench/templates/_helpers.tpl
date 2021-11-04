@@ -57,10 +57,6 @@ containers:
   {{- end }}
   - name: XDG_CONFIG_DIRS
     value: "{{ template "rstudio-workbench.xdg-config-dirs" .}}"
-  {{- if or ( gt (int .Values.replicas) 1 ) ( .Values.loadBalancer.forceEnabled ) }}
-  - name: PRESTART_LOAD_BALANCER_CONFIGURATION
-    value: enabled
-  {{- end }}
   {{- if .Values.pod.env }}
 {{ toYaml .Values.pod.env | indent 2 }}
   {{- end }}
@@ -92,12 +88,32 @@ containers:
       mountPath: "/mnt/configmap/rstudio/"
     - name: rstudio-session-config
       mountPath: "/mnt/session-configmap/rstudio/"
+    {{- if .Values.config.sessionSecret }}
+    - name: rstudio-session-secret
+      mountPath: {{ .Values.session.defaultSecretMountPath }}
+    {{- end }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
+    {{- if .Values.config.userProvisioning }}
+    - name: rstudio-user
+      mountPath: "/etc/sssd/conf.d/"
+    {{- end }}
     - name: etc-rstudio
       mountPath: "/etc/rstudio"
-    - name: shared-data
-      mountPath: "/mnt/load-balancer/rstudio"
+    - name: rstudio-rsw-startup
+      mountPath: "/startup/base"
+    {{- if .Values.launcher.enabled }}
+    - name: rstudio-launcher-startup
+      mountPath: "/startup/launcher"
+    {{- end }}
+    {{- if .Values.config.userProvisioning }}
+    - name: rstudio-user-startup
+      mountPath: "/startup/user-provisioning"
+    {{- end }}
+    {{- if .Values.config.startupCustom }}
+    - name: rstudio-custom-startup
+      mountPath: "/startup/custom"
+    {{- end }}
     {{- include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | nindent 4 }}
     {{- /* TODO: path collision problems... would be ideal to not have to maintain both long term */}}
     {{- if .Values.jobJsonOverridesFiles }}
@@ -155,28 +171,6 @@ containers:
     successThreshold: {{ .Values.readinessProbe.successThreshold }}
     failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
   {{- end }}
-{{- if or (gt (int .Values.replicas) 1) (.Values.loadBalancer.forceEnabled) }}
-- name: sidecar
-  image: "{{ .Values.loadBalancer.image.repository }}:{{ .Values.loadBalancer.image.tag }}"
-  imagePullPolicy: "{{ .Values.loadBalancer.image.imagePullPolicy }}"
-  {{- if .Values.loadBalancer.env }}
-  env:
-    {{- toYaml .Values.loadBalancer.env | nindent 2 }}
-  {{- end }}
-  args:
-    - "{{ include "rstudio-workbench.name" . }}"
-    - "{{ $.Release.Namespace }}"
-    - "/mnt/load-balancer/rstudio/"
-    - "{{ .Values.loadBalancer.sleepDuration }}"
-    - "{{ .Values.loadBalancer.appLabelKey }}"
-  {{- if .Values.loadBalancer.securityContext }}
-  securityContext:
-    {{- toYaml .Values.loadBalancer.securityContext | nindent 4 }}
-  {{- end }}
-  volumeMounts:
-  - name: shared-data
-    mountPath: "/mnt/load-balancer/rstudio/"
-{{- end }}
 {{- if .Values.prometheusExporter.enabled }}
 - name: exporter
   image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
@@ -215,8 +209,6 @@ volumes:
 {{- end }}
 - name: etc-rstudio
   emptyDir: {}
-- name: shared-data
-  emptyDir: {}
 - name: rstudio-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-config
@@ -225,14 +217,47 @@ volumes:
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-session
     defaultMode: 0644
+{{- if .Values.config.sessionSecret }}
+- name: rstudio-session-secret
+  secret:
+    name: {{ include "rstudio-workbench.fullname" . }}-session-secret
+{{- end }}
 - name: rstudio-prestart
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-prestart
     defaultMode: 0755
+- name: rstudio-rsw-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-rsw
+    defaultMode: 0755
+{{- if .Values.launcher.enabled }}
+- name: rstudio-launcher-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
+    defaultMode: 0755
+{{- end }}
+{{- if .Values.config.userProvisioning }}
+- name: rstudio-user-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-user
+    defaultMode: 0755
+{{- end }}
+{{- if .Values.config.startupCustom }}
+- name: rstudio-custom-startup
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-start-custom
+    defaultMode: 0755
+{{- end }}
 - name: rstudio-secret
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-secret
     defaultMode: 0600
+{{- if .Values.config.userProvisioning }}
+- name: rstudio-user
+  secret:
+    secretName: {{ include "rstudio-workbench.fullname" . }}-user
+    defaultMode: 0600
+{{- end }}
 {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-workbench.fullname" .)) }}
 {{- if .Values.prometheusExporter.enabled }}
 - name: graphite-exporter-config

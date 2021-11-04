@@ -6,6 +6,16 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 data:
   {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
+{{- if .Values.config.sessionSecret }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-session-secret
+  namespace: {{ $.Release.Namespace }}
+stringData:
+  {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 2 }}
+{{- end }}
 
 {{- /*
   if session/target namespace differs - duplicate session configuration there
@@ -24,4 +34,14 @@ metadata:
   namespace: {{ $targetNamespace }}
 data:
   {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
+{{- if .Values.config.sessionSecret }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-session-secret
+  namespace: {{ $targetNamespace }}
+stringData:
+  {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 2 }}
+{{- end }}
 {{- end }}

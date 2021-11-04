@@ -3,16 +3,13 @@ set -o errexit
 set -o pipefail
 
 main() {
-  local startup_script="${1:-/usr/local/bin/startup.sh}"
+  local startup_script="${1:-/usr/lib/rstudio-server/bin/rstudio-launcher}"
   local dyn_dir='/mnt/dynamic/rstudio'
 
   local cacert='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
   local k8s_url="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
   local launcher_k8s_conf="${dyn_dir}/launcher.kubernetes.conf"
-  local launcher_pem='/mnt/secret-configmap/rstudio/launcher.pem'
-  local launcher_pub="${dyn_dir}/launcher.pub"
   local launcher_ns="${RSTUDIO_LAUNCHER_NAMESPACE:-rstudio}"
-  local lb_conf='/mnt/load-balancer/rstudio/load-balancer'
 
   _logf 'Loading service account token'
   local sa_token
@@ -24,30 +21,6 @@ main() {
 
   _logf 'Ensuring %s exists' "${dyn_dir}"
   mkdir -p "${dyn_dir}"
-
-  if [[ "${PRESTART_LOAD_BALANCER_CONFIGURATION}" == enabled ]]; then
-    _logf 'Generating %s' "${lb_conf}"
-    cat >"${lb_conf}" <<EOF
-
-[config]
-
-balancer = sessions
-
-[nodes]
-$(hostname -i)
-EOF
-    _logf 'Current load-balancer file:'
-    cat "${lb_conf}" | _indent
-  fi
-
-  if [[ ! -s "${launcher_pub}" ]] && [[ -f "${launcher_pem}" ]]; then
-    _logf 'Generating %s from %s' "${launcher_pub}" "${launcher_pem}"
-    openssl rsa -in "${launcher_pem}" -outform PEM -pubout -out "${launcher_pub}" 2>&1 | _indent
-    chmod -v 600 "${launcher_pub}" 2>&1 | _indent
-  else
-    _logf 'Ensuring %s does not exist' "${launcher_pub}"
-    rm -vf "${launcher_pub}" 2>&1 | _indent
-  fi
 
   _logf 'Checking kubernetes health via %s' "${k8s_url}"
   curl -fsSL \
@@ -77,15 +50,11 @@ EOF
 
   _logf 'Preparing dirs'
   mkdir -p \
-    /var/lib/rstudio-server/monitor/log \
     /var/lib/rstudio-launcher/Local \
     /var/lib/rstudio-launcher/Kubernetes
   chown -v -R \
     rstudio-server:rstudio-server \
-    /var/lib/rstudio-server \
     /var/lib/rstudio-launcher 2>&1 | _indent
-
-  _writeEtcRstudioReadme
 
   _logf 'Replacing process with %s' "${startup_script}"
   exec "${startup_script}"
@@ -97,26 +66,13 @@ _logf() {
   local now
   now="$(date -u +%Y-%m-%dT%H:%M:%S)"
   local format_string
-  format_string="$(printf '#----> prestart.bash %s: %s' "${now}" "${msg}")\\n"
+  format_string="$(printf '#----> prestart-launcher.bash %s: %s' "${now}" "${msg}")\\n"
   # shellcheck disable=SC2059
   printf "${format_string}" "${@}"
 }
 
 _indent() {
   sed -u 's/^/       /'
-}
-
-_writeEtcRstudioReadme() {
-  _logf 'Writing README to empty /etc/rstudio directory'
-  (cat <<$HERE$
-The contents of this configuration directory have been moved to other directories
-in order to facilitate running in Kubernetes. The directories are specified via
-the XDG_CONFIG_DIRS environment variable defined in the Helm chart. The currently
-defined directories are:
-
-$(echo "$XDG_CONFIG_DIRS" | sed 's/:/\n/g')
-$HERE$
-  ) > /etc/rstudio/README
 }
 
 main "${@}"
