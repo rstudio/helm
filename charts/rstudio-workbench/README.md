@@ -363,7 +363,7 @@ config:
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
 | session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |
 | session.image.tagPrefix | string | `"bionic-"` | A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined |
-| shareProcessNamespace | bool | `true` | whether to provide `shareProcessNamespace` to the pod. Important for HA environments for the sidecar |
+| shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |
 | sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
