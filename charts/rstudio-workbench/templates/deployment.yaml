@@ -69,5 +69,5 @@ spec:
   see "_helpers.tpl" for the definition
 
   we define in a helper so that the same definition can be used in tests
-  */ }}
+  */ -}}
 {{ include "rstudio-workbench.containers" . | indent 6 }}
