@@ -114,6 +114,13 @@ containers:
     - name: rstudio-custom-startup
       mountPath: "/startup/custom"
     {{- end }}
+    {{- if .Values.config.pam }}
+      {{- range $i, $pamFileName := keys .Values.config.pam }}
+    - name: rstudio-pam
+      mountPath: "/etc/pam.d/{{ $pamFileName }}"
+      subPath: "{{ $pamFileName }}"
+      {{- end }}
+    {{- end }}
     {{- include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | nindent 4 }}
     {{- /* TODO: path collision problems... would be ideal to not have to maintain both long term */}}
     {{- if .Values.jobJsonOverridesFiles }}
@@ -246,6 +253,12 @@ volumes:
 - name: rstudio-custom-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-custom
+    defaultMode: 0755
+{{- end }}
+{{- if .Values.config.pam }}
+- name: rstudio-pam
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-pam
     defaultMode: 0755
 {{- end }}
 - name: rstudio-secret

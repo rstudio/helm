@@ -1,0 +1,10 @@
+{{- if .Values.config.pam }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-pam
+  namespace: {{ $.Release.Namespace }}
+data:
+  {{- $pamDict := dict "data" .Values.config.pam "commentDelimiter" "#" }}
+  {{- include "rstudio-library.config.txt" $pamDict | nindent 2 }}
+{{- end }}
