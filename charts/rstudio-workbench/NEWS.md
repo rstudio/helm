@@ -5,6 +5,7 @@
   - Previous versions of the chart are not compatible (by default) with 2021.09 or later
   - If you want to use charts across versions, you will need to change `command`, `args`, and some configmaps.
 - BREAKING: Change RStudio Workbench execution model to use supervisord
+- Add `imagePullSecrets` value option ([#57](https://github.com/rstudio/helm/issues/57))  
 - Add config-maps to configure startup behavior
 - Add a config setting for `sssd` (now in the container by default) - `config.userProvisioning`
 - Add a "secret" configmap for session components (useful for shared database credentials, `odbc.ini`, etc.)

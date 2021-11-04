@@ -95,8 +95,8 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-# -- whether to provide `shareProcessNamespace` to the pod. Important for HA environments for the sidecar
-shareProcessNamespace: true
+# -- whether to provide `shareProcessNamespace` to the pod.
+shareProcessNamespace: false
 
 service:
   # -- annotations for the service definition

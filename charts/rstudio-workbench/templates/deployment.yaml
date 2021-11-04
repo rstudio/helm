@@ -39,6 +39,10 @@ spec:
       {{- if and (not .Values.rbac.create) (.Values.serviceAccountName) }}
       serviceAccountName: {{ .Values.serviceAccountName }}
       {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       shareProcessNamespace: {{ .Values.shareProcessNamespace }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
