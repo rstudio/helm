@@ -11,6 +11,10 @@ spec:
   {{- if and (not .Values.rbac.create) (.Values.serviceAccountName) }}
   serviceAccountName: {{ .Values.serviceAccountName }}
   {{- end }}
+  {{- with .Values.image.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   shareProcessNamespace: {{ .Values.shareProcessNamespace }}
   restartPolicy: Never
   {{- $topLevelParams := dict "enableDiagnostics" true "userCreate" true }}

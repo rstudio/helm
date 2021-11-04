@@ -76,6 +76,8 @@ image:
   tag: ""
   # -- the imagePullPolicy for the main pod image
   imagePullPolicy: IfNotPresent
+  # -- an array of kubernetes secrets for pulling the main pod image from private registries
+  imagePullSecrets: []
 
 # -- the initContainer spec that will be used verbatim
 initContainers: false
@@ -93,8 +95,8 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-# -- whether to provide `shareProcessNamespace` to the pod. Important for HA environments for the sidecar
-shareProcessNamespace: true
+# -- whether to provide `shareProcessNamespace` to the pod.
+shareProcessNamespace: false
 
 service:
   # -- annotations for the service definition

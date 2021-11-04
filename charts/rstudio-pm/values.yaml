@@ -29,8 +29,10 @@ image:
   repository: rstudio/rstudio-package-manager
   # -- the tag to use for the main pod image
   tag: ""
-  # -- the pullPolicy for the main pod image
-  pullPolicy: IfNotPresent
+  # -- the imagePullPolicy for the main pod image
+  imagePullPolicy: IfNotPresent
+  # -- an array of kubernetes secrets for pulling the main pod image from private registries
+  imagePullSecrets: []
 
 strategy:
   type: "RollingUpdate"
