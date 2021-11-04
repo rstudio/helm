@@ -1,6 +1,8 @@
 image:
   repository: rstudio/rstudio-server-pro
   tag: daily
+  imagePullSecrets:
+    - name: "some-secret"
 license:
   key: test
 service:
