@@ -1,7 +1,9 @@
 image:
   repository: rstudio/rstudio-package-manager
   tag: 1.1.6.1-5
-  pullPolicy: IfNotPresent
+  imagePullPolicy: Always
+  imagePullSecrets:
+    - name: "some-secret"
 license:
   key: test
 service:

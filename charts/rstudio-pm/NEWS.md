@@ -1,3 +1,8 @@
+# 0.2.7
+
+- BREAKING: change `.image.pullPolicy` to `.image.imagePullPolicy` for consistency with other charts
+- Add `imagePullSecrets` value option ([#57](https://github.com/rstudio/helm/issues/57))
+
 # 0.2.6
 
 - Update `rstudio-library` chart dependency
