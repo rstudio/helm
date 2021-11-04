@@ -228,7 +228,7 @@ config:
         some-key:
           - value1
           - value2
--     myuser:
+      myuser:
         some-key:
           - value4
           - value5
