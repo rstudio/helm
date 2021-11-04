@@ -89,7 +89,7 @@ spec:
             mountPath: "/etc/rstudio-connect/runtime.yaml"
             subPath: "runtime.yaml"
           - name: rstudio-connect-config
-            mountPath: "/etc/rstudio-connect/launcher.kubernetes.profiles.conf"
+            mountPath: "/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf"
             subPath: "launcher.kubernetes.profiles.conf"
           {{- end }}
           {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
