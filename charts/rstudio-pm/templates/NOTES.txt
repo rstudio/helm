@@ -9,7 +9,14 @@ NOTE: `.Values.config.Licensing.LicenseType` is configured manually. Normally, w
   - When `license.server` is set, we set `LicenseType` to `remote`.
   - Otherwise, `LicenseType` uses the default of `local`.
 Please consider removing this configuration value.
+{{- end }}
+{{- end }}
+{{- end }}
 
-{{- end }}
-{{- end }}
+{{- if hasKey .Values.image "pullPolicy" }}
+
+WARNING: `image.pullPolicy` value has been removed in chart version 0.2.7. Please change to `image.imagePullPolicy`
+  - This was done for consistency with our other charts
+  - It is also easier to remember since this is what the kubernetes value is actually called
+  - See `NEWS.md` to note other changes between releases
 {{- end }}
