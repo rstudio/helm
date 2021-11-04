@@ -69,6 +69,10 @@ containers:
 {{ toYaml .Values.args | indent 4 }}
   {{- end }}
   imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
+  {{- with .Values.image.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   ports:
   - containerPort: 8787
   securityContext:
