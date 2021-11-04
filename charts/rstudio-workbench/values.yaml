@@ -76,7 +76,7 @@ image:
   tag: ""
   # -- the imagePullPolicy for the main pod image
   imagePullPolicy: IfNotPresent
-  # -- k8s secret for pulling from private registries
+  # -- an array of kubernetes secrets for pulling the main pod image from private registries
   imagePullSecrets: []
 
 # -- the initContainer spec that will be used verbatim
