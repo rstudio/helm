@@ -163,6 +163,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `supervisord` service / unit definition `.conf` files
   - Located at `config.startupCustom.<< name of file >>` helm values
   - Will use the `.ini` file format, by default
+  - Mounted at `/startup/custom`
   - As with all config files above, can override with a verbatim string if desired, like so:
 ```yaml
 config:
@@ -170,7 +171,11 @@ config:
     myfile.conf: |
       file-used-verbatim
 ```
-   
+- PAM configuration
+  - `pam` configuration files
+  - Located at `config.pam.<< name of file >>` helm values
+  - Will be mounted verbatim as individual files (using `subPath` mounts) at `/etc/pam.d/<< name of file >>`
+
 ## User Provisioning
 
 Provisioning users in RStudio Workbench containers is challenging. Session images have users created automatically (with
@@ -195,6 +200,26 @@ However, it is important to be careful of a few points:
 We do not provide such a service out of the box because we intend for RStudio Workbench to solve this problem in a
 future release. Please get in touch with your account representative if you have feedback or questions about this
 workflow.
+
+### PAM
+
+When starting sessions on RStudio Workbench, PAM configuration is often very important, even if PAM is not being used as
+an authentication mechanism. The RStudio Workbench helm chart allows creating custom PAM files via the `config.pam`
+values section.
+
+Each key under `config.pam` will become a PAM config file, and will be mounted into `/etc/pam.d/` in the container. For
+example:
+
+```yaml
+config:
+  pam:
+    rstudio: |
+      # the rstudio PAM config file
+      # will be used verbatim
+    rstudio-session: |
+      # the rstudio-session PAM config file
+      # will be used verbatim
+```
    
 ## RStudio Profiles
 
