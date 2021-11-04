@@ -318,3 +318,5 @@ config:
     launcher-mounts: []
   # -- a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/
   startupCustom: {}
+  # -- a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files
+  pam: {}
