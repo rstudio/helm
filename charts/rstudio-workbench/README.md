@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.0-rc03](https://img.shields.io/badge/Version-0.5.0--rc03-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.0-rc04](https://img.shields.io/badge/Version-0.5.0--rc04-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.0-rc03:
+To install the chart with the release name `my-release` at version 0.5.0-rc04:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.0-rc03
+helm install my-release rstudio/rstudio-workbench --version=0.5.0-rc04
 ```
 
 ## Required Configuration
@@ -163,6 +163,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `supervisord` service / unit definition `.conf` files
   - Located at `config.startupCustom.<< name of file >>` helm values
   - Will use the `.ini` file format, by default
+  - Mounted at `/startup/custom`
   - As with all config files above, can override with a verbatim string if desired, like so:
 ```yaml
 config:
@@ -170,7 +171,11 @@ config:
     myfile.conf: |
       file-used-verbatim
 ```
-   
+- PAM configuration
+  - `pam` configuration files
+  - Located at `config.pam.<< name of file >>` helm values
+  - Will be mounted verbatim as individual files (using `subPath` mounts) at `/etc/pam.d/<< name of file >>`
+
 ## User Provisioning
 
 Provisioning users in RStudio Workbench containers is challenging. Session images have users created automatically (with
@@ -195,6 +200,26 @@ However, it is important to be careful of a few points:
 We do not provide such a service out of the box because we intend for RStudio Workbench to solve this problem in a
 future release. Please get in touch with your account representative if you have feedback or questions about this
 workflow.
+
+### PAM
+
+When starting sessions on RStudio Workbench, PAM configuration is often very important, even if PAM is not being used as
+an authentication mechanism. The RStudio Workbench helm chart allows creating custom PAM files via the `config.pam`
+values section.
+
+Each key under `config.pam` will become a PAM config file, and will be mounted into `/etc/pam.d/` in the container. For
+example:
+
+```yaml
+config:
+  pam:
+    rstudio: |
+      # the rstudio PAM config file
+      # will be used verbatim
+    rstudio-session: |
+      # the rstudio-session PAM config file
+      # will be used verbatim
+```
    
 ## RStudio Profiles
 
@@ -228,7 +253,7 @@ config:
         some-key:
           - value1
           - value2
--     myuser:
+      myuser:
         some-key:
           - value4
           - value5
@@ -284,6 +309,7 @@ config:
 | affinity | object | `{}` |  |
 | args | list | `[]` | args is the pod container's run arguments. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| config.pam | object | `{}` | a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files |
 | config.profiles | object | `{}` | a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information. |
 | config.secret | object | `{"database.conf":{}}` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
 | config.server | object | `{"jupyter.conf":{"default-session-cluster":"Kubernetes","jupyter-exe":"/opt/python/3.6.5/bin/jupyter","labs-enabled":1,"notebooks-enabled":1},"launcher.conf":{"cluster":{"name":"Kubernetes","type":"Kubernetes"},"server":{"address":"127.0.0.1","admin-group":"rstudio-server","authorization-enabled":1,"enable-debug-logging":0,"port":5559,"server-user":"rstudio-server","thread-pool-size":4}},"logging.conf":{},"rserver.conf":{"admin-enabled":1,"launcher-address":"127.0.0.1","launcher-default-cluster":"Kubernetes","launcher-port":5559,"launcher-sessions-enabled":1,"monitor-graphite-client-id":"rstudio","monitor-graphite-enabled":1,"monitor-graphite-host":"127.0.0.1","monitor-graphite-port":9109,"server-health-check-enabled":1,"server-project-sharing":1,"www-port":8787}}` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |

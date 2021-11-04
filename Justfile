@@ -8,3 +8,6 @@ update-lock:
   done
   echo " --> Done!"
 
+docs:
+  #!/bin/bash
+  helm-docs --chart-search-root=charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl

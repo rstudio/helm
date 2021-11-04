@@ -148,3 +148,13 @@ config:
     # fake .test ending to avoid killing the image
     somefile.conf.test: |
       some-value
+  pam:
+    pam-example:
+      # NOTE: order is not deterministic when using a dict... BAD for PAM!
+      somekey: |
+        account some_thing.so
+      anotherkey: |
+        session some_other_thing.so
+    pam-example-2: |
+      account some_thing.so
+      session something_else.so
