@@ -62,7 +62,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- /* default launcher configuration */}}
   {{- if .Values.launcher.enabled }}
     {{- $namespace := default $.Release.Namespace .Values.launcher.namespace }}
-    {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher.kubernetes.profiles.conf") }}
+    {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf") }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
     {{- $pythonSettingsDict := dict "Enabled" ("true") }}
     {{- $pythonDict := dict "Python" ( $pythonSettingsDict ) }}
