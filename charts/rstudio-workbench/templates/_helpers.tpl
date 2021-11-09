@@ -227,7 +227,7 @@ volumes:
 {{- if .Values.config.sessionSecret }}
 - name: rstudio-session-secret
   secret:
-    name: {{ include "rstudio-workbench.fullname" . }}-session-secret
+    secretName: {{ include "rstudio-workbench.fullname" . }}-session-secret
 {{- end }}
 - name: rstudio-prestart
   configMap:
