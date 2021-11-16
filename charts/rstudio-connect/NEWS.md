@@ -1,3 +1,7 @@
+# 0.2.10
+
+- Update default RStudio Connect version to 2021.11.0
+
 # 0.2.9
 
 - Add `imagePullSecrets` value option ([#57](https://github.com/rstudio/helm/issues/57))
