@@ -78,6 +78,8 @@ spec:
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
         ports:
         - containerPort: 3939
+        securityContext:
+          {{ toYaml .Values.securityContext | indent 4 }}
         volumeMounts:
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/rstudio-connect.gcfg"

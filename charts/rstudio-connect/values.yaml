@@ -106,6 +106,9 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
+securityContext:
+  privileged: true
+
 prometheusExporter:
   # -- Whether the  prometheus exporter sidecar should be enabled
   enabled: true
