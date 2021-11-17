@@ -1,6 +1,6 @@
 # 0.2.11
 
-- remove "privileged: true", which is not necessary for rstudio-connect server or sessions
+- remove "privileged: true", which is no longer necessary for rstudio-connect server or sessions
 - location for RStudio Connect's KubernetesProfilesConfig file has changed from `/etc/rstudio/launcher.kubernetes.profiles.conf` to `/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf` so as to not conflict with RStudio Workbench
 
 # 0.2.10
