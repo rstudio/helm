@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.10](https://img.shields.io/badge/Version-0.2.10-informational?style=flat-square) ![AppVersion: 2021.11.0](https://img.shields.io/badge/AppVersion-2021.11.0-informational?style=flat-square)
+![Version: 0.2.11](https://img.shields.io/badge/Version-0.2.11-informational?style=flat-square) ![AppVersion: 2021.11.0](https://img.shields.io/badge/AppVersion-2021.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.10:
+To install the chart with the release name `my-release` at version 0.2.11:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.10
+helm install my-release rstudio/rstudio-connect --version=0.2.11
 ```
 
 ## Required Configuration
