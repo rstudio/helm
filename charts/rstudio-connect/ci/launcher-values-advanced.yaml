@@ -2,6 +2,7 @@ rbac:
   create: true
   serviceAccount:
     create: true
+securityContext: {}
 launcher:
   enabled: true
   customRuntimeYaml:
