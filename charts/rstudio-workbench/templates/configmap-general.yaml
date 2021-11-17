@@ -13,10 +13,10 @@
   {{- $defaultOverrides = concat $defaultOverrides ( list $sessionVolumeOverride $sessionVolumeMountOverride ) }}
   {{- if .Values.config.sessionSecret}}
     {{/* default session secret config mount */}}
-    {{- $sessionSecretVolume := dict "secret" ( dict "name" (printf "%s-session-secret" ( include "rstudio-workbench.fullname" . ) ) ) "secretName" "session-secret" }}
+    {{- $sessionSecretVolume := dict "secret" ( dict "secretName" (printf "%s-session-secret" ( include "rstudio-workbench.fullname" . ) ) ) "name" "session-secret" }}
     {{- $sessionSecretVolumeMount := dict "mountPath" .Values.session.defaultSecretMountPath "name" "session-secret" }}
-    {{- $sessionSecretVolumeOverride := dict "name" "defaultSessionSecretVolume" "target" "/spec/template/spec/volumes/-" "json" $sessionVolume }}
-    {{- $sessionSecretVolumeMountOverride := dict "name" "defaultSessionVolumeMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionVolumeMount }}
+    {{- $sessionSecretVolumeOverride := dict "name" "defaultSessionSecretVolume" "target" "/spec/template/spec/volumes/-" "json" $sessionSecretVolume }}
+    {{- $sessionSecretVolumeMountOverride := dict "name" "defaultSessionSecretVolumeMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionSecretVolumeMount }}
     {{/* build the actual overrides */}}
     {{- $defaultOverrides = concat $defaultOverrides ( list $sessionSecretVolumeOverride $sessionSecretVolumeMountOverride ) }}
   {{- end }}

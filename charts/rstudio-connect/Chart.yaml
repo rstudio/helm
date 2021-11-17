@@ -18,7 +18,7 @@ dependencies:
 annotations:
   artifacthub.io/images: |
     - name: rstudio-connect
-      image: rstudio/rstudio-connect:2021.10.0
+      image: rstudio/rstudio-connect:2021.11.0
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images
