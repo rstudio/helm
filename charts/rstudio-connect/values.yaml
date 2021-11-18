@@ -107,7 +107,7 @@ license:
     secret: false
 
 # -- Values to set the `securityContext` for Connect pods. It must include "privileged: true" or "CAP_SYS_ADMIN" when
-# launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: {}`
+# launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null`
 securityContext:
   privileged: true
 
