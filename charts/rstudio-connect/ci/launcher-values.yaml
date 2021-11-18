@@ -4,4 +4,4 @@ rbac:
     create: true
 launcher:
   enabled: true
-securityContext: {}
+securityContext: null
