@@ -284,6 +284,7 @@ config:
   server:
     rserver.conf:
       server-health-check-enabled: 1
+      auth-pam-sessions-enabled: 1
       admin-enabled: 1
       www-port: 8787
       server-project-sharing: 1
