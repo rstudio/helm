@@ -42,17 +42,17 @@ containers:
   - name: RSTUDIO_LAUNCHER_NAMESPACE
     value: "{{ default $.Release.Namespace .Values.launcher.namespace }}"
   {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-workbench") "envVarPrefix" ("RSW") "fullName" (include "rstudio-workbench.fullname" .)) | nindent 2 }}
-  - name: RSP_LAUNCHER
+  - name: RSW_LAUNCHER
     value: "{{ .Values.launcher.enabled }}"
   {{- if .Values.userCreate }}
-  - name: RSP_TESTUSER
+  - name: RSW_TESTUSER
     value: "{{ .Values.userName }}"
-  - name: RSP_TESTUSER_UID
+  - name: RSW_TESTUSER_UID
     value: "{{ .Values.userUid }}"
-  - name: RSP_TESTUSER_PASSWD
+  - name: RSW_TESTUSER_PASSWD
     value: "{{ .Values.userPassword }}"
   {{- else }}
-  - name: RSP_TESTUSER
+  - name: RSW_TESTUSER
     value: ""
   {{- end }}
   - name: XDG_CONFIG_DIRS
