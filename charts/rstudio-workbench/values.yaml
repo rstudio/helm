@@ -281,6 +281,7 @@ config:
   # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
   userProvisioning: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
+  # @default -- [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values`
   server:
     rserver.conf:
       server-health-check-enabled: 1
