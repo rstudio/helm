@@ -50,7 +50,6 @@ As a result, please:
 
 {{- end }}
 
-
 {{- define "rstudio.install" }}
 
 ## Installing the Chart
@@ -59,7 +58,7 @@ To install the chart with the release name `my-release` at version {{ template "
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/{{ template "chart.name" . }} --version={{ template "chart.version" . }}
+helm install {{- if (regexMatch "[0-9]+\\.[0-9]+\\.[0-9]+-[a-zA-Z\\.0-9]+" .Version) }} --devel{{ end }} my-release rstudio/{{ template "chart.name" . }} --version={{ template "chart.version" . }}
 ```
 
 {{- end }}
@@ -82,15 +81,17 @@ helm install my-release rstudio/{{ template "chart.name" . }} --version={{ templ
 {{ typeOf .Values }}
 {{ .ChartDirectory }}
 
-
-{{ $currentScope := . }}
-{{ range $path, $_ := $.Files.Glob "{{ .ChartDirectory }}/ci/*.yaml" }}
-  {{- with $currentScope }}
-    {{ $.Files.Get $path }}
-  {{- end }}
-{{ end }}
-
-
 {{ toPrettyJson . }}
 # Examples
 {{- end }}
+
+{{- /*
+Interesting example that does not work... but I fought hard for... for some reason:
+
+  {{ $currentScope := . }}
+  {{ range $path, $_ := $.Files.Glob "{{ .ChartDirectory }}/ci/*.yaml" }}
+    {{- with $currentScope }}
+      {{ $.Files.Get $path }}
+    {{- end }}
+  {{ end }}
+*/ -}}
