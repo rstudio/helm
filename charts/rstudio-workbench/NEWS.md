@@ -4,12 +4,18 @@
   - This version of the chart is no longer compatible (by default) with older versions (1.4 and previous).
   - Previous versions of the chart are not compatible (by default) with 2021.09 or later
   - If you want to use charts across versions, you will need to change `command`, `args`, and some configmaps.
+  - RSP environment variables for user creation, licensing, etc. are now RSW
 - BREAKING: Change RStudio Workbench execution model to use supervisord
+- BREAKING: Add `vscode.conf` defaults. This enables VS Code sessions, which is dependent on your images having
+  code-server installed at `/opt/code-server/`
+- Enable PAM sessions by default (i.e. `auth-pam-sessions-enabled=1`). This is important for proper home
+  directory creation, for instance. Disable by setting `config.server.rserver\.conf.auth-pam-sessions-enabled=0`
 - Add `imagePullSecrets` value option ([#57](https://github.com/rstudio/helm/issues/57))
 - Add `config.pam` values option to add pam config files
 - Add config-maps to configure startup behavior (`config.startupCustom`)
 - Add a config setting for `sssd` (now in the container by default) (`config.userProvisioning`)
-- Add a "secret" configmap for session components (useful for shared database credentials, `odbc.ini`, etc.) (`config.sessionSecret`)
+- Add a "secret" configmap for session components (useful for shared database credentials, `odbc.ini`,
+  etc.) (`config.sessionSecret`)
 - Update README to make `job-json-overrides`, profiles, user provisioning, etc. more clear
 - Update `rstudio-library` chart dependency
 

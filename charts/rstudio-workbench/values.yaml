@@ -281,9 +281,11 @@ config:
   # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
   userProvisioning: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
+  # @default -- [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values`
   server:
     rserver.conf:
       server-health-check-enabled: 1
+      auth-pam-sessions-enabled: 1
       admin-enabled: 1
       www-port: 8787
       server-project-sharing: 1
@@ -307,11 +309,21 @@ config:
       cluster:
         name: Kubernetes
         type: Kubernetes
-    "jupyter.conf":
+    jupyter.conf:
       jupyter-exe: /opt/python/3.6.5/bin/jupyter
       notebooks-enabled: 1
       labs-enabled: 1
       default-session-cluster: Kubernetes
+    vscode.conf:
+      enabled: 1
+      exe: /opt/code-server/bin/code-server
+      args: --verbose --host=0.0.0.0
+    vscode-user-settings.json: |
+      {
+            "terminal.integrated.shell.linux": "/bin/bash",
+            "extensions.autoUpdate": false,
+            "extensions.autoCheckUpdates": false
+      }
     logging.conf: {}
   # -- a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information.
   profiles: {}

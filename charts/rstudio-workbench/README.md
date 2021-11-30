@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.0-rc08](https://img.shields.io/badge/Version-0.5.0--rc08-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.0-rc09](https://img.shields.io/badge/Version-0.5.0--rc09-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.0-rc08:
+To install the chart with the release name `my-release` at version 0.5.0-rc09:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.0-rc08
+helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc09
 ```
 
 ## Required Configuration
@@ -312,7 +312,7 @@ config:
 | config.pam | object | `{}` | a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files |
 | config.profiles | object | `{}` | a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information. |
 | config.secret | object | `{"database.conf":{}}` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
-| config.server | object | `{"jupyter.conf":{"default-session-cluster":"Kubernetes","jupyter-exe":"/opt/python/3.6.5/bin/jupyter","labs-enabled":1,"notebooks-enabled":1},"launcher.conf":{"cluster":{"name":"Kubernetes","type":"Kubernetes"},"server":{"address":"127.0.0.1","admin-group":"rstudio-server","authorization-enabled":1,"enable-debug-logging":0,"port":5559,"server-user":"rstudio-server","thread-pool-size":4}},"logging.conf":{},"rserver.conf":{"admin-enabled":1,"launcher-address":"127.0.0.1","launcher-default-cluster":"Kubernetes","launcher-port":5559,"launcher-sessions-enabled":1,"monitor-graphite-client-id":"rstudio","monitor-graphite-enabled":1,"monitor-graphite-host":"127.0.0.1","monitor-graphite-port":9109,"server-health-check-enabled":1,"server-project-sharing":1,"www-port":8787}}` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
+| config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
 | config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.rstudio.com/cran/__linux__/bionic/latest","RSPM":"https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"},"rsession.conf":{}}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
