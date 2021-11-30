@@ -4,6 +4,7 @@
   - This version of the chart is no longer compatible (by default) with older versions (1.4 and previous).
   - Previous versions of the chart are not compatible (by default) with 2021.09 or later
   - If you want to use charts across versions, you will need to change `command`, `args`, and some configmaps.
+  - RSP environment variables for user creation, licensing, etc. are now RSW
 - BREAKING: Change RStudio Workbench execution model to use supervisord
 - Add `imagePullSecrets` value option ([#57](https://github.com/rstudio/helm/issues/57))
 - Add `config.pam` values option to add pam config files
