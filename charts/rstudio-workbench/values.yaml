@@ -307,11 +307,21 @@ config:
       cluster:
         name: Kubernetes
         type: Kubernetes
-    "jupyter.conf":
+    jupyter.conf:
       jupyter-exe: /opt/python/3.6.5/bin/jupyter
       notebooks-enabled: 1
       labs-enabled: 1
       default-session-cluster: Kubernetes
+    vscode.conf:
+      enabled: 1
+      exe: /opt/code-server/bin/code-server
+      args: --verbose --host=0.0.0.0
+    vscode-user-settings.json: |
+      {
+            "terminal.integrated.shell.linux": "/bin/bash",
+            "extensions.autoUpdate": false,
+            "extensions.autoCheckUpdates": false
+      }
     logging.conf: {}
   # -- a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information.
   profiles: {}
