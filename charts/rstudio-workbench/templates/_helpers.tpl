@@ -396,3 +396,48 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
 {{- end -}}
+
+{{- /*
+  A helper to check whether the provided storage class is a problematic one...
+  Unfortunately, Kubernetes does not "store" what access modes are allowed for a storage class
+  So we just store a list of known troublemakers (and reference docs here: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes)
+
+  Argument Dict:
+    "accessModes": required. the access modes for the given storage pvc
+    "storageClassName": required. the storage class name in use (or `false` if using the default)
+    "key": optional. default "storage". The values key to use when referencing `accessModes` or `storageClassName`
+    "check": optional. default true. Whether to run the check or not
+*/ -}}
+{{- define "rstudio-library.check-storage-class" -}}
+  {{- $allowedAccessModes := .accessModes }}
+  {{- $storageClassName := .storageClassName }}
+  {{- $key := .key | default "storage" }}
+  {{- $check := .check | default true }}
+  {{- if $check }}
+    {{- $storageClass := dict }}
+    {{- $isDefault := "" }}
+    {{- $knownNotReadWriteManyProvisioners := list "kubernetes.io/aws-ebs" }}
+    {{- $knownNotReadWriteManyClasses := list "gp2" }}
+    {{- $allStorageClasses := lookup "storage.k8s.io/v1" "StorageClass" "" "" }}
+    {{- range $sc := $allStorageClasses.items }}
+      {{- if not $storageClassName }}
+        {{- /* need to get the default */ -}}
+        {{- if eq (get $sc.metadata.annotations "storageclass.kubernetes.io/is-default-class") "true" }}
+          {{- /* this is the default storage class */ -}}
+          {{- $storageClassName = $sc.metadata.name }}
+          {{- $storageClass = $sc }}
+          {{- $isDefault = " (the default on this cluster)" }}
+        {{- end }}
+      {{- else if eq $storageClassName $sc.metadata.name }}
+        {{- $storageClass := $sc }}
+      {{- end }}
+    {{- end }}
+    {{- /* get the actual storage class */ -}}
+    {{- /* check whether the ReadWriteMany is valid */ -}}
+    {{- if has "ReadWriteMany" $allowedAccessModes -}}
+      {{- if or (has $storageClass.provisioner $knownNotReadWriteManyProvisioners) (has $storageClassName $knownNotReadWriteManyClasses) }}
+        {{- fail (printf "\n\nThe storage class '%s'%s is known to not support 'ReadWriteMany' PersistentVolumeClaims. This is important for proper disk provisioning. \nFix by setting `%s.accessModes` appropriately, changing `%s.storageClassName` or disabling this check with `%s.checkAccessModes: false`\n\n" $storageClassName $isDefault $key $key $key) -}}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
