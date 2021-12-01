@@ -38,3 +38,8 @@ NOTE: `.Values.config.server.rserver\.conf.server-license-type` is configured ma
 Please consider removing this configuration value.
 
 {{- end }}
+
+{{- /* check for invalid storage classes */ -}}
+{{- if .Values.homeStorage.create }}
+{{ include "rstudio-library.check-storage-class" (dict "accessModes" .Values.homeStorage.accessModes "storageClassName" .Values.homeStorage.storageClassName "key" "homeStorage" "check" true) }}
+{{- end }}
