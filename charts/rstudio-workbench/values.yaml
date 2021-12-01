@@ -6,6 +6,12 @@ fullnameOverride: ""
 # -- A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
+# -- Settings for enabling server diagnostics
+diagnostics:
+  enabled: false
+  directory: /var/log/rstudio
+
+
 session:
   # -- Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this
   defaultConfigMount: true
@@ -50,6 +56,10 @@ launcher:
   enabled: true
   # -- allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today
   namespace: ""
+  # -- configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup
+  kubernetesHealthCheck:
+    enabled: true
+    extraCurlArgs: ["-fsSL"]
 
 homeStorage:
   # -- whether to create the persistentVolumeClaim for homeStorage
