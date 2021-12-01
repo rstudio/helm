@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.0-rc09](https://img.shields.io/badge/Version-0.5.0--rc09-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.0-rc10](https://img.shields.io/badge/Version-0.5.0--rc10-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.0-rc09:
+To install the chart with the release name `my-release` at version 0.5.0-rc10:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc09
+helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc10
 ```
 
 ## Required Configuration
