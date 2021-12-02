@@ -1,3 +1,7 @@
+# 0.2.12
+
+- Bump Connect version to 2021.11.1
+
 # 0.2.11
 
 - move "privileged: true" into `values.yaml`, because it is no longer necessary
