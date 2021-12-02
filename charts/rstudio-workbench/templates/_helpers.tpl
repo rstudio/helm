@@ -31,13 +31,21 @@ containers:
   {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
   image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
   env:
-  {{- if .Values.enableDiagnostics }}
+  {{- if .Values.diagnostics.enabled }}
   - name: DIAGNOSTIC_DIR
-    value: "/var/log/rstudio"
+    value: "{{ .Values.diagnostics.directory }}"
   - name: DIAGNOSTIC_ONLY
     value: "true"
   - name: DIAGNOSTIC_ENABLE
     value: "true"
+  {{- end }}
+  {{- if not .Values.launcher.kubernetesHealthCheck.enabled }}
+  - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK
+    value: disabled
+  {{- end }}
+  {{- if .Values.launcher.kubernetesHealthCheck.enabled }}
+  - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
+    value: "{{ join " " .Values.launcher.kubernetesHealthCheck.extraCurlArgs }}"
   {{- end }}
   - name: RSTUDIO_LAUNCHER_NAMESPACE
     value: "{{ default $.Release.Namespace .Values.launcher.namespace }}"

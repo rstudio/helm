@@ -22,12 +22,17 @@ main() {
   _logf 'Ensuring %s exists' "${dyn_dir}"
   mkdir -p "${dyn_dir}"
 
-  _logf 'Checking kubernetes health via %s' "${k8s_url}"
-  curl -fsSL \
-    -H "Authorization: Bearer ${sa_token}" \
-    --cacert "${cacert}" \
-    "${k8s_url}/healthz" 2>&1 | _indent
-  printf '\n'
+  if [[ -z "${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}" ]]; then
+    _logf 'Checking kubernetes health via %s' "${k8s_url}"
+    curl ${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS} \
+      -H "Authorization: Bearer ${sa_token}" \
+      --cacert "${cacert}" \
+      "${k8s_url}/livez?verbose" 2>&1 | _indent
+    printf '\n'
+  else
+    _logf "Not checking kubernetes health because RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK=${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}"
+    printf '\n'
+  fi
 
   _logf 'Generating %s' "${launcher_k8s_conf}"
   cat >"${launcher_k8s_conf}" <<EOF

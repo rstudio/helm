@@ -17,7 +17,7 @@ spec:
   {{- end }}
   shareProcessNamespace: {{ .Values.shareProcessNamespace }}
   restartPolicy: Never
-  {{- $topLevelParams := dict "enableDiagnostics" true "userCreate" true }}
+  {{- $topLevelParams := dict "diagnostics" (dict "enabled" true) "userCreate" true }}
   {{- $disabledObject := dict "enabled" false }}
   {{- $readinessProbe := dict "readinessProbe" $disabledObject }}
   {{- $livenessProbe := dict "livenessProbe" $disabledObject }}

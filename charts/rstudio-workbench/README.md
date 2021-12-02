@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.0-rc09](https://img.shields.io/badge/Version-0.5.0--rc09-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.0-rc10](https://img.shields.io/badge/Version-0.5.0--rc10-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.0-rc09:
+To install the chart with the release name `my-release` at version 0.5.0-rc10:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc09
+helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc10
 ```
 
 ## Required Configuration
@@ -319,6 +319,7 @@ config:
 | config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
 | config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
+| diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
 | global.secureCookieKey | string | `""` |  |
 | homeStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
@@ -339,6 +340,7 @@ config:
 | initContainers | bool | `false` | the initContainer spec that will be used verbatim |
 | jobJsonOverridesFiles | object | `{}` | jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents |
 | launcher.enabled | bool | `true` | determines whether the launcher should be started in the container |
+| launcher.kubernetesHealthCheck | object | `{"enabled":true,"extraCurlArgs":["-fsSL"]}` | configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup |
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
 | launcherPem | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |

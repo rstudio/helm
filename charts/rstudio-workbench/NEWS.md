@@ -8,6 +8,9 @@
 - BREAKING: Change RStudio Workbench execution model to use supervisord
 - BREAKING: Add `vscode.conf` defaults. This enables VS Code sessions, which is dependent on your images having
   code-server installed at `/opt/code-server/`
+- Create `diagnostics` values (`diagnostics.enabled` and `diagnostics.directory`) to control diagnostic output
+- Add values to `launcher.kubernetesHealthCheck` to control the behavior of the "Kubernetes Health Check" that launcher
+  runs at startup
 - Enable PAM sessions by default (i.e. `auth-pam-sessions-enabled=1`). This is important for proper home
   directory creation, for instance. Disable by setting `config.server.rserver\.conf.auth-pam-sessions-enabled=0`
 - Add `imagePullSecrets` value option ([#57](https://github.com/rstudio/helm/issues/57))
