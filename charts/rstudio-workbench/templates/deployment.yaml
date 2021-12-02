@@ -32,6 +32,9 @@ spec:
 {{ include "rstudio-workbench.pod.annotations" . | indent 8 }}
       labels:
         {{- include "rstudio-workbench.selectorLabels" . | nindent 8 }}
+      {{- with .Values.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- if .Values.rbac.create }}
       serviceAccountName: {{ include "rstudio-workbench.fullname" . }}

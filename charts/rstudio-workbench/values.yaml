@@ -234,6 +234,8 @@ pod:
   volumeMounts: []
   # -- podAnnotations is a map of keys / values that will be added as annotations to the rstudio-pm pods
   annotations: {}
+  # -- Additional labels to add to the rstudio-workbench pods
+  labels: {}
   # -- sidecar is an array of containers that will be run alongside the main container
   sidecar: false
 
