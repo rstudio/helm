@@ -22,6 +22,8 @@ pod:
   volumes:
     - name: key
       emptyDir: {}
+  labels:
+    app.kubernetes.io/part-of: rstudio-team
   annotations:
     testannotation2: three
   sidecar:
