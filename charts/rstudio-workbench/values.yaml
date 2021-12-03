@@ -232,7 +232,7 @@ pod:
   volumes: []
   # -- volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec
   volumeMounts: []
-  # -- podAnnotations is a map of keys / values that will be added as annotations to the rstudio-pm pods
+  # -- Additional annotations to add to the rstudio-workbench pods
   annotations: {}
   # -- Additional labels to add to the rstudio-workbench pods
   labels: {}
