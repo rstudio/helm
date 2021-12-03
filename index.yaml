@@ -1419,6 +1419,54 @@ entries:
           url: https://www.rstudio.com/products/team/
     apiVersion: v2
     appVersion: 2021.09.0-351.pro6
+    created: "2021-12-03T23:20:38.067602762Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.17
+    description: Official Helm chart for RStudio Workbench
+    digest: 7f39d4b8cdf0ccc9fb7663af2d193e2d9914863919f385e4b60ff57f22e22544
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - ide
+    - editor
+    - jupyter
+    - vscode
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.5.0-rc11/rstudio-workbench-0.5.0-rc11.tgz
+    version: 0.5.0-rc11
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-workbench
+          image: rstudio/rstudio-workbench:2021.09.0-351.pro6
+        - name: r-session-complete
+          image: rstudio/r-session-complete:bionic-2021.09.0-351.pro6
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Workbench
+          url: https://www.rstudio.com/products/workbench/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 2021.09.0-351.pro6
     created: "2021-12-02T14:29:12.936349538Z"
     dependencies:
     - name: rstudio-library
@@ -2294,4 +2342,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2021-12-02T20:26:29.921582765Z"
+generated: "2021-12-03T23:20:38.068778822Z"
