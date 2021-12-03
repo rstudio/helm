@@ -363,8 +363,9 @@ config:
 | loadBalancer.sleepDuration | int | `15` |  |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` |  |
-| pod.annotations | object | `{}` | podAnnotations is a map of keys / values that will be added as annotations to the rstudio-pm pods |
+| pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
+| pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.sidecar | bool | `false` | sidecar is an array of containers that will be run alongside the main container |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
