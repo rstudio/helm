@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.0-rc10](https://img.shields.io/badge/Version-0.5.0--rc10-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.0-rc11](https://img.shields.io/badge/Version-0.5.0--rc11-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.0-rc10:
+To install the chart with the release name `my-release` at version 0.5.0-rc11:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc10
+helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc11
 ```
 
 ## Required Configuration
@@ -363,8 +363,9 @@ config:
 | loadBalancer.sleepDuration | int | `15` |  |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` |  |
-| pod.annotations | object | `{}` | podAnnotations is a map of keys / values that will be added as annotations to the rstudio-pm pods |
+| pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
+| pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.sidecar | bool | `false` | sidecar is an array of containers that will be run alongside the main container |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
