@@ -21,6 +21,7 @@
   etc.) (`config.sessionSecret`)
 - Update README to make `job-json-overrides`, profiles, user provisioning, etc. more clear
 - Update `rstudio-library` chart dependency
+- Add a `pod.labels` values option ([#101](https://github.com/rstudio/helm/issues/101))
 
 # 0.4.6
 
