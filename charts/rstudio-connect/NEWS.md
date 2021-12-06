@@ -1,3 +1,7 @@
+# 0.2.13
+
+- Add configuration values for `pod.haste` to set (or unset) the `RSTUDIO_CONNECT_HASTE` variable
+
 # 0.2.12
 
 - Bump Connect version to 2021.11.1

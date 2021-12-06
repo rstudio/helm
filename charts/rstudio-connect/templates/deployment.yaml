@@ -52,8 +52,10 @@ spec:
         {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
         env:
+        {{- if .Values.pod.haste }}
         - name: RSTUDIO_CONNECT_HASTE
           value: enabled
+        {{- end }}
 {{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-connect") "envVarPrefix" ("RSC") "fullName" (include "rstudio-connect.fullname" .)) | indent 8 }}
         {{- if .Values.pod.env }}
 {{ toYaml .Values.pod.env | indent 8 }}

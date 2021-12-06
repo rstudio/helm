@@ -66,6 +66,8 @@ service:
   port: 80
 
 pod:
+  # -- A helper that defines the RSTUDIO_CONNECT_HASTE environment variable
+  haste: true
   # -- An array of maps that is injected as-is into the "env:" component of the pod.container spec
   env: []
   # -- An array of maps that is injected as-is into the "volumes:" component of the pod spec
