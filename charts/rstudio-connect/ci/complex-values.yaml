@@ -33,6 +33,8 @@ pod:
       mountPath: /tmp/somepath/
   annotations:
     testannotation2: three
+  labels:
+    app.kubernetes.io/part-of: rstudio-team
   sidecar:
     - name: test
       image: "busybox"

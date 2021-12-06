@@ -32,6 +32,9 @@ spec:
 {{ include "rstudio-connect.pod.annotations" . | indent 8 }}
       labels:
         {{- include "rstudio-connect.selectorLabels" . | nindent 8 }}
+        {{- with .Values.pod.labels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- if and .Values.rbac.create .Values.launcher.enabled }}
       {{ $serviceAccountName := default .Values.rbac.serviceAccount.name (include "rstudio-connect.fullname" .) }}

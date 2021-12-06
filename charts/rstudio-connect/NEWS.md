@@ -1,6 +1,7 @@
 # 0.2.13
 
 - Add configuration values for `pod.haste` to set (or unset) the `RSTUDIO_CONNECT_HASTE` variable
+- Add a `pod.labels` values option ([#101](https://github.com/rstudio/helm/issues/101))
 
 # 0.2.12
 
