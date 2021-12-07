@@ -1,3 +1,7 @@
+# 0.1.18
+
+- Add newlines between array entries for `config.dcf` generation ([#108](https://github.com/rstudio/helm/issues/108))
+
 # 0.1.17
 
 - Add a `rstudio-library.config.txt` helper

@@ -1,3 +1,7 @@
+# 0.2.14
+
+- Bump library-chart version
+
 # 0.2.13
 
 - Add configuration values for `pod.haste` to set (or unset) the `RSTUDIO_CONNECT_HASTE` variable

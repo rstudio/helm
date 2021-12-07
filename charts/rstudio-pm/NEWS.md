@@ -1,3 +1,7 @@
+# 0.2.8
+
+- Update `rstudio-library` chart dependency
+
 # 0.2.7
 
 - BREAKING: change `.image.pullPolicy` to `.image.imagePullPolicy` for consistency with other charts
