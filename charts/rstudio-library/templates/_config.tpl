@@ -4,7 +4,9 @@
   i.e.
   { "Server" = {"Host" = "value", "another" = ["multiple", "values"]}}
   Valid values depend on the product
-*/ -}} {{- define "rstudio-library.config.gcfg" -}}
+*/ -}} 
+
+{{- define "rstudio-library.config.gcfg" -}}
 {{- range $section,$keys := . -}}
 [{{ $section }}]
   {{- range $key, $val := $keys }}
