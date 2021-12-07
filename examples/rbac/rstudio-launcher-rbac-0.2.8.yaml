@@ -1,0 +1,75 @@
+---
+# Source: rstudio-launcher-rbac/templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rstudio-launcher-rbac
+---
+# Source: rstudio-launcher-rbac/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rstudio-launcher-rbac
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+      - "pods/log"
+      - "pods/attach"
+      - "pods/exec"
+    verbs:
+      - "get"
+      - "create"
+      - "update"
+      - "patch"
+      - "watch"
+      - "list"
+      - "delete"
+  - apiGroups:
+      - ""
+    resources:
+      - "events"
+    verbs:
+      - "watch"
+  - apiGroups:
+      - ""
+    resources:
+      - "services"
+    verbs:
+      - "create"
+      - "get"
+      - "watch"
+      - "list"
+      - "delete"
+  - apiGroups:
+      - "batch"
+    resources:
+      - "jobs"
+    verbs:
+      - "create"
+      - "update"
+      - "patch"
+      - "get"
+      - "watch"
+      - "list"
+      - "delete"
+  - apiGroups:
+      - "metrics.k8s.io"
+    resources:
+      - "pods"
+    verbs:
+      - "get"
+---
+# Source: rstudio-launcher-rbac/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rstudio-launcher-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rstudio-launcher-rbac
+subjects:
+  - kind: ServiceAccount
+    name: rstudio-launcher-rbac
