@@ -4,8 +4,7 @@
   i.e.
   { "Server" = {"Host" = "value", "another" = ["multiple", "values"]}}
   Valid values depend on the product
-*/ -}}
-{{- define "rstudio-library.config.gcfg" -}}
+*/ -}} {{- define "rstudio-library.config.gcfg" -}}
 {{- range $section,$keys := . -}}
 [{{ $section }}]
   {{- range $key, $val := $keys }}
@@ -86,6 +85,7 @@
             {{- printf "%s: %s" (toString $key) (toString $val) | nindent 2 }}
           {{- end }}
         {{- end }}
+        {{- printf "" | nindent 0 }}
       {{- else }}
         {{- printf "%s: %s" (toString $parent) (toString $child) | nindent 2 }}
       {{- end }}
