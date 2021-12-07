@@ -133,6 +133,9 @@ config:
       - MountType: KubernetesPersistentVolumeClaim
         MountPath: /home
         ClaimName: rstudio-server-home-storage
+      - MountType: KubernetesPersistentVolumeClaim
+        MountPath: /shared
+        ClaimName: rstudio-shared-data
     launcher-env:
       - JobType: session
         Environment:
