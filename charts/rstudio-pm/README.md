@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.2.8](https://img.shields.io/badge/Version-0.2.8-informational?style=flat-square) ![AppVersion: 2021.09.0-1](https://img.shields.io/badge/AppVersion-2021.09.0--1-informational?style=flat-square)
+![Version: 0.2.9](https://img.shields.io/badge/Version-0.2.9-informational?style=flat-square) ![AppVersion: 2021.09.0-1](https://img.shields.io/badge/AppVersion-2021.09.0--1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.8:
+To install the chart with the release name `my-release` at version 0.2.9:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.8
+helm install my-release rstudio/rstudio-pm --version=0.2.9
 ```
 
 ## Required Configuration
@@ -121,6 +121,9 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | service.nodePort | bool | `false` | The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.type | string | `"NodePort"` | The service type (NodePort, LoadBalancer, etc.) |
+| serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
+| serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
+| serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Operator is running). Defaults to the release namespace |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |
 | sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
