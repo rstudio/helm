@@ -58,6 +58,10 @@ spec:
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
         ports:
         - containerPort: 4242
+{{- if .Values.config.Metrics.Enabled }}
+        - name: metrics
+          containerPort: 2112
+{{- end }}
         securityContext:
           privileged: true
         volumeMounts:

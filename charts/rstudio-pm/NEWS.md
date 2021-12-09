@@ -1,3 +1,7 @@
+# 0.2.9
+
+- Add `serviceMonitor` values for use with a Prometheus Operator
+
 # 0.2.8
 
 - Update `rstudio-library` chart dependency

@@ -147,6 +147,16 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+serviceMonitor:
+  # -- Whether to create a ServiceMonitor CRD for use with a Prometheus Operator
+  enabled: false
+  # -- Namespace to create the ServiceMonitor in (usually the same as the one in
+  # which the Operator is running). Defaults to the release namespace
+  namespace: ""
+  # -- additionalLabels normally includes the release name of the Prometheus
+  # Operator
+  additionalLabels: {}
+  #   release: kube-prometheus-stack
 
 # -- config is a nested map of maps that generates the rstudio-pm.gcfg file
 config:
