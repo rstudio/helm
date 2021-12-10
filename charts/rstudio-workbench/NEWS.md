@@ -23,6 +23,7 @@
 - Update `rstudio-library` chart dependency
   - BUGFIX: Address an issue with how `launcher-mounts` was generated incorrectly ([#108](https://github.com/rstudio/helm/issues/108))
 - Add a `pod.labels` values option ([#101](https://github.com/rstudio/helm/issues/101))
+- Modify how supervisord starts sssd with `config.startupUserProvisioning` values option ([#110](https://github.com/rstudio/helm/issues/110))
 
 # 0.4.6
 
