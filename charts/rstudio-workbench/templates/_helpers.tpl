@@ -114,7 +114,7 @@ containers:
     - name: rstudio-launcher-startup
       mountPath: "/startup/launcher"
     {{- end }}
-    {{- if .Values.config.userProvisioning }}
+    {{- if .Values.config.startupUserProvisioning }}
     - name: rstudio-user-startup
       mountPath: "/startup/user-provisioning"
     {{- end }}
@@ -251,7 +251,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
     defaultMode: 0755
 {{- end }}
-{{- if .Values.config.userProvisioning }}
+{{- if .Values.config.startupUserProvisioning }}
 - name: rstudio-user-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-user
