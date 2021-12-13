@@ -195,7 +195,7 @@ However, it is important to be careful of a few points:
 - usernames cannot have `@`. The `@` sign (often used in emails with SSO) is a problem for RStudio Workbench because
   some operating systems disallow `@` signs in linux usernames
 - `supervisord` is configured by default to exit if any of its child processes exit. If you use `config.startupCustom`
-  to configure a user management service, be careful that it does not exit unnecessarily
+  to configure a user management service, be careful that it does not exist unnecessarily
 
 We do not provide such a service out of the box because we intend for RStudio Workbench to solve this problem in a
 future release. Please get in touch with your account representative if you have feedback or questions about this
