@@ -344,5 +344,19 @@ config:
     launcher-mounts: []
   # -- a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/
   startupCustom: {}
+  # -- a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/
+  startupUserProvisioning:
+    sssd.conf: |
+      [program:sssd]
+      command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
+      autorestart=false
+      numprocs=1
+      stdout_logfile=/dev/stdout
+      stdout_logfile_maxbytes=0
+      stdout_logfile_backups=0
+      stderr_logfile=/dev/stderr
+      stderr_logfile_maxbytes=0
+      stderr_logfile_backups=0
+
   # -- a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files
   pam: {}

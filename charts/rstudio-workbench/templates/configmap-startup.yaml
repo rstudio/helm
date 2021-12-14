@@ -31,7 +31,7 @@ data:
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
 {{- end }}
-{{- if .Values.config.userProvisioning }}
+{{- if .Values.config.startupUserProvisioning }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -39,17 +39,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-start-user
   namespace: {{ $.Release.Namespace }}
 data:
-  sssd.conf: |
-    [program:sssd]
-    command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
-    autorestart=false
-    numprocs=1
-    stdout_logfile=/dev/stdout
-    stdout_logfile_maxbytes=0
-    stdout_logfile_backups=0
-    stderr_logfile=/dev/stderr
-    stderr_logfile_maxbytes=0
-    stderr_logfile_backups=0
+  {{- include "rstudio-library.config.ini" .Values.config.startupUserProvisioning | nindent 2}}
 {{- end }}
 {{- if .Values.config.startupCustom }}
 ---
