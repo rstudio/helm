@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.0-rc13](https://img.shields.io/badge/Version-0.5.0--rc13-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.0-rc14](https://img.shields.io/badge/Version-0.5.0--rc14-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.0-rc13:
+To install the chart with the release name `my-release` at version 0.5.0-rc14:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc13
+helm install --devel my-release rstudio/rstudio-workbench --version=0.5.0-rc14
 ```
 
 ## Required Configuration
@@ -195,7 +195,7 @@ However, it is important to be careful of a few points:
 - usernames cannot have `@`. The `@` sign (often used in emails with SSO) is a problem for RStudio Workbench because
   some operating systems disallow `@` signs in linux usernames
 - `supervisord` is configured by default to exit if any of its child processes exit. If you use `config.startupCustom`
-  to configure a user management service, be careful that it does not exist unnecessarily
+  to configure a user management service, be careful that it does not exit unnecessarily
 
 We do not provide such a service out of the box because we intend for RStudio Workbench to solve this problem in a
 future release. Please get in touch with your account representative if you have feedback or questions about this
