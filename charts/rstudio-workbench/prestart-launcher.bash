@@ -40,6 +40,7 @@ api-url=${k8s_url}
 auth-token=${sa_token}
 kubernetes-namespace=${launcher_ns}
 certificate-authority=${ca_string}
+use-templating=1
 EOF
 
   _logf 'Configuring certs'
