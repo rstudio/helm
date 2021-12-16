@@ -1,3 +1,7 @@
+# 0.2.15
+
+- Bump Connect version to 2021.12.0
+
 # 0.2.14
 
 - Bump library-chart version
