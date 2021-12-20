@@ -62,7 +62,7 @@ license:
 service:
   # -- The service type (NodePort, LoadBalancer, etc.)
   type: NodePort
-  # -- The annotations for the service
+  # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}
   # -- The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically
   nodePort: false
