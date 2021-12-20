@@ -69,7 +69,8 @@ service:
   # -- The external IP to use with `service.type` LoadBalancer, when supported
   # by the cloud provider
   loadBalancerIP: ""
-  # -- The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically
+  # -- The explicit nodePort to use for `service.type` NodePort. If not
+  # provided, Kubernetes will choose one automatically
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80
