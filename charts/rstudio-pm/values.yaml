@@ -64,6 +64,11 @@ service:
   type: NodePort
   # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}
+  # -- The cluster-internal IP to use with `service.type` ClusterIP
+  clusterIP: ""
+  # -- The external IP to use with `service.type` LoadBalancer, when supported
+  # by the cloud provider
+  loadBalancerIP: ""
   # -- The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically
   nodePort: false
   # -- The Service port. This is the port your service will run under.
