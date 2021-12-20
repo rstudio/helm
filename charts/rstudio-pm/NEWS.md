@@ -1,3 +1,7 @@
+# 0.2.10
+
+- Improve the documentation for `service.annotations`.
+
 # 0.2.9
 
 - Add `serviceMonitor` values for use with a Prometheus Operator
