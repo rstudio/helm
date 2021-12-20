@@ -18,9 +18,9 @@ spec:
   - protocol: TCP
     name: rspm
     port: {{ .Values.service.port }}
-    {{- if .Values.service.nodePort }}
+{{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
-    {{- end }}
+{{- end }}
     targetPort: 4242
 {{- if .Values.config.Metrics.Enabled }}
   - name: metrics
