@@ -1,3 +1,10 @@
+# 0.3.0
+
+- BREAKING: The generated service will now have type `ClusterIP` by default.
+- Add support for setting the `loadBalancerIP` or `clusterIP`.
+- Ignore `nodePort` settings when the service is not a `NodePort`.
+- Improve the documentation for some service-related settings.
+
 # 0.2.10
 
 - Update `rstudio-library` chart version. This adds a helper for rendering `Ingress` resources

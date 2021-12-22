@@ -60,11 +60,18 @@ license:
     secret: false
 
 service:
-  # -- The service type (NodePort, LoadBalancer, etc.)
-  type: NodePort
-  # -- The annotations for the service
+  # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
+  # expose the service using your cloud provider's load balancer)
+  type: ClusterIP
+  # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}
-  # -- The nodePort (for service type NodePort). If not provided, Kubernetes will decide one automatically
+  # -- The cluster-internal IP to use with `service.type` ClusterIP
+  clusterIP: ""
+  # -- The external IP to use with `service.type` LoadBalancer, when supported
+  # by the cloud provider
+  loadBalancerIP: ""
+  # -- The explicit nodePort to use for `service.type` NodePort. If not
+  # provided, Kubernetes will choose one automatically
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80
