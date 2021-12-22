@@ -77,13 +77,13 @@ resources:
     ephemeralStorage: "200Mi"
 
 livenessProbe:
-  enabled: false
+  enabled: true
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 2
   failureThreshold: 10
 startupProbe:
-  enabled: false
+  enabled: true
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 1

@@ -136,26 +136,35 @@ resources:
     cpu: "2000m"
     ephemeralStorage: "200Mi"
 
-# -- Used to configure the container's livenessProbe
+# -- Used to configure the container's livenessProbe. Only included if enabled = true
 livenessProbe:
   enabled: false
+  httpGet:
+    path: /__ping__
+    port: 3939
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 2
   failureThreshold: 10
 
-# -- Used to configure the container's startupProbe
+# -- Used to configure the container's startupProbe. Only included if enabled = true
 startupProbe:
   enabled: false
+  httpGet:
+    path: /__ping__
+    port: 3939
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 1
   # -- failureThreshold * periodSeconds should be strictly > worst case startup time
   failureThreshold: 30
 
-# -- Used to configure the container's readinessProbe
+# -- Used to configure the container's readinessProbe. Only included if enabled = true
 readinessProbe:
   enabled: true
+  httpGet:
+    path: /__ping__
+    port: 3939
   initialDelaySeconds: 3
   periodSeconds: 3
   timeoutSeconds: 1

@@ -8,10 +8,12 @@ update-lock:
   done
   echo " --> Done!"
 
+all-docs:
+  just docs rbac
+
 docs:
   #!/bin/bash
   helm-docs --chart-search-root=charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
-  just rbac
 
 rbac:
   #!/bin/bash
