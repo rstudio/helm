@@ -1,3 +1,8 @@
+# 0.2.16
+
+- Update `rstudio-library` chart version. This adds a helper for rendering `Ingress` resources
+- Create `k8s.networking.io/v1` `Ingress` resource when `ingress.enabled: true` and Kubernetes version is >=1.19 ([#117](https://github.com/rstudio/helm/issues/117))
+
 # 0.2.15
 
 - Bump Connect version to 2021.12.0

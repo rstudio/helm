@@ -27,6 +27,18 @@ awsAccessKeyId: keyid
 awsSecretAccessKey: keysecret
 storageClaim: someClaimName
 
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+
+  # Defines network routing in the traefik configuration.
+  hosts:
+    - host: rspm.rstudio.com
+      paths:
+        - /
+
+
 command: '["sleep","1000"]'
 args: '[]'
 
