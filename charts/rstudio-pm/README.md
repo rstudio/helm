@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.2.9](https://img.shields.io/badge/Version-0.2.9-informational?style=flat-square) ![AppVersion: 2021.09.0-1](https://img.shields.io/badge/AppVersion-2021.09.0--1-informational?style=flat-square)
+![Version: 0.2.10](https://img.shields.io/badge/Version-0.2.10-informational?style=flat-square) ![AppVersion: 2021.09.0-1](https://img.shields.io/badge/AppVersion-2021.09.0--1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.9:
+To install the chart with the release name `my-release` at version 0.2.10:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.2.9
+helm install my-release rstudio/rstudio-pm --version=0.2.10
 ```
 
 ## Required Configuration
@@ -96,6 +96,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
+| ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
 | ingress.tls | list | `[]` |  |
 | initContainers | bool | `false` | the initContainer spec that will be used verbatim |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
