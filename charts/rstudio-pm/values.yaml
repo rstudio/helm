@@ -143,6 +143,9 @@ initContainers: false
 
 ingress:
   enabled: false
+  # -- The ingressClassName for the ingress resource. Only used for clusters that support
+  # networking.k8s.io/v1 Ingress resources
+  ingressClassName: ""
   annotations: {}
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"

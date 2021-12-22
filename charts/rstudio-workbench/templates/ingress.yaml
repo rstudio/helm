@@ -1,11 +1,8 @@
 {{- if .Values.ingress.enabled -}}
+{{- $apiVersion := include "rstudio-library.ingress.apiVersion" . -}}
 {{- $fullName := include "rstudio-workbench.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
-apiVersion: extensions/v1beta1
-{{- end }}
+apiVersion: {{ $apiVersion }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
@@ -16,6 +13,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if and (.Values.ingress.ingressClassName) (include "rstudio-library.ingress.supportsIngressClassName" $apiVersion) }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}
@@ -33,9 +33,11 @@ spec:
         paths:
           {{- range .paths }}
           - path: {{ . }}
+            {{- if include "rstudio-library.ingress.supportsPathType" $apiVersion }}
+            pathType: Prefix
+            {{- end }}
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
+              {{- include "rstudio-library.ingress.backend" (dict "apiVersion" $apiVersion "svcName" $fullName "svcPort" $svcPort) | nindent 14 }}
           {{- end }}
     {{- end }}
   {{- end }}

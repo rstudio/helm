@@ -5,6 +5,11 @@
 - Ignore `nodePort` settings when the service is not a `NodePort`.
 - Improve the documentation for some service-related settings.
 
+# 0.2.10
+
+- Update `rstudio-library` chart version. This adds a helper for rendering `Ingress` resources
+- Create `k8s.networking.io/v1` `Ingress` resource when `ingress.enabled: true` and Kubernetes version is >=1.19 ([#117](https://github.com/rstudio/helm/issues/117))
+
 # 0.2.9
 
 - Add `serviceMonitor` values for use with a Prometheus Operator

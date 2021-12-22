@@ -83,7 +83,6 @@ pod:
   # -- An array of containers that will be run alongside the main pod
   sidecar: false
 
-
 # -- The pod's run command. By default, it uses the container's default
 command: []
 # -- The pod's run arguments. By default, it uses the container's default
@@ -168,6 +167,9 @@ initContainers: false
 
 ingress:
   enabled: false
+  # -- The ingressClassName for the ingress resource. Only used for clusters that support
+  # networking.k8s.io/v1 Ingress resources
+  ingressClassName: ""
   annotations: {}
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
@@ -178,7 +180,6 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
-
 
 launcher:
   # -- Whether to enable the launcher

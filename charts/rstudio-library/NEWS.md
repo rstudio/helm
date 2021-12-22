@@ -1,3 +1,15 @@
+# 0.1.19
+
+- Add an `Ingress` helper
+  - Provides template for rendering `Ingress` `apiVersion` based on
+    Kubernetes version
+  - Provides template for rendering `Ingress` `backend` based on 
+    `apiVersion`
+  - Provides template for determining if `Ingress` `apiVersion` supports
+    the `ingressClassName` field
+  - Provides template for determining if `Ingress` `apiVersion` supports
+    the `pathType` field
+
 # 0.1.18
 
 - Add newlines between array entries for `config.dcf` generation ([#108](https://github.com/rstudio/helm/issues/108))

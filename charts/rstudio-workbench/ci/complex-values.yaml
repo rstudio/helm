@@ -31,6 +31,17 @@ pod:
       image: "busybox"
       imagePullPolicy: "IfNotPresent"
 
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+
+  # Defines network routing in the traefik configuration.
+  hosts:
+    - host: workbench.rstudio.com
+      paths:
+        - /
+
 xdgConfigDirs: '/tmp/base/'
 xdgConfigDirsExtra:
   - '/tmp/one/'
