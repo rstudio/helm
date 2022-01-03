@@ -37,6 +37,9 @@ rbac:
     name: ""
     annotations: {}
 
+# -- Extra objects to deploy (value evaluated as a template)
+extraDeploy: []
+
 # -- Defines the RStudio Connect image to deploy
 image:
   # -- The repository to use for the main pod image

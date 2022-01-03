@@ -1,3 +1,8 @@
+# 0.2.18
+
+- Update `rstudio-library` chart version. This adds support for `extraDeploy`
+- Add `extraDeploy` value. This allows deploying additional resources (with templating) straight from the values file!
+
 # 0.2.17
 
 - Make `startupProbe`, `readinessProbe` and `livenessProbe` more configurable ([#97](https://github.com/rstudio/helm/issues/97))
