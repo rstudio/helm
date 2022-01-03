@@ -1,3 +1,8 @@
+# 0.3.1
+
+- Update `rstudio-library` chart version. This adds support for `extraDeploy`
+- Add `extraDeploy` value. This allows deploying additional resources (with templating) straight from the values file!
+
 # 0.3.0
 
 - BREAKING: The generated service will now have type `ClusterIP` by default.
