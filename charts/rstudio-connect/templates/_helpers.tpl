@@ -99,15 +99,19 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 */}}
 {{- define "rstudio-connect.runtimeYaml" -}}
   {{- $runtimeYaml := .Values.launcher.customRuntimeYaml }}
-  {{- if $runtimeYaml }}
-    {{- /* Allow verbatim output */ -}}
-    {{- if kindIs "string" $runtimeYaml }}
-      {{- $runtimeYaml }}
-    {{- /* Otherwise presume YAML was passed */ -}}
+  {{- if kindIs "string" $runtimeYaml }}
+    {{- if eq $runtimeYaml "pro" }}
+      {{- .Files.Get "default-runtime-pro.yaml" }}
+    {{- else if eq $runtimeYaml "base" }}
+      {{- .Files.Get "default-runtime.yaml" }}
     {{- else }}
-      {{- toYaml $runtimeYaml }}
+      {{- /* Allow verbatim output */ -}}
+      {{- $runtimeYaml }}
     {{- end }}
+  {{- else if kindIs "map" $runtimeYaml }}
+    {{- toYaml $runtimeYaml }}
   {{- else }}
+    {{- /* falsy or catch-all */ -}}
     {{- .Files.Get "default-runtime.yaml" }}
   {{- end }}
 {{- end -}}
