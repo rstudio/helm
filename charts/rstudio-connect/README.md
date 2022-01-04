@@ -117,6 +117,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources.limits | object | `{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"2Gi"}` | Defines resource limits for the rstudio-connect pod |
 | resources.requests | object | `{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"1Gi"}` | Defines resource requests for the rstudio-connect pod |
+| secretConfig | object | [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/) | A nested map of maps that generates the rstudio-connect-secret.gcfg file |
 | securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect pods. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
 | service.annotations | object | `{}` | Annotations that will be added onto the service |
 | service.nodePort | bool | `false` | The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically |

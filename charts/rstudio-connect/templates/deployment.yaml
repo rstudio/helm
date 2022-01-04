@@ -91,6 +91,9 @@ spec:
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/rstudio-connect.gcfg"
             subPath: "rstudio-connect.gcfg"
+          - name: rstudio-connect-secret-config
+            mountPath: "/etc/rstudio-connect/rstudio-connect-secret.gcfg"
+            subPath: "rstudio-connect-secret.gcfg"
           {{- if .Values.launcher.enabled }}
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/runtime.yaml"
@@ -164,6 +167,11 @@ spec:
       - name: rstudio-connect-config
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-config
+      {{- if .Values.secretConfig }}
+      - name: rstudio-connect-secret-config
+        secret:
+          secretName: {{ include "rstudio-connect.fullname" . }}-secret-config
+      {{- end }}
       {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
       - name: rstudio-connect-data
         persistentVolumeClaim:
