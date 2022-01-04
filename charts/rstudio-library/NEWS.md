@@ -1,3 +1,9 @@
+# 0.1.20
+
+- Add a `_tplvalues.tpl` helper
+  - this allows templating "extra" deployments in values
+  - taken from [this excellent example by bitnami](https://github.com/bitnami/charts/blob/master/bitnami/common/templates/_tplvalues.tpl)
+
 # 0.1.19
 
 - Add an `Ingress` helper

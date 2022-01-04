@@ -101,6 +101,9 @@ pod:
   # -- annotations is a map of keys / values that will be added as annotations to the pods
   annotations: {}
 
+# -- Extra objects to deploy (value evaluated as a template)
+extraObjects: []
+
 # -- resources define requests and limits for the rstudio-pm pod
 resources:
   requests:

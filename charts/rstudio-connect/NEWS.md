@@ -1,3 +1,8 @@
+# 0.2.19
+
+- Update `rstudio-library` chart version. This adds support for `extraObjects`
+- Add `extraObjects` value. This allows deploying additional resources (with templating) straight from the values file!
+
 # 0.2.18
 
 - Bump Connect version to 2021.12.1

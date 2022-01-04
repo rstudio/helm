@@ -263,6 +263,9 @@ rbac:
   # be disabled as the node's internal address is sufficient to allow proper functionality.
   clusterRoleCreate: false
 
+# -- Extra objects to deploy (value evaluated as a template)
+extraObjects: []
+
 # -- jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents
 jobJsonOverridesFiles: {}
 

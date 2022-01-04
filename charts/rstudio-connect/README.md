@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.18](https://img.shields.io/badge/Version-0.2.18-informational?style=flat-square) ![AppVersion: 2021.12.1](https://img.shields.io/badge/AppVersion-2021.12.1-informational?style=flat-square)
+![Version: 0.2.19](https://img.shields.io/badge/Version-0.2.19-informational?style=flat-square) ![AppVersion: 2021.12.1](https://img.shields.io/badge/AppVersion-2021.12.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.18:
+To install the chart with the release name `my-release` at version 0.2.19:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.18
+helm install my-release rstudio/rstudio-connect --version=0.2.19
 ```
 
 ## Required Configuration
@@ -68,6 +68,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/) | A nested map of maps that generates the rstudio-connect.gcfg file |
+| extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":""}` | Defines the RStudio Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |

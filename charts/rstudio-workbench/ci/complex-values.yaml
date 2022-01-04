@@ -74,6 +74,21 @@ prometheusExporter:
           host: "$1"
           duration: "$2"
 
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "test"
+    data:
+      something: fun
+  - |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "test2"
+    data:
+      something: {{ printf "fun2" }}
+
 jobJsonOverridesFiles:
   test:
     one: two
