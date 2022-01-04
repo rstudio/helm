@@ -1,3 +1,7 @@
+# 0.3.2
+
+- Update default RStudio Package Manager version to 2021.12.0-3
+
 # 0.3.1
 
 - Update `rstudio-library` chart version. This adds support for `extraObjects`
