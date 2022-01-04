@@ -60,6 +60,21 @@ initContainers:
       - mountPath: /testing
         name: test
 
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "test"
+    data:
+      something: fun
+  - |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "test2"
+    data:
+      something: {{ printf "fun2" }}
+
 license:
   key: test
 replicas: 2
