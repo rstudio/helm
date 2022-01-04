@@ -1,3 +1,7 @@
+# 0.2.18
+
+- Bump Connect version to 2021.12.1
+
 # 0.2.17
 
 - Make `startupProbe`, `readinessProbe` and `livenessProbe` more configurable ([#97](https://github.com/rstudio/helm/issues/97))
