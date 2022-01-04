@@ -1,3 +1,9 @@
+# 0.3.2
+
+- Make `startupProbe`, `readinessProbe` and `livenessProbe` more configurable ([#97](https://github.com/rstudio/helm/issues/97))
+  - They still use the `enabled` key to turn on or off
+  - We then remove this key with `omit`, and pass the values verbatim to the template (as YAML)
+
 # 0.3.1
 
 - Update `rstudio-library` chart version. This adds support for `extraObjects`
