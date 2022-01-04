@@ -88,7 +88,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
 | config | object | `{"HTTP":{"Listen":":4242"},"Launcher":{"AdminGroup":"root","ServerUser":"root"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
-| extraDeploy | list | `[]` | Extra objects to deploy (value evaluated as a template) |
+| extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |

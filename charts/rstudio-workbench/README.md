@@ -321,7 +321,7 @@ config:
 | config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
-| extraDeploy | list | `[]` | Extra objects to deploy (value evaluated as a template) |
+| extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
 | global.secureCookieKey | string | `""` |  |
 | homeStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |

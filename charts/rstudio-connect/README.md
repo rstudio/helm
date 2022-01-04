@@ -68,7 +68,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/) | A nested map of maps that generates the rstudio-connect.gcfg file |
-| extraDeploy | list | `[]` | Extra objects to deploy (value evaluated as a template) |
+| extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":""}` | Defines the RStudio Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |

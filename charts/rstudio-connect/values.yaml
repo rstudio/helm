@@ -38,7 +38,7 @@ rbac:
     annotations: {}
 
 # -- Extra objects to deploy (value evaluated as a template)
-extraDeploy: []
+extraObjects: []
 
 # -- Defines the RStudio Connect image to deploy
 image:

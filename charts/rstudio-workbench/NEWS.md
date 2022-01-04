@@ -1,7 +1,7 @@
 # 0.5.2
 
-- Update `rstudio-library` chart version. This adds support for `extraDeploy`
-- Add `extraDeploy` value. This allows deploying additional resources (with templating) straight from the values file!
+- Update `rstudio-library` chart version. This adds support for `extraObjects`
+- Add `extraObjects` value. This allows deploying additional resources (with templating) straight from the values file!
 
 # 0.5.1
 

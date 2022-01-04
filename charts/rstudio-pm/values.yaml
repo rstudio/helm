@@ -102,7 +102,7 @@ pod:
   annotations: {}
 
 # -- Extra objects to deploy (value evaluated as a template)
-extraDeploy: []
+extraObjects: []
 
 # -- resources define requests and limits for the rstudio-pm pod
 resources:
