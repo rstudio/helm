@@ -12,6 +12,37 @@ extensions/v1beta1
 {{- end -}}{{- /* end define template */ -}}
 
 {{- /*
+  Define the "path" and "pathType" for an Ingress
+    - allows a string for backwards compatibility
+    - if a string is not passed, presumes an object is passed
+      in this case, requires the `.path` key and will use `.pathType` if provided
+      (default is "Prefix")
+
+  Takes a dict:
+    "apiVersion": "the API version for the Ingress resource"
+    "pathData" input data that represents the path
+*/ -}}
+{{- define "rstudio-library.ingress.path" -}}
+  {{- $apiVersion := .apiVersion -}}
+  {{- $pathData := .pathData -}}
+  {{- if kindIs "string" $pathData }}
+path: {{ $pathData }}
+    {{- if include "rstudio-library.ingress.supportsPathType" $apiVersion }}
+pathType: Prefix
+    {{- end }}
+  {{- else }}
+path: {{ $pathData.path }}
+  {{- if include "rstudio-library.ingress.supportsPathType" $apiVersion }}
+    {{- if hasKey $pathData "pathType" }}
+pathType: {{ $pathData.pathType | default "Prefix" }}
+    {{- else }}
+pathType: Prefix
+    {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- /*
   Define the backend for an Ingress path
   Takes a dict:
     "apiVersion": "the API version for the Ingress resource"
