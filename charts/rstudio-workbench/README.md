@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.2](https://img.shields.io/badge/Version-0.5.2-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.3](https://img.shields.io/badge/Version-0.5.3-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.2:
+To install the chart with the release name `my-release` at version 0.5.3:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.2
+helm install my-release rstudio/rstudio-workbench --version=0.5.3
 ```
 
 ## Required Configuration
@@ -355,7 +355,7 @@ config:
 | license.file.secretKey | string | `"license.lic"` | secretKey is the key for the secret to use for the license file |
 | license.key | string | `nil` | key is the license to use |
 | license.server | bool | `false` | server is the <hostname>:<port> for a license server |
-| livenessProbe | object | `{"enabled":false,"failureThreshold":10,"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | livenessProbe is used to configure the container's livenessProbe |
+| livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | livenessProbe is used to configure the container's livenessProbe |
 | loadBalancer.appLabelKey | string | `"app.kubernetes.io/name"` |  |
 | loadBalancer.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the loadBalancer sidecar spec |
 | loadBalancer.forceEnabled | bool | `false` | whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node |
@@ -381,7 +381,7 @@ config:
 | rbac.clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
 | rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
 | rbac.serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
-| readinessProbe | object | `{"enabled":true,"failureThreshold":3,"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
+| readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |
 | secureCookieKey | string | `""` |  |
@@ -403,7 +403,7 @@ config:
 | sharedStorage.path | string | `"/var/lib/rstudio-server"` | the path to mount the sharedStorage claim within the pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
-| startupProbe | object | `{"enabled":false,"failureThreshold":30,"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
+| startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but will not work well if your license only allows a single activation. |
 | tolerations | list | `[]` |  |

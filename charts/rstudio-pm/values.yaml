@@ -120,6 +120,9 @@ resources:
 # -- livenessProbe is used to configure the container's livenessProbe
 livenessProbe:
   enabled: false
+  httpGet:
+    path: /__ping__
+    port: 4242
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 2
@@ -127,6 +130,9 @@ livenessProbe:
 # -- startupProbe is used to configure the container's startupProbe
 startupProbe:
   enabled: false
+  httpGet:
+    path: /__ping__
+    port: 4242
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 1
@@ -135,6 +141,9 @@ startupProbe:
 # -- readinessProbe is used to configure the container's readinessProbe
 readinessProbe:
   enabled: true
+  httpGet:
+    path: /__ping__
+    port: 4242
   initialDelaySeconds: 3
   periodSeconds: 3
   timeoutSeconds: 1

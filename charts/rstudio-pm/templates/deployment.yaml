@@ -100,35 +100,25 @@ spec:
             ephemeral-storage: "{{ .Values.resources.limits.ephemeralStorage }}"
           {{- end }}
         {{- if .Values.livenessProbe.enabled }}
+          {{- $liveness := omit .Values.livenessProbe "enabled" }}
+          {{- with $liveness }}
         livenessProbe:
-          httpGet:
-            path: /__ping__
-            port: 4242
-          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
         {{- end }}
         {{- if .Values.startupProbe.enabled }}
+          {{- $startup := omit .Values.startupProbe "enabled" }}
+          {{- with $startup}}
         startupProbe:
-          httpGet:
-            path: /__ping__
-            port: 4242
-          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
-          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
         {{- end }}
         {{- if .Values.readinessProbe.enabled }}
+          {{- $readiness := omit .Values.readinessProbe "enabled" }}
+          {{- with $readiness }}
         readinessProbe:
-          httpGet:
-            path: /__ping__
-            port: 4242
-          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-          successThreshold: {{ .Values.readinessProbe.successThreshold }}
-          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
         {{- end }}
       volumes:
       - name: rstudio-pm-config

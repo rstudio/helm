@@ -1,3 +1,9 @@
+# 0.3.3
+
+- Make `startupProbe`, `readinessProbe` and `livenessProbe` more configurable ([#97](https://github.com/rstudio/helm/issues/97))
+  - They still use the `enabled` key to turn on or off
+  - We then remove this key with `omit`, and pass the values verbatim to the template (as YAML)
+
 # 0.3.2
 
 - Update default RStudio Package Manager version to 2021.12.0-3
