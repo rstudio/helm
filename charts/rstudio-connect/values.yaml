@@ -81,7 +81,7 @@ pod:
   serviceAccountName: false
   # -- Additional annotations to add to the rstudio-connect pods
   annotations: {}
-  # -- Additional labels to add to the rstudio-workbench pods
+  # -- Additional labels to add to the rstudio-connect pods
   labels: {}
   # -- An array of containers that will be run alongside the main pod
   sidecar: false
