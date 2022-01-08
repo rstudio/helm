@@ -126,7 +126,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - mounted at `/mnt/session-configmap/rstudio/`
 - Session Secret Configuration
   - These configuration files are mounted into the server and session pods as well
-  - `odbc.ini` and other similar shared secrets 
+  - `odbc.ini` and other similar shared secrets
   - located in `config.sessionSecret.<< name of file>>` helm values
   - mounted at `/mnt/session-secret/`
 - Secret Configuration
@@ -144,7 +144,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `launcher-mounts`, `launcher-env`
   - They are located at `config.serverDcf.<< name of file >>` helm values
   - included at `/mnt/configmap/rstudio/`
-- Profiles Configuration 
+- Profiles Configuration
   - These configuration files are mounted into the server (.ini file format)
   - `launcher.kubernetes.profiles.conf`
   - They are located at `config.profiles.<< name of file >>` helm values
@@ -157,7 +157,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `prestart-launcher.bash` is used to start launcher
 - User Provisioning Configuration
   - These configuration files are used for configuring user provisioning (i.e. `sssd`)
-  - Located at `config.userProvisioning.<< name of file >>` helm values 
+  - Located at `config.userProvisioning.<< name of file >>` helm values
   - Mounted onto `/etc/sssd/conf.d/` with `0600` permissions by default
 - Custom Startup Configuration
   - `supervisord` service / unit definition `.conf` files
@@ -220,7 +220,7 @@ config:
       # the rstudio-session PAM config file
       # will be used verbatim
 ```
-   
+
 ## RStudio Profiles
 
 Profiles are used to define product behavior (in `.ini` file format) based on user and group membership.
@@ -243,6 +243,7 @@ some-key:
 ```
 - The `[*]` section will have arrays "appended" to user and group sections, along with "defaults" defined by the chart.
 
+Note that if you want to set user limits which are usually defined in `/etc/rstudio/profiles`, you would need to configure `config.profiles.profiles` as shown below.
 ### A Full Example
 
 ```yaml
@@ -257,15 +258,29 @@ config:
         some-key:
           - value4
           - value5
+    profiles:
+      "*":
+        some-key: value1
+        some-key2: value2
 ```
 
 Becomes:
+
+`/etc/rstudio/launcher.kubernetes.profiles.conf`
 
 ```ini
 [*]
 some-key: value1,value2
 [myuser]
 some-key: value1,value2,value3,value4
+```
+
+`/etc/rstudio/profiles`
+
+```ini
+[*]
+some-key: value1
+some-key2: value2
 ```
 
 > NOTE: this appending / concatenation / array translation behavior only works with the helm chart
