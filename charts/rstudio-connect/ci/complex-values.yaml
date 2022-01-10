@@ -39,6 +39,14 @@ pod:
     - name: test
       image: "busybox"
       imagePullPolicy: "IfNotPresent"
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: rstudio-team
+          topologyKey: kubernetes.io/hostname
 
 ingress:
   enabled: true

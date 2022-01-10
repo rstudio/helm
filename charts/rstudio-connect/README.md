@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.19](https://img.shields.io/badge/Version-0.2.19-informational?style=flat-square) ![AppVersion: 2021.12.1](https://img.shields.io/badge/AppVersion-2021.12.1-informational?style=flat-square)
+![Version: 0.2.20](https://img.shields.io/badge/Version-0.2.20-informational?style=flat-square) ![AppVersion: 2021.12.1](https://img.shields.io/badge/AppVersion-2021.12.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.19:
+To install the chart with the release name `my-release` at version 0.2.20:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.19
+helm install my-release rstudio/rstudio-connect --version=0.2.20
 ```
 
 ## Required Configuration
@@ -98,10 +98,11 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | license.server | bool | `false` | server is the <hostname>:<port> for a license server |
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | Used to configure the container's livenessProbe. Only included if enabled = true |
 | nameOverride | string | `""` | The name of the chart deployment (can be overridden) |
+| pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-connect pods |
 | pod.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.haste | bool | `true` | A helper that defines the RSTUDIO_CONNECT_HASTE environment variable |
-| pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
+| pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
 | pod.serviceAccountName | bool | `false` | A string representing the service account of the pod spec |
 | pod.sidecar | bool | `false` | An array of containers that will be run alongside the main pod |
 | pod.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the pod spec |

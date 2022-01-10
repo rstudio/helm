@@ -36,6 +36,10 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- with .Values.pod.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if and .Values.rbac.create .Values.launcher.enabled }}
       {{ $serviceAccountName := default .Values.rbac.serviceAccount.name (include "rstudio-connect.fullname" .) }}
       serviceAccountName: {{ $serviceAccountName }}

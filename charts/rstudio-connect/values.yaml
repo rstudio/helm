@@ -81,10 +81,12 @@ pod:
   serviceAccountName: false
   # -- Additional annotations to add to the rstudio-connect pods
   annotations: {}
-  # -- Additional labels to add to the rstudio-workbench pods
+  # -- Additional labels to add to the rstudio-connect pods
   labels: {}
   # -- An array of containers that will be run alongside the main pod
   sidecar: false
+  # -- A map used verbatim as the pod's "affinity" definition
+  affinity: {}
 
 # -- The pod's run command. By default, it uses the container's default
 command: []
