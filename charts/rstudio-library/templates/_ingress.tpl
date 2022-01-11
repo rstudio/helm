@@ -12,6 +12,15 @@ extensions/v1beta1
 {{- end -}}{{- /* end define template */ -}}
 
 {{- /*
+  Test debug comparisons
+*/ -}}
+{{- define "rstudio-library.ingress.debug" -}}
+{{ semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
+{{ .Capabilities.KubeVersion.GitVersion }}
+{{ .Capabilities.KubeVersion.Version }}
+{{- end -}}
+
+{{- /*
   Define the "path" and "pathType" for an Ingress
     - allows a string for backwards compatibility
     - if a string is not passed, presumes an object is passed
