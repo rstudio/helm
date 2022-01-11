@@ -5,6 +5,10 @@ metadata:
   name: {{ include "rstudio-connect.fullname" . }}-config
   namespace: {{ $.Release.Namespace }}
 data:
+  debug.txt: |
+    {{ semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
+    {{ .Capabilities.KubeVersion.GitVersion }}
+    {{ .Capabilities.KubeVersion.Version }}
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
 {{- if .Values.launcher.enabled }}
