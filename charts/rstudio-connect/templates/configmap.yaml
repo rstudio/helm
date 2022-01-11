@@ -5,8 +5,6 @@ metadata:
   name: {{ include "rstudio-connect.fullname" . }}-config
   namespace: {{ $.Release.Namespace }}
 data:
-  debug.txt: |
-    {{- include "rstudio-library.ingress.debug" . | nindent 4 }}
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
 {{- if .Values.launcher.enabled }}

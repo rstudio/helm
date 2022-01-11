@@ -4,21 +4,12 @@
 {{- define "rstudio-library.ingress.apiVersion" -}}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 networking.k8s.io/v1
-{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion }}
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 networking.k8s.io/v1beta1
 {{- else -}}
 extensions/v1beta1
 {{- end -}}
 {{- end -}}{{- /* end define template */ -}}
-
-{{- /*
-  Test debug comparisons
-*/ -}}
-{{- define "rstudio-library.ingress.debug" -}}
-{{ semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
-{{ .Capabilities.KubeVersion.GitVersion }}
-{{ .Capabilities.KubeVersion.Version }}
-{{- end -}}
 
 {{- /*
   Define the "path" and "pathType" for an Ingress
