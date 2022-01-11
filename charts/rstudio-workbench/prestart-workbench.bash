@@ -21,7 +21,7 @@ main() {
     rm -vf "${launcher_pub}" 2>&1 | _indent
   fi
 
-  if [[ -z "$RSW_LOAD_BALANCING" ]]; then
+  if [[ -n "$RSW_LOAD_BALANCING" ]]; then
     _logf "Enabling load-balancing by making sure that the /mnt/load-balancer/rstudio/load-balancer file exists"
     mkdir -p /mnt/load-balancer/rstudio/
     touch "/mnt/load-balancer/rstudio/load-balancer"
