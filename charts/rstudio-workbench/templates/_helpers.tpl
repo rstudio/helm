@@ -63,6 +63,10 @@ containers:
   - name: RSW_TESTUSER
     value: ""
   {{- end }}
+  {{- if or (gt (int .Values.replicas) 1) .Values.loadBalancer.forceEnabled }}
+  - name: RSW_LOAD_BALANCING
+    value: "true"
+  {{- end }}
   - name: XDG_CONFIG_DIRS
     value: "{{ template "rstudio-workbench.xdg-config-dirs" .}}"
   {{- if .Values.pod.env }}
