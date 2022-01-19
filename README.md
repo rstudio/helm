@@ -1,5 +1,7 @@
 # RStudio Helm charts
 
+[Link to GitHub](https://github.com/rstudio/helm)
+
 ## Usage
 
 1. Install [Helm](https://helm.sh). Please refer to Helm's [documentation](https://helm.sh/docs/) for more information on getting started.
@@ -15,6 +17,8 @@
    ```console
    helm search repo rstudio
    ```
+
+4. [Look at chart READMEs](https://github.com/rstudio/helm)
 
 ## Support
 
