@@ -1,3 +1,7 @@
+# 0.5.6
+
+- Fix the version update. Our annotations were incorrect.
+
 # 0.5.5
 
 - Update RStudio Workbench to version 2021.09.2+382.pro1 (the second patch release of 2021.09)
