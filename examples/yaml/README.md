@@ -26,6 +26,10 @@ deploy a daemonset that has an `initContainer` with `imagePullPolicy: "Always"`
 that runs a simple `echo` command. Then the `pause` container takes over, and
 nothing else happens for the life of the daemonset.
 
+> WARNING: deploying this daemonset will cause a spike in CPU (and disk) usage, because every node in your cluster
+> will immediately start pulling the same image. Also, beware that `DockerHub` has rate limits, so unauthenticated access
+> with many pulls like this could run into the DockerHub rate limit.
+
 ### Usage
 
 - Let's say that my Workbench installation uses images `rstudio/r-session-complete:2021.09.2-382.pro1`
