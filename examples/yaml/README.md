@@ -15,7 +15,7 @@ They differ only in which repository image they re-pull. This differs based on:
 - Product version
 
 Feel free to download one of these files and modify it for your purposes. It is important that your
-daemonset references the exact same images that are used by your RStudio Workbench installation.
+daemonset references the exact same images that are used by your RStudio Workbench installation to ensure the image you are using is updated.  
 
 ### What is it
 
@@ -24,7 +24,7 @@ A
 runs a single pod on every node of a Kubernetes cluster. In this case, we
 deploy a daemonset that has an `initContainer` with `imagePullPolicy: "Always"`
 that runs a simple `echo` command. Then the `pause` container takes over, and
-nothing else happens for the life of the daemonset.
+nothing else happens for the life of the daemonset. When run in your kubernetes environment, this daemonset will force the specified image to be updated on each node. Later when sessions are started on that same node, they will use the updated image. 
 
 ### Usage
 
