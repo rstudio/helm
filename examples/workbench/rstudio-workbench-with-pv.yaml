@@ -2,6 +2,9 @@
 # 
 # the PersistentVolume allows setting NFS mountOptions
 # it creates a storage class that RStudio Workbench then takes advantage of
+# when it creates its PersistentVolumeClaim
+#
+# PVC and PV will be left around after the helm release is removed (for manual cleanup)
 
 homeStorage:
   create: true
@@ -16,6 +19,8 @@ extraObjects:
     kind: PersistentVolume
     metadata:
       name: nfs-workbench-home-pv
+      annotations:
+        "helm.sh/resource-policy": keep
     spec:
       capacity:
         storage: {{ .Values.homeStorage.requests.storage }}
