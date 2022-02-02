@@ -333,7 +333,10 @@ config:
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
       }
-    logging.conf: {}
+    logging.conf:
+      "*":
+        log-level: info
+        logger-type: stderr
   # -- a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information.
   profiles: {}
   # -- a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.)
