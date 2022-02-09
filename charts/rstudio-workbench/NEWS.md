@@ -1,3 +1,7 @@
+# 0.5.7
+
+- Update `logging.conf` to default to output logs on `stderr`
+
 # 0.5.6
 
 - Fix the version update. Our annotations were incorrect.
