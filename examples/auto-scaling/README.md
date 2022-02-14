@@ -1,11 +1,15 @@
 # RStudio Workbench with Auto-Scaling
 
-These files show you an example kubernetes auto-scaling configuration with RStudio Workbench. To successfully set up an auto-scaled kubernetes cluster, you will need to look at the autoscaler and rstudio-workbench values.yaml files. 
+These files show you an example kubernetes auto-scaling configuration with RStudio Workbench. The two subdirectories, autoscaler and rstudio-workbench, contain specific configuration files that outline the parameters required to successfully set up kubernetes with auto-scaling. 
+
+## Autoscaler
+
+The [`values.yaml`](../auto-scaling/autoscaler/values.yaml) in the autoscaler folder outlines the configuration required for the cluster autoscaler. This is a comoponent that automatically adjusts the size of a Kubernetes Cluster so that all pods have a place to run. We have provided a sample configuration for AWS EKS clusters. For more details see the [Kubernetes Autoscaler Repo](https://github.com/kubernetes/autoscaler).
 
 ## RStudio Workbench
-The [values.yaml](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-workbench folder outlines the timeout configurations required to set up this configuration. The file has 3 sections that need to be configured for autoscaling. 
+The [`values.yaml`](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-workbench folder outlines the timeout configurations required to set up this configuration. The file has 3 sections that need to be configured for autoscaling. 
 
-- #### rsession
+- #### `rsession`
     - This section provides the configuration for the rsession.conf file which controls behaviour of the rsession process, allowing you to tune various R session paramaters. There are 4 parameters that need to be configured in this section. You can learn more about the options in the [RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rsession_conf.html#session-settings).
 
     ```yaml
@@ -16,8 +20,8 @@ The [values.yaml](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-
     session-timeout-kill-hours: 1
     ```
 
-- #### jupyter
-    - This section provides the configuration for the jupyter.conf file. There are 3 parameters that need to be configured in this section. You can learn more about the topinos in ]the [Jupyter Configuration section of the RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/latest/jupyter_sessions/configuration.html).
+- #### `jupyter`
+    - This section provides the configuration for the jupyter.conf file. There are 3 parameters that need to be configured in this section. You can learn more about the options in the [Jupyter Configuration section of the RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/latest/jupyter_sessions/configuration.html).
 
     ```yaml
     ...
@@ -26,7 +30,7 @@ The [values.yaml](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-
     session-cull-connected: 1
     ```
 
-- #### launcher.kubernetes.profiles.conf
+- #### `launcher.kubernetes.profiles.conf`
     - This section provides the configuration for the Kubernetes Job Launcher Plugin. You will need to specify the job-json-overrides parameter to prevent the automatic eviction of pods. For more details see the [Kubernetes Plugin Configuration Guide](https://docs.rstudio.com/job-launcher/latest/kube.html#kube-config). 
     
     ```yaml
@@ -36,7 +40,3 @@ The [values.yaml](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-
         json: "false"
         name: evict-annotation
     ```
-## Autoscaler
-
-The [values.yaml](../auto-scaling/autoscaler/values.yaml) in the autoscaler folder outlines the configuration required for the cluster autoscaler. This is a comoponent that automatically adjusts the size of a Kubernetes Cluster so that all pods have a place to run. We have provided a sample configuration for AWS EKS clusters. For more details see the [Kubernetes Autoscaler Repo](https://github.com/kubernetes/autoscaler).
-
