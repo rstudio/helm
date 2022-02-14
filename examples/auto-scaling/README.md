@@ -2,7 +2,8 @@
 
 These files show you an example kubernetes auto-scaling configuration with RStudio Workbench. To successfully set up an auto-scaled kubernetes cluster, you will need to look at the autoscaler and rstudio-workbench values.yaml files. 
 
-The ['values.yaml'](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-workbench folder outlines the timeout configurations required to set up this configuration. The file has 3 sections that need to be configured for autoscaling. 
+## RStudio Workbench
+The [values.yaml](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-workbench folder outlines the timeout configurations required to set up this configuration. The file has 3 sections that need to be configured for autoscaling. 
 
 - #### rsession
     - This section provides the configuration for the rsession.conf file which controls behaviour of the rsession process, allowing you to tune various R session paramaters. There are 4 parameters that need to be configured in this section. You can learn more about the options in the [RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rsession_conf.html#session-settings).
@@ -35,6 +36,7 @@ The ['values.yaml'](../auto-scaling/rstudio-workbench/values.yaml) in the rstudi
         json: "false"
         name: evict-annotation
     ```
+## Autoscaler
 
-The ['values.yaml'](../auto-scaling/autoscaler/values.yaml) in the autoscaler folder outlines the configuration required for the cluster autoscaler. This is a comoponent that automatically adjusts the size of a Kubernetes Cluster so that all pods have a place to run. We have provided a sample configuration for AWS EKS clusters. For more details see the [Kubernetes Autoscaler Repo](https://github.com/kubernetes/autoscaler).
+The [values.yaml](../auto-scaling/autoscaler/values.yaml) in the autoscaler folder outlines the configuration required for the cluster autoscaler. This is a comoponent that automatically adjusts the size of a Kubernetes Cluster so that all pods have a place to run. We have provided a sample configuration for AWS EKS clusters. For more details see the [Kubernetes Autoscaler Repo](https://github.com/kubernetes/autoscaler).
 
