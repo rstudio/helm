@@ -1,0 +1,36 @@
+{{ template "rstudio.header" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "rstudio.description" . }}
+
+{{ template "rstudio.install" . }}
+
+## Use
+
+Create a `values.yaml` file somewhere that lists the images you'd like to be pre-pulled (use the `values.yaml` file in this repo for format):
+
+```
+images:
+  - name: my-first-image
+    image: some-id.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repo:latest
+  - name: my-second-image
+    image: some-id.dkr.ecr.us-east-1.amazonaws.com/my-other-repo:latest
+  - name: my-third-public-image
+    image: ubuntu:bionic
+```
+
+## Upgrade
+
+To run the pre-pull again, there are a few options:
+```
+# by default, every upgrade is randomized / does a rollout (`--set randomize=false` to disable this behavior)
+helm upgrade install preepull-daemonset rstudio/prepull-daemonset
+
+# or use kubectl
+kubectl rollout restart daemonset/prepull-daemonset
+```
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
