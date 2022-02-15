@@ -32,13 +32,14 @@ jobs:
       - name: Run helm-docs
         run: |
           ./helm-docs --chart-search-root=charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
+          ./helm-docs --chart-search-root=other-charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
 
       - name: Commit results
         run: |
           set -xe
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git commit charts/*/README.md -m 'Update helm-docs and README.md' || echo "No changes to commit"
+          git commit other-charts/*/README.md charts/*/README.md -m 'Update helm-docs and README.md' || echo "No changes to commit"
 
       - uses: r-lib/actions/pr-push@master
         with:

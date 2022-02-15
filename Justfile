@@ -14,6 +14,7 @@ all-docs:
 docs:
   #!/bin/bash
   helm-docs --chart-search-root=charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
+  helm-docs --chart-search-root=other-charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
 
 rbac:
   #!/bin/bash
