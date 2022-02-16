@@ -1,0 +1,16 @@
+replicaCount: 3
+autoDiscovery:
+  clusterName: cluster_name
+  tags:
+  - k8s.io/cluster-autoscaler/enabled
+  - k8s.io/cluster-autoscaler/{{ .Values.autoDiscovery.clusterName }}
+awsRegion: us-east-1
+cloudProvider: aws
+rbac:
+  create: true
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: #add autoscaler IAM role 
+    create: true
+    name: "autoscaler-aws-cluster-autoscaler"
+    

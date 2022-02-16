@@ -1,0 +1,173 @@
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.middlewares: "default-default-add-forwarded-headers@kubernetescrd"
+
+  hosts:
+    - host: hostname.mydomain.com
+      paths:
+        - /
+
+homeStorage:
+  create: true
+  storageClassName: efs-client
+
+service:
+  port: 80
+  annotations:
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.name: RSW-SESSION-COOKIE
+    traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.samesite: "none"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.httponly: "true"
+
+image:
+  repository: "ghcr.io/rstudio/rstudio-workbench"
+  tag: "2021.09.0-351.pro6"
+  imagePullPolicy: Always
+
+launcher:
+  enabled: true
+  namespace: "soleng-team"
+
+rbac:
+  create: true
+
+command: []
+  # - "sleep"
+  # - "100000"
+args: []
+
+resources:
+  requests:
+    enabled: true
+    memory: "200Mi"
+    cpu: "100m"
+    ephemeralStorage: "250Mi"
+  limits:
+    enabled: true
+    memory: "3Gi"
+    cpu: "2000m"
+    ephemeralStorage: "500Mi"
+
+loadBalancer:
+  forceEnabled: true
+
+replicas: 3
+
+config:
+  profiles:
+    launcher.kubernetes.profiles.conf:
+      "*":
+        default-cpus: "1.0"
+        default-mem-mb: "2048"
+        max-cpus: "3.0"
+        max-mem-mb: "8192"
+        allow-unknown-images: "1"
+        cpu-request-ratio: "1"
+        memory-request-ratio: "1"
+        default-container-image: "ghcr.io/rstudio/r-session-complete:bionic-2021.09.0-351.pro6"
+        container-images:
+          - "ghcr.io/rstudio/r-session-complete:bionic-2021.09.0-351.pro6"
+          - "ghcr.io/rstudio/r-session-complete:centos7-2021.09.0-351.pro6"
+        job-json-overrides:
+          - target: "/spec/template/metadata/annotations/cluster-autoscaler.kubernetes.io~1safe-to-evict"
+            json: "false"
+            name: evict-annotation
+  server:
+    rserver.conf:
+      admin-enabled: 1
+      admin-group: rstudio-users
+      admin-superuser-group: rstudio-admin
+      www-port: 8787
+      www-address: 0.0.0.0
+      server-health-check-enabled: 1
+      server-project-sharing: 0
+      auth-pam-sessions-profile: rstudio-session
+      auth-stay-signed-in-days: 7
+      auth-timeout-minutes: 4320
+      launcher-sessions-enabled: 1
+      launcher-default-cluster: Kubernetes
+      launcher-sessions-container-run-as-root: 0
+      launcher-sessions-create-container-user: 1
+      monitor-graphite-enabled: 1
+      monitor-graphite-host: 127.0.0.1
+      monitor-graphite-port: 9109
+      monitor-graphite-client-id: rstudio
+      audit-r-sessions: 1
+      # using the home storage as shared storage for the server
+      server-shared-storage-path: /home/rstudio-storage/
+      auth-revocation-list-dir: /home/rstudio-storage/
+      www-enable-origin-check: 0
+    launcher.conf:
+      server:
+        enable-debug-logging: 0
+    jupyter.conf:
+      jupyter-exe: /opt/python/3.9.5/bin/jupyter
+      notebooks-enabled: 1
+      labs-enabled: 1
+      lab-args: --no-browser --allow-root --ip=0.0.0.0 --collaborative
+      default-session-cluster: Kubernetes
+      session-cull-minutes: 5
+      session-shutdown-minutes: 3
+      session-cull-connected: 1
+    vscode.conf:
+      enabled: 1
+      exe: /opt/code-server/bin/code-server
+      default-session-cluster: Kubernetes
+    logging.conf:
+      "*":
+        log-level: info
+        logger-type: stderr
+  session:
+    rsession.conf:
+      default-rsconnect-server: #rstudio connect server
+      session-timeout-minutes: 5
+      session-timeout-suspend: 1
+      session-quit-child-processes-on-exit: 1
+      session-timeout-kill-hours: 1
+    crash-handler.conf:
+      crash-handling-enabled: 1
+      crash-db-path: /home/diagnostics
+      uploads-enabled: 0
+    pip.conf: |
+      [global]
+      timeout = 60
+      index-url = pypi_rspm_repo
+  secret:
+    database.conf:
+      provider: postgresql
+      database: rstudio_auto
+      port: 5432
+      host: db-hostname
+      username: rstudio_auto_app
+      password: placeholder
+  startupCustom:
+    create-users-ongoing.sh: |
+      #!/bin/bash
+      set -x
+      echo 'it is running!'
+
+      # IMPORTANT NOTE: this is NOT safe in HA or over time.
+      # Need to make sure UIDs are consistent
+      for user in x; do
+        echo "Creating user: $user"
+        useradd -m -s /bin/bash -N $user
+        echo "$user:$user" | sudo chpasswd
+      done;
+
+      echo 'sleeping forever'
+      while :; do read; done
+
+    user-provision.conf: |
+      [program:user-provision]
+      command=/startup/custom/create-users-ongoing.sh
+      autorestart=false
+      numprocs=1
+      startsecs=10
+      stdout_logfile=/dev/stdout
+      stdout_logfile_maxbytes=0
+      stderr_logfile=/dev/stderr
+      stderr_logfile_maxbytes=0
+      
