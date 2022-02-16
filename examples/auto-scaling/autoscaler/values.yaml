@@ -13,3 +13,4 @@ rbac:
       eks.amazonaws.com/role-arn: #add autoscaler IAM role 
     create: true
     name: "autoscaler-aws-cluster-autoscaler"
+    
