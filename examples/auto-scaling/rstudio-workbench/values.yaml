@@ -22,11 +22,6 @@ service:
     traefik.ingress.kubernetes.io/service.sticky.cookie.samesite: "none"
     traefik.ingress.kubernetes.io/service.sticky.cookie.httponly: "true"
 
-image:
-  repository: "ghcr.io/rstudio/rstudio-workbench"
-  tag: "2021.09.0-351.pro6"
-  imagePullPolicy: Always
-
 launcher:
   enabled: true
   namespace: "soleng-team"
@@ -66,11 +61,6 @@ config:
         max-mem-mb: "8192"
         allow-unknown-images: "1"
         cpu-request-ratio: "1"
-        memory-request-ratio: "1"
-        default-container-image: "ghcr.io/rstudio/r-session-complete:bionic-2021.09.0-351.pro6"
-        container-images:
-          - "ghcr.io/rstudio/r-session-complete:bionic-2021.09.0-351.pro6"
-          - "ghcr.io/rstudio/r-session-complete:centos7-2021.09.0-351.pro6"
         job-json-overrides:
           - target: "/spec/template/metadata/annotations/cluster-autoscaler.kubernetes.io~1safe-to-evict"
             json: "false"
