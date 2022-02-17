@@ -10,6 +10,6 @@ rbac:
   create: true
   serviceAccount:
     annotations:
-      eks.amazonaws.com/role-arn: #add autoscaler IAM role 
+      eks.amazonaws.com/role-arn: #TODO: add autoscaler IAM role 
     create: true
     name: "autoscaler-aws-cluster-autoscaler"
