@@ -24,7 +24,7 @@ The [`values.yaml`](../auto-scaling/rstudio-workbench/values.yaml) in the rstudi
     ```
 
 - #### `jupyter`
-    - This section provides the configuration for the jupyter.conf file. There are 3 parameters that need to be configured in this section. You can learn more about the options in the [Jupyter Configuration section of the RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/latest/jupyter_sessions/configuration.html).
+    - This section provides the configuration for the jupyter.conf file, which configures jupyter sessions. There are 3 parameters that need to be configured in this section. You can learn more about the options in the [Jupyter Configuration section of the RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/latest/jupyter_sessions/configuration.html).
 
     ```yaml
     ...
