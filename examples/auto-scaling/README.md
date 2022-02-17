@@ -4,7 +4,10 @@ These files show you an example kubernetes auto-scaling configuration with RStud
 
 ## Autoscaler
 
-The [`values.yaml`](../auto-scaling/autoscaler/values.yaml) in the autoscaler folder outlines the configuration required for the cluster autoscaler. This is a comoponent that automatically adjusts the size of a Kubernetes Cluster so that all pods have a place to run. We have provided a sample configuration for AWS EKS clusters. For more details see the [Kubernetes Autoscaler Repo](https://github.com/kubernetes/autoscaler).
+The [`values.yaml`](../auto-scaling/autoscaler/values.yaml) in the autoscaler folder outlines the configuration required for the cluster autoscaler. This is a component that automatically adjusts the size of a Kubernetes Cluster so that all pods have a place to run. We have provided a sample configuration for AWS EKS clusters. For more details see the [Kubernetes Autoscaler Repo](https://github.com/kubernetes/autoscaler).
+
+Note: Autoscaler is a third party software maintained by the Kubernetes project. 
+
 
 ## RStudio Workbench
 The [`values.yaml`](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-workbench folder outlines the timeout configurations required to set up this configuration. The file has 3 sections that need to be configured for autoscaling. 
