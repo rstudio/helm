@@ -1,3 +1,7 @@
+# 0.5.8
+
+- Update README docs
+
 # 0.5.7
 
 - Update `logging.conf` to default to output logs on `stderr`
