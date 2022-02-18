@@ -1,0 +1,11 @@
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+
+  # Defines network routing in the traefik configuration.
+  hosts:
+    - host: rspm.rstudio.com
+      paths:
+        - path: /test/
+          pathType: Other
