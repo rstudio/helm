@@ -41,6 +41,8 @@ sharedStorage:
   requests:
     # -- the volume of storage to request for this persistent volume claim
     storage: "10Gi"
+  # -- selector for PVC definition
+  selector: {}
 
 # -- How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but
 # will not work well if your license only allows a single activation.
@@ -77,6 +79,8 @@ homeStorage:
   requests:
     # -- the volume of storage to request for this persistent volume claim
     storage: "10Gi"
+  # -- selector for PVC definition
+  selector: {}
 
 image:
   # -- the repository to use for the main pod image
