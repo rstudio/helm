@@ -1,6 +1,8 @@
 # 0.5.8
 
 - Update README docs
+- Add `selector` for storage definition ([#136](https://github.com/rstudio/helm/issues/136))
+- Fix default permissions (0644) on pam mounts ([#141](https://github.com/rstudio/helm/issues/141))
 
 # 0.5.7
 
