@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.3](https://img.shields.io/badge/Version-0.5.3-informational?style=flat-square) ![AppVersion: 2021.09.0-351.pro6](https://img.shields.io/badge/AppVersion-2021.09.0--351.pro6-informational?style=flat-square)
+![Version: 0.5.7](https://img.shields.io/badge/Version-0.5.7-informational?style=flat-square) ![AppVersion: 2021.09.2-382.pro1](https://img.shields.io/badge/AppVersion-2021.09.2--382.pro1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.3:
+To install the chart with the release name `my-release` at version 0.5.7:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.3
+helm install my-release rstudio/rstudio-workbench --version=0.5.7
 ```
 
 ## Required Configuration
@@ -371,14 +371,7 @@ config:
 | license.key | string | `nil` | key is the license to use |
 | license.server | bool | `false` | server is the <hostname>:<port> for a license server |
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | livenessProbe is used to configure the container's livenessProbe |
-| loadBalancer.appLabelKey | string | `"app.kubernetes.io/name"` |  |
-| loadBalancer.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the loadBalancer sidecar spec |
 | loadBalancer.forceEnabled | bool | `false` | whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node |
-| loadBalancer.image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy to use for the side-car pod image |
-| loadBalancer.image.repository | string | `"rstudio/rstudio-server-load-balancer-manager"` | the repository to use for the side-car pod image |
-| loadBalancer.image.tag | string | `"2.2"` | the tag to use for the side-car pod image |
-| loadBalancer.securityContext.capabilities.add[0] | string | `"SYS_PTRACE"` |  |
-| loadBalancer.sleepDuration | int | `15` |  |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` |  |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |

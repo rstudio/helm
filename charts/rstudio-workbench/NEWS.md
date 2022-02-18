@@ -1,3 +1,22 @@
+# 0.5.7
+
+- Update `logging.conf` to default to output logs on `stderr`
+
+# 0.5.6
+
+- Fix the version update. Our annotations were incorrect.
+
+# 0.5.5
+
+- Update RStudio Workbench to version 2021.09.2+382.pro1 (the second patch release of 2021.09)
+
+# 0.5.4
+
+- BUGFIX: address an important issue in RStudio Workbench load balancing
+  - Ever since 0.5.0, we did not create a `load-balancer` file
+  - This means that even "HA" installations of Workbench would function like independent nodes
+  - We now touch an empty file and let the nodes report themselves to the database in this case
+
 # 0.5.3
 
 - Make `startupProbe`, `readinessProbe` and `livenessProbe` more configurable ([#97](https://github.com/rstudio/helm/issues/97))

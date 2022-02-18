@@ -1,3 +1,7 @@
+# 0.2.20
+
+- Add `pod.affinity` value to define affinity for the pod
+
 # 0.2.19
 
 - Update `rstudio-library` chart version. This adds support for `extraObjects`

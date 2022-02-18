@@ -1,0 +1,28 @@
+---
+# Source: prepull-daemonset/templates/daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prepull-daemonset
+  labels:
+    app: prepull-daemonset
+spec:
+  selector:
+    matchLabels:
+      name: prepull-daemonset
+  template:
+    metadata:
+      annotations:
+        rollme: "eEEzz4fRZL"
+      labels:
+        name: prepull-daemonset
+    spec:
+      initContainers:
+        - name: prepull-prepull-image
+          image: rstudio/r-session-complete:bionic-2021.09.0-351.pro6
+          imagePullPolicy: Always
+          command: ["echo"]
+          args: ["Finished pre-pull"]
+      containers:
+        - name: pause
+          image: gcr.io/google_containers/pause
