@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.7](https://img.shields.io/badge/Version-0.5.7-informational?style=flat-square) ![AppVersion: 2021.09.2-382.pro1](https://img.shields.io/badge/AppVersion-2021.09.2--382.pro1-informational?style=flat-square)
+![Version: 0.5.8](https://img.shields.io/badge/Version-0.5.8-informational?style=flat-square) ![AppVersion: 2021.09.2-382.pro1](https://img.shields.io/badge/AppVersion-2021.09.2--382.pro1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.7:
+To install the chart with the release name `my-release` at version 0.5.8:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.7
+helm install my-release rstudio/rstudio-workbench --version=0.5.8
 ```
 
 ## Required Configuration
@@ -266,8 +266,7 @@ config:
 
 Becomes:
 
-`/etc/rstudio/launcher.kubernetes.profiles.conf`
-
+_/etc/rstudio/launcher.kubernetes.profiles.conf_
 ```ini
 [*]
 some-key: value1,value2
@@ -275,14 +274,12 @@ some-key: value1,value2
 some-key: value1,value2,value3,value4
 ```
 
-`/etc/rstudio/profiles`
-
+_/etc/rstudio/profiles_
 ```ini
 [*]
 some-key: value1
 some-key2: value2
 ```
-
 > NOTE: this appending / concatenation / array translation behavior only works with the helm chart
 
 ### Job Json Overrides
