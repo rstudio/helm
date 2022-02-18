@@ -1,0 +1,7 @@
+images:
+  - name: ubuntu-bionic
+    image: ubuntu:bionic
+
+updateStrategy: {}
+
+randomize: true
