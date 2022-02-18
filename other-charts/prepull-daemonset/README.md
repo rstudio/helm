@@ -34,7 +34,7 @@ caches<sup>†</sup> are fresh), there are a few options:
 
 ```
 # by default, every upgrade is randomized / does a rollout (`--set randomize=false` to disable this behavior)
-helm upgrade install preepull-daemonset rstudio/prepull-daemonset
+helm upgrade install prepull-daemonset rstudio/prepull-daemonset
 
 # or use kubectl
 kubectl rollout restart daemonset/prepull-daemonset
