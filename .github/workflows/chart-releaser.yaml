@@ -30,3 +30,11 @@ jobs:
           charts_repo_url: https://helm.rstudio.com
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Run chart-releaser (other)
+        uses: helm/chart-releaser-action@v1.2.0
+        with:
+          charts_dir: other-charts
+          charts_repo_url: https://helm.rstudio.com
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

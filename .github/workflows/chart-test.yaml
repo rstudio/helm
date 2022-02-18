@@ -30,16 +30,16 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --target-branch main)
+          changed=$(ct list-changed --target-branch main --chart-dirs charts --chart-dirs other-charts)
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
 
       - name: Run chart-testing (lint changed)
-        run: ct lint --target-branch main
+        run: ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
 
       - name: Run chart-testing (lint all)
-        run: ct lint --target-branch main --all
+        run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
 
   install:
     runs-on: ubuntu-latest
@@ -64,7 +64,7 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --target-branch main)
+          changed=$(ct list-changed --target-branch main --chart-dirs charts --chart-dirs other-charts)
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
@@ -76,11 +76,11 @@ jobs:
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install changed)
         if: ${{ github.ref != 'refs/heads/main' }}
-        run: ct install --target-branch main
+        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
         continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: ct install --target-branch main --all
+        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
         continue-on-error: true
