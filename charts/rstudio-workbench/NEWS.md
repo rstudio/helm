@@ -1,3 +1,7 @@
+# 0.5.10
+
+- Fix ingress definition issues with older Kubernetes clusters ([#139](https://github.com/rstudio/helm/issues/139))
+
 # 0.5.9
 
 - Upgrade Workbench to version 2022.02.1+461.pro1
