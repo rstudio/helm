@@ -32,10 +32,8 @@ spec:
       http:
         paths:
           {{- range .paths }}
-          - path: {{ . }}
-            {{- if include "rstudio-library.ingress.supportsPathType" $apiVersion }}
-            pathType: Prefix
-            {{- end }}
+          -
+            {{- include "rstudio-library.ingress.path" (dict "apiVersion" $apiVersion "pathData" . ) | indent 12 }}
             backend:
               {{- include "rstudio-library.ingress.backend" (dict "apiVersion" $apiVersion "svcName" $fullName "svcPort" $svcPort) | nindent 14 }}
           {{- end }}
