@@ -61,6 +61,28 @@ so you can set the database password with something like:
 
 The Helm `config` values are converted into the `rstudio-connect.gcfg` service configuration file via go-templating.
 
+### Ingress
+
+Here are some examples how to define the ingress:
+
+**Subdomain**
+
+```yaml
+  hosts:
+    - host: subdomain.domain.com
+      paths:
+        - /
+```
+
+**Subpath**
+
+```yaml
+  hosts:
+    - host: domain.com
+      paths:
+        - /subpath(/|$)(.*)
+```
+
 ## Values
 
 | Key | Type | Default | Description |
