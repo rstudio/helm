@@ -15,7 +15,7 @@ Note: Autoscaler is a third party software maintained by the Kubernetes project.
 The [`values.yaml`](../auto-scaling/rstudio-workbench/values.yaml) in the rstudio-workbench folder outlines the timeout configurations required to set up this configuration. The file has 3 sections that need to be configured for autoscaling. 
 
 - #### `rsession`
-    - This section provides the configuration for the rsession.conf file which controls behaviour of the rsession process, allowing you to tune various R session paramaters. There are 4 parameters that need to be configured in this section. You can learn more about the options in the [RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rsession_conf.html#session-settings).
+    - This section provides the configuration for the `rsession.conf` file which controls behaviour of the `rsession` process, allowing you to tune various R session parameters. There are 4 parameters that need to be configured in this section. You can learn more about the options in the [RStudio Workbench Admin Guide](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rsession_conf.html#session-settings).
 
     ```yaml
     ...
