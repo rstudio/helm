@@ -4,6 +4,18 @@ ingress:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.middlewares: "default-default-add-forwarded-headers@kubernetescrd"
 
+extraObjects:
+  - |
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: Middleware
+    metadata:
+      name: default-add-forwarded-headers
+      namespace: default
+    spec:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Port: "443"
   hosts:
     - host: hostname.mydomain.com
       paths:
