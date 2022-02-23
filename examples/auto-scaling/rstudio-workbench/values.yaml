@@ -148,12 +148,14 @@ config:
   startupCustom:
     create-users-ongoing.sh: |
       #!/bin/bash
+      
       for user in users.txt; do
-        USERNAME=$(cat users.txt | cut -d: -f1)
+        USERNAME=$(cat users.txt | grep -v '^\s*#'| cut -d: -f1)
         echo "$USERNAME"
-
+        PASSWORD=$(cat users.txt | grep -v '^\s*#'| cut -d: -f3)
+        
         useradd -m -s /bin/bash -N $USERNAME
-        echo "$USERNAME:$USERNAME" | sudo chpasswd
+        echo "$USERNAME:$PASSWORD" | sudo chpasswd
       done;
       echo 'sleeping forever'
       while :; do read; done
