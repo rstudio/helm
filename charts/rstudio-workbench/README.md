@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.7](https://img.shields.io/badge/Version-0.5.7-informational?style=flat-square) ![AppVersion: 2021.09.2-382.pro1](https://img.shields.io/badge/AppVersion-2021.09.2--382.pro1-informational?style=flat-square)
+![Version: 0.5.8](https://img.shields.io/badge/Version-0.5.8-informational?style=flat-square) ![AppVersion: 2021.09.2-382.pro1](https://img.shields.io/badge/AppVersion-2021.09.2--382.pro1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.7:
+To install the chart with the release name `my-release` at version 0.5.8:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.7
+helm install my-release rstudio/rstudio-workbench --version=0.5.8
 ```
 
 ## Required Configuration
@@ -126,7 +126,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - mounted at `/mnt/session-configmap/rstudio/`
 - Session Secret Configuration
   - These configuration files are mounted into the server and session pods as well
-  - `odbc.ini` and other similar shared secrets 
+  - `odbc.ini` and other similar shared secrets
   - located in `config.sessionSecret.<< name of file>>` helm values
   - mounted at `/mnt/session-secret/`
 - Secret Configuration
@@ -144,7 +144,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `launcher-mounts`, `launcher-env`
   - They are located at `config.serverDcf.<< name of file >>` helm values
   - included at `/mnt/configmap/rstudio/`
-- Profiles Configuration 
+- Profiles Configuration
   - These configuration files are mounted into the server (.ini file format)
   - `launcher.kubernetes.profiles.conf`
   - They are located at `config.profiles.<< name of file >>` helm values
@@ -157,7 +157,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `prestart-launcher.bash` is used to start launcher
 - User Provisioning Configuration
   - These configuration files are used for configuring user provisioning (i.e. `sssd`)
-  - Located at `config.userProvisioning.<< name of file >>` helm values 
+  - Located at `config.userProvisioning.<< name of file >>` helm values
   - Mounted onto `/etc/sssd/conf.d/` with `0600` permissions by default
 - Custom Startup Configuration
   - `supervisord` service / unit definition `.conf` files
@@ -220,7 +220,7 @@ config:
       # the rstudio-session PAM config file
       # will be used verbatim
 ```
-   
+
 ## RStudio Profiles
 
 Profiles are used to define product behavior (in `.ini` file format) based on user and group membership.
@@ -243,6 +243,7 @@ some-key:
 ```
 - The `[*]` section will have arrays "appended" to user and group sections, along with "defaults" defined by the chart.
 
+Note that if you want to set user limits which are usually defined in `/etc/rstudio/profiles`, you would need to configure `config.profiles.profiles` as shown below.
 ### A Full Example
 
 ```yaml
@@ -257,10 +258,15 @@ config:
         some-key:
           - value4
           - value5
+    profiles:
+      "*":
+        some-key: value1
+        some-key2: value2
 ```
 
 Becomes:
 
+_/etc/rstudio/launcher.kubernetes.profiles.conf_
 ```ini
 [*]
 some-key: value1,value2
@@ -268,6 +274,12 @@ some-key: value1,value2
 some-key: value1,value2,value3,value4
 ```
 
+_/etc/rstudio/profiles_
+```ini
+[*]
+some-key: value1
+some-key2: value2
+```
 > NOTE: this appending / concatenation / array translation behavior only works with the helm chart
 
 ### Job Json Overrides
@@ -330,6 +342,7 @@ config:
 | homeStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | homeStorage.path | string | `"/home"` | the path to mount the homeStorage claim within the pod |
 | homeStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
+| homeStorage.selector | object | `{}` | selector for PVC definition |
 | homeStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
@@ -395,6 +408,7 @@ config:
 | sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | sharedStorage.path | string | `"/var/lib/rstudio-server"` | the path to mount the sharedStorage claim within the pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
+| sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |

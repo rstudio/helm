@@ -1,0 +1,45 @@
+# this example deploys RStudio Workbench with a PersistentVolume
+# 
+# the PersistentVolume allows setting NFS mountOptions
+# it creates a storage class that RStudio Workbench then takes advantage of
+# when it creates its PersistentVolumeClaim
+#
+# PVC and PV will be left around after the helm release is removed (for manual cleanup)
+
+homeStorage:
+  create: true
+  storageClassName: "nfs-workbench-home-pv"
+  requests:
+    storage: "64Gi"
+
+# this is evaluated as a template
+extraObjects:
+  - |
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: nfs-workbench-home-pv
+      annotations:
+        "helm.sh/resource-policy": keep
+    spec:
+      capacity:
+        storage: {{ .Values.homeStorage.requests.storage }}
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteMany
+      persistentVolumeReclaimPolicy: Retain
+      storageClassName: nfs-workbench-home-pv
+      mountOptions:
+        - rw
+        - lookupcache=pos
+        - vers=4
+        - noac
+        - actimeo=1
+      nfs:
+        path: /
+        server: nfs.server.example.com
+
+config:
+  server:
+    rserver.conf:
+      server-shared-storage-path: /home/rstudio-shared-storage/

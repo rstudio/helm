@@ -1,0 +1,31 @@
+name: prepull-daemonset
+description: a daemonset to prepull images so they are cached
+version: 0.0.2
+apiVersion: v2
+icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+home: https://www.rstudio.com
+sources:
+  - https://github.com/rstudio/helm
+maintainers:
+  - name: sol-eng
+    email: docker@rstudio.com
+    url: https://github.com/sol-eng
+annotations:
+  artifacthub.io/images: |
+    - name: ubuntu
+      image: ubuntu:bionic
+    - name: pause
+      image: gcr.io/google_containers/pause
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: Docker Images
+      url: https://github.com/rstudio/rstudio-docker-products
+    - name: RStudio Community
+      url: https://community.rstudio.com/c/r-admin/5
+keywords:
+  - "prepull"
+  - "bootstrap"
+  - "image-cache"
+  - "auto-scaling"
+  - "startup"
+  - "container"
