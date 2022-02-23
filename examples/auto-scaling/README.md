@@ -2,7 +2,7 @@
 
 These files show you an example kubernetes auto-scaling configuration with RStudio Workbench. The two subdirectories, autoscaler and rstudio-workbench, contain specific configuration files that outline the parameters required to successfully set up kubernetes with auto-scaling. 
 
-See general information on this use case [here](https://solutions.rstudio.com/sys-admin/launcher/)
+To learn more about this use case, refer to the [RStudio Solutions Site](https://solutions.rstudio.com/sys-admin/launcher/).
 
 ## Autoscaler
 
