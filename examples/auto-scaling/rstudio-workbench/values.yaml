@@ -148,17 +148,13 @@ config:
   startupCustom:
     create-users-ongoing.sh: |
       #!/bin/bash
-      set -x
-      echo 'it is running!'
+      for user in users.txt; do
+        USERNAME=$(cat users.txt | cut -d: -f1)
+        echo "$USERNAME"
 
-      # IMPORTANT NOTE: this is NOT safe in HA or over time.
-      # Need to make sure UIDs are consistent
-      for user in x; do
-        echo "Creating user: $user"
-        useradd -m -s /bin/bash -N $user
-        echo "$user:$user" | sudo chpasswd
+        useradd -m -s /bin/bash -N $USERNAME
+        echo "$USERNAME:$USERNAME" | sudo chpasswd
       done;
-
       echo 'sleeping forever'
       while :; do read; done
 
