@@ -51,13 +51,12 @@ config:
 In addition to the above required configuration, we recommend setting the following to ensure a reliable deployment:
 
 * Set the `launcherPem` value to ensure that it stays the same between releases.
-  This will ensure that users can continue to properly connect to older sessions even after a redeployment of the chart. See the 
+  This will ensure that users can continue to properly connect to older sessions even after a redeployment of the chart. See the
   [RSW Admin Guide](https://docs.rstudio.com/ide/server-pro/job-launcher.html#authentication) for details on generating the file.
 * Set the `global.secureCookieKey` so that user authentication continues to work between deployments. A valid value can be obtained
   by simply running the `uuid` command.
 * Some use-cases may require special PAM profiles to run. By default, no PAM profiles other than the basic `auth` profile will be used to authenticate users.
   If this is not sufficient then you will need to add your PAM profiles into the container using a volume and volumeMount.
-
 
 ## General Principles
 
@@ -105,7 +104,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - mounted at `/mnt/session-configmap/rstudio/`
 - Session Secret Configuration
   - These configuration files are mounted into the server and session pods as well
-  - `odbc.ini` and other similar shared secrets  
+  - `odbc.ini` and other similar shared secrets
   - located in `config.sessionSecret.<< name of file>>` helm values
   - mounted at `/mnt/session-secret/`
 - Secret Configuration
@@ -123,7 +122,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `launcher-mounts`, `launcher-env`
   - They are located at `config.serverDcf.<< name of file >>` helm values
   - included at `/mnt/configmap/rstudio/`
-- Profiles Configuration  
+- Profiles Configuration
   - These configuration files are mounted into the server (.ini file format)
   - `launcher.kubernetes.profiles.conf`
   - They are located at `config.profiles.<< name of file >>` helm values
@@ -136,7 +135,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - `prestart-launcher.bash` is used to start launcher
 - User Provisioning Configuration
   - These configuration files are used for configuring user provisioning (i.e. `sssd`)
-  - Located at `config.userProvisioning.<< name of file >>` helm values  
+  - Located at `config.userProvisioning.<< name of file >>` helm values
   - Mounted onto `/etc/sssd/conf.d/` with `0600` permissions by default
 - Custom Startup Configuration
   - `supervisord` service / unit definition `.conf` files
@@ -199,7 +198,7 @@ config:
       # the rstudio-session PAM config file
       # will be used verbatim
 ```
-    
+
 ## RStudio Profiles
 
 Profiles are used to define product behavior (in `.ini` file format) based on user and group membership.
@@ -222,6 +221,7 @@ some-key:
 ```
 - The `[*]` section will have arrays "appended" to user and group sections, along with "defaults" defined by the chart.
 
+Note that if you want to set user limits which are usually defined in `/etc/rstudio/profiles`, you would need to configure `config.profiles.profiles` as shown below.
 ### A Full Example
 
 ```yaml
@@ -236,10 +236,15 @@ config:
         some-key:
           - value4
           - value5
+    profiles:
+      "*":
+        some-key: value1
+        some-key2: value2
 ```
 
 Becomes:
 
+_/etc/rstudio/launcher.kubernetes.profiles.conf_
 ```ini
 [*]
 some-key: value1,value2
@@ -247,6 +252,12 @@ some-key: value1,value2
 some-key: value1,value2,value3,value4
 ```
 
+_/etc/rstudio/profiles_
+```ini
+[*]
+some-key: value1
+some-key2: value2
+```
 > NOTE: this appending / concatenation / array translation behavior only works with the helm chart
 
 ### Job Json Overrides
@@ -273,7 +284,7 @@ config:
             json: "Always"
             name: imagePullPolicy
           - target: "/spec/template/spec/imagePullSecrets"
-            json: 
+            json:
               name: my-pull-secret
             name: imagePullSecrets
         container-images:

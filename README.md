@@ -33,6 +33,15 @@ Examples:
     - [RStudio Connect](./examples/connect/)
     - [Standalone RBAC for the Job Launcher](./examples/rbac)
 
+### Other Charts
+
+Supporting and miscellaneous charts with varying levels of maintenance, usefulness, and support
+
+- [Library Chart](./charts/rstudio-library)
+    - Supporting tools for building helm charts
+- [Pre-pull Daemonset](./other-charts/prepull-daemonset)
+    - Chart for deploying a daemonset that pulls container images to nodes
+
 ## Support
 
 **IMPORTANT:** 

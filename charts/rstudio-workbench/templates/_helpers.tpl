@@ -261,7 +261,7 @@ volumes:
 - name: rstudio-pam
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-pam
-    defaultMode: 0755
+    defaultMode: 0644
 {{- end }}
 - name: rstudio-secret
   secret:
