@@ -2,6 +2,8 @@
 
 These files show you an example kubernetes auto-scaling configuration with RStudio Workbench. The two subdirectories, autoscaler and rstudio-workbench, contain specific configuration files that outline the parameters required to successfully set up kubernetes with auto-scaling. 
 
+See general information on this use case [here](https://solutions.rstudio.com/sys-admin/launcher/)
+
 ## Autoscaler
 
 The [`values.yaml`](../auto-scaling/autoscaler/values.yaml) in the autoscaler folder outlines the configuration required for the cluster autoscaler. This is a component that automatically adjusts the size of a Kubernetes Cluster so that all pods have a place to run. We have provided a sample configuration for AWS EKS clusters. For more details see the [Kubernetes Autoscaler Repo](https://github.com/kubernetes/autoscaler).
