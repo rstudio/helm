@@ -36,7 +36,7 @@ The [`values.yaml`](../auto-scaling/rstudio-workbench/values.yaml) in the rstudi
     ```
 
 - #### `launcher.kubernetes.profiles.conf`
-    - This section provides the configuration for the Kubernetes Job Launcher Plugin. You will need to specify the job-json-overrides parameter to prevent the automatic eviction of pods. For more details see the [Kubernetes Plugin Configuration Guide](https://docs.rstudio.com/job-launcher/latest/kube.html#kube-config). 
+    - This section provides the configuration for the Kubernetes Job Launcher Plugin. You will need to specify the value below for the `job-json-overrides` parameter to prevent the automatic eviction of pods. For more details see the [Kubernetes Plugin Configuration Guide](https://docs.rstudio.com/job-launcher/latest/kube.html#kube-config). 
     
     ```yaml
     ...
