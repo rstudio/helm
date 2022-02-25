@@ -151,10 +151,11 @@ config:
       
       for user in users.txt; do
         USERNAME=$(cat users.txt | grep -v '^\s*#'| cut -d: -f1)
+        USERID=$(cat users.txt | grep -v '^\s*#'| cut -d: -f2)
         echo "$USERNAME"
         PASSWORD=$(cat users.txt | grep -v '^\s*#'| cut -d: -f3)
         
-        useradd -m -s /bin/bash -N $USERNAME
+        useradd -u $USERID -m -s /bin/bash -N $USERNAME
         echo "$USERNAME:$PASSWORD" | sudo chpasswd
       done;
       echo 'sleeping forever'
