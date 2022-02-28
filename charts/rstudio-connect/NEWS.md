@@ -1,3 +1,7 @@
+# 0.2.21
+
+- Bump Connect version to 2022.02.0
+
 # 0.2.20
 
 - Add `pod.affinity` value to define affinity for the pod
