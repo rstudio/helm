@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.24:
+To install the chart with the release name `my-release` at version 0.2.25:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.24
+helm install my-release rstudio/rstudio-connect --version=0.2.25
 ```
 
 ## Required Configuration
