@@ -1,3 +1,7 @@
+# 0.2.25
+
+- Bump Connect version to 2022.03.2
+
 # 0.2.24
 
 - Bump Connect version to 2022.03.1
