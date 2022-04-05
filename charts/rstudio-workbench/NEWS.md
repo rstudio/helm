@@ -1,3 +1,7 @@
+# 0.5.9
+
+- Upgrade Workbench to version 2022.02.1+461.pro1
+
 # 0.5.8
 
 - Update README docs
