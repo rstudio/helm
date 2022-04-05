@@ -1,12 +1,4 @@
-# 0.2.9...
-
-- Update `rstudio-library` chart dependency
-
-# 0.2.8
-
-- Update `rstudio-library` chart dependency
-
-# 0.2.7
+# 0.2.7+
 
 - Update `rstudio-library` chart dependency
 
