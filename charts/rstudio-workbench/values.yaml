@@ -279,6 +279,18 @@ global:
   secureCookieKey: ""
 
 config:
+  # -- defaultMode used for mounting the various configuration configmaps
+  defaultMode:
+    session: 0644
+    sessionSecret: 0420
+    secret: 0600
+    userProvisioning: 0600
+    server: 0644
+    jobJsonOverrides: 0644
+    startup: 0755
+    prestart: 0755
+    pam: 0644
+
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:

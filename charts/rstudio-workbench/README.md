@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.12](https://img.shields.io/badge/Version-0.5.12-informational?style=flat-square) ![AppVersion: 2022.02.1-461.pro1](https://img.shields.io/badge/AppVersion-2022.02.1--461.pro1-informational?style=flat-square)
+![Version: 0.5.13](https://img.shields.io/badge/Version-0.5.13-informational?style=flat-square) ![AppVersion: 2022.02.1-461.pro1](https://img.shields.io/badge/AppVersion-2022.02.1--461.pro1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.12:
+To install the chart with the release name `my-release` at version 0.5.13:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.12
+helm install my-release rstudio/rstudio-workbench --version=0.5.13
 ```
 
 ## Required Configuration
@@ -323,6 +323,7 @@ config:
 | affinity | object | `{}` |  |
 | args | list | `[]` | args is the pod container's run arguments. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| config.defaultMode | object | `{"jobJsonOverrides":420,"pam":420,"prestart":493,"secret":384,"server":420,"session":420,"sessionSecret":272,"startup":493,"userProvisioning":384}` | defaultMode used for mounting the various configuration configmaps |
 | config.pam | object | `{}` | a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files |
 | config.profiles | object | `{}` | a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information. |
 | config.secret | object | `{"database.conf":{}}` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |

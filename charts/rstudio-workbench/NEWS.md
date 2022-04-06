@@ -1,3 +1,8 @@
+# 0.5.13
+
+- Allow specifying `defaultMode` for most/all configMap and secret mounts
+  - this _should_ be backwards compatible. Please let us know if any issues arise
+
 # 0.5.12
 
 - Allow Launcher to Auto Configure Kubernetes variables
