@@ -2,8 +2,8 @@ apiVersion: v2
 name: rstudio-library
 description: Helm library helpers for use by Official RStudio charts
 type: library
-version: 0.1.21
-appVersion: 0.1.21
+version: 0.1.22
+appVersion: 0.1.22
 
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com

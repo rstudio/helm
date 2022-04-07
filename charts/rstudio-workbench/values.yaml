@@ -324,7 +324,6 @@ config:
         type: Kubernetes
     launcher.kubernetes.conf:
       use-templating: 0
-    launcher.fargate.conf:
     jupyter.conf:
       jupyter-exe: /opt/python/3.6.5/bin/jupyter
       notebooks-enabled: 1

@@ -3,6 +3,7 @@
 - Allow Launcher to Auto Configure Kubernetes variables
   - Removes dynamic generation of `launcher.kubernetes.conf` file
   - Add `launcher.kubernetes.conf` to default values, setting `kubernetes-namespace` to the value of `launcher.namespace`
+- Add support for multiple ini sections with the same name
 
 # 0.5.11
 
