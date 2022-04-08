@@ -12,7 +12,7 @@
 */ -}}
 {{- define "rstudio-library.rbac" -}}
 {{- $serviceAccountAnnotations := default (dict) .serviceAccountAnnotations }}
-{{- $serviceAccountCreate := default true .serviceAccountCreate }}
+{{- $serviceAccountCreate := eq .serviceAccountCreate false | ternary false true }}
 {{- $serviceAccountName := .serviceAccountName }}
 {{- $roleName := default $serviceAccountName .roleName }}
 {{- $removeNamespaceReferences := default false .removeNamespaceReferences }}
