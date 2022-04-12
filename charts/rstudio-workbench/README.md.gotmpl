@@ -264,7 +264,7 @@ some-key2: value2
 
 If you want to customize the job launch process (i.e. how sessions are defined), you will need to edit the following
 configuration:
-  - modify `config.profiles.launcher.kubernetes.profiles.conf.<< some selector >>.job-json-overrides`
+  - modify `config.profiles.launcher\.kubernetes\.profiles\.conf.<< some selector >>.job-json-overrides`
   - create an array of maps with the following keys:
     - `target`: the "target" part of the job spec to replace
     - `name`: a unique identifier (ideally with no spaces) that will become a config filename on disk
@@ -273,6 +273,8 @@ configuration:
 Note that several examples are provided
 in [this support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
 (however, examples do not use the helm chart syntax there).
+
+Alternatively, you can explore the docs in the [helm repository](https://github.com/rstudio/helm/blob/main/docs/customize.md)
 
 ```yaml
 config:

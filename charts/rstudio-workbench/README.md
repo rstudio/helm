@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.10](https://img.shields.io/badge/Version-0.5.10-informational?style=flat-square) ![AppVersion: 2022.02.1-461.pro1](https://img.shields.io/badge/AppVersion-2022.02.1--461.pro1-informational?style=flat-square)
+![Version: 0.5.11](https://img.shields.io/badge/Version-0.5.11-informational?style=flat-square) ![AppVersion: 2022.02.1-461.pro1](https://img.shields.io/badge/AppVersion-2022.02.1--461.pro1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.10:
+To install the chart with the release name `my-release` at version 0.5.11:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.10
+helm install my-release rstudio/rstudio-workbench --version=0.5.11
 ```
 
 ## Required Configuration
@@ -286,7 +286,7 @@ some-key2: value2
 
 If you want to customize the job launch process (i.e. how sessions are defined), you will need to edit the following
 configuration:
-  - modify `config.profiles.launcher.kubernetes.profiles.conf.<< some selector >>.job-json-overrides`
+  - modify `config.profiles.launcher\.kubernetes\.profiles\.conf.<< some selector >>.job-json-overrides`
   - create an array of maps with the following keys:
     - `target`: the "target" part of the job spec to replace
     - `name`: a unique identifier (ideally with no spaces) that will become a config filename on disk
@@ -295,6 +295,8 @@ configuration:
 Note that several examples are provided
 in [this support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
 (however, examples do not use the helm chart syntax there).
+
+Alternatively, you can explore the docs in the [helm repository](https://github.com/rstudio/helm/blob/main/docs/customize.md)
 
 ```yaml
 config:
