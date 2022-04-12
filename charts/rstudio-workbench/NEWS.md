@@ -1,3 +1,7 @@
+# 0.5.11
+
+- Update docs for `job-json-overrides` (fix a key reference issue and link to new docs in the helm repo)
+
 # 0.5.10
 
 - Fix ingress definition issues with older Kubernetes clusters ([#139](https://github.com/rstudio/helm/issues/139))
