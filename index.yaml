@@ -2645,6 +2645,54 @@ entries:
           url: https://www.rstudio.com/products/team/
     apiVersion: v2
     appVersion: 2022.02.1-461.pro1
+    created: "2022-04-12T21:35:30.063449614Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.21
+    description: Official Helm chart for RStudio Workbench
+    digest: 16d02fe1cd6122d96f8d6808a8f414e0e9fea84a90c0aa7d3321cb49aa98be31
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - ide
+    - editor
+    - jupyter
+    - vscode
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.5.11/rstudio-workbench-0.5.11.tgz
+    version: 0.5.11
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-workbench
+          image: rstudio/rstudio-workbench:2022.02.1-461.pro1
+        - name: r-session-complete
+          image: rstudio/r-session-complete:bionic-2022.02.1-461.pro1
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Workbench
+          url: https://www.rstudio.com/products/workbench/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 2022.02.1-461.pro1
     created: "2022-04-05T12:53:49.708122014Z"
     dependencies:
     - name: rstudio-library
@@ -4240,4 +4288,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2022-04-05T12:53:49.709488476Z"
+generated: "2022-04-12T21:35:30.064301451Z"
