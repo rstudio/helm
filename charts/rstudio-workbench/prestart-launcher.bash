@@ -8,22 +8,18 @@ main() {
 
   local cacert='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
   local k8s_url="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
-  local launcher_k8s_conf="${dyn_dir}/launcher.kubernetes.conf"
-  local launcher_ns="${RSTUDIO_LAUNCHER_NAMESPACE:-rstudio}"
 
   _logf 'Loading service account token'
   local sa_token
   sa_token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
 
-  _logf 'Loading service account ca.crt'
-  local ca_string
-  ca_string="$(tr -d '\n' <"${cacert}" | base64 | tr -d '\n')"
-
   _logf 'Ensuring %s exists' "${dyn_dir}"
   mkdir -p "${dyn_dir}"
 
+  # Empty if enabled, set to "disabled"
   if [[ -z "${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}" ]]; then
     _logf 'Checking kubernetes health via %s' "${k8s_url}"
+    # shellcheck disable=SC2086
     curl ${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS} \
       -H "Authorization: Bearer ${sa_token}" \
       --cacert "${cacert}" \
@@ -33,14 +29,6 @@ main() {
     _logf "Not checking kubernetes health because RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK=${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}"
     printf '\n'
   fi
-
-  _logf 'Generating %s' "${launcher_k8s_conf}"
-  cat >"${launcher_k8s_conf}" <<EOF
-api-url=${k8s_url}
-auth-token=${sa_token}
-kubernetes-namespace=${launcher_ns}
-certificate-authority=${ca_string}
-EOF
 
   _logf 'Configuring certs'
   cp -v "${cacert}" ${dyn_dir}/k8s-cert 2>&1 | _indent

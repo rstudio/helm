@@ -39,7 +39,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-start-user
   namespace: {{ $.Release.Namespace }}
 data:
-  {{- include "rstudio-library.config.ini" .Values.config.startupUserProvisioning | nindent 2}}
+  {{- include "rstudio-library.config.ini" .Values.config.startupUserProvisioning | nindent 2 }}
 {{- end }}
 {{- if .Values.config.startupCustom }}
 ---

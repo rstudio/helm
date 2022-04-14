@@ -28,6 +28,8 @@
 {{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
 {{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
+{{- $defaultLauncherK8sConfigValues := dict "kubernetes-namespace" (default $.Release.Namespace .Values.launcher.namespace) }}
+{{- $defaultLauncherK8sConfig := dict "launcher.kubernetes.conf" ($defaultLauncherK8sConfigValues) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -43,6 +45,7 @@ data:
   {{- $overrideDict = mergeOverwrite $licenseServerConf $overrideDict }}
 {{- end }}
 {{- $overrideDict = mergeOverwrite $defaultRServerConfig $overrideDict }}
+{{- $overrideDict = mergeOverwrite $defaultLauncherK8sConfig $overrideDict }}
 {{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
 {{- $profilesConfig := .Values.config.profiles }}
