@@ -1,3 +1,8 @@
+
+# 0.3.9
+
+- Update `rstudio-library` chart version. Add support for lists in INI file sections.
+
 # 0.3.8
 
 - Add `securityContext` for pod and container as documented [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
@@ -5,7 +10,7 @@
 # 0.3.7
 
 -  Add `extraContainers` value. This allows adding a list of additional containers.
-  
+
 # 0.3.6
 
 -  Add `pod.lifecycle` value. This allows running lifecycle hooks like postStart commands!

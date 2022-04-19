@@ -16,7 +16,7 @@ main() {
   _logf 'Ensuring %s exists' "${dyn_dir}"
   mkdir -p "${dyn_dir}"
 
-  # Empty if enabled, set to "disabled"
+  # Empty if enabled, set to "disabled" by default
   if [[ -z "${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}" ]]; then
     _logf 'Checking kubernetes health via %s' "${k8s_url}"
     # shellcheck disable=SC2086
