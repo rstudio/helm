@@ -1,3 +1,7 @@
+# 0.3.5
+
+- Update default RStudio Package Manager version to 2022.04.0-7
+
 # 0.3.4
 
 - Fix ingress definition issues with older Kubernetes clusters ([#139](https://github.com/rstudio/helm/issues/139))
