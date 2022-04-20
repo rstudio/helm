@@ -100,6 +100,8 @@ pod:
   serviceAccountName: false
   # -- annotations is a map of keys / values that will be added as annotations to the pods
   annotations: {}
+  # -- postStart Hook command [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
+  postStartCommand: []
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []

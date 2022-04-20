@@ -56,6 +56,12 @@ spec:
         args: {{ .Values.args }}
         {{- end }}
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
+        {{- if .Values.pod.postStartCommand }}
+        lifecycle:
+          postStart:
+            exec:
+              command: {{ .Values.pod.postStartCommand }}
+        {{- end }}
         ports:
         - containerPort: 4242
 {{- if .Values.config.Metrics.Enabled }}
