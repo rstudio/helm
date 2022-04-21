@@ -1,3 +1,7 @@
+# 0.3.6
+
+-  Add `pod.lifecycle` value. This allows running lifecycle hooks like postStart commands!
+
 # 0.3.5
 
 - Update default RStudio Package Manager version to 2022.04.0-7
