@@ -56,11 +56,9 @@ spec:
         args: {{ .Values.args }}
         {{- end }}
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
-        {{- if .Values.pod.postStartCommand }}
+        {{- if .Values.pod.lifecycle }}
         lifecycle:
-          postStart:
-            exec:
-              command: {{ .Values.pod.postStartCommand }}
+          {{- toYaml .Values.pod.lifecycle | nindent 10 }}
         {{- end }}
         ports:
         - containerPort: 4242
