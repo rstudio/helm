@@ -1,3 +1,7 @@
+# 0.2.27
+
+- Bump Connect version to 2022.04.0
+
 # 0.2.26
 
 - Fix ingress definition issues with older Kubernetes clusters ([#139](https://github.com/rstudio/helm/issues/139))
