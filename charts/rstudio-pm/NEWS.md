@@ -1,6 +1,6 @@
 # 0.3.7
 
--  Add `sidecarContainers` value. This allows adding a list of additional containers.
+-  Add `extraContainers` value. This allows adding a list of additional containers.
   
 # 0.3.6
 

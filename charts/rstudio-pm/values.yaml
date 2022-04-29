@@ -193,4 +193,4 @@ config:
     AdminGroup: root
 
 # -- sidecar container list
-sidecarContainers: []
+extraContainers: []
