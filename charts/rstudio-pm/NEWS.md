@@ -1,3 +1,7 @@
+# 0.3.7
+
+-  Add `sidecarContainers` value. This allows adding a list of additional containers.
+  
 # 0.3.6
 
 -  Add `pod.lifecycle` value. This allows running lifecycle hooks like postStart commands!
