@@ -125,7 +125,7 @@ spec:
           {{- end }}
         {{- end }}
       {{- if .Values.extraContainers }}
-      {{- toYaml .Values.extraContainers | nindent 6 }}
+        {{- toYaml .Values.extraContainers | nindent 6 }}
       {{- end }}
       volumes:
       - name: rstudio-pm-config
