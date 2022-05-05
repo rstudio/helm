@@ -191,3 +191,6 @@ config:
   Launcher:
     ServerUser: root
     AdminGroup: root
+
+# -- sidecar container list
+extraContainers: []
