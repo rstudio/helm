@@ -1,3 +1,7 @@
+# 0.2.28
+
+- Update Connect CI values. No functional changes.
+
 # 0.2.27
 
 - Bump Connect version to 2022.04.1
