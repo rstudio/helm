@@ -114,7 +114,10 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
-# -- Values to set the `securityContext` for Connect pods. It must include "privileged: true" or "CAP_SYS_ADMIN" when
+# -- Values to set the `securityContext` for Connect pod
+podSecurityContext: {}
+
+# -- Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
 # launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null`
 securityContext:
   privileged: true
