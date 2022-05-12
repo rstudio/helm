@@ -105,7 +105,8 @@ pod:
   # -- Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
   lifecycle: {}
   # -- container [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings
-  securityContext: {}
+  securityContext:
+    privileged: true
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
