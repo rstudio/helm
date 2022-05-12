@@ -114,7 +114,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
-| pod.securityContext | object | `{}` | container [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings |
+| pod.securityContext | object | `{"privileged":true}` | container [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings |
 | pod.serviceAccountName | bool | `false` | serviceAccountName is a string representing the service account of the pod spec |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
