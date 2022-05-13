@@ -114,7 +114,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
-| pod.securityContext | object | `{"privileged":true}` | container [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings |
+| pod.securityContext | object | `{}` | pod [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings |
 | pod.serviceAccountName | bool | `false` | serviceAccountName is a string representing the service account of the pod spec |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
@@ -122,7 +122,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
 | rstudioPMKey | bool | `false` | rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service |
-| securityContext | object | `{}` | pod [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings |
+| securityContext | object | `{"privileged":true}` | container [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
