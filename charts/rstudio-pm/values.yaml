@@ -88,7 +88,7 @@ rstudioPMKey: false
 command: false
 # -- args is the pod's run arguments. By default, it uses the container's default
 args: false
-# -- container [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) defines privilege and access control settings
+# -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container
 securityContext:
   privileged: true
 
