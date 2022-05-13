@@ -71,8 +71,8 @@ spec:
           containerPort: 2112
 {{- end }}
         securityContext:
-        {{- if .Values.securityContext }}
-          {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- if .Values.pod.containerSecurityContext }}
+          {{- toYaml .Values.pod.containerSecurityContext | nindent 10 }}
         {{- end }}
         volumeMounts:
           - name: rstudio-pm-config
