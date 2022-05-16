@@ -1,3 +1,7 @@
+# 0.3.8
+
+- Add `securityContext` for pod and container as documented [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+
 # 0.3.7
 
 -  Add `extraContainers` value. This allows adding a list of additional containers.

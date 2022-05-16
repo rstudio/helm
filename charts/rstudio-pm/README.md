@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.3.7](https://img.shields.io/badge/Version-0.3.7-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
+![Version: 0.3.8](https://img.shields.io/badge/Version-0.3.8-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.7:
+To install the chart with the release name `my-release` at version 0.3.8:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.3.7
+helm install my-release rstudio/rstudio-pm --version=0.3.8
 ```
 
 ## Required Configuration
@@ -112,8 +112,10 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | livenessProbe is used to configure the container's livenessProbe |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
+| pod.containerSecurityContext | object | `{"privileged":true}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
+| pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | bool | `false` | serviceAccountName is a string representing the service account of the pod spec |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |

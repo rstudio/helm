@@ -29,6 +29,10 @@ spec:
       labels:
         {{- include "rstudio-pm.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.pod.securityContext }}
+      securityContext:
+        {{- toYaml .Values.pod.securityContext | nindent 8 }}
+      {{- end }}
       {{- if .Values.pod.serviceAccountName }}
       serviceAccountName: {{ .Values.pod.serviceAccountName }}
       {{- end }}
@@ -67,7 +71,9 @@ spec:
           containerPort: 2112
 {{- end }}
         securityContext:
-          privileged: true
+        {{- if .Values.pod.containerSecurityContext }}
+          {{- toYaml .Values.pod.containerSecurityContext | nindent 10 }}
+        {{- end }}
         volumeMounts:
           - name: rstudio-pm-config
             mountPath: "/etc/rstudio-pm/rstudio-pm.gcfg"
