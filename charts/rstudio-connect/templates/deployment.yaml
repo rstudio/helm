@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
       {{- include "rstudio-connect.selectorLabels" . | nindent 6 }}
-  {{- with .Values.podSecurityContext }}
+  {{- with .Values.pod.securityContext }}
   securityContext:
     {{- toYaml . | nindent 4 }}
   {{- end }}
