@@ -46,6 +46,10 @@ spec:
       {{- else if .Values.pod.serviceAccountName }}
       serviceAccountName: {{ .Values.pod.serviceAccountName }}
       {{- end }}
+      {{- with .Values.pod.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

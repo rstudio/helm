@@ -1,6 +1,6 @@
 name: rstudio-connect
 description: Official Helm chart for RStudio Connect
-version: 0.2.28
+version: 0.2.29
 apiVersion: v2
 appVersion: 2022.04.2
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
