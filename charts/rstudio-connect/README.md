@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.27](https://img.shields.io/badge/Version-0.2.27-informational?style=flat-square) ![AppVersion: 2022.04.1](https://img.shields.io/badge/AppVersion-2022.04.1-informational?style=flat-square)
+![Version: 0.2.28](https://img.shields.io/badge/Version-0.2.28-informational?style=flat-square) ![AppVersion: 2022.04.1](https://img.shields.io/badge/AppVersion-2022.04.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.27:
+To install the chart with the release name `my-release` at version 0.2.28:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.27
+helm install my-release rstudio/rstudio-connect --version=0.2.28
 ```
 
 ## Required Configuration
@@ -103,6 +103,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.haste | bool | `true` | A helper that defines the RSTUDIO_CONNECT_HASTE environment variable |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
+| pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
 | pod.serviceAccountName | bool | `false` | A string representing the service account of the pod spec |
 | pod.sidecar | bool | `false` | An array of containers that will be run alongside the main pod |
 | pod.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
@@ -118,7 +119,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources.limits | object | `{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"2Gi"}` | Defines resource limits for the rstudio-connect pod |
 | resources.requests | object | `{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"1Gi"}` | Defines resource requests for the rstudio-connect pod |
-| securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect pods. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
+| securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
 | service.annotations | object | `{}` | Annotations that will be added onto the service |
 | service.nodePort | bool | `false` | The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically |
 | service.port | int | `80` | The port to use for the Connect service |
