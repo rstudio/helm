@@ -16,10 +16,6 @@ spec:
   selector:
     matchLabels:
       {{- include "rstudio-connect.selectorLabels" . | nindent 6 }}
-  {{- with .Values.pod.securityContext }}
-  securityContext:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   template:
     metadata:
       annotations:
@@ -49,6 +45,10 @@ spec:
       serviceAccountName: {{ $serviceAccountName }}
       {{- else if .Values.pod.serviceAccountName }}
       serviceAccountName: {{ .Values.pod.serviceAccountName }}
+      {{- end }}
+      {{- with .Values.pod.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
