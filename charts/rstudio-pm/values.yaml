@@ -102,6 +102,11 @@ pod:
   annotations: {}
   # -- Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
   lifecycle: {}
+  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
+  securityContext: {}
+  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container
+  containerSecurityContext:
+    privileged: true
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
