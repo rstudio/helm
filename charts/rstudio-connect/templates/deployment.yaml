@@ -164,6 +164,10 @@ spec:
         volumeMounts:
           - name: graphite-exporter-config
             mountPath: "/mnt/graphite"
+        {{- with .Values.prometheusExporter.resources }}
+        resources:
+          {{ toYaml . | nindent 10 }}
+        {{- end }}
       {{- end }}
       {{- if .Values.pod.sidecar }}
 {{ toYaml .Values.pod.sidecar | indent 6 }}
