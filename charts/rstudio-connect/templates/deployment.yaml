@@ -121,19 +121,10 @@ spec:
       {{- if .Values.pod.volumeMounts }}
 {{ toYaml .Values.pod.volumeMounts | indent 10 }}
       {{- end }}
+        {{- with .Values.resources }}
         resources:
-          {{- if .Values.resources.requests.enabled }}
-          requests:
-            memory: "{{ .Values.resources.requests.memory }}"
-            cpu: "{{ .Values.resources.requests.cpu }}"
-            ephemeral-storage: "{{ .Values.resources.requests.ephemeralStorage }}"
-          {{- end }}
-          {{- if .Values.resources.limits.enabled }}
-          limits:
-            memory: "{{ .Values.resources.limits.memory }}"
-            cpu: "{{ .Values.resources.limits.cpu }}"
-            ephemeral-storage: "{{ .Values.resources.limits.ephemeralStorage }}"
-          {{- end }}
+          {{ toYaml . | nindent 10 }}
+        {{- end }}
         {{- if .Values.livenessProbe.enabled }}
           {{- $liveness := omit .Values.livenessProbe "enabled" }}
           {{- with $liveness }}
