@@ -31,6 +31,7 @@ spec:
         {{- range .Job.volumes }}
         - {{ nindent 10 (toYaml .) | trim -}}
         {{- end }}
+        {{- include "rstudio-helm-volumes" . | nindent 8 }}
       {{- end }}
       {{- if ne (len .Job.placementConstraints) 0 }}
       nodeSelector:
