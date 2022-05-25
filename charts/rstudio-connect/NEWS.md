@@ -1,3 +1,7 @@
+# 0.2.30
+
+- Bump Connect version to 2022.05.0
+
 # 0.2.29
 
 - Add `pod.securityContext` value configuration option
