@@ -1,0 +1,8 @@
+service:
+  type: NodePort
+pod:
+  volumes: []
+  volumeMounts: []
+  initContainers: []
+  imagePullPolicy: ""
+  imagePullSecrets: []
