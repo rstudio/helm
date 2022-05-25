@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.29](https://img.shields.io/badge/Version-0.2.29-informational?style=flat-square) ![AppVersion: 2022.04.2](https://img.shields.io/badge/AppVersion-2022.04.2-informational?style=flat-square)
+![Version: 0.2.30](https://img.shields.io/badge/Version-0.2.30-informational?style=flat-square) ![AppVersion: 2022.04.2](https://img.shields.io/badge/AppVersion-2022.04.2-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.29:
+To install the chart with the release name `my-release` at version 0.2.30:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.29
+helm install my-release rstudio/rstudio-connect --version=0.2.30
 ```
 
 ## Required Configuration
@@ -112,13 +112,13 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |
+| prometheusExporter.resources | object | `{}` |  |
 | rbac.clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
 | rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
 | rbac.serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | Used to configure the container's readinessProbe. Only included if enabled = true |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
-| resources.limits | object | `{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"2Gi"}` | Defines resource limits for the rstudio-connect pod |
-| resources.requests | object | `{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"1Gi"}` | Defines resource requests for the rstudio-connect pod |
+| resources | object | `{}` | Defines resources for the rstudio-connect container |
 | securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
 | service.annotations | object | `{}` | Annotations that will be added onto the service |
 | service.nodePort | bool | `false` | The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically |
