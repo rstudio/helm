@@ -1,3 +1,7 @@
+# 0.2.31
+
+- Bump Connect version to 2022.05.0
+
 # 0.2.30
 
 - Simplify `resources` configuration and allow `resources` configuration on the
