@@ -1,6 +1,10 @@
 # 0.2.30
 
-- Bump Connect version to 2022.05.0
+- Simplify `resources` configuration and allow `resources` configuration on the
+  sidecar container
+  - Worth noting that _if baseline `enabled`_, defaults have changed to not
+    specify resources. Prototype recommendations remain in the chart values as
+    a comment
 
 # 0.2.29
 
