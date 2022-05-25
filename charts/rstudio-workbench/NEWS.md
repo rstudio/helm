@@ -1,3 +1,7 @@
+# 0.5.14
+
+- Bump Workbench to version 2022.02.2+485.pro2
+
 # 0.5.13
 
 - Allow specifying `defaultMode` for most/all configMap and secret mounts
