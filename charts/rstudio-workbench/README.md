@@ -324,6 +324,15 @@ config:
 | args | list | `[]` | args is the pod container's run arguments. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
 | config.defaultMode | object | `{"jobJsonOverrides":420,"pam":420,"prestart":493,"secret":384,"server":420,"session":420,"sessionSecret":272,"startup":493,"userProvisioning":384}` | defaultMode used for mounting the various configuration configmaps |
+| config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
+| config.defaultMode.pam | int | 0644 | default mode for pam scripts |
+| config.defaultMode.prestart | int | 0755 | default mode for prestart config |
+| config.defaultMode.secret | int | 0600 | default mode for secrets |
+| config.defaultMode.server | int | 0644 | default mode for server config |
+| config.defaultMode.session | int | 0644 | default mode for session files |
+| config.defaultMode.sessionSecret | int | 0420 | default mode for session secrets |
+| config.defaultMode.startup | int | 0755 | default mode for startup config |
+| config.defaultMode.userProvisioning | int | 0600 | default mode for userProvisioning config |
 | config.pam | object | `{}` | a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files |
 | config.profiles | object | `{}` | a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information. |
 | config.secret | object | `{"database.conf":{}}` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
