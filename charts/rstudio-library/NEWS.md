@@ -1,3 +1,22 @@
+# 0.1.22
+
+- Add support for list of INI file sections, like the following example
+
+    ```yaml
+    config:
+      server:
+        launcher.conf:
+          cluster:
+            - name: Cluster1
+              type: Kubernetes
+            - name: Cluster2
+              type: Kubernetes
+              config-file: /path/to/config/file
+    ```
+
+- Fixes issue where RBAC service account is always created even when `serviceAccountCreate: false`
+  `serviceAccountCreate` is required and must be specified as a boolean
+
 # 0.1.20
 
 - Add a `_tplvalues.tpl` helper

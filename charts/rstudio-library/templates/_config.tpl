@@ -4,7 +4,7 @@
   i.e.
   { "Server" = {"Host" = "value", "another" = ["multiple", "values"]}}
   Valid values depend on the product
-*/ -}} 
+*/ -}}
 
 {{- define "rstudio-library.config.gcfg" -}}
 {{- range $section,$keys := . -}}
@@ -50,18 +50,20 @@
   {{- $keys | nindent 2 }}
 {{- else }}
 {{- range $parent, $child := $keys -}}
-  {{- if kindIs "map" $child }}
-    {{- if not ( kindIs "slice" $keys ) -}}
+  {{/* ini files may have multiple sections with the same name */}}
+  {{- $sections := ( (kindIs "slice" $child) | ternary $child ( list $child ))}}
+  {{- range $i, $section := $sections -}}
+    {{- if kindIs "map" $section }}
+      {{- if not ( kindIs "slice" $keys ) -}}
+        {{- printf "[%s]" (toString $parent) | nindent 2 }}
+      {{- end }}
+      {{- range $key, $val := $section }}
+        {{- printf "%s=%s" (toString $key) (toString $val) | nindent 2 }}
+      {{- end }}
       {{- printf "" | nindent 0 }}
-      {{- printf "[%s]" (toString $parent) | nindent 2 }}
     {{- else }}
-      {{- printf "" | nindent 0 }}
+      {{- printf "%s=%s" (toString $parent) (toString $section) | nindent 2 }}
     {{- end }}
-    {{- range $key, $val := $child }}
-      {{- printf "%s=%s" (toString $key) (toString $val) | nindent 2 }}
-    {{- end }}
-  {{- else }}
-    {{- printf "%s=%s" (toString $parent) (toString $child) | nindent 2 }}
   {{- end }}
 {{- end }}
 {{- end }}

@@ -1,3 +1,7 @@
+# 0.2.32
+
+- Update `rstudio-library` chart version. Add support for lists in INI file sections.
+
 # 0.2.31
 
 - Bump Connect version to 2022.05.0

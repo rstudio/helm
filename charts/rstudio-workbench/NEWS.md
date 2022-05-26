@@ -1,3 +1,10 @@
+# 0.5.12
+
+- Allow Launcher to Auto Configure Kubernetes variables
+  - Removes dynamic generation of `launcher.kubernetes.conf` file
+  - Add `launcher.kubernetes.conf` to default values, setting `kubernetes-namespace` to the value of `launcher.namespace`
+- Update `rstudio-library` chart version. Add support for lists in INI file sections.
+
 # 0.5.11
 
 - Update docs for `job-json-overrides` (fix a key reference issue and link to new docs in the helm repo)

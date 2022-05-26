@@ -12,7 +12,8 @@
 */ -}}
 {{- define "rstudio-library.rbac" -}}
 {{- $serviceAccountAnnotations := default (dict) .serviceAccountAnnotations }}
-{{- $serviceAccountCreate := default true .serviceAccountCreate }}
+{{- include "rstudio-library.debug.type-check" (dict "name" "serviceAccountCreate" "object" .serviceAccountCreate "expected" "bool" "description" "enabling cluster service account creation") }}
+{{- $serviceAccountCreate := eq .serviceAccountCreate false | ternary false true }}
 {{- $serviceAccountName := .serviceAccountName }}
 {{- $roleName := default $serviceAccountName .roleName }}
 {{- $removeNamespaceReferences := default false .removeNamespaceReferences }}
