@@ -14,7 +14,8 @@
               config-file: /path/to/config/file
     ```
 
-- Fixes issue where RBAC service account is always created even when `serviceAccount.create: false`
+- Fixes issue where RBAC service account is always created even when `serviceAccountCreate: false`
+  `serviceAccountCreate` is required and must be specified as a boolean
 
 # 0.1.20
 
