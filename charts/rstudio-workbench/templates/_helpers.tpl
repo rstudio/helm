@@ -208,77 +208,78 @@ volumes:
 - name: rstudio-job-overrides-old
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-overrides-old
-    defaultMode: 0644
+    defaultMode: {{ .Values.config.defaultMode.jobJsonOverrides }}
 {{- end }}
 {{- if not $useLegacyProfiles }}
 - name: rstudio-job-overrides-new
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-overrides-new
-    defaultMode: 0644
+    defaultMode: {{ .Values.config.defaultMode.jobJsonOverrides }}
 {{- end }}
 - name: etc-rstudio
   emptyDir: {}
 - name: rstudio-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-config
-    defaultMode: 0644
+    defaultMode: {{ .Values.config.defaultMode.server }}
 - name: rstudio-session-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-session
-    defaultMode: 0644
+    defaultMode: {{ .Values.config.defaultMode.session }}
 {{- if .Values.config.sessionSecret }}
 - name: rstudio-session-secret
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-session-secret
+    defaultMode: {{ .Values.config.defaultMode.sessionSecret }}
 {{- end }}
 - name: rstudio-prestart
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-prestart
-    defaultMode: 0755
+    defaultMode: {{ .Values.config.defaultMode.prestart }}
 - name: rstudio-rsw-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-rsw
-    defaultMode: 0755
+    defaultMode: {{ .Values.config.defaultMode.startup }}
 {{- if .Values.launcher.enabled }}
 - name: rstudio-launcher-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
-    defaultMode: 0755
+    defaultMode: {{ .Values.config.defaultMode.startup }}
 {{- end }}
 {{- if .Values.config.startupUserProvisioning }}
 - name: rstudio-user-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-user
-    defaultMode: 0755
+    defaultMode: {{ .Values.config.defaultMode.startup }}
 {{- end }}
 {{- if .Values.config.startupCustom }}
 - name: rstudio-custom-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-custom
-    defaultMode: 0755
+    defaultMode: {{ .Values.config.defaultMode.startup }}
 {{- end }}
 {{- if .Values.config.pam }}
 - name: rstudio-pam
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-pam
-    defaultMode: 0644
+    defaultMode: {{ .Values.config.defaultMode.pam }}
 {{- end }}
 - name: rstudio-secret
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-secret
-    defaultMode: 0600
+    defaultMode: {{ .Values.config.defaultMode.secret }}
 {{- if .Values.config.userProvisioning }}
 - name: rstudio-user
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-user
-    defaultMode: 0600
+    defaultMode: {{ .Values.config.defaultMode.userProvisioning }}
 {{- end }}
 {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-workbench.fullname" .)) }}
 {{- if .Values.prometheusExporter.enabled }}
 - name: graphite-exporter-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-graphite
-    defaultMode: 0755
+    defaultMode: {{ .Values.config.defaultMode.server }}
 {{- end }}
 {{- if .Values.pod.volumes }}
 {{ toYaml .Values.pod.volumes }}

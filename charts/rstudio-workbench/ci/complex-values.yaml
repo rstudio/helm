@@ -108,6 +108,16 @@ loadBalancer:
       value: "false"
 
 config:
+  defaultMode:
+    session: 0644
+    sessionSecret: 0420
+    secret: 0600
+    userProvisioning: 0600
+    server: 0644
+    jobJsonOverrides: 0644
+    startup: 0755
+    prestart: 0755
+    pam: 0644
   session:
     repos.conf:
       RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
