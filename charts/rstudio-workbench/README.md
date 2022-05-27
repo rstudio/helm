@@ -323,7 +323,6 @@ config:
 | affinity | object | `{}` |  |
 | args | list | `[]` | args is the pod container's run arguments. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
-| config.defaultMode | object | `{"jobJsonOverrides":420,"pam":420,"prestart":493,"secret":384,"server":420,"session":420,"sessionSecret":272,"startup":493,"userProvisioning":384}` | defaultMode used for mounting the various configuration configmaps |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
 | config.defaultMode.pam | int | 0644 | default mode for pam scripts |
 | config.defaultMode.prestart | int | 0755 | default mode for prestart config |
