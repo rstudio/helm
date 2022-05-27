@@ -38,3 +38,13 @@ NOTE: `.Values.config.server.rserver\.conf.server-license-type` is configured ma
 Please consider removing this configuration value.
 
 {{- end }}
+
+{{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
+  {{- if hasKey .Values.config.profiles "launcher.kubernetes.profiles.conf" }}
+    {{- range $k,$v :=  (get .Values.config.profiles "launcher.kubernetes.profiles.conf") }}
+      {{- if hasKey $v "job-json-overrides" }}
+        {{- fail "\n\n`profiles` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`" }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

@@ -47,7 +47,7 @@ main() {
     /var/lib/rstudio-launcher/Kubernetes
   chown -v -R \
     rstudio-server:rstudio-server \
-    /var/lib/rstudio-launcher 2>&1 | _indent
+    /var/lib/rstudio-launcher/Local 2>&1 | _indent
 
   _logf 'Replacing process with %s' "${startup_script}"
   exec "${startup_script}"

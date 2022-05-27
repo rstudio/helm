@@ -369,6 +369,21 @@ config:
 | launcher.enabled | bool | `true` | determines whether the launcher should be started in the container |
 | launcher.kubernetesHealthCheck | object | `{"enabled":true,"extraCurlArgs":["-fsSL"]}` | configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup |
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
+| launcher.templateValues.job.annotations | object | `{}` |  |
+| launcher.templateValues.job.labels | object | `{}` |  |
+| launcher.templateValues.pod.annotations | object | `{}` |  |
+| launcher.templateValues.pod.extraContainers | list | `[]` |  |
+| launcher.templateValues.pod.imagePullPolicy | string | `""` |  |
+| launcher.templateValues.pod.imagePullSecrets | list | `[]` |  |
+| launcher.templateValues.pod.initContainers | list | `[]` |  |
+| launcher.templateValues.pod.labels | object | `{}` |  |
+| launcher.templateValues.pod.serviceAccountName | string | `""` |  |
+| launcher.templateValues.pod.volumeMounts | list | `[]` |  |
+| launcher.templateValues.pod.volumes | list | `[]` |  |
+| launcher.templateValues.service.annotations | object | `{}` |  |
+| launcher.templateValues.service.labels | object | `{}` |  |
+| launcher.templateValues.service.type | string | `"ClusterIP"` |  |
+| launcher.useTemplates | bool | `false` |  |
 | launcherPem | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |

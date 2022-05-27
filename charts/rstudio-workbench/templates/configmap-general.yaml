@@ -3,6 +3,7 @@
 {{- $sessionTag := .Values.session.image.tag | default (printf "%s%s" .Values.session.image.tagPrefix $defaultVersion ) }}
 {{- $defaultImages := list (printf "%s:%s" .Values.session.image.repository $sessionTag) }}
 {{- $defaultOverrides := list }}
+{{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
 {{- if .Values.session.defaultConfigMount }}
   {{/* default session config mount */}}
   {{- $sessionVolume := dict "configMap" ( dict "defaultMode" .Values.config.defaultMode.session "name" (printf "%s-session" ( include "rstudio-workbench.fullname" . ) ) ) "name" "session-config" }}
@@ -11,6 +12,12 @@
   {{- $sessionVolumeMountOverride := dict "name" "defaultSessionVolumeMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionVolumeMount }}
   {{/* build the actual overrides */}}
   {{- $defaultOverrides = concat $defaultOverrides ( list $sessionVolumeOverride $sessionVolumeMountOverride ) }}
+  {{- if .Values.launcher.useTemplates }}
+    {{- $volumeList := append $sessionTemplate.pod.volumes $sessionVolume }}
+    {{- $_ := set $sessionTemplate.pod "volumes" $volumeList }}
+    {{- $volumeMountList := append $sessionTemplate.pod.volumeMounts $sessionVolumeMount }}
+    {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
+  {{- end }}
   {{- if .Values.config.sessionSecret}}
     {{/* default session secret config mount */}}
     {{- $sessionSecretVolume := dict "secret" ( dict "defaultMode" .Values.config.defaultMode.sessionSecret "secretName" (printf "%s-session-secret" ( include "rstudio-workbench.fullname" . ) ) ) "name" "session-secret" }}
@@ -19,6 +26,12 @@
     {{- $sessionSecretVolumeMountOverride := dict "name" "defaultSessionSecretVolumeMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionSecretVolumeMount }}
     {{/* build the actual overrides */}}
     {{- $defaultOverrides = concat $defaultOverrides ( list $sessionSecretVolumeOverride $sessionSecretVolumeMountOverride ) }}
+    {{- if .Values.launcher.useTemplates }}
+      {{- $volumeList2 := append $sessionTemplate.pod.volumes $sessionSecretVolume }}
+      {{- $_ := set $sessionTemplate.pod "volumes" $volumeList2 }}
+      {{- $volumeMountList2 := append $sessionTemplate.pod.volumeMounts $sessionSecretVolumeMount }}
+      {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList2 }}
+    {{- end }}
   {{- end }}
 {{- end }}
 {{- $defaultProfiles := dict "default-container-image" (first $defaultImages) "container-images" $defaultImages "allow-unknown-images" 1 }}
@@ -29,6 +42,9 @@
 {{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
 {{- $defaultLauncherK8sConfigValues := dict "kubernetes-namespace" (default $.Release.Namespace .Values.launcher.namespace) }}
+{{- if .Values.launcher.useTemplates }}
+  {{- $defaultLauncherK8sConfigValues = mergeOverwrite $defaultLauncherK8sConfigValues (dict "use-templating" 1) }}
+{{- end }}
 {{- $defaultLauncherK8sConfig := dict "launcher.kubernetes.conf" ($defaultLauncherK8sConfigValues) }}
 ---
 apiVersion: v1
@@ -87,4 +103,20 @@ data:
   {{/* TODO: need to make the json-from-overrides-config take more than one file... only using launcher.kubernetes.profiles.conf today */}}
   {{- $configValue := dict "data" (get $profilesConfig "launcher.kubernetes.profiles.conf" | deepCopy) "default" ($defaultOverrides) }}
   {{- include "rstudio-library.profiles.json-from-overrides-config" $configValue | indent 2 }}
+{{- end }}
+{{- if .Values.launcher.useTemplates }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-templates
+  namespace: {{ $.Release.Namespace }}
+data:
+  rstudio-library-templates-data.tpl: |
+    {{- $tplData := dict "name" "rstudio-library.templates.data" "value" $sessionTemplate }}
+    {{- include "rstudio-library.templates.dataOutput" $tplData | nindent 4}}
+  job.tpl: |
+    {{- .Files.Get "files/job.tpl" | nindent 4 }}
+  service.tpl: |
+    {{- .Files.Get "files/service.tpl" | nindent 4 }}
 {{- end }}
