@@ -398,3 +398,10 @@ config:
 
   # -- a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files
   pam: {}
+  sessionTemplate:
+    service:
+      type: NodePort
+    pod:
+      volumes: []
+      volumeMounts: []
+      initContainers: []
