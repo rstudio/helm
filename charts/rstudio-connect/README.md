@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.32](https://img.shields.io/badge/Version-0.2.32-informational?style=flat-square) ![AppVersion: 2022.05.0](https://img.shields.io/badge/AppVersion-2022.05.0-informational?style=flat-square)
+![Version: 0.2.33](https://img.shields.io/badge/Version-0.2.33-informational?style=flat-square) ![AppVersion: 2022.05.0](https://img.shields.io/badge/AppVersion-2022.05.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.32:
+To install the chart with the release name `my-release` at version 0.2.33:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.32
+helm install my-release rstudio/rstudio-connect --version=0.2.33
 ```
 
 ## Required Configuration
@@ -127,8 +127,9 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | A list of accessModes that are defined for the storage PVC (represented as YAML) |
 | sharedStorage.create | bool | `false` | Whether to create the persistentVolumeClaim for shared storage |
 | sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
+| sharedStorage.mountContent | bool | `false` | Whether the persistentVolumeClaim should be mounted to the content pods created by the Launcher |
 | sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
-| sharedStorage.path | string | `"/var/lib/rstudio-connect"` | The path to mount the sharedStorage claim within the pod |
+| sharedStorage.path | string | `"/var/lib/rstudio-connect"` | The path to mount the sharedStorage claim within the Connect pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | The volume of storage to request for this persistent volume claim |
 | sharedStorage.storageClassName | bool | `false` | The type of storage to use. Must allow ReadWriteMany |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | Used to configure the container's startupProbe. Only included if enabled = true |

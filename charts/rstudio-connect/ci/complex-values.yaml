@@ -38,15 +38,18 @@ pod:
   sidecar:
     - name: test
       image: "busybox"
+      command: ["sleep"]
+      args: ["infinity"]
       imagePullPolicy: "IfNotPresent"
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100
-          labelSelector:
-            matchLabels:
-              app.kubernetes.io/part-of: rstudio-team
-          topologyKey: kubernetes.io/hostname
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/part-of: rstudio-team
+            topologyKey: kubernetes.io/hostname
 
 ingress:
   enabled: true
