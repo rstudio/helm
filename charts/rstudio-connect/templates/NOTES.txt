@@ -12,7 +12,8 @@ Please consider removing this configuration value.
 
 {{- end }}
 {{- end }}
-{{- end }}
+{{- if hasKey .Values.config "Launcher" }}
+{{- if hasKey .Values.config.Launcher "DataDir" }}
 {{- if contains ":" .Values.config.Launcher.DataDir }}
 
 NOTE: `config.Launcher.DataDir` is configured with a ":". When a ":" character
@@ -23,4 +24,7 @@ pods created by the Launcher. This feature will be removed in the next release o
   - When `sharedStorage.mountContent = true`, `config.Launcher.DataDir`
     should not be set.
 
+{{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
