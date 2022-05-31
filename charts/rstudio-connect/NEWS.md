@@ -1,3 +1,13 @@
+# Devel
+
+- Add support for the `launcher.useTemplates` value
+  - This enables greater customization of session creation as well as better labels and annotations out of the box
+  - To make use of the default session templates, configure values in `launcher.sessionTemplate`
+- Add a toggle for `launcher.useDefaultInitContainer` to turn off the default init container
+  - When using the launcher, it is important that sessions have the RStudio Connect "session runtime" available
+  - By default, we make these available through an init container, but they can also be provided other ways
+  - By disabling this setting, you are opting in to managing this runtime requirement yourself
+
 # 0.2.38
 
 - Bump rstudio-library chart version

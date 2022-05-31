@@ -7,11 +7,11 @@ metadata:
 data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
+{{- $sessionTemplate := deepCopy .Values.launcher.sessionTemplate }}
 {{- if .Values.launcher.enabled }}
   runtime.yaml: |
     {{- include "rstudio-connect.runtimeYaml" . | nindent 4 }}
-
-  {{- /* configuration for job-json-overrides (also used below) */ -}}
+  {{- /* configuration for job customization (also used below) */ -}}
     {{- /* 1 - volume */ -}}
       {{- $emptyRscVolume := dict "name" ("rsc-volume") "emptydir" (dict) }}
       {{- $jobJsonRuntimeVolume := dict "target" ("/spec/template/spec/volumes/-") "name" ("defaultRuntimeConnectVolume") "json" ( $emptyRscVolume ) }}
@@ -31,7 +31,20 @@ data:
       {{- $completeProfilesConfig := dict "launcher.kubernetes.profiles.conf" ($profilesConfig) }}
       {{- $jobJsonFilePath := "/mnt/job-json-overrides/" }}
       {{- $profilesArg := dict "data" ($completeProfilesConfig | deepCopy) "jobJsonDefaults" ($jobJsonDefaults | deepCopy) "filePath" $jobJsonFilePath }}
+    {{- /*
+      may still need profiles, even if using templating (i.e. for resources, etc.)
+      in a bout of laziness, we put job-json-overrides in both places for now for backwards compatibility...
+      */ -}}
     {{- include "rstudio-library.profiles.ini.advanced" $profilesArg | nindent 2 }}
+    {{- /* append the jobJson stuff onto the template values */ -}}
+    {{- if .Values.launcher.useDefaultInitContainer }}
+      {{- $initList := append $sessionTemplate.pod.initContainers $initContainerJson }}
+      {{- $_ := set $sessionTemplate.pod "initContainers" $initList }}
+      {{- $volumeList := append $sessionTemplate.pod.volumes $emptyRscVolume }}
+      {{- $_ := set $sessionTemplate.pod "volumes" $volumeList }}
+      {{- $volumeMountList := append $sessionTemplate.pod.volumeMounts $rscVolumeMount }}
+      {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
+    {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -42,4 +55,20 @@ data:
   {{- /* configuration _files_ for job-json-overrides (uses variables from above) */ -}}
   {{- $configValue := dict "data" ($profilesConfig | deepCopy) "default" ($jobJsonDefaults | deepCopy) }}
   {{- include "rstudio-library.profiles.json-from-overrides-config" $configValue | indent 2 }}
+{{- if .Values.launcher.useTemplates }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}-templates
+  namespace: {{ $.Release.Namespace }}
+data:
+  rstudio-library-templates-data.tpl: |
+    {{- $tplData := dict "name" "rstudio-library.templates.data" "value" $sessionTemplate }}
+    {{- include "rstudio-library.templates.dataOutput" $tplData | nindent 4}}
+  job.tpl: |
+    {{- .Files.Get "files/job.tpl" | nindent 4 }}
+  service.tpl: |
+    {{- .Files.Get "files/service.tpl" | nindent 4 }}
+{{- end }}
 {{- end }}

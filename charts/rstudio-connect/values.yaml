@@ -211,6 +211,27 @@ launcher:
   customRuntimeYaml: false
   # -- User definition of launcher.kubernetes.profiles.conf for job customization
   launcherKubernetesProfilesConf: {}
+  useTemplates: false
+  useDefaultInitContainer: true
+  # -- Values to pass along to the RStudio Connect session templating process
+  sessionTemplate:
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+    pod:
+      annotations: {}
+      labels: {}
+      serviceAccountName: ""
+      volumes: []
+      volumeMounts: []
+      imagePullPolicy: ""
+      imagePullSecrets: []
+      initContainers: []
+      extraContainers: []
+    job:
+      annotations: {}
+      labels: {}
   # -- Image definition for the RStudio Connect Content InitContainer
   contentInitContainer:
     # -- The repository to use for the Content InitContainer image

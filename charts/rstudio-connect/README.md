@@ -88,6 +88,9 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.enabled | bool | `false` | Whether to enable the launcher |
 | launcher.launcherKubernetesProfilesConf | object | `{}` | User definition of launcher.kubernetes.profiles.conf for job customization |
 | launcher.namespace | string | `""` | The namespace to launch sessions into. Uses the Release namespace by default |
+| launcher.sessionTemplate | object | `{"pod":{"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"serviceAccountName":"","volumeMounts":[],"volumes":[]},"service":{"type":"ClusterIP"}}` | Values to pass along to the RStudio Connect session templating process |
+| launcher.useDefaultInitContainer | bool | `true` |  |
+| launcher.useTemplates | bool | `false` |  |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |
 | license.file.mountPath | string | `"/etc/rstudio-licensing"` | mountPath is the place the license file will be mounted into the container |
