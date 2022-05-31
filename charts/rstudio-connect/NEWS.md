@@ -1,4 +1,4 @@
-# 0.2.32
+# 0.2.33
 
 - Add `sharedStorage.mountContent` value configuration option. When this setting
   is enabled, the chart will configure Connect's `Launcher.DataDirPVCName` to use
