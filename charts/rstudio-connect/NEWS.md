@@ -1,5 +1,12 @@
 # 0.2.32
 
+- Add `sharedStorage.mountContent` value configuration option. When this setting
+  is enabled, the chart will configure Connect's `Launcher.DataDirPVCName` to use
+  the PVC defined by `sharedStorage.name`. If this setting is used, then
+  `config.Launcher.DataDir` must not be set.
+
+# 0.2.32
+
 - Update `rstudio-library` chart version. Add support for lists in INI file sections.
 
 # 0.2.31

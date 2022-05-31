@@ -13,8 +13,10 @@ sharedStorage:
   name: ""
   # -- Whether the persistentVolumeClaim should be mounted (even if not created)
   mount: false
-  # -- The path to mount the sharedStorage claim within the pod
+  # -- The path to mount the sharedStorage claim within the Connect pod
   path: /var/lib/rstudio-connect
+  # -- Whether the persistentVolumeClaim should be mounted to the content pods created by the Launcher
+  mountContent: false
   # -- The type of storage to use. Must allow ReadWriteMany
   storageClassName: false
   # -- A list of accessModes that are defined for the storage PVC (represented as YAML)

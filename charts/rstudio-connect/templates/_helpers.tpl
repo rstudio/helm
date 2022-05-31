@@ -63,6 +63,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- if .Values.launcher.enabled }}
     {{- $namespace := default $.Release.Namespace .Values.launcher.namespace }}
     {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf") }}
+    {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
+    {{- if .Values.sharedStorage.mountContent }}
+      {{- $_ := set $launcherSettingsDict "DataDirPVCName" $dataDirPVCName }}
+    {{- end }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
     {{- $pythonSettingsDict := dict "Enabled" ("true") }}
     {{- $pythonDict := dict "Python" ( $pythonSettingsDict ) }}
