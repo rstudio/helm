@@ -24,7 +24,7 @@ main() {
   if [[ -n "$RSW_LOAD_BALANCING" ]]; then
     _logf "Enabling load-balancing by making sure that the /mnt/load-balancer/rstudio/load-balancer file exists"
     mkdir -p /mnt/load-balancer/rstudio/
-    touch "/mnt/load-balancer/rstudio/load-balancer"
+    echo -e "balancer=sessions\nwww-host-name=$(hostname -i)" > /mnt/load-balancer/rstudio/load-balancer
   fi
 
   _logf 'Preparing dirs'

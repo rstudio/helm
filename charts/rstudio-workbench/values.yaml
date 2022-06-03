@@ -239,6 +239,8 @@ pod:
   labels: {}
   # -- sidecar is an array of containers that will be run alongside the main container
   sidecar: false
+  # -- A map used verbatim as the pod's "affinity" definition
+  affinity: {}
 
 prometheusExporter:
   # -- whether the  prometheus exporter sidecar should be enabled

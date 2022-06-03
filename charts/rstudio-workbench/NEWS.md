@@ -1,3 +1,11 @@
+# 0.5.18
+
+- Add `pod.affinity` value for configuration of pod affinity
+- Fix issue where hostnames are not routable within kubernetes while load balancing
+  - Because `hostname` output is not routable between pods, we use `www-host-name=$(hostname -i)`
+    to route by IP address
+  - This fixes a load balancing issue with some hard to understand `asio.netdb` errors
+
 # 0.5.17
 
 - Bump rstudio-library chart version
@@ -6,6 +14,11 @@
 # 0.5.16
 
 - Add the ability to set annotations to the Persistent Volume Claim.
+
+# 0.5.15
+
+- Bump Workbench to version 2022.02.3-492.pro3
+- Fix typo in the README
 
 # 0.5.14
 
