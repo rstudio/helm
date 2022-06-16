@@ -309,7 +309,7 @@ config:
             name: imagePullPolicy
           - target: "/spec/template/spec/imagePullSecrets"
             json:
-              name: my-pull-secret
+             - name: my-pull-secret
             name: imagePullSecrets
         container-images:
           - "one-image:tag"
