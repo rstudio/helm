@@ -25,6 +25,9 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "2112"
+        # Required for the startup R version check that runs under rsandbox when
+        # RSPM runs as root.
+        container.apparmor.security.beta.kubernetes.io/rspm: unconfined
         {{- include "rstudio-pm.pod.annotations" . | nindent 8 }}
       labels:
         {{- include "rstudio-pm.selectorLabels" . | nindent 8 }}
