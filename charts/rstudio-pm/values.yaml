@@ -106,7 +106,11 @@ pod:
   securityContext: {}
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container
   containerSecurityContext:
-    privileged: true
+    capabilities:
+      drop: ["ALL"]
+      # These are required for the startup R version check that runs under
+      # rsandbox when RSPM runs as root.
+      add: ["SYS_ADMIN", "DAC_OVERRIDE", "SETGID", "SETUID"]
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []

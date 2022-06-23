@@ -1,3 +1,8 @@
+# 0.3.10
+
+- The Package Manager container no longer runs as privileged by default.
+  Instead, it uses stricter security settings with a smaller set of elevated
+  privileges.
 
 # 0.3.9
 
