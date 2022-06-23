@@ -1,5 +1,6 @@
 # 0.5.18
 
+- Add a ServiceMonitor CRD and values to configure
 - Add `pod.affinity` value for configuration of pod affinity
 - Fix issue where hostnames are not routable within kubernetes while load balancing
   - Because `hostname` output is not routable between pods, we use `www-host-name=$(hostname -i)`
