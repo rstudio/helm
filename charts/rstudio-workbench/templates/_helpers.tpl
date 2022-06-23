@@ -189,6 +189,9 @@ containers:
   volumeMounts:
     - name: graphite-exporter-config
       mountPath: "/mnt/graphite/"
+  ports:
+  - containerPort: 9108
+    name: metrics
 {{- end }}
 {{- if .Values.pod.sidecar }}
 {{ toYaml .Values.pod.sidecar }}
