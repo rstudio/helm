@@ -388,6 +388,28 @@ config:
       "*":
         log-level: info
         logger-type: stderr
+    health-check: |
+      # HELP active_sessions health_check metric Active RStudio sessions
+      # TYPE active_sessions gauge
+      active_sessions #active-sessions#
+      # HELP idle_seconds health_check metric Time since active RStudio sessions
+      # TYPE idle_seconds gauge
+      idle_seconds #idle-seconds#
+      # HELP cpu_percent health_check metric cpu (percentage)
+      # TYPE cpu_percent gauge
+      cpu_percent #cpu-percent#
+      # HELP memory_percent health_check metric memory used (percentage)
+      # TYPE memory_percent gauge
+      memory_percent #memory-percent#
+      # HELP swap_percent health_check metric swap used (percentage)
+      # TYPE swap_percent gauge
+      swap_percent #swap-percent#
+      # HELP load_average health_check metric cpu load average
+      # TYPE load_average gauge
+      load_average #load-average#
+      # HELP license_days_left the number of days left on the license
+      # TYPE license_days gauge
+      license_days_left #license-days-left#
   # -- a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information.
   profiles: {}
   # -- a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.)

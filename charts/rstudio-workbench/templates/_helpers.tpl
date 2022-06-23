@@ -83,6 +83,7 @@ containers:
   imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
   ports:
   - containerPort: 8787
+    name: http
   securityContext:
 {{ toYaml .Values.securityContext | indent 4 }}
   volumeMounts:
