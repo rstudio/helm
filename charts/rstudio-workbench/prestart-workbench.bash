@@ -36,6 +36,9 @@ main() {
 
   _writeEtcRstudioReadme
 
+  # TODO: necessary until https://github.com/rstudio/rstudio-pro/issues/3638
+  cp /mnt/configmap/rstudio/health-check /mnt/dynamic/rstudio/
+
   _logf 'Replacing process with %s' "${startup_script}"
   exec "${startup_script}"
 }
