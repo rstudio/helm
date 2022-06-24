@@ -77,8 +77,15 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - "pods"
       - "pods/log"
+    verbs:
+      - "get"
+      - "watch"
+      - "list"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
       - "pods/attach"
       - "pods/exec"
     verbs:
