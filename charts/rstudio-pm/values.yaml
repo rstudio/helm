@@ -100,6 +100,8 @@ pod:
   serviceAccountName: false
   # -- annotations is a map of keys / values that will be added as annotations to the pods
   annotations: {}
+  # -- Additional labels to add to the rstudio-pm pods
+  labels: {}
   # -- Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
   lifecycle: {}
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
@@ -203,3 +205,11 @@ config:
 
 # -- sidecar container list
 extraContainers: []
+# -- A map used verbatim as the pod's "affinity" definition
+affinity: {}
+# -- A map used verbatim as the pod's "nodeSelector" definition
+nodeSelector: {}
+# -- An array used verbatim as the pod's "tolerations" definition
+tolerations: []
+# -- The pod's priorityClassName
+priorityClassName: null

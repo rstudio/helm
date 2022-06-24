@@ -62,3 +62,8 @@ extraObjects:
       name: "test2"
     data:
       something: {{ printf "fun2" }}
+
+pod:
+  labels:
+    onelabel.com: value
+priorityClassName: someval

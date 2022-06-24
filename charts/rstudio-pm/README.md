@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.3.10](https://img.shields.io/badge/Version-0.3.10-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
+![Version: 0.3.11](https://img.shields.io/badge/Version-0.3.11-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.10:
+To install the chart with the release name `my-release` at version 0.3.11:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.3.10
+helm install my-release rstudio/rstudio-pm --version=0.3.11
 ```
 
 ## Required Configuration
@@ -83,6 +83,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | bool | `false` | args is the pod's run arguments. By default, it uses the container's default |
 | awsAccessKeyId | bool | `false` | awsAccessKeyId is the access key id for s3 access, used also to gate file creation |
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
@@ -111,14 +112,17 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | license.server | bool | `false` | server is the <hostname>:<port> for a license server |
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | livenessProbe is used to configure the container's livenessProbe |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
+| nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
 | pod.containerSecurityContext | object | `{"capabilities":{"add":["SYS_ADMIN","DAC_OVERRIDE","SETGID","SETUID"],"drop":["ALL"]}}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
+| pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
 | pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | bool | `false` | serviceAccountName is a string representing the service account of the pod spec |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
+| priorityClassName | string | `nil` | The pod's priorityClassName |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
@@ -144,6 +148,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | strategy.rollingUpdate.maxSurge | string | `"100%"` |  |
 | strategy.rollingUpdate.maxUnavailable | int | `0` |  |
 | strategy.type | string | `"RollingUpdate"` |  |
+| tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | versionOverride | string | `""` | A Package Manager version to override the "tag" for the RStudio Package Manager image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
