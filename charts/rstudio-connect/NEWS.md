@@ -1,3 +1,8 @@
+# 0.2.34
+
+- Make `resources` configuration backwards compatible with the previous `enabled`
+  flag ([#218](https://github.com/rstudio/helm/issues/218))
+
 # 0.2.33
 
 - Add `sharedStorage.mountContent` value configuration option. When this setting
