@@ -1,3 +1,8 @@
+# 0.1.23
+
+- Add helpers for launcher template usage
+- Relax rbac constraints on `pod/logs` ([#215](https://github.com/rstudio/helm/issues/215))
+
 # 0.1.22
 
 - Add support for list of INI file sections, like the following example
