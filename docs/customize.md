@@ -90,7 +90,7 @@ Set an `imagePullSecret` called `my-pull-secret`
     - name: imagePullSecrets
       target: "/spec/template/spec/imagePullSecrets"
       json:
-        name: my-pull-secret
+        - name: my-pull-secret
 ```
 
 #### imagePullPolicy
