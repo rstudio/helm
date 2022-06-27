@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.3.15](https://img.shields.io/badge/Version-0.3.15-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
+![Version: 0.4.0-rc01](https://img.shields.io/badge/Version-0.4.0--rc01-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,12 +23,27 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.15:
+To install the chart with the release name `my-release` at version 0.4.0-rc01:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.3.15
+helm install --devel my-release rstudio/rstudio-pm --version=0.4.0-rc01
 ```
+
+## Upgrade Guidance
+
+### 0.4.0
+
+- When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
+  the `rstudio-pm` user (with `uid:gid` `999:999`)
+- This can cause problems with file ownership when using a Persistent Volume Claim or other persistent directory
+- To handle the migration of existing data owned by `root`, there is now a Helm hook that essentially runs chown on the
+  data directory every time a user runs `helm upgrade`. Unfortunately, we can't detect when we actually need to run this
+  migration, so it currently runs unconditionally. The rook only runs when a PersistentVolumeClaim is being used for
+  Package Manager storage. The hook can be disabled by setting `enableMigrations=false`; in the future when we no longer
+  expect users to have root-owned data, this will become the default.
+- If you are using a `volume` directly, you will need to run such a migration yourself. It is basically just a
+  recursive `chown`
 
 ## Required Configuration
 

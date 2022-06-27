@@ -1,3 +1,25 @@
+# 0.4.0
+
+- Package Manager now runs as non-root by default and the default
+  `containerSecurityContext` has been updated to reflect the permissions
+  required to do so.
+
+- There is a new top-level `enableSandboxing` setting that gives users a direct
+  way to disable sandboxing of Git builds, which reduces the Kubernetes security
+  requirements and should allow the Package Manager chart to run on any
+  non-OpenShift cluster without modification.
+
+- To handle the migration of existing data owned by `root`, there is now a Helm hook that essentially runs chown on the
+  data directory every time a user runs `helm upgrade`. Unfortunately, we can't detect when we actually need to run this
+  migration, so it currently runs unconditionally. The rook only runs when a PersistentVolumeClaim is being used for
+  Package Manager storage. The hook can be disabled by setting `enableMigrations=false`; in the future when we no longer
+  expect users to have root-owned data, this will become the default.
+
+- Package Manager's encryption key (if specified in `rstudioPMKey`) is now read
+  from an environment variable rather than being mounted into the container.
+  This sidesteps an issue where this file is owned as root when mounted by
+  Kubernetes but Package Manager itself requires 0600 file permissions.
+
 # 0.3.15
 
 - Bump rstudio-library chart version
