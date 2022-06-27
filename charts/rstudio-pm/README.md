@@ -118,7 +118,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-package-manager"` | the repository to use for the main pod image |
+| image.repository | string | `"rstudio/rstudio-package-manager-preview"` | the repository to use for the main pod image |
 | image.tag | string | `""` | the tag to use for the main pod image |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |

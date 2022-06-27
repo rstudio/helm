@@ -29,7 +29,7 @@ sharedStorage:
 
 image:
   # -- the repository to use for the main pod image
-  repository: rstudio/rstudio-package-manager
+  repository: rstudio/rstudio-package-manager-preview
   # -- the tag to use for the main pod image
   tag: ""
   # -- the imagePullPolicy for the main pod image
