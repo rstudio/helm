@@ -111,6 +111,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
 | config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true},"Server":{"RVersion":"/opt/R/3.6.2/"}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
+| enableMigration | bool | `true` | Enable migrations for shared storage (if necessary) using Helm hooks. |
 | enableSandboxing | bool | `true` | Enable sandboxing of Git builds, which requires elevated security privileges for the Package Manager container. |
 | extraContainers | list | `[]` | sidecar container list |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
