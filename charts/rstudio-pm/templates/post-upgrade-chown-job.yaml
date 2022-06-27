@@ -1,0 +1,46 @@
+{{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.enableMigration -}}
+# The purpose of this hook is to automatically handle the migration from running
+# RSPM containers as root to non-root, which requires modifying the ownership of
+# any persistent storage.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "rstudio-pm.fullname" . }}-chown-shared-storage
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "rstudio-pm.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  template:
+    metadata:
+      name: {{ include "rstudio-pm.fullname" . }}-chown-shared-storage
+      labels:
+        {{- include "rstudio-pm.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: chown-shared-storage
+        image: "busybox"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo 'Ensuring shared storage permissions are correct...'
+          chown -R 999:999 /var/lib/rstudio-pm/
+          echo 'Removing license activations by the root user...'
+          rm -rf /var/lib/rstudio-pm/verify
+          echo 'Migration succeeded.'
+        securityContext:
+          capabilities:
+            add: ["CHOWN", "DAC_OVERRIDE"]
+            drop: ["ALL"]
+        volumeMounts:
+          - name: rstudio-pm-data
+            mountPath: /var/lib/rstudio-pm
+      volumes:
+      - name: rstudio-pm-data
+        persistentVolumeClaim:
+          claimName: {{default (print (include "rstudio-pm.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
+{{- end }}
