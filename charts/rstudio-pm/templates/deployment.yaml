@@ -78,6 +78,13 @@ spec:
         {{- if .Values.pod.env }}
         {{- toYaml .Values.pod.env | nindent 8 }}
         {{- end }}
+        {{- if .Values.rstudioPMKey }}
+        - name: PACKAGEMANAGER_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
+              key: rstudio-pm.key
+        {{- end }}
         {{- if (not .Values.enableSandboxing) }}
         - name: PACKAGEMANAGER_GIT_ALLOWUNSANDBOXEDGITBUILDS
           value: "1"
@@ -111,11 +118,6 @@ spec:
           - name: aws-creds
             readOnly: true
             mountPath: "/home/rstudio-pm/.aws"
-          {{- end }}
-          {{- if .Values.rstudioPMKey }}
-          - name: rstudio-pm-key
-            mountPath: "/var/lib/rstudio-pm/rstudio-pm.key"
-            subPath: rstudio-pm.key
           {{- end }}
           {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-pm-data
@@ -173,12 +175,6 @@ spec:
       - name: aws-creds
         secret:
           secretName: {{ include "rstudio-pm.fullname" . }}-aws-creds
-      {{- end }}
-      {{- if .Values.rstudioPMKey }}
-      - name: rstudio-pm-key
-        secret:
-          secretName: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
-          defaultMode: 0600
       {{- end }}
       {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
       - name: rstudio-pm-data

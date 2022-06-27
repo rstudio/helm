@@ -31,6 +31,10 @@ spec:
           chown -R 999:999 /var/lib/rstudio-pm/
           echo 'Removing license activations by the root user...'
           rm -rf /var/lib/rstudio-pm/verify
+          {{- if .Values.rstudioPMKey }}
+          echo 'Removing potential encryption key conflicts...'
+          rm -rf /var/lib/rstudio-pm/rstudio-pm.key
+          {{- end }}
           echo 'Migration succeeded.'
         securityContext:
           capabilities:
