@@ -25,8 +25,10 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "2112"
+        {{- if .Values.enableSandboxing }}
         # Required for sandboxed Git builds.
         container.apparmor.security.beta.kubernetes.io/rspm: unconfined
+        {{- end }}
         {{- include "rstudio-pm.pod.annotations" . | nindent 8 }}
       labels:
         {{- include "rstudio-pm.selectorLabels" . | nindent 8 }}
@@ -76,6 +78,10 @@ spec:
         {{- if .Values.pod.env }}
         {{- toYaml .Values.pod.env | nindent 8 }}
         {{- end }}
+        {{- if (not .Values.enableSandboxing) }}
+        - name: PACKAGEMANAGER_GIT_ALLOWUNSANDBOXEDGITBUILDS
+          value: "1"
+        {{- end }}
         {{- if .Values.command }}
         command: {{ .Values.command}}
         {{- end }}
@@ -95,7 +101,7 @@ spec:
 {{- end }}
         securityContext:
         {{- if .Values.pod.containerSecurityContext }}
-          {{- toYaml .Values.pod.containerSecurityContext | nindent 10 }}
+          {{- tpl (toYaml .Values.pod.containerSecurityContext) . | nindent 10 }}
         {{- end }}
         volumeMounts:
           - name: rstudio-pm-config

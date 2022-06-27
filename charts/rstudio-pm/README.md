@@ -111,6 +111,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
 | config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true},"Server":{"RVersion":"/opt/R/3.6.2/"}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
+| enableSandboxing | bool | `true` | Enable sandboxing of Git builds, which requires elevated security privileges for the Package Manager container. |
 | extraContainers | list | `[]` | sidecar container list |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
@@ -136,7 +137,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
-| pod.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":999}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container |
+| pod.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"}}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
