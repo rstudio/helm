@@ -31,6 +31,9 @@ spec:
         {{- include "rstudio-pm.pod.annotations" . | nindent 8 }}
       labels:
         {{- include "rstudio-pm.selectorLabels" . | nindent 8 }}
+        {{- with .Values.pod.labels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- if .Values.pod.securityContext }}
       securityContext:
@@ -41,6 +44,22 @@ spec:
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.initContainers }}

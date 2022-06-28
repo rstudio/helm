@@ -1,3 +1,7 @@
+# 0.3.11
+
+- Add configuration values for the pod's `labels`, `affinity`, `nodeSelector`, `tolerations`, and `priorityClassName` ([#206](https://github.com/rstudio/helm/issues/206)).
+
 # 0.3.10
 
 - The Package Manager container no longer runs as privileged by default.
