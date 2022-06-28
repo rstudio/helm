@@ -80,3 +80,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
 {{- end -}}
+
+{{/*
+Create the name of the ServiceAccount
+*/}}
+{{- define "rstudio-pm.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (include "rstudio-pm.fullname" .) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
