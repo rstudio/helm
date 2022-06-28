@@ -46,22 +46,44 @@ This chart requires the following in order to function:
 
 ## S3 Configuration
 
-Package Manager can be configured to store data in S3 buckets (see the [Admin Guide](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations)
-for more details). When configured this way, AWS access credentials are required. You must set the `awsAccessKeyId` and `awsSecretAccessKey` chart values
-to ensure that RSPM will be able to authenticate with your configured S3 buckets.
+Package Manager [can be configured to store its data in S3
+buckets](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations),
+which eliminates the need to provision shared storage for multiple replicas. A
+`values.yaml` file using S3 might contain something like the following:
 
-Configuring Package Manager to use S3 requires modifying the `.gfcg` configuration file as explained below. A sample chart values configuration might look like the following:
-
-```
-awsAccessKeyId: your-access-key-id
-awsSecretAccessKey: your-secret-access-key
-
+``` yaml
 config:
   Storage:
     Default: s3
   S3Storage:
     Bucket: your-s3-bucket
 ```
+
+If you are running on EKS, we strongly suggest using [IAM Roles for Service
+Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+to manage the credentials needed to access S3. In this scenario, once you have
+[created an IAM
+role](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
+you can use this role as an annotation on the existing Service Account:
+
+``` yaml
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
+```
+
+If you are unable to use IAM Roles for Service Accounts, there are any number of
+alternatives for injecting AWS credentials into a container. As a fallback, the
+chart supports setting static credentials:
+
+``` yaml
+awsAccessKeyId: your-access-key-id
+awsSecretAccessKey: your-secret-access-key
+```
+
+Bear in mind that static, long-lived credentials are the least secure option and
+should be avoided if at all possible.
 
 ## General Principles
 
