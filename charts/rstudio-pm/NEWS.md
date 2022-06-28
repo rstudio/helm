@@ -1,3 +1,8 @@
+# 0.3.13
+
+- Package Manager now enables the bundled R version (which is required to use
+  Git-backed packages) by default.
+
 # 0.3.12
 
 - Add the ability to set annotations to the Persistent Volume Claim.
