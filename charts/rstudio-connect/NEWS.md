@@ -1,3 +1,7 @@
+# 0.2.35
+
+- Bump Connect version to 2022.06.0
+
 # 0.2.34
 
 - Make `resources` configuration backwards compatible with the previous `enabled`
