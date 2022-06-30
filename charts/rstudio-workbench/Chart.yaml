@@ -1,8 +1,8 @@
 name: rstudio-workbench
 description: Official Helm chart for RStudio Workbench
-version: 0.5.15
+version: 0.5.16
 apiVersion: v2
-appVersion: 2022.02.3-492.pro3
+appVersion: 2022.07.0-preview-545.pro3
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
 sources:
@@ -18,9 +18,9 @@ dependencies:
 annotations:
   artifacthub.io/images: |
     - name: rstudio-workbench
-      image: rstudio/rstudio-workbench:2022.02.3-492.pro3
+      image: rstudio/rstudio-workbench-preview:2022.07.0-preview-545.pro3
     - name: r-session-complete
-      image: rstudio/r-session-complete:bionic-2022.02.3-492.pro3
+      image: rstudio/r-session-complete-preview:bionic-2022.07.0-preview-545.pro3
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images
