@@ -1,6 +1,7 @@
 # Version: 2
 # DO NOT MODIFY the "Version: " key
 # Helm Version: v1
+{{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -27,10 +28,16 @@ spec:
       nodeName: {{ toYaml .Job.host }}
       {{- end }}
       restartPolicy: Never
+      {{- with $templateData.pod.serviceAccountName }}
+      serviceAccountName: {{- . }}
+      {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
-      {{- if ne (len .Job.volumes) 0 }}
+      {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
       volumes:
         {{- range .Job.volumes }}
+        - {{ nindent 10 (toYaml .) | trim -}}
+        {{- end }}
+        {{- range $templateData.pod.volumes }}
         - {{ nindent 10 (toYaml .) | trim -}}
         {{- end }}
       {{- end }}
@@ -59,6 +66,10 @@ spec:
         {{- range $key, $val := $securityContext }}
         {{ $key }}: {{ $val }}
         {{- end }}
+      {{- end }}
+      {{- if $templateData.pod.initContainers }}
+      initContainers:
+        {{- toYaml $templateData.pod.initContainers | nindent 8}}
       {{- end }}
       containers:
         - name: rs-launcher-container
@@ -175,9 +186,12 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if ne (len .Job.volumes) 0 }}
+          {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
           volumeMounts:
             {{- range .Job.volumeMounts }}
+            - {{ nindent 14 (toYaml .) | trim -}}
+            {{- end }}
+            {{- range $templateData.pod.volumeMounts }}
             - {{ nindent 14 (toYaml .) | trim -}}
             {{- end }}
           {{- end }}

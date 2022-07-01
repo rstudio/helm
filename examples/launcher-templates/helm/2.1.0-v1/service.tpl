@@ -1,6 +1,7 @@
 # Version: 2.1.0
 # DO NOT MODIFY the "Version: " key
 # Helm Version: v1
+{{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -33,4 +34,4 @@ spec:
   selector:
     job-name: {{toYaml .Job.id }}
   clusterIP: ''
-  type: NodePort
+  type: {{ $templateData.service.type }}
