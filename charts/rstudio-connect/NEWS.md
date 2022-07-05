@@ -1,3 +1,7 @@
+# 0.2.35
+
+- Add the ability to set annotations to the Persistent Volume Claim.
+
 # 0.2.34
 
 - Make `resources` configuration backwards compatible with the previous `enabled`

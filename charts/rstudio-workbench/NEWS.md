@@ -1,3 +1,7 @@
+# 0.5.16
+
+- Add the ability to set annotations to the Persistent Volume Claim.
+
 # 0.5.14
 
 - Bump Workbench to version 2022.02.2+485.pro2

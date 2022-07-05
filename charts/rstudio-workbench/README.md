@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.15](https://img.shields.io/badge/Version-0.5.15-informational?style=flat-square) ![AppVersion: 2022.02.3-492.pro3](https://img.shields.io/badge/AppVersion-2022.02.3--492.pro3-informational?style=flat-square)
+![Version: 0.5.16](https://img.shields.io/badge/Version-0.5.16-informational?style=flat-square) ![AppVersion: 2022.02.3-492.pro3](https://img.shields.io/badge/AppVersion-2022.02.3--492.pro3-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.15:
+To install the chart with the release name `my-release` at version 0.5.16:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.15
+helm install my-release rstudio/rstudio-workbench --version=0.5.16
 ```
 
 ## Required Configuration
@@ -414,6 +414,7 @@ config:
 | session.image.tagPrefix | string | `"bionic-"` | A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined |
 | shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
+| sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |
 | sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
 | sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |

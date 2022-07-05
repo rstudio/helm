@@ -25,6 +25,9 @@ sharedStorage:
   requests:
     # -- The volume of storage to request for this persistent volume claim
     storage: "10Gi"
+  # -- Annotations for the Persistent Volume Claim
+  annotations:
+    helm.sh/resource-policy: keep
 
 rbac:
   # -- Whether to create rbac. (also depends on launcher.enabled = true)

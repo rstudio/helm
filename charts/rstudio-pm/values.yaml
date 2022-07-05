@@ -23,6 +23,9 @@ sharedStorage:
   requests:
     # -- the volume of storage to request for this persistent volume claim
     storage: "10Gi"
+  # -- Define the annotations for the Persistent Volume Claim resource
+  annotations:
+    helm.sh/resource-policy: keep
 
 image:
   # -- the repository to use for the main pod image
