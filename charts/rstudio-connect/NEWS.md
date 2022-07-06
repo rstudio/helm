@@ -1,3 +1,7 @@
+# 0.2.36
+
+- Bump Connect version to 2022.06.0
+
 # 0.2.35
 
 - Add the ability to set annotations to the Persistent Volume Claim.
