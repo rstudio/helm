@@ -104,7 +104,7 @@ spec:
         {{- end }}
         {{- with $templateData.pod.initContainers }}
           {{- range . }}
-        - {{- toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
+        - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
           {{- end }}
         {{- end }}
       containers:
