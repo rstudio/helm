@@ -1,3 +1,7 @@
+# 0.3.12
+
+- Add the ability to set annotations to the Persistent Volume Claim.
+
 # 0.3.11
 
 - Add configuration values for the pod's `labels`, `affinity`, `nodeSelector`, `tolerations`, and `priorityClassName` ([#206](https://github.com/rstudio/helm/issues/206)).

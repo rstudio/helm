@@ -43,6 +43,9 @@ sharedStorage:
     storage: "10Gi"
   # -- selector for PVC definition
   selector: {}
+  # -- Define the annotations for the Persistent Volume Claim resource
+  annotations:
+    helm.sh/resource-policy: keep
 
 # -- How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but
 # will not work well if your license only allows a single activation.

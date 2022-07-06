@@ -5,7 +5,7 @@ metadata:
   name: {{default (print (include "rstudio-workbench.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
   namespace: {{ $.Release.Namespace }}
   annotations:
-    "helm.sh/resource-policy": keep
+{{ .Values.sharedStorage.annotations | toYaml | indent 4}}
 spec:
   accessModes:
 {{ .Values.sharedStorage.accessModes | toYaml | indent 4 }}

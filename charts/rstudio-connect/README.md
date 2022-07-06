@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.35](https://img.shields.io/badge/Version-0.2.35-informational?style=flat-square) ![AppVersion: 2022.06.0](https://img.shields.io/badge/AppVersion-2022.06.0-informational?style=flat-square)
+![Version: 0.2.36](https://img.shields.io/badge/Version-0.2.36-informational?style=flat-square) ![AppVersion: 2022.06.0](https://img.shields.io/badge/AppVersion-2022.06.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.35:
+To install the chart with the release name `my-release` at version 0.2.36:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.2.35
+helm install my-release rstudio/rstudio-connect --version=0.2.36
 ```
 
 ## Required Configuration
@@ -125,6 +125,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | service.port | int | `80` | The port to use for the Connect service |
 | service.type | string | `"NodePort"` | The service type (LoadBalancer, NodePort, etc.) |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | A list of accessModes that are defined for the storage PVC (represented as YAML) |
+| sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Annotations for the Persistent Volume Claim |
 | sharedStorage.create | bool | `false` | Whether to create the persistentVolumeClaim for shared storage |
 | sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
 | sharedStorage.mountContent | bool | `false` | Whether the persistentVolumeClaim should be mounted to the content pods created by the Launcher |
