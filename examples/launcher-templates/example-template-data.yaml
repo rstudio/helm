@@ -1,9 +1,17 @@
 service:
   type: NodePort
+  annotations: {}
+  labels: {}
 pod:
+  annotations: {}
+  labels: {}
   volumes: []
   volumeMounts: []
   initContainers: []
   imagePullPolicy: ""
   imagePullSecrets: []
   serviceAccountName: ""
+  extraContainers: []
+job:
+  annotations: {}
+  labels: {}

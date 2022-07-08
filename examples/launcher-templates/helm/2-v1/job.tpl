@@ -6,6 +6,18 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   generateName: {{ toYaml .Job.generateName }}
+  annotations:
+    {{- with $templateData.job.annotations }}
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+    {{- end }}
+    {{- end }}
+  labels:
+    {{- with $templateData.job.labels }}
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+    {{- end }}
+    {{- end }}
 spec:
   backoffLimit: 0
   template:
@@ -22,6 +34,17 @@ spec:
         user: {{ toYaml .Job.user }}
         name: {{ toYaml .Job.name }}
         service_ports: {{ toYaml .Job.servicePortsJson }}
+        {{- with $templateData.pod.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
+      labels:
+        {{- with $templateData.pod.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
       generateName: {{ toYaml .Job.generateName }}
     spec:
       {{- if .Job.host }}
@@ -67,13 +90,21 @@ spec:
         {{ $key }}: {{ $val }}
         {{- end }}
       {{- end }}
-      {{- if $templateData.pod.initContainers }}
-      initContainers:
-        {{- toYaml $templateData.pod.initContainers | nindent 8}}
+      {{- with $templateData.pod.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 12 }}
       {{- end }}
+      initContainers:
+        {{- with $templateData.pod.initContainers }}
+          {{- range . }}
+        - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
+          {{- end }}
+        {{- end }}
       containers:
         - name: rs-launcher-container
           image: {{ toYaml .Job.container.image }}
+          {{- with $templateData.pod.imagePullPolicy }}
+          imagePullPolicy: {{- . | nindent 12 }}
+          {{- end }}
           {{- $isShell := false }}
           {{- if .Job.command }}
           command: ['/bin/sh']
@@ -195,3 +226,6 @@ spec:
             - {{ nindent 14 (toYaml .) | trim -}}
             {{- end }}
           {{- end }}
+        {{- with $templateData.pod.extraContainers }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}

@@ -1,6 +1,7 @@
 # 0.2.38
 
 - Bump rstudio-library chart version
+- Relax RBAC for `pod/logs` to remove write-related privileges
 
 # 0.2.37
 

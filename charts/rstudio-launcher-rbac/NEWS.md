@@ -1,3 +1,8 @@
+# 0.2.13+
+
+- Update `rstudio-library` chart dependency
+- Relax RBAC for `pod/logs` to remove write-related privileges
+
 # 0.2.7+
 
 - Update `rstudio-library` chart dependency
