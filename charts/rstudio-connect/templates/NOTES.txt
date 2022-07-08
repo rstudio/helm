@@ -1,7 +1,9 @@
 
 {{ include "rstudio-connect.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
 
+{{- /* Verify configuration values */ -}}
 {{- if hasKey .Values "config" }}
+
 {{- if hasKey .Values.config "Licensing" }}
 {{- if hasKey .Values.config.Licensing "LicenseType" }}
 
@@ -12,6 +14,7 @@ Please consider removing this configuration value.
 
 {{- end }}
 {{- end }}
+
 {{- if hasKey .Values.config "Launcher" }}
 {{- if hasKey .Values.config.Launcher "DataDir" }}
 {{- if contains ":" .Values.config.Launcher.DataDir }}
@@ -27,7 +30,10 @@ pods created by the Launcher. This feature will be removed in the next release o
 {{- end }}
 {{- end }}
 {{- end }}
+
 {{- end }}
+
+{{- /* chart deprecations and misconfiguration warnings */ -}}
 
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
   {{- range $k,$v :=  .Values.launcher.launcherKubernetesProfilesConf }}
@@ -35,4 +41,8 @@ pods created by the Launcher. This feature will be removed in the next release o
       {{- fail "launcher.launcherKubernetesProfilesConf has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`" }}
     {{- end }}
   {{- end }}
+{{- end }}
+
+{{- if .Values.launcher.contentInitContainer }}
+  {{- fail "launcher.contentInitContainer values are now stored at launcher.defaultInitContainer" }}
 {{- end }}

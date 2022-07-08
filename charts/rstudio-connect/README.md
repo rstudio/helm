@@ -81,15 +81,14 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
 | ingress.tls | list | `[]` |  |
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
-| launcher.contentInitContainer | object | `{"repository":"ghcr.io/rstudio/rstudio-connect-content-init","tag":""}` | Image definition for the RStudio Connect Content InitContainer |
-| launcher.contentInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
-| launcher.contentInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | launcher.customRuntimeYaml | bool | `false` | Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "false," which pulls in the default runtime.yaml file. If changing this value, be careful to include the images that you have already used. |
+| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","tag":""}` | Image definition for the default RStudio Connect Content InitContainer |
+| launcher.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
+| launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | launcher.enabled | bool | `false` | Whether to enable the launcher |
 | launcher.launcherKubernetesProfilesConf | object | `{}` | User definition of launcher.kubernetes.profiles.conf for job customization |
 | launcher.namespace | string | `""` | The namespace to launch sessions into. Uses the Release namespace by default |
-| launcher.sessionTemplate | object | `{"pod":{"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"serviceAccountName":"","volumeMounts":[],"volumes":[]},"service":{"type":"ClusterIP"}}` | Values to pass along to the RStudio Connect session templating process |
-| launcher.useDefaultInitContainer | bool | `true` |  |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"annotations":{},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"serviceAccountName":"","volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the RStudio Connect session templating process |
 | launcher.useTemplates | bool | `false` |  |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |

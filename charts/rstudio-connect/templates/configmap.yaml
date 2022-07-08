@@ -7,7 +7,7 @@ metadata:
 data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
-{{- $sessionTemplate := deepCopy .Values.launcher.sessionTemplate }}
+{{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
 {{- if .Values.launcher.enabled }}
   runtime.yaml: |
     {{- include "rstudio-connect.runtimeYaml" . | nindent 4 }}
@@ -20,27 +20,27 @@ data:
       {{- $jobJsonRuntimeMount := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMount") "json" ( $rscVolumeMount ) }}
     {{- /* 3 - init container */ -}}
       {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-      {{- $initContainerImage := print .Values.launcher.contentInitContainer.repository ":" ( .Values.launcher.contentInitContainer.tag | default $defaultVersion ) }}
+      {{- $initContainerImage := print .Values.launcher.defaultInitContainer.repository ":" ( .Values.launcher.defaultInitContainer.tag | default $defaultVersion ) }}
+      {{- $initContainerPullPolicy := default .Values.launcher.defaultInitContainer.imagePullPolicy "IfNotPresent" }}
       {{- $initContainerVolumeMount := dict "name" ("rsc-volume") "mountPath" ("/mnt/rstudio-connect-runtime/") }}
-      {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "volumeMounts" ( list  $initContainerVolumeMount ) }}
+      {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "imagePullPolicy" ($initContainerPullPolicy) "volumeMounts" ( list  $initContainerVolumeMount ) }}
       {{- $jobJsonInitContainer := dict "target" ("/spec/template/spec/initContainers/0") "name" ("defaultInitContainer") "json" $initContainerJson }}
     {{- /* set up job-json defaults */ -}}
       {{- $jobJsonDefaults := list }}
-      {{- if not .Values.launcher.useTemplates }}
+      {{- if and (not .Values.launcher.useTemplates) .Values.launcher.defaultInitContainer.enabled }}
         {{- $jobJsonDefaults = list $jobJsonRuntimeVolume $jobJsonRuntimeMount $jobJsonInitContainer }}
       {{- end }}
-    {{- /* build the configuration */ -}}
+    {{- /* build the configuration for profiles */ -}}
       {{- $profilesConfig := .Values.launcher.launcherKubernetesProfilesConf }}
       {{- $completeProfilesConfig := dict "launcher.kubernetes.profiles.conf" ($profilesConfig) }}
       {{- $jobJsonFilePath := "/mnt/job-json-overrides/" }}
       {{- $profilesArg := dict "data" ($completeProfilesConfig | deepCopy) "jobJsonDefaults" ($jobJsonDefaults | deepCopy) "filePath" $jobJsonFilePath }}
     {{- /*
       may still need profiles, even if using templating (i.e. for resources, etc.)
-      in a bout of laziness, we put job-json-overrides in both places for now for backwards compatibility...
       */ -}}
     {{- include "rstudio-library.profiles.ini.advanced" $profilesArg | nindent 2 }}
     {{- /* append the jobJson stuff onto the template values */ -}}
-    {{- if .Values.launcher.useDefaultInitContainer }}
+    {{- if and .Values.launcher.useTemplates .Values.launcher.defaultInitContainer.enabled }}
       {{- $initList := append $sessionTemplate.pod.initContainers $initContainerJson }}
       {{- $_ := set $sessionTemplate.pod "initContainers" $initList }}
       {{- $volumeList := append $sessionTemplate.pod.volumes $emptyRscVolume }}
