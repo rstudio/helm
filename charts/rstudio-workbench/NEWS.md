@@ -1,3 +1,7 @@
+# 0.5.17
+
+- Bump rstudio-library chart version
+
 # 0.5.16
 
 - Add the ability to set annotations to the Persistent Volume Claim.

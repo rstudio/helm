@@ -9,6 +9,7 @@ setup:
 
 update-lock:
   #!/bin/bash
+  set -xe
   orig_dir=$(pwd)
   for dir in `ls charts`; do
     echo " --> Updating Chart.lock for $dir"
