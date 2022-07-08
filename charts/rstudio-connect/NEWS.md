@@ -1,3 +1,7 @@
+# 0.2.37
+
+- Bump rstudio-library chart version
+
 # 0.2.36
 
 - Bump Connect version to 2022.06.0
