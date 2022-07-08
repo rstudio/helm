@@ -6,8 +6,19 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Job.serviceName }}
+  annotations:
+    {{- with $templateData.service.annotations }}
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+    {{- end }}
+    {{- end }}
   labels:
     job-name: {{ toYaml .Job.id }}
+    {{- with $templateData.service.labels }}
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+    {{- end }}
+    {{- end }}
 spec:
   ports:
     {{- $i := 0 }}
