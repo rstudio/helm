@@ -117,8 +117,10 @@ spec:
             mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/service.tpl"
             subPath: "service.tpl"
           {{- end }}
+          {{- if not .Values.launcher.useTemplates }}
           - name: overrides
             mountPath: "/mnt/job-json-overrides/"
+          {{- end }}
           - name: rstudio-connect-prestart
             mountPath: "/scripts/"
           {{- end }}
@@ -198,10 +200,12 @@ spec:
           name: {{ include "rstudio-connect.fullname" . }}-templates
           defaultMode: 0644
       {{- end }}
+      {{- if not .Values.launcher.useTemplates }}
       - name: overrides
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-overrides
           defaultMode: 0644
+      {{- end }}
       - name: rstudio-connect-prestart
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-prestart

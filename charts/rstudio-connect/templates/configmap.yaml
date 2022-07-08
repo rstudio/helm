@@ -25,7 +25,10 @@ data:
       {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "volumeMounts" ( list  $initContainerVolumeMount ) }}
       {{- $jobJsonInitContainer := dict "target" ("/spec/template/spec/initContainers/0") "name" ("defaultInitContainer") "json" $initContainerJson }}
     {{- /* set up job-json defaults */ -}}
-      {{- $jobJsonDefaults := list $jobJsonRuntimeVolume $jobJsonRuntimeMount $jobJsonInitContainer }}
+      {{- $jobJsonDefaults := list }}
+      {{- if not .Values.launcher.useTemplates }}
+        {{- $jobJsonDefaults = list $jobJsonRuntimeVolume $jobJsonRuntimeMount $jobJsonInitContainer }}
+      {{- end }}
     {{- /* build the configuration */ -}}
       {{- $profilesConfig := .Values.launcher.launcherKubernetesProfilesConf }}
       {{- $completeProfilesConfig := dict "launcher.kubernetes.profiles.conf" ($profilesConfig) }}
@@ -45,6 +48,7 @@ data:
       {{- $volumeMountList := append $sessionTemplate.pod.volumeMounts $rscVolumeMount }}
       {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
     {{- end }}
+{{- if not .Values.launcher.useTemplates }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -55,6 +59,7 @@ data:
   {{- /* configuration _files_ for job-json-overrides (uses variables from above) */ -}}
   {{- $configValue := dict "data" ($profilesConfig | deepCopy) "default" ($jobJsonDefaults | deepCopy) }}
   {{- include "rstudio-library.profiles.json-from-overrides-config" $configValue | indent 2 }}
+{{- end }}
 {{- if .Values.launcher.useTemplates }}
 ---
 apiVersion: v1
