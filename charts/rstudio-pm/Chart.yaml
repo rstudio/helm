@@ -1,6 +1,6 @@
 name: rstudio-pm
 description: Official Helm chart for RStudio Package Manager
-version: 0.3.13
+version: 0.3.14
 apiVersion: v2
 appVersion: 2022.04.0-7
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
