@@ -28,13 +28,17 @@ sharedStorage:
     helm.sh/resource-policy: keep
 
 image:
-  # -- the repository to use for the main pod image
+  # -- Image repository
   repository: rstudio/rstudio-package-manager
-  # -- the tag to use for the main pod image
+  # -- Image tag
+  # @default -- The chart's `appVersion`
   tag: ""
-  # -- the imagePullPolicy for the main pod image
+  # -- The [image pull
+  # policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy)
   imagePullPolicy: IfNotPresent
-  # -- an array of kubernetes secrets for pulling the main pod image from private registries
+  # -- [Image pull
+  # secrets](https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod),
+  # if any
   imagePullSecrets: []
 
 strategy:
@@ -170,16 +174,24 @@ readinessProbe:
 initContainers: false
 
 ingress:
+  # -- Whether to create an
+  # [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource)
   enabled: false
-  # -- The ingressClassName for the ingress resource. Only used for clusters that support
-  # networking.k8s.io/v1 Ingress resources
+  # -- The name of an [Ingress class
+  # resource](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class)
+  # @default -- When empty, the Ingress will use the cluster's [default IngressClass](https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class)
   ingressClassName: ""
+  # -- Annotations for the Ingress, if any
   annotations: {}
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
-  hosts:
+  # -- One or more [Ingress
+  # rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules)
+  hosts: []
   # - host: chart-example.local
   #   paths: []
+  # -- [TLS entries](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)
+  # for the Ingress, if any
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

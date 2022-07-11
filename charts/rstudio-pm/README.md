@@ -114,15 +114,15 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | extraContainers | list | `[]` | sidecar container list |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
-| image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
-| image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-package-manager"` | the repository to use for the main pod image |
-| image.tag | string | `""` | the tag to use for the main pod image |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts | string | `nil` |  |
-| ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
-| ingress.tls | list | `[]` |  |
+| image.imagePullPolicy | string | `"IfNotPresent"` | The [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy) |
+| image.imagePullSecrets | list | `[]` | [Image pull secrets](https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod), if any |
+| image.repository | string | `"rstudio/rstudio-package-manager"` | Image repository |
+| image.tag | string | The chart's `appVersion` | Image tag |
+| ingress.annotations | object | `{}` | Annotations for the Ingress, if any |
+| ingress.enabled | bool | `false` | Whether to create an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource) |
+| ingress.hosts | list | `[]` | One or more [Ingress rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules) |
+| ingress.ingressClassName | string | When empty, the Ingress will use the cluster's [default IngressClass](https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class) | The name of an [Ingress class resource](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class) |
+| ingress.tls | list | `[]` | [TLS entries](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) for the Ingress, if any |
 | initContainers | bool | `false` | the initContainer spec that will be used verbatim |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |

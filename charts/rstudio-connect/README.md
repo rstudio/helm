@@ -70,16 +70,15 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | config | object | [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
-| image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":""}` | Defines the RStudio Connect image to deploy |
-| image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |
-| image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"ghcr.io/rstudio/rstudio-connect"` | The repository to use for the main pod image |
-| image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts | string | `nil` |  |
-| ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
-| ingress.tls | list | `[]` |  |
+| image.imagePullPolicy | string | `"IfNotPresent"` | The [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy) |
+| image.imagePullSecrets | list | `[]` | [Image pull secrets](https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod), if any |
+| image.repository | string | `"ghcr.io/rstudio/rstudio-connect"` | Image repository |
+| image.tag | string | The chart's `appVersion` | Image tag |
+| ingress.annotations | object | `{}` | Annotations for the Ingress, if any |
+| ingress.enabled | bool | `false` | Whether to create an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource) |
+| ingress.hosts | list | `[]` | One or more [Ingress rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules) |
+| ingress.ingressClassName | string | When empty, the Ingress will use the cluster's [default IngressClass](https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class) | The name of an [Ingress class resource](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class) |
+| ingress.tls | list | `[]` | [TLS entries](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) for the Ingress, if any |
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
 | launcher.contentInitContainer | object | `{"repository":"ghcr.io/rstudio/rstudio-connect-content-init","tag":""}` | Image definition for the RStudio Connect Content InitContainer |
 | launcher.contentInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |

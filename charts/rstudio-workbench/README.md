@@ -355,15 +355,15 @@ config:
 | homeStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | homeStorage.selector | object | `{}` | selector for PVC definition |
 | homeStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
-| image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
-| image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-workbench"` | the repository to use for the main pod image |
-| image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts | string | `nil` |  |
-| ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
-| ingress.tls | list | `[]` |  |
+| image.imagePullPolicy | string | `"IfNotPresent"` | The [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy) |
+| image.imagePullSecrets | list | `[]` | [Image pull secrets](https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod), if any |
+| image.repository | string | `"rstudio/rstudio-workbench"` | Image repository |
+| image.tag | string | The chart's `appVersion` | Image tag |
+| ingress.annotations | object | `{}` | Annotations for the Ingress, if any |
+| ingress.enabled | bool | `false` | Whether to create an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource) |
+| ingress.hosts | list | `[]` | One or more [Ingress rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules) |
+| ingress.ingressClassName | string | When empty, the Ingress will use the cluster's [default IngressClass](https://kubernetes.io/docs/concepts/services-networking/ingress/#default-ingress-class) | The name of an [Ingress class resource](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class) |
+| ingress.tls | list | `[]` | [TLS entries](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) for the Ingress, if any |
 | initContainers | bool | `false` | the initContainer spec that will be used verbatim |
 | jobJsonOverridesFiles | object | `{}` | jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents |
 | launcher.enabled | bool | `true` | determines whether the launcher should be started in the container |
