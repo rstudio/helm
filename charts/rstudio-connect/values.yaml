@@ -48,7 +48,7 @@ extraObjects: []
 # -- Defines the RStudio Connect image to deploy
 image:
   # -- The repository to use for the main pod image
-  repository: ghcr.io/rstudio/rstudio-connect
+  repository: ghcr.io/rstudio/rstudio-connect-preview
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- The imagePullPolicy for the main pod image
@@ -235,7 +235,7 @@ launcher:
   defaultInitContainer:
     enabled: true
     # -- The repository to use for the Content InitContainer image
-    repository: ghcr.io/rstudio/rstudio-connect-content-init
+    repository: ghcr.io/rstudio/rstudio-connect-content-init-preview
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     imagePullPolicy: ""
