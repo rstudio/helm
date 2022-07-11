@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.3.12](https://img.shields.io/badge/Version-0.3.12-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
+![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.12:
+To install the chart with the release name `my-release` at version 0.3.13:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.3.12
+helm install my-release rstudio/rstudio-pm --version=0.3.13
 ```
 
 ## Required Configuration
@@ -88,7 +88,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsAccessKeyId | bool | `false` | awsAccessKeyId is the access key id for s3 access, used also to gate file creation |
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
-| config | object | `{"HTTP":{"Listen":":4242"},"Launcher":{"AdminGroup":"root","ServerUser":"root"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
+| config | object | `{"HTTP":{"Listen":":4242"},"Launcher":{"AdminGroup":"root","ServerUser":"root"},"Metrics":{"Enabled":true},"Server":{"RVersion":"/opt/R/3.6.2/"}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
 | extraContainers | list | `[]` | sidecar container list |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
