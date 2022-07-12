@@ -38,11 +38,11 @@ pods created by the Launcher. This feature will be removed in the next release o
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
   {{- range $k,$v :=  .Values.launcher.launcherKubernetesProfilesConf }}
     {{- if hasKey $v "job-json-overrides" }}
-      {{- fail "launcher.launcherKubernetesProfilesConf has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`" }}
+      {{- fail "\n\n`launcher.launcherKubernetesProfilesConf` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`" }}
     {{- end }}
   {{- end }}
 {{- end }}
 
 {{- if .Values.launcher.contentInitContainer }}
-  {{- fail "launcher.contentInitContainer values are now stored at launcher.defaultInitContainer" }}
+  {{- fail "\n\n`launcher.contentInitContainer` values are now stored at `launcher.defaultInitContainer`" }}
 {{- end }}

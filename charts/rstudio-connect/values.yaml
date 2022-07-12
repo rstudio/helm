@@ -211,7 +211,8 @@ launcher:
   customRuntimeYaml: false
   # -- User definition of launcher.kubernetes.profiles.conf for job customization
   launcherKubernetesProfilesConf: {}
-  useTemplates: false
+  # -- Whether to use launcher templates when launching sessions. Defaults to true
+  useTemplates: true
   # -- Values to pass along to the RStudio Connect session templating process
   templateValues:
     service:
@@ -233,11 +234,13 @@ launcher:
       labels: {}
   # -- Image definition for the default RStudio Connect Content InitContainer
   defaultInitContainer:
+    # -- Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way.
     enabled: true
     # -- The repository to use for the Content InitContainer image
     repository: ghcr.io/rstudio/rstudio-connect-content-init-preview
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
+    # -- The imagePullPolicy for the default initContainer
     imagePullPolicy: ""
 
 # -- A nested map of maps that generates the rstudio-connect.gcfg file
