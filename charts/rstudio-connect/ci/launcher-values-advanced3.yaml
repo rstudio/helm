@@ -1,8 +1,0 @@
-rbac:
-  create: true
-  serviceAccount:
-    create: true
-securityContext: null
-launcher:
-  enabled: true
-  customRuntimeYaml: pro
