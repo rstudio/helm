@@ -1,3 +1,11 @@
+# 0.3.14
+
+- A Service Account is now created by default. This is primarily to facilitate
+  better IAM security when using Package Manager with S3.
+
+- `pod.serviceAccountName` has been deprecated in favour of the new
+  `serviceAccount.name` setting.
+
 # 0.3.13
 
 - Package Manager now enables the bundled R version (which is required to use

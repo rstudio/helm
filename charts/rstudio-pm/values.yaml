@@ -99,8 +99,8 @@ pod:
   volumes: []
   # -- volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec
   volumeMounts: []
-  # -- serviceAccountName is a string representing the service account of the pod spec
-  serviceAccountName: false
+  # -- Deprecated, use `serviceAccount.name` instead
+  serviceAccountName: ""
   # -- annotations is a map of keys / values that will be added as annotations to the pods
   annotations: {}
   # -- Additional labels to add to the rstudio-pm pods
@@ -184,6 +184,16 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+serviceAccount:
+  # -- Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+  create: true
+  # -- ServiceAccount to use, if any, or an explicit name for the one we create
+  # @default -- When `serviceAccount.create` is `true` this defaults to the full name of the release
+  name: ""
+  # -- Annotations for the ServiceAccount, if any
+  annotations: {}
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
 
 serviceMonitor:
   # -- Whether to create a ServiceMonitor CRD for use with a Prometheus Operator

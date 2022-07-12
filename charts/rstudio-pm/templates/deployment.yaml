@@ -41,6 +41,8 @@ spec:
       {{- end }}
       {{- if .Values.pod.serviceAccountName }}
       serviceAccountName: {{ .Values.pod.serviceAccountName }}
+      {{- else }}
+      serviceAccountName: {{ include "rstudio-pm.serviceAccountName" . }}
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:

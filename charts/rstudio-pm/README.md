@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
+![Version: 0.3.14](https://img.shields.io/badge/Version-0.3.14-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.13:
+To install the chart with the release name `my-release` at version 0.3.14:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.3.13
+helm install my-release rstudio/rstudio-pm --version=0.3.14
 ```
 
 ## Required Configuration
@@ -46,22 +46,44 @@ This chart requires the following in order to function:
 
 ## S3 Configuration
 
-Package Manager can be configured to store data in S3 buckets (see the [Admin Guide](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations)
-for more details). When configured this way, AWS access credentials are required. You must set the `awsAccessKeyId` and `awsSecretAccessKey` chart values
-to ensure that RSPM will be able to authenticate with your configured S3 buckets.
+Package Manager [can be configured to store its data in S3
+buckets](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations),
+which eliminates the need to provision shared storage for multiple replicas. A
+`values.yaml` file using S3 might contain something like the following:
 
-Configuring Package Manager to use S3 requires modifying the `.gfcg` configuration file as explained below. A sample chart values configuration might look like the following:
-
-```
-awsAccessKeyId: your-access-key-id
-awsSecretAccessKey: your-secret-access-key
-
+``` yaml
 config:
   Storage:
     Default: s3
   S3Storage:
     Bucket: your-s3-bucket
 ```
+
+If you are running on EKS, we strongly suggest using [IAM Roles for Service
+Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+to manage the credentials needed to access S3. In this scenario, once you have
+[created an IAM
+role](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
+you can use this role as an annotation on the existing Service Account:
+
+``` yaml
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
+```
+
+If you are unable to use IAM Roles for Service Accounts, there are any number of
+alternatives for injecting AWS credentials into a container. As a fallback, the
+chart supports setting static credentials:
+
+``` yaml
+awsAccessKeyId: your-access-key-id
+awsSecretAccessKey: your-secret-access-key
+```
+
+Bear in mind that static, long-lived credentials are the least secure option and
+should be avoided if at all possible.
 
 ## General Principles
 
@@ -119,7 +141,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
 | pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
-| pod.serviceAccountName | bool | `false` | serviceAccountName is a string representing the service account of the pod spec |
+| pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
 | priorityClassName | string | `nil` | The pod's priorityClassName |
@@ -133,6 +155,9 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | service.nodePort | bool | `false` | The explicit nodePort to use for `service.type` NodePort. If not provided, Kubernetes will choose one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
+| serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, if any |
+| serviceAccount.create | bool | `true` | Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) |
+| serviceAccount.name | string | When `serviceAccount.create` is `true` this defaults to the full name of the release | ServiceAccount to use, if any, or an explicit name for the one we create |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Operator is running). Defaults to the release namespace |

@@ -20,3 +20,8 @@ WARNING: `image.pullPolicy` value has been removed in chart version 0.2.7. Pleas
   - It is also easier to remember since this is what the kubernetes value is actually called
   - See `NEWS.md` to note other changes between releases
 {{- end }}
+
+{{- if hasKey .Values.pod "serviceAccountName" }}
+NOTE: `pod.serviceAccountName` is deprecated and will be removed in the future.
+Please use `serviceAccount.name` instead.
+{{- end }}
