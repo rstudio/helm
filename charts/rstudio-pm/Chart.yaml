@@ -1,8 +1,8 @@
 name: rstudio-pm
 description: Official Helm chart for RStudio Package Manager
-version: 0.3.14
+version: 0.3.15-pre
 apiVersion: v2
-appVersion: 2022.04.0-7
+appVersion: 2022.04.1-791
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
 sources:
@@ -18,8 +18,8 @@ dependencies:
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |
-    - name: rstudio-package-manager
-      image: rstudio/rstudio-package-manager:2022.04.0-7
+    - name: rstudio-package-manager-preview
+      image: rstudio/rstudio-package-manager-preview:2022.04.1-791
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: RStudio Community

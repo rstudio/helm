@@ -29,7 +29,7 @@ sharedStorage:
 
 image:
   # -- the repository to use for the main pod image
-  repository: rstudio/rstudio-package-manager
+  repository: rstudio/rstudio-package-manager-preview
   # -- the tag to use for the main pod image
   tag: ""
   # -- the imagePullPolicy for the main pod image
@@ -92,6 +92,13 @@ command: false
 # -- args is the pod's run arguments. By default, it uses the container's default
 args: false
 
+# -- Enable sandboxing of Git builds, which requires elevated security
+# privileges for the Package Manager container.
+enableSandboxing: true
+
+# -- Enable migrations for shared storage (if necessary) using Helm hooks.
+enableMigration: true
+
 pod:
   # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
   env: []
@@ -111,11 +118,13 @@ pod:
   securityContext: {}
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container
   containerSecurityContext:
+    runAsUser: 999
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
-      # These are required for the startup R version check that runs under
-      # rsandbox when RSPM runs as root.
-      add: ["SYS_ADMIN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+    seccompProfile:
+      type: "{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
@@ -214,9 +223,6 @@ config:
     Listen: :4242
   Metrics:
     Enabled: true
-  Launcher:
-    ServerUser: root
-    AdminGroup: root
 
 # -- sidecar container list
 extraContainers: []
