@@ -1,3 +1,7 @@
+# 0.3.15
+
+- Bump rstudio-library chart version
+
 # 0.3.14
 
 - A Service Account is now created by default. This is primarily to facilitate

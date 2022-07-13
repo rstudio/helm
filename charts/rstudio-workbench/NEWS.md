@@ -1,3 +1,8 @@
+# 0.5.17
+
+- Bump rstudio-library chart version
+- Relax RBAC for `pod/logs` to remove write-related privileges
+
 # 0.5.16
 
 - Add the ability to set annotations to the Persistent Volume Claim.
