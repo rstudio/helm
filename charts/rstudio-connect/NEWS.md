@@ -6,6 +6,7 @@
 - Add support for the `launcher.useTemplates` value
   - This enables greater customization of session creation as well as better labels and annotations out of the box
   - To make use of the default session templates, configure values in `launcher.sessionTemplate`
+- Enable logging using RStudio Connect's new logging configuration (effective with version 2022.07)
 - Add a toggle for `launcher.defaultInitContainer.enabled` to turn off the default init container
   - When using the launcher, it is important that sessions have the RStudio Connect "session runtime" available
   - By default, we make these available through an init container, but they can also be provided other ways
