@@ -67,6 +67,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- if .Values.sharedStorage.mountContent }}
       {{- $_ := set $launcherSettingsDict "DataDirPVCName" $dataDirPVCName }}
     {{- end }}
+    {{- if .Values.launcher.useTemplates }}
+      {{- $_ := set $launcherSettingsDict "KubernetesUseTemplates" "true" }}
+      {{- $_ = set $launcherSettingsDict "ScratchPath" "/var/lib/rstudio-connect-launcher" }}
+    {{- else }}
+      {{- $_ := set $launcherSettingsDict "KubernetesUseTemplates" "false" }}
+    {{- end }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
     {{- $pythonSettingsDict := dict "Enabled" ("true") }}
     {{- $pythonDict := dict "Python" ( $pythonSettingsDict ) }}

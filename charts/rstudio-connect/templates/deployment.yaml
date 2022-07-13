@@ -106,16 +106,27 @@ spec:
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf"
             subPath: "launcher.kubernetes.profiles.conf"
+          {{- if .Values.launcher.useTemplates }}
+          - name: rstudio-connect-templates
+            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            subPath: "rstudio-library-templates-data.tpl"
+          - name: rstudio-connect-templates
+            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/job.tpl"
+            subPath: "job.tpl"
+          - name: rstudio-connect-templates
+            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/service.tpl"
+            subPath: "service.tpl"
+          {{- end }}
+          {{- if not .Values.launcher.useTemplates }}
+          - name: overrides
+            mountPath: "/mnt/job-json-overrides/"
+          {{- end }}
+          - name: rstudio-connect-prestart
+            mountPath: "/scripts/"
           {{- end }}
           {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-connect-data
             mountPath: "{{ .Values.sharedStorage.path }}"
-          {{- end }}
-          {{- if .Values.launcher.enabled }}
-          - name: overrides
-            mountPath: "/mnt/job-json-overrides/"
-          - name: rstudio-connect-prestart
-            mountPath: "/scripts/"
           {{- end }}
           {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
       {{- if .Values.pod.volumeMounts }}
@@ -183,10 +194,18 @@ spec:
 {{ toYaml .Values.pod.volumes | indent 6 }}
       {{- end }}
       {{- if .Values.launcher.enabled }}
+      {{- if .Values.launcher.useTemplates }}
+      - name: rstudio-connect-templates
+        configMap:
+          name: {{ include "rstudio-connect.fullname" . }}-templates
+          defaultMode: 0644
+      {{- end }}
+      {{- if not .Values.launcher.useTemplates }}
       - name: overrides
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-overrides
           defaultMode: 0644
+      {{- end }}
       - name: rstudio-connect-prestart
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-prestart
