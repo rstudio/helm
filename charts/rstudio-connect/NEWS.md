@@ -12,6 +12,7 @@
   - By default, we make these available through an init container, but they can also be provided other ways
   - By disabling this setting, you are opting into managing this runtime requirement yourself
 - Add values for `pod.port` and `service.targetPort`
+- Allow `launcher.additionalRuntimeImages` and `launcher.customRuntimeYaml="pro"` ([#238](https://github.com/rstudio/helm/issues/238), [#92](https://github.com/rstudio/helm/issues/92))
 
 # 0.2.38
 
