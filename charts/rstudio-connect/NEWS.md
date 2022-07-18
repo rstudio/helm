@@ -11,6 +11,7 @@
   - When using the launcher, it is important that sessions have the RStudio Connect "session runtime" available
   - By default, we make these available through an init container, but they can also be provided other ways
   - By disabling this setting, you are opting into managing this runtime requirement yourself
+- Add values for `pod.port` and `service.targetPort`
 
 # 0.2.38
 
