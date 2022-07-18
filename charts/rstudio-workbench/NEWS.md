@@ -1,3 +1,7 @@
+# 0.5.18
+
+- Bump Workbench version to 2022.07.0-548.pro5
+
 # 0.5.17
 
 - Bump rstudio-library chart version
