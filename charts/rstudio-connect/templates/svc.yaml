@@ -18,5 +18,5 @@ spec:
     {{- if .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
     {{- end }}
-    targetPort: 3939
+    targetPort: {{ .Values.service.targetPort }}
 ---

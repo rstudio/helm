@@ -72,6 +72,8 @@ service:
   nodePort: false
   # -- The port to use for the Connect service
   port: 80
+  # -- The port to forward to on the Connect pod. Also see pod.port
+  targetPort: 3939
 
 pod:
   # -- A helper that defines the RSTUDIO_CONNECT_HASTE environment variable
@@ -94,6 +96,8 @@ pod:
   affinity: {}
   # -- Values to set the `securityContext` for the connect pod
   securityContext: {}
+  # -- The containerPort used by the main pod container
+  port: 3939
 
 # -- The pod's run command. By default, it uses the container's default
 command: []
