@@ -1,7 +1,7 @@
 name: Kubernetes
 images:
   -
-    name: ghcr.io/rstudio/content-base:r3.1.3-py2.7.18-bionic
+    name: ghcr.io/rstudio/content-pro:r3.1.3-py2.7.18-bionic
     python:
       installations:
         -
@@ -13,7 +13,7 @@ images:
           path: /opt/R/3.1.3/bin/R
           version: 3.1.3
   -
-    name: ghcr.io/rstudio/content-base:r3.2.5-py2.7.18-bionic
+    name: ghcr.io/rstudio/content-pro:r3.2.5-py2.7.18-bionic
     python:
       installations:
         -
@@ -25,7 +25,7 @@ images:
           path: /opt/R/3.2.5/bin/R
           version: 3.2.5
   -
-    name: ghcr.io/rstudio/content-base:r3.3.3-py3.6.13-bionic
+    name: ghcr.io/rstudio/content-pro:r3.3.3-py3.6.13-bionic
     python:
       installations:
         -
@@ -37,7 +37,7 @@ images:
           path: /opt/R/3.3.3/bin/R
           version: 3.3.3
   -
-    name: ghcr.io/rstudio/content-base:r3.4.4-py3.6.13-bionic
+    name: ghcr.io/rstudio/content-pro:r3.4.4-py3.6.13-bionic
     python:
       installations:
         -
@@ -49,7 +49,31 @@ images:
           path: /opt/R/3.4.4/bin/R
           version: 3.4.4
   -
-    name: ghcr.io/rstudio/content-base:r3.5.3-py3.7.10-bionic
+    name: ghcr.io/rstudio/content-pro:r3.4.4-py3.7.10-bionic
+    python:
+      installations:
+        -
+          path: /opt/python/3.7.10/bin/python3.7
+          version: 3.7.10
+    r:
+      installations:
+        -
+          path: /opt/R/3.4.4/bin/R
+          version: 3.4.4
+  -
+    name: ghcr.io/rstudio/content-pro:r3.5.3-py2.7.18-bionic
+    python:
+      installations:
+        -
+          path: /opt/python/2.7.18/bin/python2.7
+          version: 2.7.18
+    r:
+      installations:
+        -
+          path: /opt/R/3.5.3/bin/R
+          version: 3.5.3
+  -
+    name: ghcr.io/rstudio/content-pro:r3.5.3-py3.7.10-bionic
     python:
       installations:
         -
@@ -61,7 +85,31 @@ images:
           path: /opt/R/3.5.3/bin/R
           version: 3.5.3
   -
-    name: ghcr.io/rstudio/content-base:r3.6.3-py3.8.8-bionic
+    name: ghcr.io/rstudio/content-pro:r3.6.3-py2.7.18-bionic
+    python:
+      installations:
+        -
+          path: /opt/python/2.7.18/bin/python2.7
+          version: 2.7.18
+    r:
+      installations:
+        -
+          path: /opt/R/3.6.3/bin/R
+          version: 3.6.3
+  -
+    name: ghcr.io/rstudio/content-pro:r3.6.3-py3.6.13-bionic
+    python:
+      installations:
+        -
+          path: /opt/python/3.6.13/bin/python3.6
+          version: 3.6.13
+    r:
+      installations:
+        -
+          path: /opt/R/3.6.3/bin/R
+          version: 3.6.3
+  -
+    name: ghcr.io/rstudio/content-pro:r3.6.3-py3.8.8-bionic
     python:
       installations:
         -
@@ -73,7 +121,31 @@ images:
           path: /opt/R/3.6.3/bin/R
           version: 3.6.3
   -
-    name: ghcr.io/rstudio/content-base:r4.0.5-py3.8.8-bionic
+    name: ghcr.io/rstudio/content-pro:r4.0.5-py3.6.13-bionic
+    python:
+      installations:
+        -
+          path: /opt/python/3.6.13/bin/python3.6
+          version: 3.6.13
+    r:
+      installations:
+        -
+          path: /opt/R/4.0.5/bin/R
+          version: 4.0.5
+  -
+    name: ghcr.io/rstudio/content-pro:r4.0.5-py3.7.10-bionic
+    python:
+      installations:
+        -
+          path: /opt/python/3.7.10/bin/python3.7
+          version: 3.7.10
+    r:
+      installations:
+        -
+          path: /opt/R/4.0.5/bin/R
+          version: 4.0.5
+  -
+    name: ghcr.io/rstudio/content-pro:r4.0.5-py3.8.8-bionic
     python:
       installations:
         -
@@ -85,7 +157,7 @@ images:
           path: /opt/R/4.0.5/bin/R
           version: 4.0.5
   -
-    name: ghcr.io/rstudio/content-base:r4.0.5-py3.9.2-bionic
+    name: ghcr.io/rstudio/content-pro:r4.0.5-py3.9.2-bionic
     python:
       installations:
         -
@@ -96,9 +168,8 @@ images:
         -
           path: /opt/R/4.0.5/bin/R
           version: 4.0.5
-
   -
-    name: ghcr.io/rstudio/content-base:r4.1.0-py3.8.8-bionic
+    name: ghcr.io/rstudio/content-pro:r4.1.0-py3.8.8-bionic
     python:
       installations:
         -
@@ -110,7 +181,7 @@ images:
           path: /opt/R/4.1.0/bin/R
           version: 4.1.0
   -
-    name: ghcr.io/rstudio/content-base:r4.1.0-py3.9.2-bionic
+    name: ghcr.io/rstudio/content-pro:r4.1.0-py3.9.2-bionic
     python:
       installations:
         -
@@ -121,9 +192,8 @@ images:
         -
           path: /opt/R/4.1.0/bin/R
           version: 4.1.0
-
   -
-    name: ghcr.io/rstudio/content-base:r4.1.3-py3.10.4-bionic
+    name: ghcr.io/rstudio/content-pro:r4.1.3-py3.10.4-bionic
     python:
       installations:
         -

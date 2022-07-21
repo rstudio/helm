@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.39-alpha02](https://img.shields.io/badge/Version-0.2.39--alpha02-informational?style=flat-square) ![AppVersion: 2022.07.0-dev-228](https://img.shields.io/badge/AppVersion-2022.07.0--dev--228-informational?style=flat-square)
+![Version: 0.2.39-alpha03](https://img.shields.io/badge/Version-0.2.39--alpha03-informational?style=flat-square) ![AppVersion: 2022.07.0-dev-428](https://img.shields.io/badge/AppVersion-2022.07.0--dev--428-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.39-alpha02:
+To install the chart with the release name `my-release` at version 0.2.39-alpha03:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-connect --version=0.2.39-alpha02
+helm install --devel my-release rstudio/rstudio-connect --version=0.2.39-alpha03
 ```
 
 ## Required Configuration
@@ -81,7 +81,8 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
 | ingress.tls | list | `[]` |  |
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
-| launcher.customRuntimeYaml | bool | `false` | Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "false," which pulls in the default runtime.yaml file. If changing this value, be careful to include the images that you have already used. |
+| launcher.additionalRuntimeImages | list | `[]` | Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key). If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list". |
+| launcher.customRuntimeYaml | string | `"base"` | Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default runtime.yaml file. If changing this value, be careful to include the images that you have already used. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). |
 | launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init-preview","tag":""}` | Image definition for the default RStudio Connect Content InitContainer |
 | launcher.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. |
 | launcher.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |

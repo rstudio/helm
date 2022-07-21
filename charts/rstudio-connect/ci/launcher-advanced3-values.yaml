@@ -5,6 +5,7 @@ rbac:
 securityContext: null
 launcher:
   enabled: true
+  customRuntimeYaml: pro
   additionalRuntimeImages:
     - name: ghcr.io/rstudio/content-base:r4.1.0-py3.9.2-bionic
       python:
@@ -15,18 +16,3 @@ launcher:
         installations:
           - path: /opt/R/4.1.0/bin/R
             version: 4.1.0
-  customRuntimeYaml:
-    name: Kubernetes
-    images:
-      -
-        name: ghcr.io/rstudio/content-base:r3.1.3-py2.7.18-bionic
-        python:
-          installations:
-            -
-              path: /opt/python/2.7.18/bin/python2.7
-              version: 2.7.18
-        r:
-          installations:
-            -
-              path: /opt/R/3.1.3/bin/R
-              version: 3.1.3
