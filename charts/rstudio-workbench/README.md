@@ -316,6 +316,28 @@ config:
           - "two-image:tag
 ```
 
+### Ingress
+
+Here are some examples how to define the ingress:
+
+**Subdomain**
+
+```yaml
+  hosts:
+    - host: subdomain.domain.com
+      paths:
+        - /
+```
+
+**Subpath**
+
+```yaml
+  hosts:
+    - host: domain.com
+      paths:
+        - /subpath(/|$)(.*)
+```
+
 ## Values
 
 | Key | Type | Default | Description |
