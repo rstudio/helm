@@ -16,19 +16,11 @@ Please consider removing this configuration value.
 {{- end }}
 
 {{- if hasKey .Values.config "Launcher" }}
-{{- if hasKey .Values.config.Launcher "DataDir" }}
-{{- if contains ":" .Values.config.Launcher.DataDir }}
-
-NOTE: `config.Launcher.DataDir` is configured with a ":". When a ":" character
-is found, Connect treats this configuration as an NFS connection string. Connect then
-uses this information to create NFS volumes when mounting the DataDir to the content
-pods created by the Launcher. This feature will be removed in the next release of Connect.
-  - Please consider setting `sharedStorage.mountContent = true` instead.
-  - When `sharedStorage.mountContent = true`, `config.Launcher.DataDir`
-    should not be set.
-
-{{- end }}
-{{- end }}
+  {{- if hasKey .Values.config.Launcher "DataDir" }}
+    {{- if contains ":" .Values.config.Launcher.DataDir }}
+      {{- fail "NOTE: `config.Launcher.DataDir` is configured with a ':'. This functionality has been removed. Instead, please use a Persistent Volume Claim through the `sharedStorage` values and unset `config.Launcher.DataDir`." -}}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 {{- end }}
