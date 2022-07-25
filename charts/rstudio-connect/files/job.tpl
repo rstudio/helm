@@ -11,8 +11,18 @@ metadata:
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
     {{- end }}
     {{- end }}
+    {{- with $templateData.job.annotations }}
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+    {{- end }}
+    {{- end }}
   labels:
     {{- with .Job.metadata.job.labels }}
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+    {{- end }}
+    {{- end }}
+    {{- with $templateData.job.labels }}
     {{- range $key, $val := . }}
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
     {{- end }}
@@ -42,8 +52,18 @@ spec:
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- end }}
         {{- end }}
+        {{- with $templateData.pod.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
       labels:
         {{- with .Job.metadata.pod.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
+        {{- with $templateData.pod.labels }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- end }}
