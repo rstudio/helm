@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.39-alpha04](https://img.shields.io/badge/Version-0.2.39--alpha04-informational?style=flat-square) ![AppVersion: 2022.07.0](https://img.shields.io/badge/AppVersion-2022.07.0-informational?style=flat-square)
+![Version: 0.2.39-rc01](https://img.shields.io/badge/Version-0.2.39--rc01-informational?style=flat-square) ![AppVersion: 2022.07.0](https://img.shields.io/badge/AppVersion-2022.07.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.39-alpha04:
+To install the chart with the release name `my-release` at version 0.2.39-rc01:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-connect --version=0.2.39-alpha04
+helm install --devel my-release rstudio/rstudio-connect --version=0.2.39-rc01
 ```
 
 ## Required Configuration
@@ -135,7 +135,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Annotations for the Persistent Volume Claim |
 | sharedStorage.create | bool | `false` | Whether to create the persistentVolumeClaim for shared storage |
 | sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
-| sharedStorage.mountContent | bool | `false` | Whether the persistentVolumeClaim should be mounted to the content pods created by the Launcher |
+| sharedStorage.mountContent | bool | `true` | Whether the persistentVolumeClaim should be mounted to the content pods created by the Launcher |
 | sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | sharedStorage.path | string | `"/var/lib/rstudio-connect"` | The path to mount the sharedStorage claim within the Connect pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | The volume of storage to request for this persistent volume claim |
