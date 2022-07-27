@@ -1,8 +1,9 @@
-# Devel
+# 0.3.0
 
 - BETA BREAKING: We moved `launcher.contentInitContainer` customizations to `launcher.defaultInitContainer`
   - This should only affect if you are using `launcher.enabled=true`, which is still in Beta
   - Values are treated the same, so a simple modification to the key should resolve any issues
+- RStudio Connect with off-host execution is now in Public Beta
 - Add support for the `launcher.useTemplates` value
   - This enables greater customization of session creation as well as better labels and annotations out of the box
   - To make use of the default session templates, configure values in `launcher.sessionTemplate`

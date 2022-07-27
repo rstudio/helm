@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.2.39-rc01](https://img.shields.io/badge/Version-0.2.39--rc01-informational?style=flat-square) ![AppVersion: 2022.07.0](https://img.shields.io/badge/AppVersion-2022.07.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![AppVersion: 2022.07.0](https://img.shields.io/badge/AppVersion-2022.07.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -23,12 +23,19 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.39-rc01:
+To install the chart with the release name `my-release` at version 0.3.0:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-connect --version=0.2.39-rc01
+helm install my-release rstudio/rstudio-connect --version=0.3.0
 ```
+
+### NOTE
+
+> NOTE: Off-Host execution via Kubernetes (a.k.a. running Connect content in
+> their own dedicated pods) is now in Public Beta. Please
+> [see the formal documentation
+> here](https://docs.rstudio.com/helm/rstudio-connect/kubernetes-howto/intro/overview.html).
 
 ## Required Configuration
 
