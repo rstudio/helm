@@ -24,7 +24,7 @@ main() {
   if [[ -n "$RSW_LOAD_BALANCING" ]]; then
     _logf "Enabling load-balancing by making sure that the /mnt/load-balancer/rstudio/load-balancer file exists"
     mkdir -p /mnt/load-balancer/rstudio/
-    touch "/mnt/load-balancer/rstudio/load-balancer"
+    echo -e "balancer=sessions\nwww-host-name=$(hostname -i)" > /mnt/load-balancer/rstudio/load-balancer
   fi
 
   _logf 'Preparing dirs'
@@ -35,6 +35,9 @@ main() {
     /var/lib/rstudio-server 2>&1 | _indent
 
   _writeEtcRstudioReadme
+
+  # TODO: necessary until https://github.com/rstudio/rstudio-pro/issues/3638
+  cp /mnt/configmap/rstudio/health-check /mnt/dynamic/rstudio/
 
   _logf 'Replacing process with %s' "${startup_script}"
   exec "${startup_script}"
