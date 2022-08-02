@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.4.0-rc01](https://img.shields.io/badge/Version-0.4.0--rc01-informational?style=flat-square) ![AppVersion: 2022.04.0-7](https://img.shields.io/badge/AppVersion-2022.04.0--7-informational?style=flat-square)
+![Version: 0.4.0-rc01](https://img.shields.io/badge/Version-0.4.0--rc01-informational?style=flat-square) ![AppVersion: 2022.07.2-11](https://img.shields.io/badge/AppVersion-2022.07.2--11-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 

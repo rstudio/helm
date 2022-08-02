@@ -1,5 +1,7 @@
 # 0.4.0
 
+- Update default RStudio Package Manager version to 2022.07.2-11
+
 - Package Manager now runs as non-root by default and the default
   `containerSecurityContext` has been updated to reflect the permissions
   required to do so.
