@@ -1,3 +1,7 @@
+# 0.3.16
+
+- Update default RStudio Package Manager version to 2022.07.2-11
+
 # 0.3.15
 
 - Bump rstudio-library chart version
