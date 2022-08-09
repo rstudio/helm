@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.17](https://img.shields.io/badge/Version-0.5.17-informational?style=flat-square) ![AppVersion: 2022.02.3-492.pro3](https://img.shields.io/badge/AppVersion-2022.02.3--492.pro3-informational?style=flat-square)
+![Version: 0.5.18](https://img.shields.io/badge/Version-0.5.18-informational?style=flat-square) ![AppVersion: 2022.07.1-554.pro3](https://img.shields.io/badge/AppVersion-2022.07.1--554.pro3-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.17:
+To install the chart with the release name `my-release` at version 0.5.18:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.17
+helm install my-release rstudio/rstudio-workbench --version=0.5.18
 ```
 
 ## Required Configuration
@@ -383,6 +383,7 @@ config:
 | loadBalancer.forceEnabled | bool | `false` | whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` |  |
+| pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
@@ -407,6 +408,9 @@ config:
 | service.nodePort | bool | `false` | the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.type | string | `"NodePort"` | the service type (i.e. NodePort, LoadBalancer, etc.) |
+| serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
+| serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
+| serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |
 | session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
