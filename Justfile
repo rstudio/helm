@@ -37,3 +37,28 @@ rbac:
 lint:
   #!/bin/bash
   ct lint ./charts --target-branch main
+
+snapshot-rsw:
+  #!/bin/bash
+  set -xe
+
+  helm template ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" > charts/rstudio-workbench/snapshot/default.yaml
+  
+  for file in `ls ./charts/rstudio-workbench/ci/*.yaml`; do
+    filename=$(basename $file)
+    helm template ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" -f $file > charts/rstudio-workbench/snapshot/$filename
+  done
+
+snapshot-rsw-lock:
+  #!/bin/bash
+  set -xe
+  for file in `ls ./charts/rstudio-workbench/snapshot/*.yaml`; do
+    cp $file $file.lock
+  done
+
+snapshot-rsw-diff:
+  #!/bin/bash
+  for file in `ls ./charts/rstudio-workbench/snapshot/*.yaml`; do
+    echo Diffing $file
+    diff $file $file.lock
+  done

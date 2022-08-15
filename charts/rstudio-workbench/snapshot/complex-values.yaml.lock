@@ -1,0 +1,1068 @@
+---
+# Source: rstudio-workbench/templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: release-name-rstudio-workbench
+  namespace: training-cole
+---
+# Source: rstudio-workbench/templates/configmap-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-rstudio-workbench-secret
+  namespace: training-cole
+stringData:
+  
+  database.conf: |
+  launcher.pem: |
+    abc
+    
+  secure-cookie-key: |
+    abc
+---
+# Source: rstudio-workbench/templates/configmap-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-rstudio-workbench-user
+  namespace: training-cole
+stringData:  
+  some-value.conf.test: |
+    some-value
+---
+# Source: rstudio-workbench/templates/configmap-session.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-rstudio-workbench-session-secret
+  namespace: training-cole
+stringData:
+  
+  odbc.ini: |
+    [hello]
+    uid=someval
+---
+# Source: rstudio-workbench/templates/license-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-rstudio-workbench-license
+  namespace: training-cole
+type: Opaque
+stringData:
+  rstudio-workbench: "test"
+---
+# Source: rstudio-workbench/templates/configmap-general.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-config
+  namespace: training-cole
+data:
+
+  
+  health-check: |
+    # HELP active_sessions health_check metric Active RStudio sessions
+    # TYPE active_sessions gauge
+    active_sessions #active-sessions#
+    # HELP idle_seconds health_check metric Time since active RStudio sessions
+    # TYPE idle_seconds gauge
+    idle_seconds #idle-seconds#
+    # HELP cpu_percent health_check metric cpu (percentage)
+    # TYPE cpu_percent gauge
+    cpu_percent #cpu-percent#
+    # HELP memory_percent health_check metric memory used (percentage)
+    # TYPE memory_percent gauge
+    memory_percent #memory-percent#
+    # HELP swap_percent health_check metric swap used (percentage)
+    # TYPE swap_percent gauge
+    swap_percent #swap-percent#
+    # HELP load_average health_check metric cpu load average
+    # TYPE load_average gauge
+    load_average #load-average#
+    # HELP license_days_left the number of days left on the license
+    # TYPE license_days gauge
+    license_days_left #license-days-left#
+    
+  jupyter.conf: |
+    default-session-cluster=Kubernetes
+    jupyter-exe=/opt/python/3.6.5/bin/jupyter
+    labs-enabled=1
+    notebooks-enabled=1
+  launcher.conf: |
+    [cluster]
+    name=Kubernetes
+    type=Kubernetes
+  
+    [server]
+    address=127.0.0.1
+    admin-group=rstudio-server
+    authorization-enabled=1
+    enable-debug-logging=1
+    port=5559
+    server-user=rstudio-server
+    thread-pool-size=4
+  
+  launcher.kubernetes.conf: |
+    kubernetes-namespace=training-cole
+    use-templating=0
+  logging.conf: |
+    [*]
+    log-level=info
+    logger-type=stderr
+  
+  rserver.conf: |
+    admin-enabled=1
+    auth-pam-sessions-enabled=1
+    launcher-address=127.0.0.1
+    launcher-default-cluster=Kubernetes
+    launcher-port=5559
+    launcher-sessions-callback-address=http://127.0.0.1:8787
+    launcher-sessions-enabled=1
+    monitor-graphite-client-id=rstudio
+    monitor-graphite-enabled=1
+    monitor-graphite-host=127.0.0.1
+    monitor-graphite-port=9109
+    server-health-check-enabled=1
+    server-project-sharing=1
+    www-port=8787
+  vscode-user-settings.json: |
+    {
+          "terminal.integrated.shell.linux": "/bin/bash",
+          "extensions.autoUpdate": false,
+          "extensions.autoCheckUpdates": false
+    }
+    
+  vscode.conf: |
+    args=--verbose --host=0.0.0.0
+    enabled=1
+    exe=/opt/code-server/bin/code-server
+
+  
+  
+  launcher.kubernetes.profiles.conf: |
+  
+    [*]
+    allow-unknown-images=1
+    container-images=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
+    default-container-image=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
+    job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json","/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionSecretVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionSecretVolumeMount.json"
+  
+  
+  
+  launcher-env: |
+  
+    Environment:
+      TEST=1
+      TEST2=2
+    JobType: session
+  
+  
+    Environment:
+      TESTA=A
+      TESTB=B
+    JobType: adhoc
+  
+  
+  
+  
+  launcher-mounts: |
+    ClaimName: rstudio-server-home-storage
+    MountPath: /home
+    MountType: KubernetesPersistentVolumeClaim
+  
+    ClaimName: rstudio-shared-data
+    MountPath: /shared
+    MountType: KubernetesPersistentVolumeClaim
+---
+# Source: rstudio-workbench/templates/configmap-general.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-overrides-old
+  namespace: training-cole
+data:
+  test: |
+    {
+      "array": [
+        "one",
+        {
+          "two": [
+            "three",
+            4,
+            false
+          ]
+        }
+      ],
+      "one": "two",
+      "three": "four"
+    }
+  two: |
+    {
+      "three": "four"
+    }
+---
+# Source: rstudio-workbench/templates/configmap-general.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-overrides-new
+  namespace: training-cole
+data:
+    
+  defaultSessionSecretVolume.json: |
+    {
+      "name": "session-secret",
+      "secret": {
+        "defaultMode": 272,
+        "secretName": "release-name-rstudio-workbench-session-secret"
+      }
+    }
+  defaultSessionSecretVolumeMount.json: |
+    {
+      "mountPath": "/mnt/session-secret/",
+      "name": "session-secret"
+    }
+  defaultSessionVolume.json: |
+    {
+      "configMap": {
+        "defaultMode": 420,
+        "name": "release-name-rstudio-workbench-session"
+      },
+      "name": "session-config"
+    }
+  defaultSessionVolumeMount.json: |
+    {
+      "mountPath": "/mnt/session-configmap/rstudio",
+      "name": "session-config"
+    }
+---
+# Source: rstudio-workbench/templates/configmap-graphite-exporter.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-graphite
+  namespace: training-cole
+data:
+  graphite-mapping.yaml: |-
+    mappings:
+    - labels:
+        duration: $2
+        host: $1
+      match: rstudio\.([\w-]+)\.system\.load\.(.*)
+      match_type: regex
+      name: rstudio_system_load_test
+---
+# Source: rstudio-workbench/templates/configmap-pam.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-pam
+  namespace: training-cole
+data:
+  
+  pam-example: |
+    # anotherkey
+    session some_other_thing.so
+    
+    # somekey
+    account some_thing.so
+    
+  pam-example-2: |
+    account some_thing.so
+    session something_else.so
+---
+# Source: rstudio-workbench/templates/configmap-prestart.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-prestart
+  namespace: training-cole
+data:
+  prestart-workbench.bash: |
+    #!/bin/bash
+    set -o errexit
+    set -o pipefail
+    
+    main() {
+      local startup_script="${1:-/usr/local/bin/startup.sh}"
+      local dyn_dir='/mnt/dynamic/rstudio'
+    
+      local launcher_pem='/mnt/secret-configmap/rstudio/launcher.pem'
+      local launcher_pub="${dyn_dir}/launcher.pub"
+    
+      _logf 'Ensuring %s exists' "${dyn_dir}"
+      mkdir -p "${dyn_dir}"
+    
+      if [[ ! -s "${launcher_pub}" ]] && [[ -f "${launcher_pem}" ]]; then
+        _logf 'Generating %s from %s' "${launcher_pub}" "${launcher_pem}"
+        openssl rsa -in "${launcher_pem}" -outform PEM -pubout -out "${launcher_pub}" 2>&1 | _indent
+        chmod -v 600 "${launcher_pub}" 2>&1 | _indent
+      else
+        _logf 'Ensuring %s does not exist' "${launcher_pub}"
+        rm -vf "${launcher_pub}" 2>&1 | _indent
+      fi
+    
+      if [[ -n "$RSW_LOAD_BALANCING" ]]; then
+        _logf "Enabling load-balancing by making sure that the /mnt/load-balancer/rstudio/load-balancer file exists"
+        mkdir -p /mnt/load-balancer/rstudio/
+        echo -e "balancer=sessions\nwww-host-name=$(hostname -i)" > /mnt/load-balancer/rstudio/load-balancer
+      fi
+    
+      _logf 'Preparing dirs'
+      mkdir -p \
+        /var/lib/rstudio-server/monitor/log
+      chown -v -R \
+        rstudio-server:rstudio-server \
+        /var/lib/rstudio-server 2>&1 | _indent
+    
+      _writeEtcRstudioReadme
+    
+      # TODO: necessary until https://github.com/rstudio/rstudio-pro/issues/3638
+      cp /mnt/configmap/rstudio/health-check /mnt/dynamic/rstudio/
+    
+      _logf 'Replacing process with %s' "${startup_script}"
+      exec "${startup_script}"
+    }
+    
+    _logf() {
+      local msg="${1}"
+      shift
+      local now
+      now="$(date -u +%Y-%m-%dT%H:%M:%S)"
+      local format_string
+      format_string="$(printf '#----> prestart-workbench.bash %s: %s' "${now}" "${msg}")\\n"
+      # shellcheck disable=SC2059
+      printf "${format_string}" "${@}"
+    }
+    
+    _indent() {
+      sed -u 's/^/       /'
+    }
+    
+    _writeEtcRstudioReadme() {
+      _logf 'Writing README to empty /etc/rstudio directory'
+      (cat <<$HERE$
+    The contents of this configuration directory have been moved to other directories
+    in order to facilitate running in Kubernetes. The directories are specified via
+    the XDG_CONFIG_DIRS environment variable defined in the Helm chart. The currently
+    defined directories are:
+    
+    $(echo "$XDG_CONFIG_DIRS" | sed 's/:/\n/g')
+    $HERE$
+      ) > /etc/rstudio/README
+    }
+    
+    main "${@}"
+    
+  prestart-launcher.bash: |
+    #!/bin/bash
+    set -o errexit
+    set -o pipefail
+    
+    main() {
+      local startup_script="${1:-/usr/lib/rstudio-server/bin/rstudio-launcher}"
+      local dyn_dir='/mnt/dynamic/rstudio'
+    
+      local cacert='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+      local k8s_url="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+    
+      _logf 'Loading service account token'
+      local sa_token
+      sa_token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    
+      _logf 'Ensuring %s exists' "${dyn_dir}"
+      mkdir -p "${dyn_dir}"
+    
+      # Empty if enabled, set to "disabled" by default
+      if [[ -z "${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}" ]]; then
+        _logf 'Checking kubernetes health via %s' "${k8s_url}"
+        # shellcheck disable=SC2086
+        curl ${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS} \
+          -H "Authorization: Bearer ${sa_token}" \
+          --cacert "${cacert}" \
+          "${k8s_url}/livez?verbose" 2>&1 | _indent
+        printf '\n'
+      else
+        _logf "Not checking kubernetes health because RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK=${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}"
+        printf '\n'
+      fi
+    
+      _logf 'Configuring certs'
+      cp -v "${cacert}" ${dyn_dir}/k8s-cert 2>&1 | _indent
+      mkdir -p /usr/local/share/ca-certificates/Kubernetes
+      cp -v \
+        ${dyn_dir}/k8s-cert \
+        /usr/local/share/ca-certificates/Kubernetes/cert-Kubernetes.crt 2>&1 | _indent
+    
+      _logf 'Updating CA certificates'
+      PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        update-ca-certificates 2>&1 | _indent
+    
+      _logf 'Preparing dirs'
+      mkdir -p \
+        /var/lib/rstudio-launcher/Local \
+        /var/lib/rstudio-launcher/Kubernetes
+      chown -v -R \
+        rstudio-server:rstudio-server \
+        /var/lib/rstudio-launcher 2>&1 | _indent
+    
+      _logf 'Replacing process with %s' "${startup_script}"
+      exec "${startup_script}"
+    }
+    
+    _logf() {
+      local msg="${1}"
+      shift
+      local now
+      now="$(date -u +%Y-%m-%dT%H:%M:%S)"
+      local format_string
+      format_string="$(printf '#----> prestart-launcher.bash %s: %s' "${now}" "${msg}")\\n"
+      # shellcheck disable=SC2059
+      printf "${format_string}" "${@}"
+    }
+    
+    _indent() {
+      sed -u 's/^/       /'
+    }
+    
+    main "${@}"
+---
+# Source: rstudio-workbench/templates/configmap-session.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-session
+  namespace: training-cole
+data:
+  
+  notifications.conf: |
+  r-versions: |
+    Label=test
+    Path=/opt/R/3.6.3
+  
+    Label=other
+    Path=/opt/R/4.0.2
+  
+  repos.conf: |
+    CRAN=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+    RSPM=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+  rsession.conf: |
+---
+# Source: rstudio-workbench/templates/configmap-startup.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-start-rsw
+  namespace: training-cole
+data:
+  rstudio-workbench.conf: |
+    [program:rstudio-workbench]
+    command=/scripts/prestart-workbench.bash /usr/local/bin/startup.sh
+    autorestart=false
+    numprocs=1
+    stdout_logfile=/dev/stdout
+    stdout_logfile_maxbytes=0
+    stderr_logfile=/dev/stderr
+    stderr_logfile_maxbytes=0
+---
+# Source: rstudio-workbench/templates/configmap-startup.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-start-launcher
+  namespace: training-cole
+data:
+  rstudio-launcher.conf: |
+    [program:rstudio-launcher]
+    command=/scripts/prestart-launcher.bash /usr/lib/rstudio-server/bin/rstudio-launcher
+    autorestart=false
+    numprocs=1
+    stdout_logfile=/dev/stdout
+    stdout_logfile_maxbytes=0
+    stderr_logfile=/dev/stderr
+    stderr_logfile_maxbytes=0
+---
+# Source: rstudio-workbench/templates/configmap-startup.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-start-user
+  namespace: training-cole
+data:
+  
+  sssd.conf: |
+    [program:sssd]
+    command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
+    autorestart=false
+    numprocs=1
+    stdout_logfile=/dev/stdout
+    stdout_logfile_maxbytes=0
+    stdout_logfile_backups=0
+    stderr_logfile=/dev/stderr
+    stderr_logfile_maxbytes=0
+    stderr_logfile_backups=0
+---
+# Source: rstudio-workbench/templates/configmap-startup.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-start-custom
+  namespace: training-cole
+data:
+  
+  somefile.conf.test: |
+    some-value
+---
+# Source: rstudio-workbench/templates/extra-objects.yaml
+apiVersion: v1
+data:
+  something: fun
+kind: ConfigMap
+metadata:
+  name: test
+---
+# Source: rstudio-workbench/templates/extra-objects.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "test2"
+data:
+  something: fun2
+---
+# Source: rstudio-workbench/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: release-name-rstudio-workbench-shared-storage
+  namespace: training-cole
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 200Gi
+---
+# Source: rstudio-workbench/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: release-name-rstudio-workbench-home-storage
+  namespace: training-cole
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 500Gi
+---
+# Source: rstudio-workbench/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: release-name-rstudio-workbench
+  namespace: training-cole
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "pods/log"
+    verbs:
+      - "get"
+      - "watch"
+      - "list"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+      - "pods/attach"
+      - "pods/exec"
+    verbs:
+      - "get"
+      - "create"
+      - "update"
+      - "patch"
+      - "watch"
+      - "list"
+      - "delete"
+  - apiGroups:
+      - ""
+    resources:
+      - "events"
+    verbs:
+      - "watch"
+  - apiGroups:
+      - ""
+    resources:
+      - "services"
+    verbs:
+      - "create"
+      - "get"
+      - "watch"
+      - "list"
+      - "delete"
+  - apiGroups:
+      - "batch"
+    resources:
+      - "jobs"
+    verbs:
+      - "create"
+      - "update"
+      - "patch"
+      - "get"
+      - "watch"
+      - "list"
+      - "delete"
+  - apiGroups:
+      - "metrics.k8s.io"
+    resources:
+      - "pods"
+    verbs:
+      - "get"
+---
+# Source: rstudio-workbench/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: release-name-rstudio-workbench
+  namespace: training-cole
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: release-name-rstudio-workbench
+subjects:
+  - kind: ServiceAccount
+    name: release-name-rstudio-workbench
+    namespace: training-cole
+---
+# Source: rstudio-workbench/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-rstudio-workbench
+  namespace: training-cole
+  labels:
+    helm.sh/chart: rstudio-workbench-0.5.19
+    app.kubernetes.io/name: rstudio-workbench
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "2022.07.1-554.pro3"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    key: "value"
+    
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: rstudio-workbench
+    app.kubernetes.io/instance: release-name
+  ports:
+  - protocol: TCP
+    name: http
+    port: 80
+    nodePort: 31878
+    targetPort: 8787
+  - name: metrics
+    port: 9108
+---
+# Source: rstudio-workbench/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-rstudio-workbench
+  namespace: training-cole
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 100%
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rstudio-workbench
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      annotations:
+        checksum/config-general: 4892ed8863026d78c8423fb430bf677549b2c5587eaef86a80606233299b705a
+        checksum/config-graphite: e3199ebf57b77cbfe7cf9f9920602aa62af15e15979e5c52b7d98531bb3c728d
+        checksum/config-prestart: b10f8bd837857b3a937c3a3672b0b51d4b273f9a5f92a5585471ec909a8991d8
+        checksum/config-secret: 4ac346fe5eb3d7763b11254f3155305db42c1e730fc240a4e8d9ae0413ca7424
+        checksum/config-session: afcb3ea07b690c6ac387349f07f8a9534f8074e4c07347f53cbe1deb78cc19d0
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9108"
+        testannotation2: "three"
+        
+      labels:
+        app.kubernetes.io/name: rstudio-workbench
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/part-of: rstudio-team
+    spec:
+      serviceAccountName: release-name-rstudio-workbench
+      imagePullSecrets:
+        - name: some-secret
+      shareProcessNamespace: false      
+      containers:
+      - name: rstudio
+        image: "rstudio/rstudio-server-pro:daily"
+        env:
+        - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
+          value: "-fsSL"
+        - name: RSTUDIO_LAUNCHER_NAMESPACE
+          value: "training-cole"
+        
+        - name: RSW_LICENSE
+          valueFrom:
+            secretKeyRef:
+              name: release-name-rstudio-workbench-license
+              key: rstudio-workbench
+        - name: RSW_LAUNCHER
+          value: "true"
+        - name: RSW_TESTUSER
+          value: ""
+        - name: RSW_LOAD_BALANCING
+          value: "true"
+        - name: XDG_CONFIG_DIRS
+          value: "/tmp/base/:/tmp/one/:/tmp/two/"
+        - name: TEST_ENV_WORKS
+          value: "true"
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 8787
+          name: http
+        securityContext:
+          {}
+        volumeMounts:
+          - name: rstudio-shared-storage
+            mountPath: "/var/lib/awesome"
+          - name: rstudio-home-storage
+            mountPath: "/mnt/home"
+          - name: rstudio-prestart
+            mountPath: "/scripts/"
+          - name: rstudio-config
+            mountPath: "/mnt/configmap/rstudio/"
+          - name: rstudio-session-config
+            mountPath: "/mnt/session-configmap/rstudio/"
+          - name: rstudio-session-secret
+            mountPath: /mnt/session-secret/
+          - name: rstudio-secret
+            mountPath: "/mnt/secret-configmap/rstudio/"
+          - name: rstudio-user
+            mountPath: "/etc/sssd/conf.d/"
+          - name: etc-rstudio
+            mountPath: "/etc/rstudio"
+          - name: rstudio-rsw-startup
+            mountPath: "/startup/base"
+          - name: rstudio-launcher-startup
+            mountPath: "/startup/launcher"
+          - name: rstudio-user-startup
+            mountPath: "/startup/user-provisioning"
+          - name: rstudio-custom-startup
+            mountPath: "/startup/custom"
+          - name: rstudio-pam
+            mountPath: "/etc/pam.d/pam-example"
+            subPath: "pam-example"
+          - name: rstudio-pam
+            mountPath: "/etc/pam.d/pam-example-2"
+            subPath: "pam-example-2"
+          
+          - name: rstudio-job-overrides-old
+            mountPath: "/mnt/job-json-overrides"
+          - name: rstudio-job-overrides-new
+            mountPath: "/mnt/job-json-overrides-new"
+          - mountPath: /tmp/somepath
+            name: key
+        resources:
+          limits:
+        readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health-check
+                  port: 8787
+                initialDelaySeconds: 3
+                periodSeconds: 3
+                successThreshold: 1
+                timeoutSeconds: 1
+      - name: exporter
+        image: "prom/graphite-exporter:v0.9.0"
+        imagePullPolicy: "IfNotPresent"
+        args:
+          - "--graphite.mapping-config=/mnt/graphite/graphite-mapping.yaml"
+        volumeMounts:
+          - name: graphite-exporter-config
+            mountPath: "/mnt/graphite/"
+        ports:
+        - containerPort: 9108
+          name: metrics
+      - image: busybox
+        imagePullPolicy: IfNotPresent
+        name: test
+      volumes:
+      - name: rstudio-shared-storage
+        persistentVolumeClaim:
+          claimName: release-name-rstudio-workbench-shared-storage
+      - name: rstudio-home-storage
+        persistentVolumeClaim:
+          claimName: release-name-rstudio-workbench-home-storage
+      - name: rstudio-job-overrides-old
+        configMap:
+          name: release-name-rstudio-workbench-overrides-old
+          defaultMode: 420
+      - name: rstudio-job-overrides-new
+        configMap:
+          name: release-name-rstudio-workbench-overrides-new
+          defaultMode: 420
+      - name: etc-rstudio
+        emptyDir: {}
+      - name: rstudio-config
+        configMap:
+          name: release-name-rstudio-workbench-config
+          defaultMode: 420
+      - name: rstudio-session-config
+        configMap:
+          name: release-name-rstudio-workbench-session
+          defaultMode: 420
+      - name: rstudio-session-secret
+        secret:
+          secretName: release-name-rstudio-workbench-session-secret
+          defaultMode: 272
+      - name: rstudio-prestart
+        configMap:
+          name: release-name-rstudio-workbench-prestart
+          defaultMode: 493
+      - name: rstudio-rsw-startup
+        configMap:
+          name: release-name-rstudio-workbench-start-rsw
+          defaultMode: 493
+      - name: rstudio-launcher-startup
+        configMap:
+          name: release-name-rstudio-workbench-start-launcher
+          defaultMode: 493
+      - name: rstudio-user-startup
+        configMap:
+          name: release-name-rstudio-workbench-start-user
+          defaultMode: 493
+      - name: rstudio-custom-startup
+        configMap:
+          name: release-name-rstudio-workbench-start-custom
+          defaultMode: 493
+      - name: rstudio-pam
+        configMap:
+          name: release-name-rstudio-workbench-pam
+          defaultMode: 420
+      - name: rstudio-secret
+        secret:
+          secretName: release-name-rstudio-workbench-secret
+          defaultMode: 384
+      - name: rstudio-user
+        secret:
+          secretName: release-name-rstudio-workbench-user
+          defaultMode: 384
+      
+      - name: graphite-exporter-config
+        configMap:
+          name: release-name-rstudio-workbench-graphite
+          defaultMode: 420
+      - emptyDir: {}
+        name: key
+---
+# Source: rstudio-workbench/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: release-name-rstudio-workbench
+  labels:
+    helm.sh/chart: rstudio-workbench-0.5.19
+    app.kubernetes.io/name: rstudio-workbench
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "2022.07.1-554.pro3"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: "workbench.rstudio.com"
+      http:
+        paths:
+          -            
+            path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: release-name-rstudio-workbench
+                port:
+                  number: 80
+---
+# Source: rstudio-workbench/templates/tests/test-verify-installation.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: release-name-rstudio-workbench-test
+  annotations:
+   "helm.sh/hook": test
+spec:
+  serviceAccountName: release-name-rstudio-workbench
+  imagePullSecrets:
+    - name: some-secret
+  shareProcessNamespace: false
+  restartPolicy: Never
+  
+  containers:
+  - name: rstudio
+    image: "rstudio/rstudio-server-pro:daily"
+    env:
+    - name: DIAGNOSTIC_DIR
+      value: "/var/log/rstudio"
+    - name: DIAGNOSTIC_ONLY
+      value: "true"
+    - name: DIAGNOSTIC_ENABLE
+      value: "true"
+    - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
+      value: "-fsSL"
+    - name: RSTUDIO_LAUNCHER_NAMESPACE
+      value: "training-cole"
+    
+    - name: RSW_LICENSE
+      valueFrom:
+        secretKeyRef:
+          name: release-name-rstudio-workbench-license
+          key: rstudio-workbench
+    - name: RSW_LAUNCHER
+      value: "true"
+    - name: RSW_TESTUSER
+      value: "rstudio"
+    - name: RSW_TESTUSER_UID
+      value: "10000"
+    - name: RSW_TESTUSER_PASSWD
+      value: "rstudio"
+    - name: RSW_LOAD_BALANCING
+      value: "true"
+    - name: XDG_CONFIG_DIRS
+      value: "/tmp/base/:/tmp/one/:/tmp/two/"
+    - name: TEST_ENV_WORKS
+      value: "true"
+    imagePullPolicy: "IfNotPresent"
+    ports:
+    - containerPort: 8787
+      name: http
+    securityContext:
+      {}
+    volumeMounts:
+      - name: rstudio-shared-storage
+        mountPath: "/var/lib/awesome"
+      - name: rstudio-home-storage
+        mountPath: "/mnt/home"
+      - name: rstudio-prestart
+        mountPath: "/scripts/"
+      - name: rstudio-config
+        mountPath: "/mnt/configmap/rstudio/"
+      - name: rstudio-session-config
+        mountPath: "/mnt/session-configmap/rstudio/"
+      - name: rstudio-session-secret
+        mountPath: /mnt/session-secret/
+      - name: rstudio-secret
+        mountPath: "/mnt/secret-configmap/rstudio/"
+      - name: rstudio-user
+        mountPath: "/etc/sssd/conf.d/"
+      - name: etc-rstudio
+        mountPath: "/etc/rstudio"
+      - name: rstudio-rsw-startup
+        mountPath: "/startup/base"
+      - name: rstudio-launcher-startup
+        mountPath: "/startup/launcher"
+      - name: rstudio-user-startup
+        mountPath: "/startup/user-provisioning"
+      - name: rstudio-custom-startup
+        mountPath: "/startup/custom"
+      - name: rstudio-pam
+        mountPath: "/etc/pam.d/pam-example"
+        subPath: "pam-example"
+      - name: rstudio-pam
+        mountPath: "/etc/pam.d/pam-example-2"
+        subPath: "pam-example-2"
+      
+      - name: rstudio-job-overrides-old
+        mountPath: "/mnt/job-json-overrides"
+      - name: rstudio-job-overrides-new
+        mountPath: "/mnt/job-json-overrides-new"
+      - mountPath: /tmp/somepath
+        name: key
+    resources:
+      limits:
+  - image: busybox
+    imagePullPolicy: IfNotPresent
+    name: test
+  volumes:
+  - name: rstudio-shared-storage
+    persistentVolumeClaim:
+      claimName: release-name-rstudio-workbench-shared-storage
+  - name: rstudio-home-storage
+    persistentVolumeClaim:
+      claimName: release-name-rstudio-workbench-home-storage
+  - name: rstudio-job-overrides-old
+    configMap:
+      name: release-name-rstudio-workbench-overrides-old
+      defaultMode: 420
+  - name: rstudio-job-overrides-new
+    configMap:
+      name: release-name-rstudio-workbench-overrides-new
+      defaultMode: 420
+  - name: etc-rstudio
+    emptyDir: {}
+  - name: rstudio-config
+    configMap:
+      name: release-name-rstudio-workbench-config
+      defaultMode: 420
+  - name: rstudio-session-config
+    configMap:
+      name: release-name-rstudio-workbench-session
+      defaultMode: 420
+  - name: rstudio-session-secret
+    secret:
+      secretName: release-name-rstudio-workbench-session-secret
+      defaultMode: 272
+  - name: rstudio-prestart
+    configMap:
+      name: release-name-rstudio-workbench-prestart
+      defaultMode: 493
+  - name: rstudio-rsw-startup
+    configMap:
+      name: release-name-rstudio-workbench-start-rsw
+      defaultMode: 493
+  - name: rstudio-launcher-startup
+    configMap:
+      name: release-name-rstudio-workbench-start-launcher
+      defaultMode: 493
+  - name: rstudio-user-startup
+    configMap:
+      name: release-name-rstudio-workbench-start-user
+      defaultMode: 493
+  - name: rstudio-custom-startup
+    configMap:
+      name: release-name-rstudio-workbench-start-custom
+      defaultMode: 493
+  - name: rstudio-pam
+    configMap:
+      name: release-name-rstudio-workbench-pam
+      defaultMode: 420
+  - name: rstudio-secret
+    secret:
+      secretName: release-name-rstudio-workbench-secret
+      defaultMode: 384
+  - name: rstudio-user
+    secret:
+      secretName: release-name-rstudio-workbench-user
+      defaultMode: 384
+  
+  - emptyDir: {}
+    name: key

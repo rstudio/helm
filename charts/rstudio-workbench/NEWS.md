@@ -1,3 +1,7 @@
+# 0.5.19
+
+- Add a simple mechanism for snapshot testing to make stronger backwards compatibility guarantees
+
 # 0.5.18
 
 - Add a ServiceMonitor CRD and values to configure
