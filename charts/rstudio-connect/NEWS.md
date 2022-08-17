@@ -1,3 +1,6 @@
+# 0.3.1
+- Bump Connect version to 2022.08.0
+
 # 0.3.0
 
 - BETA BREAKING: We moved `launcher.contentInitContainer` customizations to `launcher.defaultInitContainer`
