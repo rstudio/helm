@@ -144,9 +144,18 @@ containers:
     - name: rstudio-job-overrides-new
       mountPath: "/mnt/job-json-overrides-new"
     {{- end }}
-    # mount into the default scratch-path...
+    {{- if .Values.launcher.useTemplates }}
+    # mount into the default scratch-path... what if it gets changed?
     - name: session-templates
-      mountPath: "/var/lib/rstudio-launcher/Kubernetes/"
+      mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+      subPath: "rstudio-library-templates-data.tpl"
+    - name: session-templates
+      mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+      subPath: "job.tpl"
+    - name: session-templates
+      mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+      subPath: "service.tpl"
+    {{- end }}
     {{- if .Values.pod.volumeMounts }}
     {{- toYaml .Values.pod.volumeMounts | nindent 4 }}
     {{- end }}
@@ -288,10 +297,12 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-graphite
     defaultMode: {{ .Values.config.defaultMode.server }}
 {{- end }}
+{{- if .Values.launcher.useTemplates }}
 - name: session-templates
   configMap:
     name: {{ include "rstudio-workbench.fullname" .}}-templates
     defaultMode: {{ .Values.config.defaultMode.server }}
+{{- end }}
 {{- if .Values.pod.volumes }}
 {{ toYaml .Values.pod.volumes }}
 {{- end }}
@@ -410,7 +421,3 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
 {{- end -}}
-
-{{- define "rstudio-library.templates.data" -}}
-{"pod":{"initContainers":[],"volumeMounts":[],"volumes":[]},"service":{"type":"NodePort"}}
-{{- end }}
