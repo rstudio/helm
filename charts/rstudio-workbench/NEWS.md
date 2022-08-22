@@ -1,3 +1,9 @@
+# 0.5.22
+
+- add option and values for `launcher.useTemplates` and `launcher.templateValues`
+  - this mechanism is useful for simplifying session configuration and replaces `job-json-overrides`
+  - both will continue being used for now, but they are incompatible and will generate an error if both are used
+
 # 0.5.21
 
 - Fix an issue in the startup script to verify that the dir exists 
