@@ -146,6 +146,289 @@ data:
       "name": "session-config"
     }
 ---
+# Source: rstudio-workbench/templates/configmap-general.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-rstudio-workbench-templates
+  namespace: rstudio
+data:
+  rstudio-library-templates-data.tpl: |
+    {{- define "rstudio-library.templates.data" -}}
+    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"}},"pod":{"annotations":{"one":"two"},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"serviceAccountName":"test","volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
+    {{- end }}
+  job.tpl: |
+    # Version: 2
+    # DO NOT MODIFY the "Version: " key
+    # Helm Version: v1
+    {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      generateName: {{ toYaml .Job.generateName }}
+      annotations:
+        {{- with $templateData.job.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+      labels:
+        {{- with $templateData.job.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          annotations:
+            {{- if .Job.tags }}
+            {{- $i := 0 }}
+            {{- range .Job.tags }}
+            USER_TAG_{{ $i }}: {{ toYaml . | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- $i = add $i 1 }}
+            {{- end }}
+            {{- end }}
+            stdin: {{ toYaml .Job.stdin | indent 8 | trimPrefix (repeat 8 " ") }}
+            user: {{ toYaml .Job.user }}
+            name: {{ toYaml .Job.name }}
+            service_ports: {{ toYaml .Job.servicePortsJson }}
+            {{- with $templateData.pod.annotations }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
+          labels:
+            {{- with $templateData.pod.labels }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
+          generateName: {{ toYaml .Job.generateName }}
+        spec:
+          {{- if .Job.host }}
+          nodeName: {{ toYaml .Job.host }}
+          {{- end }}
+          restartPolicy: Never
+          {{- with $templateData.pod.serviceAccountName }}
+          serviceAccountName: {{- . }}
+          {{- end }}
+          shareProcessNamespace: {{ .Job.shareProcessNamespace }}
+          {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
+          volumes:
+            {{- range .Job.volumes }}
+            - {{ nindent 10 (toYaml .) | trim -}}
+            {{- end }}
+            {{- range $templateData.pod.volumes }}
+            - {{ nindent 10 (toYaml .) | trim -}}
+            {{- end }}
+          {{- end }}
+          {{- if ne (len .Job.placementConstraints) 0 }}
+          nodeSelector:
+            {{- range .Job.placementConstraints }}
+            {{ .name }}: {{ toYaml .value }}
+            {{- end }}
+          {{- end }}
+          {{- $securityContext := dict }}
+          {{- if .Job.container.runAsUserId }}
+            {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
+          {{- end }}
+          {{- if .Job.container.runAsGroupId }}
+            {{- $_ := set $securityContext "runAsGroup" .Job.container.runAsGroupId }}
+          {{- end }}
+          {{- if .Job.container.supplementalGroupIds }}
+            {{- $groupIds := list }}
+            {{- range .Job.container.supplementalGroupIds }}
+              {{- $groupIds = append $groupIds . }}
+            {{- end }}
+            {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
+          {{- end }}
+          {{- if $securityContext }}
+          securityContext:
+            {{- range $key, $val := $securityContext }}
+            {{ $key }}: {{ $val }}
+            {{- end }}
+          {{- end }}
+          {{- with $templateData.pod.imagePullSecrets }}
+          imagePullSecrets: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          initContainers:
+            {{- with $templateData.pod.initContainers }}
+              {{- range . }}
+            - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
+              {{- end }}
+            {{- end }}
+          containers:
+            - name: rs-launcher-container
+              image: {{ toYaml .Job.container.image }}
+              {{- with $templateData.pod.imagePullPolicy }}
+              imagePullPolicy: {{- . | nindent 12 }}
+              {{- end }}
+              {{- $isShell := false }}
+              {{- if .Job.command }}
+              command: ['/bin/sh']
+              {{- $isShell = true }}
+              {{- else }}
+              command: [{{ toYaml .Job.exe }}]
+              {{- $isShell = false }}
+              {{- end }}
+              {{- if .Job.stdin }}
+              stdin: true
+              {{- else }}
+              stdin: false
+              {{- end }}
+              stdinOnce: true
+              {{- if .Job.workingDirectory }}
+              workingDir: {{ toYaml .Job.workingDirectory }}
+              {{- end }}
+              {{- if or (ne (len .Job.args) 0) $isShell }}
+              args:
+                {{- if $isShell }}
+                - '-c'
+                {{- if ne (len .Job.args) 0 }}
+                - {{ .Job.args | join " " | cat .Job.command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- else }}
+                - {{ .Job.command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- end }}
+                {{- else }}
+                {{- range .Job.args }}
+                - {{ toYaml . | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- $secrets := list }}
+              {{- range .Job.config }}
+                {{- if eq .name "secret" }}
+                  {{- $packedSecret := .value }}
+                  {{- $secret := dict }}
+                  {{- $_ := set $secret "secret" (splitList ":" $packedSecret | first) }}
+                  {{- $_ := set $secret "key" (slice (splitList ":" $packedSecret) 1 2 | first) }}
+                  {{- $_ := set $secret "name" (splitList ":" $packedSecret | last) }}
+                  {{- $secrets = append $secrets $secret }}
+                {{- end }}
+              {{- end }}
+              {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) }}
+              env:
+                {{- range .Job.environment }}
+                - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
+                  value: {{ toYaml .value | indent 14 | trimPrefix (repeat 14 " ") }}
+                {{- end }}
+                {{- range $secrets }}
+                - name: {{ get . "name"}}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ get . "secret" }}
+                      key: {{ get . "key" }}
+                {{- end }}
+              {{- end }}
+              {{- $exposedPorts := list }}
+              {{- range .Job.exposedPorts }}
+                {{- if .publishedPort }}
+                  {{- $exposedPorts = append $exposedPorts . }}
+                {{- end }}
+              {{- end }}
+              {{- if ne (len $exposedPorts) 0 }}
+              ports:
+                {{- range $exposedPorts }}
+                - containerPort: {{ .targetPort }}
+                  hostPort: {{ .publishedPort }}
+                {{- end }}
+              {{- end }}
+              {{- $limits := dict }}
+              {{- $requests := dict }}
+              {{- range .Job.resourceLimits }}
+                {{- if eq .type "cpuCount" }}
+                  {{- $_ := set $limits "cpu" .value }}
+                  {{- if ne $.Job.cpuRequestRatio 1.0 }}
+                    {{- $val := mulf .value $.Job.cpuRequestRatio | toString }}
+                    {{- $_ := set $requests "cpu" $val }}
+                  {{- end }}
+                {{- else if eq .type "memory" }}
+                  {{- $_ := set $limits "memory" (printf "%s%s" .value "M") }}
+                  {{- if ne $.Job.memoryRequestRatio 1.0 }}
+                    {{- $val := mulf .value $.Job.memoryRequestRatio }}
+                    {{- $_ := set $requests "memory" (printf "%.2f%s" $val "M") }}
+                  {{- end }}
+                {{- else if eq .type "NVIDIA GPUs" }}
+                  {{- $val := float64 .value }}
+                  {{- if ne $val 0.0 }}
+                    {{- $_ := set $limits "nvidia.com/gpu" $val }}
+                  {{- end }}
+                {{- else if eq .type "AMD GPUs" }}
+                  {{- $val := float64 .value }}
+                  {{- if ne $val 0.0 }}
+                    {{- $_ := set $limits "amd.com/gpu" $val }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if any (ne (len $requests) 0) (ne (len $limits) 0) }}
+              resources:
+                {{- if ne (len $requests) 0 }}
+                requests:
+                  {{- range $key, $val := $requests }}
+                  {{ $key }}: {{ toYaml $val }}
+                  {{- end }}
+                {{- end }}
+                {{- if ne (len $limits) 0 }}
+                limits:
+                  {{- range $key, $val := $limits }}
+                  {{ $key }}: {{ toYaml $val }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
+              volumeMounts:
+                {{- range .Job.volumeMounts }}
+                - {{ nindent 14 (toYaml .) | trim -}}
+                {{- end }}
+                {{- range $templateData.pod.volumeMounts }}
+                - {{ nindent 14 (toYaml .) | trim -}}
+                {{- end }}
+              {{- end }}
+            {{- with $templateData.pod.extraContainers }}
+              {{- toYaml . | nindent 8 }}
+            {{- end }}
+    
+  service.tpl: |
+    # Version: 2
+    # DO NOT MODIFY the "Version: " key
+    # Helm Version: v1
+    {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: {{ .Job.serviceName }}
+      annotations:
+        {{- with $templateData.service.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+      labels:
+        job-name: {{ toYaml .Job.id }}
+        {{- with $templateData.service.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
+    spec:
+      ports:
+        {{- $i := 0 }}
+        {{- range .Job.exposedPorts }}
+        {{- if not .publishedPort }}
+        - name: {{ printf "port%d" $i }}
+          protocol: {{ .protocol }}
+          port: {{ .targetPort }}
+          targetPort: {{ .targetPort }}
+          {{- $i = add $i 1 }}
+        {{- end }}
+        {{- end }}
+      selector:
+        job-name: {{toYaml .Job.id }}
+      clusterIP: ''
+      type: {{ $templateData.service.type }}
+---
 # Source: rstudio-workbench/templates/configmap-graphite-exporter.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -517,7 +800,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 5c6678f70ce2e9a72b3ef20e50355667b0f7aee40c8a178e3705e7f818c341c6
+        checksum/config-general: 406ebd8de6831787d09dcd97eb2865bac80fa50c5848250ea734d51d8b605ac5
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 80ff25c04b7848168cdbb4308d4b6c211baed5b9454e7dd3f3e694419236d81f
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
@@ -573,6 +856,16 @@ spec:
           
           - name: rstudio-job-overrides-new
             mountPath: "/mnt/job-json-overrides-new"
+          # mount into the default scratch-path... what if it gets changed?
+          - name: session-templates
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            subPath: "rstudio-library-templates-data.tpl"
+          - name: session-templates
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+            subPath: "job.tpl"
+          - name: session-templates
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+            subPath: "service.tpl"
         resources:
           limits:
         readinessProbe:
@@ -634,6 +927,10 @@ spec:
       - name: graphite-exporter-config
         configMap:
           name: release-name-rstudio-workbench-graphite
+          defaultMode: 420
+      - name: session-templates
+        configMap:
+          name: release-name-rstudio-workbench-templates
           defaultMode: 420
 ---
 # Source: rstudio-workbench/templates/tests/test-verify-installation.yaml
@@ -699,6 +996,16 @@ spec:
       
       - name: rstudio-job-overrides-new
         mountPath: "/mnt/job-json-overrides-new"
+      # mount into the default scratch-path... what if it gets changed?
+      - name: session-templates
+        mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+        subPath: "rstudio-library-templates-data.tpl"
+      - name: session-templates
+        mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+        subPath: "job.tpl"
+      - name: session-templates
+        mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+        subPath: "service.tpl"
     resources:
       limits:
   volumes:
@@ -736,3 +1043,8 @@ spec:
     secret:
       secretName: release-name-rstudio-workbench-secret
       defaultMode: 384
+  
+  - name: session-templates
+    configMap:
+      name: release-name-rstudio-workbench-templates
+      defaultMode: 420
