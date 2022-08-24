@@ -65,6 +65,7 @@ launcher:
     enabled: true
     extraCurlArgs: ["-fsSL"]
   useTemplates: false
+  extraTemplates: {}
   templateValues:
     service:
       type: ClusterIP

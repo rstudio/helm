@@ -124,4 +124,8 @@ data:
     {{- .Files.Get "files/job.tpl" | nindent 4 }}
   service.tpl: |
     {{- .Files.Get "files/service.tpl" | nindent 4 }}
+  {{- range $key,$val := .Values.launcher.extraTemplates }}
+  {{ $key }}: |
+    {{- $val | nindent 4 }}
+  {{- end }}
 {{- end }}

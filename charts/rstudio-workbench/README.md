@@ -367,6 +367,7 @@ config:
 | initContainers | bool | `false` | the initContainer spec that will be used verbatim |
 | jobJsonOverridesFiles | object | `{}` | jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents |
 | launcher.enabled | bool | `true` | determines whether the launcher should be started in the container |
+| launcher.extraTemplates | object | `{}` |  |
 | launcher.kubernetesHealthCheck | object | `{"enabled":true,"extraCurlArgs":["-fsSL"]}` | configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup |
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
 | launcher.templateValues.job.annotations | object | `{}` |  |
