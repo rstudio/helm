@@ -74,7 +74,7 @@ data:
   
   launcher.kubernetes.conf: |
     kubernetes-namespace=rstudio
-    use-templating=0
+    use-templating=1
   logging.conf: |
     [*]
     log-level=info
@@ -115,7 +115,6 @@ data:
     allow-unknown-images=1
     container-images=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
     default-container-image=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
-    job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json"
   
   
   
@@ -125,28 +124,7 @@ data:
   launcher-mounts: |
 ---
 # Source: rstudio-workbench/templates/configmap-general.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: release-name-rstudio-workbench-overrides-new
-  namespace: rstudio
-data:
-    
-  defaultSessionVolume.json: |
-    {
-      "configMap": {
-        "defaultMode": 420,
-        "name": "release-name-rstudio-workbench-session"
-      },
-      "name": "session-config"
-    }
-  defaultSessionVolumeMount.json: |
-    {
-      "mountPath": "/mnt/session-configmap/rstudio",
-      "name": "session-config"
-    }
 ---
-# Source: rstudio-workbench/templates/configmap-general.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -800,7 +778,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 406ebd8de6831787d09dcd97eb2865bac80fa50c5848250ea734d51d8b605ac5
+        checksum/config-general: c39623187aa52867e06fa1b0c14a7a08634fefef2e2a5c848785819aff594e56
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 80ff25c04b7848168cdbb4308d4b6c211baed5b9454e7dd3f3e694419236d81f
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
@@ -854,8 +832,6 @@ spec:
           - name: rstudio-user-startup
             mountPath: "/startup/user-provisioning"
           
-          - name: rstudio-job-overrides-new
-            mountPath: "/mnt/job-json-overrides-new"
           # mount into the default scratch-path... what if it gets changed?
           - name: session-templates
             mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
@@ -889,10 +865,6 @@ spec:
         - containerPort: 9108
           name: metrics
       volumes:
-      - name: rstudio-job-overrides-new
-        configMap:
-          name: release-name-rstudio-workbench-overrides-new
-          defaultMode: 420
       - name: etc-rstudio
         emptyDir: {}
       - name: rstudio-config
@@ -994,8 +966,6 @@ spec:
       - name: rstudio-user-startup
         mountPath: "/startup/user-provisioning"
       
-      - name: rstudio-job-overrides-new
-        mountPath: "/mnt/job-json-overrides-new"
       # mount into the default scratch-path... what if it gets changed?
       - name: session-templates
         mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
@@ -1009,10 +979,6 @@ spec:
     resources:
       limits:
   volumes:
-  - name: rstudio-job-overrides-new
-    configMap:
-      name: release-name-rstudio-workbench-overrides-new
-      defaultMode: 420
   - name: etc-rstudio
     emptyDir: {}
   - name: rstudio-config

@@ -106,7 +106,6 @@ data:
   
   launcher.kubernetes.conf: |
     kubernetes-namespace=rstudio
-    use-templating=0
   logging.conf: |
     [*]
     log-level=info
@@ -693,7 +692,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 0d221fc03e1f43a0890bb09685e73d73c54428e2bbca5c777c38a7459019f1be
+        checksum/config-general: 5355ff444d7dd04f1bf497578ca52f792bcc7ac0901b4ed428428baa2815a2db
         checksum/config-graphite: 69dd73685cb821ebf5bcec3155d92801f31d72b031a4d681700bded2ff5700c2
         checksum/config-prestart: 80ff25c04b7848168cdbb4308d4b6c211baed5b9454e7dd3f3e694419236d81f
         checksum/config-secret: fc06992d38b807a70a6f5722d670969573e2ee3f82293197a2bd0d840ca3a7d4
@@ -985,11 +984,11 @@ spec:
       - name: rstudio-custom-startup
         mountPath: "/startup/custom"
       - name: rstudio-pam
-        mountPath: "/etc/pam.d/pam-example-2"
-        subPath: "pam-example-2"
-      - name: rstudio-pam
         mountPath: "/etc/pam.d/pam-example"
         subPath: "pam-example"
+      - name: rstudio-pam
+        mountPath: "/etc/pam.d/pam-example-2"
+        subPath: "pam-example-2"
       
       - name: rstudio-job-overrides-old
         mountPath: "/mnt/job-json-overrides"

@@ -84,7 +84,6 @@ data:
   
   launcher.kubernetes.conf: |
     kubernetes-namespace=rstudio
-    use-templating=0
   logging.conf: |
     [*]
     log-level=info
@@ -549,7 +548,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: eea8402fb2d6b6732b03a21aa99b53abdc8293d15b79abb90769ed3042b4dea5
+        checksum/config-general: 267112598e920968a52d4a08e195a20b44aa76222efcbdde1d7a268e79f1442f
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 80ff25c04b7848168cdbb4308d4b6c211baed5b9454e7dd3f3e694419236d81f
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4

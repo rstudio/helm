@@ -84,7 +84,6 @@ data:
   
   launcher.kubernetes.conf: |
     kubernetes-namespace=rstudio
-    use-templating=0
   launcher.kubernetes.profiles.conf: |
     [*]
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides/volumes.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides/volumeMounts.json","/spec/template/spec/containers/0/command/0":"/mnt/job-json-overrides/entrypoint.json"
@@ -547,7 +546,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 5c3829193ef40b09a6321c88ef9154b610bdee66f84e011abcaab67157eabd5e
+        checksum/config-general: 98fa5528090d53bf97e6f54261eb1bdfa67632034ae926e25240f05ec283342e
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 80ff25c04b7848168cdbb4308d4b6c211baed5b9454e7dd3f3e694419236d81f
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
