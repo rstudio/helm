@@ -24,8 +24,8 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 
 {{- if hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
 
-NOTE: `.Values.config.server.launcher\.kubernetes\.profiles\.conf` is superseded
-  - Instead, we recommend using `.Values.config.profiles.launcher\.kubernetes\.profiles\.conf
+WARNING: `.Values.config.server.launcher\.kubernetes\.profiles\.conf` is deprecated
+  - Instead, we recommend using `.Values.config.profiles.launcher\.kubernetes\.profiles\.conf` or `.Values.launcher.useTemplates`
   - Please note, `job-json-overrides` behaves differently for this new location. See NEWS.md for details.
 
 {{- end }}

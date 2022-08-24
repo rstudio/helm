@@ -34,6 +34,10 @@
     {{- end }}
   {{- end }}
 {{- end }}
+{{- if .Values.launcher.useTemplates }}
+  {{- /* this sets defaultOverrides to be empty if we are using templating */ -}}
+  {{- $defaultOverrides = list }}
+{{- end }}
 {{- $defaultProfiles := dict "default-container-image" (first $defaultImages) "container-images" $defaultImages "allow-unknown-images" 1 }}
 {{- $defaultProfilesConfig := dict "*" $defaultProfiles }}
 {{- /* Define the default rserver values - point to the launcher and IDE services in Kubernetes */}}
@@ -66,10 +70,11 @@ data:
 {{/* helper variables to make things here a bit more sane */}}
 {{- $profilesConfig := .Values.config.profiles }}
 {{- $profilesConfig = mergeOverwrite (dict "launcher.kubernetes.profiles.conf" $defaultProfilesConfig) $profilesConfig }}
-{{- $useLegacyProfiles := hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
+{{- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
 {{- $jobJsonFilePath := "/mnt/job-json-overrides-new/" }}
-{{- if not $useLegacyProfiles }}
-  {{- $profilesDict := dict "data" ($profilesConfig | deepCopy) "filePath" ($jobJsonFilePath) "jobJsonDefaults" ($defaultOverrides) }}
+{{- /* $defaultOverrides should be empty from above if we are using templates */ -}}
+{{- $profilesDict := dict "data" ($profilesConfig | deepCopy) "filePath" ($jobJsonFilePath) "jobJsonDefaults" ($defaultOverrides) }}
+{{- if not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf") }}
   {{/* generate the profiles configuration */}}
   {{- include "rstudio-library.profiles.ini.advanced" $profilesDict | nindent 2 }}
 {{- end }}
@@ -93,7 +98,7 @@ data:
 ---
 {{- end }}
 {{/* The new pattern for job-json-overrides "json" files */}}
-{{- if not $useLegacyProfiles }}
+{{- if $useNewerOverrides }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

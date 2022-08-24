@@ -25,7 +25,7 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{- define "rstudio-workbench.containers" -}}
-{{- $useLegacyProfiles := hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
+{{- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
 containers:
 - name: rstudio
   {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
@@ -140,7 +140,7 @@ containers:
     - name: rstudio-job-overrides-old
       mountPath: "/mnt/job-json-overrides"
     {{- end }}
-    {{- if not $useLegacyProfiles }}
+    {{- if $useNewerOverrides }}
     - name: rstudio-job-overrides-new
       mountPath: "/mnt/job-json-overrides-new"
     {{- end }}
@@ -226,7 +226,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-overrides-old
     defaultMode: {{ .Values.config.defaultMode.jobJsonOverrides }}
 {{- end }}
-{{- if not $useLegacyProfiles }}
+{{- if $useNewerOverrides }}
 - name: rstudio-job-overrides-new
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-overrides-new
