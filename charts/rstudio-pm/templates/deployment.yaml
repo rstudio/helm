@@ -5,13 +5,10 @@ metadata:
   name: {{ include "rstudio-pm.fullname" . }}
   namespace: {{ $.Release.Namespace }}
 spec:
+  {{- with .Values.strategy }}
   strategy:
-    type: {{ .Values.strategy.type }}
-    {{- if eq .Values.strategy.type "RollingUpdate" }}
-    rollingUpdate:
-      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
-      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:

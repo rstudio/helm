@@ -37,6 +37,7 @@ image:
   # -- an array of kubernetes secrets for pulling the main pod image from private registries
   imagePullSecrets: []
 
+# -- The update strategy used by the main service pod.
 strategy:
   type: "RollingUpdate"
   rollingUpdate:
