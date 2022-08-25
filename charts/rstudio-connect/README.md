@@ -1,33 +1,36 @@
 # RStudio Connect
 
-![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square) ![AppVersion: 2022.08.1](https://img.shields.io/badge/AppVersion-2022.08.1-informational?style=flat-square)
+![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![AppVersion: 2022.08.1](https://img.shields.io/badge/AppVersion-2022.08.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
 Business Users and Collaborators use R and Python data products on [RStudio Connect](https://www.rstudio.com/products/connect/)
 that are published by Data Scientists.
 
-## Disclaimer
+## Best Practices
 
-> This chart is "beta" quality. It will likely undergo
-> breaking changes without warning as it moves towards stability.
+Helm charts are very useful tools for deploying resources into Kubernetes, however, they do require
+some familiarity with kubernetes and `helm` itself. Please ensure you have adequate training and
+IT support before deploying these charts into production environments. Reach out to your account representative
+if you need help deciding whether helm is a good choice for your deployment.
 
-As a result, please:
+To ensure reproducibility in your environment and insulate yourself from future changes, please:
+
 * Ensure you "pin" the version of the Helm chart that you are using. You can do
   this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. IMPORTANT: This protects you from breaking changes
-* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
+  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
+* Before upgrading, to avoid breaking changes, use the `helm-diff` plugin and `helm diff upgrade` to check
   for breaking changes
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking
   changes, as well as documentation below on how to use the chart
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.2:
+To install the chart with the release name `my-release` at version 0.3.3:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.3.2
+helm install my-release rstudio/rstudio-connect --version=0.3.3
 ```
 
 ### NOTE

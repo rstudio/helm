@@ -50,6 +50,27 @@ As a result, please:
 
 {{- end }}
 
+{{- define "rstudio.best-practices" }}
+
+## Best Practices
+
+Helm charts are very useful tools for deploying resources into Kubernetes, however, they do require
+some familiarity with kubernetes and `helm` itself. Please ensure you have adequate training and
+IT support before deploying these charts into production environments. Reach out to your account representative
+if you need help deciding whether helm is a good choice for your deployment.
+
+To ensure reproducibility in your environment and insulate yourself from future changes, please:
+
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
+  this using the `helm dependency` command and the associated "Chart.lock" files
+  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
+* Before upgrading, to avoid breaking changes, use the `helm-diff` plugin and `helm diff upgrade` to check
+  for breaking changes
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking
+  changes, as well as documentation below on how to use the chart
+
+{{- end }}
+
 {{- define "rstudio.install" }}
 
 ## Installing the Chart
