@@ -17,3 +17,7 @@ High Availability using `traefik` as an ingress controller
 ### [Standalone](./standalone)
 
 Simple deployment for a single Connect host. Useful for a Proof-of-Concept
+
+### [Off-Host with Custom Images](./off-host-custom-images)
+
+Using Connect with off-host execution and custom images.
