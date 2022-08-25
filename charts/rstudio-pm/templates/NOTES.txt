@@ -21,7 +21,7 @@ WARNING: `image.pullPolicy` value has been removed in chart version 0.2.7. Pleas
   - See `NEWS.md` to note other changes between releases
 {{- end }}
 
-{{- if hasKey .Values.pod "serviceAccountName" }}
+{{- if and (hasKey .Values.pod "serviceAccountName") (.Values.pod.serviceAccountName) }}
 NOTE: `pod.serviceAccountName` is deprecated and will be removed in the future.
 Please use `serviceAccount.name` instead.
 {{- end }}
