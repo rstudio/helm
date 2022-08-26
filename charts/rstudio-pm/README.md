@@ -37,6 +37,9 @@ helm install --devel my-release rstudio/rstudio-pm --version=0.4.0-rc01
 - When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
   the `rstudio-pm` user (with `uid:gid` `999:999`)
 - This can cause problems with file ownership when using a Persistent Volume Claim or other persistent directory
+- This can also be at-odds with your configuration if you set / copied / persisted values
+  like `config.Launcher.ServerUser = root`. We added a check for this setup and a `rootCheckIsFatal` value to disable
+  the check if needed. You should only disable this check if you have good reason to do so.
 - To handle the migration of existing data owned by `root`, there is now a Helm hook that essentially runs chown on the
   data directory every time a user runs `helm upgrade`. Unfortunately, we can't detect when we actually need to run this
   migration, so it currently runs unconditionally. The rook only runs when a PersistentVolumeClaim is being used for
@@ -153,7 +156,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
-| pod.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"}}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container |
+| pod.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"}}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template. |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
@@ -165,6 +168,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
+| rootCheckIsFatal | bool | `true` | Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new helm chart version. |
 | rstudioPMKey | bool | `false` | rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
