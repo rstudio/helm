@@ -1,6 +1,9 @@
 
 {{ include "rstudio-connect.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
 
+{{- $hasLauncherDataDir := false }}
+{{- $hasLauncherDataDirPVCName := false}}
+
 {{- /* Verify configuration values */ -}}
 {{- if hasKey .Values "config" }}
 
@@ -17,9 +20,13 @@ Please consider removing this configuration value.
 
 {{- if hasKey .Values.config "Launcher" }}
   {{- if hasKey .Values.config.Launcher "DataDir" }}
+    {{- $hasLauncherDataDir = true }}
     {{- if contains ":" .Values.config.Launcher.DataDir }}
       {{- fail "NOTE: `config.Launcher.DataDir` is configured with a ':'. This functionality has been removed. Instead, please use a Persistent Volume Claim through the `sharedStorage` values and unset `config.Launcher.DataDir`." -}}
     {{- end }}
+  {{- end }}
+  {{- if hasKey .Values.config.Launcher "DataDirPVCName" }}
+    {{- $hasLauncherDataDirPVCName = true }}
   {{- end }}
 {{- end }}
 
@@ -33,6 +40,10 @@ Please consider removing this configuration value.
       {{- fail "\n\n`launcher.launcherKubernetesProfilesConf` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`" }}
     {{- end }}
   {{- end }}
+{{- end }}
+
+{{- if and .Values.launcher.enabled (and (not .Values.sharedStorage.create) (not .Values.sharedStorage.mount) (not $hasLauncherDataDir) (not $hasLauncherDataDirPVCName) ) }}
+  {{- fail "\n\nWhen launcher is enabled, persistent storage must be provided.\nThis is usually done via a PersistentVolumeClaim (PVC) with `sharedStorage.create=true`, although there are other options."}}
 {{- end }}
 
 {{- if .Values.launcher.contentInitContainer }}
