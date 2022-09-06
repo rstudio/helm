@@ -37,6 +37,7 @@ image:
   # -- an array of kubernetes secrets for pulling the main pod image from private registries
   imagePullSecrets: []
 
+# -- The update strategy used by the main service pod.
 strategy:
   type: "RollingUpdate"
   rollingUpdate:
@@ -92,6 +93,16 @@ command: false
 # -- args is the pod's run arguments. By default, it uses the container's default
 args: false
 
+# -- Enable sandboxing of Git builds, which requires elevated security
+# privileges for the Package Manager container.
+enableSandboxing: true
+
+# -- Enable migrations for shared storage (if necessary) using Helm hooks.
+enableMigration: true
+
+# -- Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new helm chart version.
+rootCheckIsFatal: true
+
 pod:
   # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
   env: []
@@ -109,13 +120,15 @@ pod:
   lifecycle: {}
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
   securityContext: {}
-  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container
+  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template.
   containerSecurityContext:
+    runAsUser: 999
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
-      # These are required for the startup R version check that runs under
-      # rsandbox when RSPM runs as root.
-      add: ["SYS_ADMIN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+    seccompProfile:
+      type: "{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
@@ -214,9 +227,6 @@ config:
     Listen: :4242
   Metrics:
     Enabled: true
-  Launcher:
-    ServerUser: root
-    AdminGroup: root
 
 # -- sidecar container list
 extraContainers: []

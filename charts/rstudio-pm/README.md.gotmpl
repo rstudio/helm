@@ -8,6 +8,14 @@
 
 {{ template "rstudio.install" . }}
 
+## Upgrade Guidance
+
+### 0.4.0
+
+- When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
+  the `rstudio-pm` user (with `uid:gid` `999:999`). A `chown` of persistent storage may be required. We will try to
+  fix this up automatically. Set `enableMigrations=false` to disable the automatic fixup / hook.
+
 ## Required Configuration
 
 This chart requires the following in order to function:

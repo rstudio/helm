@@ -11,6 +11,17 @@ NOTE: `.Values.config.Licensing.LicenseType` is configured manually. Normally, w
 Please consider removing this configuration value.
 {{- end }}
 {{- end }}
+
+{{- if hasKey .Values.config "Launcher" }}
+  {{- if hasKey .Values.config.Launcher "ServerUser" }}
+    {{- if eq (get .Values.config.Launcher "ServerUser") "root" }}
+      {{- if .Values.rootCheckIsFatal }}
+        {{- fail "\n\n`config.Launcher.ServerUser=root`, but the public helm chart and docker image now run Package Manager as non-root. Please remove the `root` values from your values file.\n\nDANGER: set `.Values.rootCheckIsFatal` to bypass this error." }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
 {{- end }}
 
 {{- if hasKey .Values.image "pullPolicy" }}
@@ -21,7 +32,7 @@ WARNING: `image.pullPolicy` value has been removed in chart version 0.2.7. Pleas
   - See `NEWS.md` to note other changes between releases
 {{- end }}
 
-{{- if hasKey .Values.pod "serviceAccountName" }}
+{{- if and (hasKey .Values.pod "serviceAccountName") (.Values.pod.serviceAccountName) }}
 NOTE: `pod.serviceAccountName` is deprecated and will be removed in the future.
 Please use `serviceAccount.name` instead.
 {{- end }}

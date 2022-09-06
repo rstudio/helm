@@ -5,13 +5,10 @@ metadata:
   name: {{ include "rstudio-pm.fullname" . }}
   namespace: {{ $.Release.Namespace }}
 spec:
+  {{- with .Values.strategy }}
   strategy:
-    type: {{ .Values.strategy.type }}
-    {{- if eq .Values.strategy.type "RollingUpdate" }}
-    rollingUpdate:
-      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
-      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
@@ -25,9 +22,10 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "2112"
-        # Required for the startup R version check that runs under rsandbox when
-        # RSPM runs as root.
+        {{- if .Values.enableSandboxing }}
+        # Required for sandboxed Git builds.
         container.apparmor.security.beta.kubernetes.io/rspm: unconfined
+        {{- end }}
         {{- include "rstudio-pm.pod.annotations" . | nindent 8 }}
       labels:
         {{- include "rstudio-pm.selectorLabels" . | nindent 8 }}
@@ -77,6 +75,17 @@ spec:
         {{- if .Values.pod.env }}
         {{- toYaml .Values.pod.env | nindent 8 }}
         {{- end }}
+        {{- if .Values.rstudioPMKey }}
+        - name: PACKAGEMANAGER_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
+              key: rstudio-pm.key
+        {{- end }}
+        {{- if (not .Values.enableSandboxing) }}
+        - name: PACKAGEMANAGER_GIT_ALLOWUNSANDBOXEDGITBUILDS
+          value: "1"
+        {{- end }}
         {{- if .Values.command }}
         command: {{ .Values.command}}
         {{- end }}
@@ -96,7 +105,7 @@ spec:
 {{- end }}
         securityContext:
         {{- if .Values.pod.containerSecurityContext }}
-          {{- toYaml .Values.pod.containerSecurityContext | nindent 10 }}
+          {{- tpl (toYaml .Values.pod.containerSecurityContext) . | nindent 10 }}
         {{- end }}
         volumeMounts:
           - name: rstudio-pm-config
@@ -106,11 +115,6 @@ spec:
           - name: aws-creds
             readOnly: true
             mountPath: "/home/rstudio-pm/.aws"
-          {{- end }}
-          {{- if .Values.rstudioPMKey }}
-          - name: rstudio-pm-key
-            mountPath: "/var/lib/rstudio-pm/rstudio-pm.key"
-            subPath: rstudio-pm.key
           {{- end }}
           {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-pm-data
@@ -168,12 +172,6 @@ spec:
       - name: aws-creds
         secret:
           secretName: {{ include "rstudio-pm.fullname" . }}-aws-creds
-      {{- end }}
-      {{- if .Values.rstudioPMKey }}
-      - name: rstudio-pm-key
-        secret:
-          secretName: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
-          defaultMode: 0600
       {{- end }}
       {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
       - name: rstudio-pm-data
