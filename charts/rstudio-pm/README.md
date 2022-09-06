@@ -35,18 +35,8 @@ helm install --devel my-release rstudio/rstudio-pm --version=0.4.0-rc01
 ### 0.4.0
 
 - When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
-  the `rstudio-pm` user (with `uid:gid` `999:999`)
-- This can cause problems with file ownership when using a Persistent Volume Claim or other persistent directory
-- This can also be at-odds with your configuration if you set / copied / persisted values
-  like `config.Launcher.ServerUser = root`. We added a check for this setup and a `rootCheckIsFatal` value to disable
-  the check if needed. You should only disable this check if you have good reason to do so.
-- To handle the migration of existing data owned by `root`, there is now a Helm hook that essentially runs chown on the
-  data directory every time a user runs `helm upgrade`. Unfortunately, we can't detect when we actually need to run this
-  migration, so it currently runs unconditionally. The rook only runs when a PersistentVolumeClaim is being used for
-  Package Manager storage. The hook can be disabled by setting `enableMigrations=false`; in the future when we no longer
-  expect users to have root-owned data, this will become the default.
-- If you are using a `volume` directly, you will need to run such a migration yourself. It is basically just a
-  recursive `chown`
+  the `rstudio-pm` user (with `uid:gid` `999:999`). A `chown` of persistent storage may be required. We will try to
+  fix this up automatically. Set `enableMigrations=false` to disable the automatic fixup / hook.
 
 ## Required Configuration
 
