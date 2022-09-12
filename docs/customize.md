@@ -169,7 +169,7 @@ Add another volume to the session pod. This time, a `PersistentVolumeClaim` name
       json:
         name: pvc-volume
         persistentVolumeClaim:
-          name: my-pvc
+          claimName: my-pvc
     - name: add-pvc-volume-mount
       target: /spec/template/spec/containers/0/volumeMounts/-
       json:
