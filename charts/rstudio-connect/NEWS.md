@@ -1,3 +1,7 @@
+# 0.3.4
+
+- Bump Connect version to 2022.09.0
+
 # 0.3.3
 
 - Add a check to provide faster feedback if `launcher.enabed=true` without setting up shared storage
