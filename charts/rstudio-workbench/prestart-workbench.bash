@@ -32,7 +32,7 @@ main() {
     /var/lib/rstudio-server/monitor/log
   chown -v -R \
     rstudio-server:rstudio-server \
-    /var/lib/rstudio-server 2>&1 | _indent
+    /var/lib/rstudio-server/Local 2>&1 | _indent
 
   _writeEtcRstudioReadme
 
