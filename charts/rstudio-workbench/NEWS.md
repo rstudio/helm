@@ -2,6 +2,7 @@
 
 - Fix an issue where chowning fails in the startup script
   - This is particularly problematic if ConfigMaps or Secrets are mounted into this directory
+- Change appVersion to reflect the new docker image naming convention: `bionic-***` to include the OS in the image name.
 
 # 0.5.19
 
