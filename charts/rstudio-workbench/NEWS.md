@@ -1,3 +1,8 @@
+# 0.5.20
+
+- Fix an issue where chowning fails in the startup script
+  - This is particularly problematic if ConfigMaps or Secrets are mounted into this directory
+
 # 0.5.19
 
 - Add a simple mechanism for snapshot testing to make stronger backwards compatibility guarantees
