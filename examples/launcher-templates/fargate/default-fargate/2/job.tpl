@@ -7,6 +7,16 @@ spec:
   backoffLimit: 0
   template:
     metadata:
+      {{- /* BEGIN CHANGE */ -}}
+      {{- $useFargate := true }}
+      {{- range .Job.placementConstraints }}
+        {{- if and (eq .name "eks.amazonaws.com/compute-type") (eq .value "not-fargate") }}
+          {{- $useFargate := false }}
+        {{- end }}
+      {{- end }}
+      labels:
+        fargate-job: {{ $useFargate | quote }}
+      {{- /* END CHANGE */}}
       annotations:
         {{- if .Job.tags }}
         {{- $i := 0 }}
@@ -32,12 +42,18 @@ spec:
         - {{ nindent 10 (toYaml .) | trim -}}
         {{- end }}
       {{- end }}
-      {{- if ne (len .Job.placementConstraints) 0 }}
+      {{- /* BEGIN CHANGE */ -}}
+      {{- /*
+	NOTE: this disables other placement constraints because there is not a
+        default key that both fargate and EKS nodes share. It is possible to
+        re-enable this behavior by copying the `.Job.placementConstraints` list
+        and removing the "fake" placement constraint we added
+      */ -}}
+      {{- if $useFargate }}
       nodeSelector:
-        {{- range .Job.placementConstraints }}
-        {{ .name }}: {{ toYaml .value }}
-        {{- end }}
+	    eks.amazonaws.com/compute-type: fargate
       {{- end }}
+      {{- /* END CHANGE */}}
       {{- $securityContext := dict }}
       {{- if .Job.container.runAsUserId }}
         {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
