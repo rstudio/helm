@@ -20,4 +20,4 @@ spec:
   selector:
     job-name: {{toYaml .Job.id }}
   clusterIP: ''
-  type: NodePort
+  type: ClusterIP

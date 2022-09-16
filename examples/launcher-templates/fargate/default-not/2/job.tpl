@@ -7,6 +7,18 @@ spec:
   backoffLimit: 0
   template:
     metadata:
+      {{- /* BEGIN CHANGE */ -}}
+      {{- $useFargate := false }}
+      {{- range .Job.placementConstraints }}
+        {{- if and (eq .name "eks.amazonaws.com/compute-type") (eq .value "fargate") }}
+          {{- $useFargate := true }}
+        {{- end }}
+      {{- end }}
+      {{- if $useFargate }}
+      labels:
+        fargate-job: {{ $useFargate | quote }}
+      {{- end }}
+      {{- /* END CHANGE */}}
       annotations:
         {{- if .Job.tags }}
         {{- $i := 0 }}
