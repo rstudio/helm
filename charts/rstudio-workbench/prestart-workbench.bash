@@ -30,9 +30,12 @@ main() {
   _logf 'Preparing dirs'
   mkdir -p \
     /var/lib/rstudio-server/monitor/log
-  chown -v -R \
+  
+  if [ -d "/var/lib/rstudio-server/Local" ]; then
+    chown -v -R \
     rstudio-server:rstudio-server \
     /var/lib/rstudio-server/Local 2>&1 | _indent
+  fi
 
   _writeEtcRstudioReadme
 
