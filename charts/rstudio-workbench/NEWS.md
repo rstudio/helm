@@ -1,3 +1,7 @@
+# 0.5.21
+
+- Fix an issue in the startup script to verify that the dir exists 
+  
 # 0.5.20
 
 - Fix an issue where chowning fails in the startup script
