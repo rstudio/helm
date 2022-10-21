@@ -144,8 +144,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
-    default-container-image=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
+    container-images=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
+    default-container-image=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json","/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionSecretVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionSecretVolumeMount.json"
   
   
@@ -312,9 +312,12 @@ data:
       _logf 'Preparing dirs'
       mkdir -p \
         /var/lib/rstudio-server/monitor/log
-      chown -v -R \
+      
+      if [ -d "/var/lib/rstudio-server/Local" ]; then
+        chown -v -R \
         rstudio-server:rstudio-server \
-        /var/lib/rstudio-server 2>&1 | _indent
+        /var/lib/rstudio-server/Local 2>&1 | _indent
+      fi
     
       _writeEtcRstudioReadme
     
@@ -650,10 +653,10 @@ metadata:
   name: release-name-rstudio-workbench
   namespace: rstudio
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.20-rc01
+    helm.sh/chart: rstudio-workbench-0.5.22
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2022.07.1-554.pro3"
+    app.kubernetes.io/version: "2022.07.2-576.pro12"
     app.kubernetes.io/managed-by: Helm
   annotations:
     key: "value"
@@ -692,9 +695,9 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 5355ff444d7dd04f1bf497578ca52f792bcc7ac0901b4ed428428baa2815a2db
+        checksum/config-general: e3d268ae99494166dc265bae42672e5b4b6230b33e037323fce4eb56829ea695
         checksum/config-graphite: 69dd73685cb821ebf5bcec3155d92801f31d72b031a4d681700bded2ff5700c2
-        checksum/config-prestart: 80ff25c04b7848168cdbb4308d4b6c211baed5b9454e7dd3f3e694419236d81f
+        checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: fc06992d38b807a70a6f5722d670969573e2ee3f82293197a2bd0d840ca3a7d4
         checksum/config-session: 1e1189618d9113414ca3b1ff32a6d723ccefa7eacb23a20c63c26910fdcca983
         prometheus.io/scrape: "true"
@@ -769,11 +772,11 @@ spec:
           - name: rstudio-custom-startup
             mountPath: "/startup/custom"
           - name: rstudio-pam
-            mountPath: "/etc/pam.d/pam-example"
-            subPath: "pam-example"
-          - name: rstudio-pam
             mountPath: "/etc/pam.d/pam-example-2"
             subPath: "pam-example-2"
+          - name: rstudio-pam
+            mountPath: "/etc/pam.d/pam-example"
+            subPath: "pam-example"
           
           - name: rstudio-job-overrides-old
             mountPath: "/mnt/job-json-overrides"
@@ -881,10 +884,10 @@ kind: Ingress
 metadata:
   name: release-name-rstudio-workbench
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.20-rc01
+    helm.sh/chart: rstudio-workbench-0.5.22
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2022.07.1-554.pro3"
+    app.kubernetes.io/version: "2022.07.2-576.pro12"
     app.kubernetes.io/managed-by: Helm
   annotations:
     kubernetes.io/ingress.class: traefik
@@ -984,11 +987,11 @@ spec:
       - name: rstudio-custom-startup
         mountPath: "/startup/custom"
       - name: rstudio-pam
-        mountPath: "/etc/pam.d/pam-example"
-        subPath: "pam-example"
-      - name: rstudio-pam
         mountPath: "/etc/pam.d/pam-example-2"
         subPath: "pam-example-2"
+      - name: rstudio-pam
+        mountPath: "/etc/pam.d/pam-example"
+        subPath: "pam-example"
       
       - name: rstudio-job-overrides-old
         mountPath: "/mnt/job-json-overrides"
