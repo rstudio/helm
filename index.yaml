@@ -4281,6 +4281,54 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-workbench
+          image: rstudio/rstudio-workbench:bionic-2022.07.2-576.pro12
+        - name: r-session-complete
+          image: rstudio/r-session-complete:bionic-2022.07.2-576.pro12
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Workbench
+          url: https://www.rstudio.com/products/workbench/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 2022.07.2-576.pro12
+    created: "2022-10-21T16:20:09.434767416Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.23
+    description: Official Helm chart for RStudio Workbench
+    digest: 5db47a19a99f07b8908a3a32284314acf80b90510e872aff531f40635880c750
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - ide
+    - editor
+    - jupyter
+    - vscode
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.5.22/rstudio-workbench-0.5.22.tgz
+    version: 0.5.22
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-workbench
           image: rstudio/rstudio-workbench:2022.07.1-554.pro3
         - name: r-session-complete
           image: rstudio/r-session-complete:bionic-2022.07.1-554.pro3
@@ -6419,4 +6467,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2022-09-23T13:56:28.014424527Z"
+generated: "2022-10-21T16:20:09.436290509Z"
