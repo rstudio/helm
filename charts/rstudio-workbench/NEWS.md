@@ -3,6 +3,9 @@
 - add option and values for `launcher.useTemplates` and `launcher.templateValues`
   - this mechanism is useful for simplifying session configuration and replaces `job-json-overrides`
   - both will continue being used for now, but they are incompatible and will generate an error if both are used
+  - Advanced topics include `launcher.includeDefaultTemplates=false` and `launcher.extraTemplates`
+- bump Workbench version to 2022.07.2-576.pro12
+- add a value for `image.tagPrefix` to make choosing operating system for the server image easier. Default is `bionic-`
 
 # 0.5.21
 

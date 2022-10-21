@@ -29,7 +29,8 @@ If release name contains chart name it will be used as a full name.
 containers:
 - name: rstudio
   {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-  image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
+  {{- $imageTag := .Values.image.tag | default (printf "%s%s" .Values.image.tagPrefix $defaultVersion )}}
+  image: "{{ .Values.image.repository }}:{{ $imageTag }}"
   env:
   {{- if .Values.diagnostics.enabled }}
   - name: DIAGNOSTIC_DIR

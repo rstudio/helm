@@ -117,13 +117,17 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-templates
   namespace: {{ $.Release.Namespace }}
 data:
+  {{- if .Values.launcher.includeTemplateValues }}
   rstudio-library-templates-data.tpl: |
     {{- $tplData := dict "name" "rstudio-library.templates.data" "value" $sessionTemplate }}
     {{- include "rstudio-library.templates.dataOutput" $tplData | nindent 4}}
+  {{- end }}
+  {{- if .Values.launcher.includeDefaultTemplates }}
   job.tpl: |
     {{- .Files.Get "files/job.tpl" | nindent 4 }}
   service.tpl: |
     {{- .Files.Get "files/service.tpl" | nindent 4 }}
+  {{- end }}
   {{- range $key,$val := .Values.launcher.extraTemplates }}
   {{ $key }}: |
     {{- $val | nindent 4 }}
