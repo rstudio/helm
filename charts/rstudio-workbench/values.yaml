@@ -397,7 +397,7 @@ config:
         name: Kubernetes
         type: Kubernetes
     jupyter.conf:
-      jupyter-exe: /opt/python/3.6.5/bin/jupyter
+      jupyter-exe: /usr/local/bin/jupyter
       notebooks-enabled: 1
       labs-enabled: 1
       default-session-cluster: Kubernetes
