@@ -25,11 +25,12 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{- define "rstudio-workbench.containers" -}}
-{{- $useLegacyProfiles := hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
+{{- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
 containers:
 - name: rstudio
   {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-  image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default $defaultVersion }}"
+  {{- $imageTag := .Values.image.tag | default (printf "%s%s" .Values.image.tagPrefix $defaultVersion )}}
+  image: "{{ .Values.image.repository }}:{{ $imageTag }}"
   env:
   {{- if .Values.diagnostics.enabled }}
   - name: DIAGNOSTIC_DIR
@@ -140,9 +141,21 @@ containers:
     - name: rstudio-job-overrides-old
       mountPath: "/mnt/job-json-overrides"
     {{- end }}
-    {{- if not $useLegacyProfiles }}
+    {{- if $useNewerOverrides }}
     - name: rstudio-job-overrides-new
       mountPath: "/mnt/job-json-overrides-new"
+    {{- end }}
+    {{- if .Values.launcher.useTemplates }}
+    # mount into the default scratch-path... what if it gets changed?
+    - name: session-templates
+      mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+      subPath: "rstudio-library-templates-data.tpl"
+    - name: session-templates
+      mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+      subPath: "job.tpl"
+    - name: session-templates
+      mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+      subPath: "service.tpl"
     {{- end }}
     {{- if .Values.pod.volumeMounts }}
     {{- toYaml .Values.pod.volumeMounts | nindent 4 }}
@@ -214,7 +227,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-overrides-old
     defaultMode: {{ .Values.config.defaultMode.jobJsonOverrides }}
 {{- end }}
-{{- if not $useLegacyProfiles }}
+{{- if $useNewerOverrides }}
 - name: rstudio-job-overrides-new
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-overrides-new
@@ -283,6 +296,12 @@ volumes:
 - name: graphite-exporter-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-graphite
+    defaultMode: {{ .Values.config.defaultMode.server }}
+{{- end }}
+{{- if .Values.launcher.useTemplates }}
+- name: session-templates
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" .}}-templates
     defaultMode: {{ .Values.config.defaultMode.server }}
 {{- end }}
 {{- if .Values.pod.volumes }}

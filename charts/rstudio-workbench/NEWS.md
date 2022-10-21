@@ -1,3 +1,15 @@
+# 0.5.22
+
+- BREAKING: change jupyter path from `/opt/python/3.6.5/bin/jupyter` to `/usr/local/bin/jupyter`
+  - This will hopefully not affect your deployment, but it depends on how your image is built
+  - We have recently changed all of our images to symlink jupyter to `/usr/local/bin/jupyter`
+- add option and values for `launcher.useTemplates` and `launcher.templateValues`
+  - this mechanism is useful for simplifying session configuration and replaces `job-json-overrides`
+  - both will continue being used for now, but they are incompatible and will generate an error if both are used
+  - Advanced topics include `launcher.includeDefaultTemplates=false` and `launcher.extraTemplates`
+- bump Workbench version to 2022.07.2-576.pro12
+- add a value for `image.tagPrefix` to make choosing operating system for the server image easier. Default is `bionic-`
+
 # 0.5.21
 
 - Fix an issue in the startup script to verify that the dir exists 

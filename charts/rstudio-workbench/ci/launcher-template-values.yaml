@@ -1,0 +1,25 @@
+launcher:
+  enabled: true
+  useTemplates: true
+  templateValues:
+    service:
+      type: ClusterIP
+      annotations:
+        five: six
+    job:
+      annotations:
+        seven: eight
+      labels:
+        nine: ten
+    pod:
+      serviceAccountName: test
+      annotations:
+        one: two
+      labels:
+        three: four
+      volumes:
+        - name: test
+          emptyDir: {}
+      volumeMounts:
+        - name: test
+          mountPath: /tmp/mnt

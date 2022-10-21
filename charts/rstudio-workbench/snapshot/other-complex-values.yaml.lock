@@ -4,14 +4,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: release-name-rstudio-workbench
-  namespace: training-cole
+  namespace: rstudio
 ---
 # Source: rstudio-workbench/templates/configmap-secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: release-name-rstudio-workbench-secret
-  namespace: training-cole
+  namespace: rstudio
 stringData:
   
   database.conf: |
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: release-name-rstudio-workbench-license
-  namespace: training-cole
+  namespace: rstudio
 type: Opaque
 stringData:
   rstudio-workbench: "test"
@@ -36,7 +36,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-config
-  namespace: training-cole
+  namespace: rstudio
 data:
 
   
@@ -83,8 +83,7 @@ data:
     thread-pool-size=4
   
   launcher.kubernetes.conf: |
-    kubernetes-namespace=training-cole
-    use-templating=0
+    kubernetes-namespace=rstudio
   logging.conf: |
     [*]
     log-level=info
@@ -123,8 +122,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
-    default-container-image=rstudio/r-session-complete:bionic-2022.07.1-554.pro3
+    container-images=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
+    default-container-image=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json"
   
   
@@ -155,7 +154,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-overrides-old
-  namespace: training-cole
+  namespace: rstudio
 data:
   test: |
     {
@@ -182,7 +181,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-overrides-new
-  namespace: training-cole
+  namespace: rstudio
 data:
     
   defaultSessionVolume.json: |
@@ -204,7 +203,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-graphite
-  namespace: training-cole
+  namespace: rstudio
 data:
   graphite-mapping.yaml: |-
     mappings:
@@ -220,7 +219,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-prestart
-  namespace: training-cole
+  namespace: rstudio
 data:
   prestart-workbench.bash: |
     #!/bin/bash
@@ -255,9 +254,12 @@ data:
       _logf 'Preparing dirs'
       mkdir -p \
         /var/lib/rstudio-server/monitor/log
-      chown -v -R \
+      
+      if [ -d "/var/lib/rstudio-server/Local" ]; then
+        chown -v -R \
         rstudio-server:rstudio-server \
-        /var/lib/rstudio-server 2>&1 | _indent
+        /var/lib/rstudio-server/Local 2>&1 | _indent
+      fi
     
       _writeEtcRstudioReadme
     
@@ -348,7 +350,7 @@ data:
         /var/lib/rstudio-launcher/Kubernetes
       chown -v -R \
         rstudio-server:rstudio-server \
-        /var/lib/rstudio-launcher 2>&1 | _indent
+        /var/lib/rstudio-launcher/Local 2>&1 | _indent
     
       _logf 'Replacing process with %s' "${startup_script}"
       exec "${startup_script}"
@@ -376,7 +378,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-session
-  namespace: training-cole
+  namespace: rstudio
 data:
   
   notifications.conf: |
@@ -397,7 +399,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-start-rsw
-  namespace: training-cole
+  namespace: rstudio
 data:
   rstudio-workbench.conf: |
     [program:rstudio-workbench]
@@ -414,7 +416,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-start-launcher
-  namespace: training-cole
+  namespace: rstudio
 data:
   rstudio-launcher.conf: |
     [program:rstudio-launcher]
@@ -431,7 +433,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-rstudio-workbench-start-user
-  namespace: training-cole
+  namespace: rstudio
 data:
   
   sssd.conf: |
@@ -451,7 +453,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: release-name-rstudio-workbench-shared-storage
-  namespace: training-cole
+  namespace: rstudio
   annotations:
     helm.sh/resource-policy: keep
 spec:
@@ -468,7 +470,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: release-name-rstudio-workbench-home-storage
-  namespace: training-cole
+  namespace: rstudio
   annotations:
     "helm.sh/resource-policy": keep
 spec:
@@ -485,7 +487,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: release-name-rstudio-workbench
-  namespace: training-cole
+  namespace: rstudio
 rules:
   - apiGroups:
       - ""
@@ -549,7 +551,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: release-name-rstudio-workbench
-  namespace: training-cole
+  namespace: rstudio
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -557,19 +559,19 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: release-name-rstudio-workbench
-    namespace: training-cole
+    namespace: rstudio
 ---
 # Source: rstudio-workbench/templates/svc.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: release-name-rstudio-workbench
-  namespace: training-cole
+  namespace: rstudio
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.19
+    helm.sh/chart: rstudio-workbench-0.5.22
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2022.07.1-554.pro3"
+    app.kubernetes.io/version: "2022.07.2-576.pro12"
     app.kubernetes.io/managed-by: Helm
   annotations:
     key: "value"
@@ -593,7 +595,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-rstudio-workbench
-  namespace: training-cole
+  namespace: rstudio
 spec:
   strategy:
     type: RollingUpdate
@@ -608,11 +610,11 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: f929fa56134496ef7c9c961345d06f3dcc2c1a10b09e8843f0baef88c3aef75c
-        checksum/config-graphite: dd2e12423e118b05f62e8775d80ce5d1c637b4af0eaeddaf59e8e30f3f8eb5a8
-        checksum/config-prestart: b10f8bd837857b3a937c3a3672b0b51d4b273f9a5f92a5585471ec909a8991d8
-        checksum/config-secret: 4750aca38a4a1f230f3bedbb0ea1b9cca3d4f2a920ecd29f01d824a4d1690e3e
-        checksum/config-session: aaa5d874d11fa40818c7a1ac291a65eff1993740bdde31fd0355d04d5240e348
+        checksum/config-general: 2de620907d9043556c3f269c5ee437a96e8985ddcebd161d751f0afdc77c0122
+        checksum/config-graphite: ab090aebd9b73a011de2ba8d98eb62398fa39a4fdd7d137281ada8306c3909d8
+        checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
+        checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
+        checksum/config-session: b31fcdf8218c2b1feac32f7a9e15b119bb6a4f08c004ffce2c46cb642e22bf63
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9108"
@@ -631,7 +633,7 @@ spec:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
         - name: RSTUDIO_LAUNCHER_NAMESPACE
-          value: "training-cole"
+          value: "rstudio"
         
         - name: RSW_LICENSE
           valueFrom:
@@ -785,7 +787,7 @@ spec:
     - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
       value: "-fsSL"
     - name: RSTUDIO_LAUNCHER_NAMESPACE
-      value: "training-cole"
+      value: "rstudio"
     
     - name: RSW_LICENSE
       valueFrom:

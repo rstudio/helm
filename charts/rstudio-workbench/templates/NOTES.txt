@@ -24,8 +24,8 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 
 {{- if hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
 
-NOTE: `.Values.config.server.launcher\.kubernetes\.profiles\.conf` is superseded
-  - Instead, we recommend using `.Values.config.profiles.launcher\.kubernetes\.profiles\.conf
+WARNING: `.Values.config.server.launcher\.kubernetes\.profiles\.conf` is deprecated
+  - Instead, we recommend using `.Values.config.profiles.launcher\.kubernetes\.profiles\.conf` or `.Values.launcher.useTemplates`
   - Please note, `job-json-overrides` behaves differently for this new location. See NEWS.md for details.
 
 {{- end }}
@@ -37,4 +37,14 @@ NOTE: `.Values.config.server.rserver\.conf.server-license-type` is configured ma
   - Otherwise, `server-license-type` uses the default of `local`.
 Please consider removing this configuration value.
 
+{{- end }}
+
+{{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
+  {{- if hasKey .Values.config.profiles "launcher.kubernetes.profiles.conf" }}
+    {{- range $k,$v :=  (get .Values.config.profiles "launcher.kubernetes.profiles.conf") }}
+      {{- if hasKey $v "job-json-overrides" }}
+        {{- fail "\n\n`profiles` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`" }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}

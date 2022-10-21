@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.21](https://img.shields.io/badge/Version-0.5.21-informational?style=flat-square) ![AppVersion: bionic-2022.07.1-554.pro3](https://img.shields.io/badge/AppVersion-bionic--2022.07.1--554.pro3-informational?style=flat-square)
+![Version: 0.5.22](https://img.shields.io/badge/Version-0.5.22-informational?style=flat-square) ![AppVersion: 2022.07.2-576.pro12](https://img.shields.io/badge/AppVersion-2022.07.2--576.pro12-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.21:
+To install the chart with the release name `my-release` at version 0.5.22:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.21
+helm install my-release rstudio/rstudio-workbench --version=0.5.22
 ```
 
 ## Required Configuration
@@ -359,6 +359,7 @@ config:
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
 | image.repository | string | `"rstudio/rstudio-workbench"` | the repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
+| image.tagPrefix | string | `"bionic-"` | A tag prefix for the server image (common selections: bionic-, jammy-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -367,8 +368,13 @@ config:
 | initContainers | bool | `false` | the initContainer spec that will be used verbatim |
 | jobJsonOverridesFiles | object | `{}` | jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file's contents |
 | launcher.enabled | bool | `true` | determines whether the launcher should be started in the container |
+| launcher.extraTemplates | object | `{}` | extra templates to render in the template directory. |
+| launcher.includeDefaultTemplates | bool | `true` | whether to include the default `job.tpl` and `service.tpl` files included with the chart |
+| launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.kubernetesHealthCheck | object | `{"enabled":true,"extraCurlArgs":["-fsSL"]}` | configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup |
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"annotations":{},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"serviceAccountName":"","volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
+| launcher.useTemplates | bool | `false` | whether to render and use templates in the job launching process |
 | launcherPem | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |

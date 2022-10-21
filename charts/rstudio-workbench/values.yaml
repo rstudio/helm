@@ -64,6 +64,33 @@ launcher:
   kubernetesHealthCheck:
     enabled: true
     extraCurlArgs: ["-fsSL"]
+  # -- whether to render and use templates in the job launching process
+  useTemplates: false
+  # -- extra templates to render in the template directory.
+  extraTemplates: {}
+  # -- whether to include the default `job.tpl` and `service.tpl` files included with the chart
+  includeDefaultTemplates: true
+  # -- whether to include the templateValues rendering process
+  includeTemplateValues: true
+  # -- values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates.
+  templateValues:
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+    pod:
+      annotations: {}
+      labels: {}
+      serviceAccountName: ""
+      volumes: []
+      volumeMounts: []
+      imagePullPolicy: ""
+      imagePullSecrets: []
+      initContainers: []
+      extraContainers: []
+    job:
+      annotations: {}
+      labels: {}
 
 homeStorage:
   # -- whether to create the persistentVolumeClaim for homeStorage
@@ -88,6 +115,8 @@ homeStorage:
 image:
   # -- the repository to use for the main pod image
   repository: rstudio/rstudio-workbench
+  # -- A tag prefix for the server image (common selections: bionic-, jammy-). Only used if tag is not defined
+  tagPrefix: bionic-
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- the imagePullPolicy for the main pod image
@@ -367,10 +396,8 @@ config:
       cluster:
         name: Kubernetes
         type: Kubernetes
-    launcher.kubernetes.conf:
-      use-templating: 0
     jupyter.conf:
-      jupyter-exe: /opt/python/3.6.5/bin/jupyter
+      jupyter-exe: /usr/local/bin/jupyter
       notebooks-enabled: 1
       labs-enabled: 1
       default-session-cluster: Kubernetes
