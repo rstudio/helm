@@ -22,7 +22,7 @@ data:
       {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
       {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default (printf "%s%s" .Values.launcher.defaultInitContainer.tagPrefix $defaultVersion )}}
       {{- $initContainerImage := print .Values.launcher.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
-      {{- $initContainerPullPolicy := default .Values.launcher.defaultInitContainer.imagePullPolicy "IfNotPresent" }}
+      {{- $initContainerPullPolicy := default "IfNotPresent" .Values.launcher.defaultInitContainer.imagePullPolicy }}
       {{- $initContainerVolumeMount := dict "name" ("rsc-volume") "mountPath" ("/mnt/rstudio-connect-runtime/") }}
       {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "imagePullPolicy" ($initContainerPullPolicy) "volumeMounts" ( list  $initContainerVolumeMount ) }}
       {{- $jobJsonInitContainer := dict "target" ("/spec/template/spec/initContainers/0") "name" ("defaultInitContainer") "json" $initContainerJson }}
