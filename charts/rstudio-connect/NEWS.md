@@ -1,3 +1,7 @@
+# 0.3.6
+
+- Bump Connect version to 2022.10.0
+
 # 0.3.5
 
 - Fix appVersion to target `bionic-2022.09.0`, to reflect new image naming conventions that include the operating system.
