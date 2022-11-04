@@ -65,6 +65,8 @@ homeStorage:
     storage: "500Gi"
 
 prometheusExporter:
+  securityContext:
+    privileged: false
   mappingYaml:
     mappings:
       - match: "rstudio\\.([\\w-]+)\\.system\\.load\\.(.*)"

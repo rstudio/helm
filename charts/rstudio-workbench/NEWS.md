@@ -1,3 +1,7 @@
+# 0.5.24
+
+- Add `prometheusExporter.securityContext` for the ability to configure the sidecar `securityContext`
+
 # 0.5.23
 
 - Add updated templates for `launcher.templateValues` and session container customization

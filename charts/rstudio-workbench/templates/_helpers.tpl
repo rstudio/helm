@@ -206,6 +206,8 @@ containers:
   ports:
   - containerPort: 9108
     name: metrics
+  securityContext:
+    {{- toYaml .Values.prometheusExporter.securityContext | nindent 4 }}
 {{- end }}
 {{- if .Values.pod.sidecar }}
 {{ toYaml .Values.pod.sidecar }}

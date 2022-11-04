@@ -281,6 +281,8 @@ prometheusExporter:
   enabled: true
   # -- Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
   mappingYaml: null
+  # -- securityContext for the prometheus exporter sidecar
+  securityContext: {}
   image:
     repository: "prom/graphite-exporter"
     tag: "v0.9.0"
