@@ -16,6 +16,7 @@ spec:
   selector:
     matchLabels:
       {{- include "rstudio-workbench.selectorLabels" . | nindent 6 }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   template:
     metadata:
       annotations:

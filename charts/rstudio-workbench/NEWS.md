@@ -1,6 +1,8 @@
 # 0.5.24
 
 - Add `prometheusExporter.securityContext` for the ability to configure the sidecar `securityContext`
+- Add `revisionHistoryLimit` value for the Workbench deployment
+  - This can be helpful particularly when CI systems such as `ArgoCD` leave replicaseits around
 
 # 0.5.23
 

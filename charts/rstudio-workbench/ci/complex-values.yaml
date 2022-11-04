@@ -12,6 +12,7 @@ service:
     key: value
 replicas: 2
 
+revisionHistoryLimit: 3
 pod:
   env:
     - name: TEST_ENV_WORKS
