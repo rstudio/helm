@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.3.9](https://img.shields.io/badge/Version-0.3.9-informational?style=flat-square) ![AppVersion: 2022.11.0](https://img.shields.io/badge/AppVersion-2022.11.0-informational?style=flat-square)
+![Version: 0.3.10](https://img.shields.io/badge/Version-0.3.10-informational?style=flat-square) ![AppVersion: 2022.11.0](https://img.shields.io/badge/AppVersion-2022.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.9:
+To install the chart with the release name `my-release` at version 0.3.10:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.3.9
+helm install my-release rstudio/rstudio-connect --version=0.3.10
 ```
 
 ### NOTE
@@ -125,7 +125,6 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
 | pod.port | int | `3939` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
-| pod.serviceAccountName | bool | `false` | A string representing the service account of the pod spec |
 | pod.sidecar | bool | `false` | An array of containers that will be run alongside the main pod |
 | pod.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | An array of maps that is injected as-is into the "volumes:" component of the pod spec |

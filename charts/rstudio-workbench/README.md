@@ -402,12 +402,14 @@ config:
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |
 | prometheusExporter.mappingYaml | string | `nil` | Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file |
+| prometheusExporter.securityContext | object | `{}` | securityContext for the prometheus exporter sidecar |
 | rbac.clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
 | rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
 | rbac.serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |
+| revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | secureCookieKey | string | `""` |  |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` | annotations for the service definition |

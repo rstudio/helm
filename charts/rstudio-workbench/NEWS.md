@@ -1,8 +1,9 @@
 # 0.5.24
 
-- BREAKING: remove `serviceAccountName` in favor of `serviceAccount.name`.
+- BREAKING: remove `serviceAccountName` in favor of `rbac.serviceAccount.name`.
   - Also fix a handful of consistency issues with serviceAccount
     creation ([#251](https://github.com/rstudio/helm/issues/251))
+  - Allow un-setting `rbac.serviceAccount.name` ([#294](https://github.com/rstudio/helm/pull/294))
 - Add `prometheusExporter.securityContext` for the ability to configure the sidecar `securityContext`
 - Add `revisionHistoryLimit` value for the Workbench deployment
   - This can be helpful particularly when CI systems such as `ArgoCD` leave replicasets around
