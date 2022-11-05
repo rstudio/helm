@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
   namespace: rstudio
 ---
 # Source: rstudio-workbench/templates/configmap-secret.yaml
@@ -486,7 +486,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
   namespace: rstudio
 rules:
   - apiGroups:
@@ -550,15 +550,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
   namespace: rstudio
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
 subjects:
   - kind: ServiceAccount
-    name: release-name-rstudio-workbench
+    name: rstudio-server-job-launcher
     namespace: rstudio
 ---
 # Source: rstudio-workbench/templates/svc.yaml
@@ -607,6 +607,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: rstudio-workbench
       app.kubernetes.io/instance: release-name
+  revisionHistoryLimit: 10
   template:
     metadata:
       annotations:
@@ -624,7 +625,8 @@ spec:
         app.kubernetes.io/name: rstudio-workbench
         app.kubernetes.io/instance: release-name
     spec:
-      serviceAccountName: release-name-rstudio-workbench
+      
+      serviceAccountName: rstudio-server-job-launcher
       shareProcessNamespace: false      
       containers:
       - name: rstudio
@@ -706,6 +708,8 @@ spec:
         ports:
         - containerPort: 9108
           name: metrics
+        securityContext:
+          {}
       - image: busybox
         imagePullPolicy: IfNotPresent
         name: test
@@ -770,7 +774,7 @@ metadata:
   annotations:
    "helm.sh/hook": test
 spec:
-  serviceAccountName: release-name-rstudio-workbench
+  serviceAccountName: rstudio-server-job-launcher
   shareProcessNamespace: false
   restartPolicy: Never
   

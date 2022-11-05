@@ -526,6 +526,7 @@ spec:
         app.kubernetes.io/name: rstudio-workbench
         app.kubernetes.io/instance: release-name
     spec:
+      
       serviceAccountName: default
       shareProcessNamespace: false      
       containers:

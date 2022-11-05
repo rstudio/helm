@@ -526,6 +526,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: rstudio-workbench
       app.kubernetes.io/instance: release-name
+  revisionHistoryLimit: 10
   template:
     metadata:
       annotations:
@@ -542,6 +543,7 @@ spec:
         app.kubernetes.io/name: rstudio-workbench
         app.kubernetes.io/instance: release-name
     spec:
+      
       serviceAccountName: release-name-rstudio-workbench
       shareProcessNamespace: false      
       containers:
@@ -612,6 +614,8 @@ spec:
         ports:
         - containerPort: 9108
           name: metrics
+        securityContext:
+          {}
       volumes:
       - name: rstudio-job-overrides-new
         configMap:
