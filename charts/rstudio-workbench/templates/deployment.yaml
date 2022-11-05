@@ -40,11 +40,22 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{/**
+         * NOTE: In the case where a service account was in use and
+         * then later removed, the behavior of kubernetes is to
+         * leave the `serviceAccount` / `serviceAccountName` value
+         * unchanged unless explicitly overwritten with an empty
+         * string. See linked issues tracing backward from:
+         * https://github.com/kubernetes/kubernetes/issues/108208#issuecomment-1262269204
+         * and also the "Note" callout at the end of this section:
+         * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
+         */}}
       {{- if .Values.rbac.create }}
+      serviceAccount: {{ include "rstudio-workbench.fullname" . }}
       serviceAccountName: {{ include "rstudio-workbench.fullname" . }}
-      {{- end }}
-      {{- if and (not .Values.rbac.create) (.Values.serviceAccountName) }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- else }}
+      serviceAccount: {{ .Values.serviceAccountName | toString | quote }}
+      serviceAccountName: {{ .Values.serviceAccountName | toString | quote }}
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
