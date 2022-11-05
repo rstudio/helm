@@ -5,11 +5,9 @@ metadata:
   annotations:
    "helm.sh/hook": test
 spec:
-  {{- if .Values.rbac.create }}
-  serviceAccountName: {{ include "rstudio-workbench.fullname" . }}
-  {{- end }}
-  {{- if and (not .Values.rbac.create) (.Values.serviceAccountName) }}
-  serviceAccountName: {{ .Values.serviceAccountName }}
+  {{- $serviceAccountName := .Values.rbac.serviceAccount.name | default (include "rstudio-workbench.fullname" .)}}
+  {{- if or .Values.rbac.create (.Values.rbac.serviceAccount.name) }}
+  serviceAccountName: {{ $serviceAccountName }}
   {{- end }}
   {{- with .Values.image.imagePullSecrets }}
   imagePullSecrets:

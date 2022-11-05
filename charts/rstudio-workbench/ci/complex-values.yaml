@@ -48,8 +48,12 @@ xdgConfigDirsExtra:
   - '/tmp/one/'
   - '/tmp/two/'
 
-rbac.create: true
-serviceAccountName: rstudio-server-job-launcher
+rbac:
+  create: true
+  serviceAccount:
+    name: rstudio-server-job-launcher
+    annotations:
+      one-two: three
 
 sharedStorage:
   create: true
