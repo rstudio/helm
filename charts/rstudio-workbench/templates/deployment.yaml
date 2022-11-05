@@ -51,12 +51,11 @@ spec:
          * and also the "Note" callout at the end of this section:
          * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
          */}}
-      {{- if .Values.rbac.create }}
-      serviceAccount: {{ include "rstudio-workbench.fullname" . }}
-      serviceAccountName: {{ include "rstudio-workbench.fullname" . }}
+      {{- $serviceAccountName := .Values.rbac.serviceAccount.name | default (include "rstudio-workbench.fullname" .)}}
+      {{- if or .Values.rbac.create (.Values.rbac.serviceAccount.name) }}
+      serviceAccountName: {{ $serviceAccountName }}
       {{- else }}
-      serviceAccount: {{ .Values.serviceAccountName | toString | quote }}
-      serviceAccountName: {{ .Values.serviceAccountName | toString | quote }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name | toString | quote }}
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:

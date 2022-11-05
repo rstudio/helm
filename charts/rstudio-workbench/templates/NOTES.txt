@@ -48,3 +48,7 @@ Please consider removing this configuration value.
     {{- end }}
   {{- end }}
 {{- end }}
+
+{{- if .Values.serviceAccountName }}
+  {{- fail "\n\n`serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead"}}
+{{- end }}
