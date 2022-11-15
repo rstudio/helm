@@ -1,3 +1,7 @@
+# 0.4.1
+
+- Update default Posit Package Manager version to 2022.11.0-13
+
 # 0.4.0
 
 - Update default RStudio Package Manager version to 2022.07.2-11
@@ -16,7 +20,7 @@
   migration, so it currently runs unconditionally. The rook only runs when a PersistentVolumeClaim is being used for
   Package Manager storage. The hook can be disabled by setting `enableMigrations=false`; in the future when we no longer
   expect users to have root-owned data, this will become the default.
-
+RStudio
 - Package Manager's encryption key (if specified in `rstudioPMKey`) is now read
   from an environment variable rather than being mounted into the container.
   This sidesteps an issue where this file is owned as root when mounted by
