@@ -268,7 +268,6 @@ config:
   Scheduler:
     InitTimeout: 5m
   Logging:
-    Enabled: true
     ServiceLog: STDOUT
     ServiceLogLevel: INFO    # INFO, WARNING or ERROR
     ServiceLogFormat: TEXT   # TEXT or JSON
