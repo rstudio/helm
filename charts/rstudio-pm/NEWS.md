@@ -1,3 +1,7 @@
+# 0.5.0
+
+- Update default Post Package Manager version to 2022.11.2-18
+
 # 0.4.0
 
 - Update default RStudio Package Manager version to 2022.07.2-11
