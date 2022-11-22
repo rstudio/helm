@@ -91,10 +91,6 @@ launcher:
     job:
       annotations: {}
       labels: {}
-      # set `securityContext: null` to run unprivileged
-      securityContext:
-        runAsUser: 999
-        runAsGroup: 999
 
 homeStorage:
   # -- whether to create the persistentVolumeClaim for homeStorage
