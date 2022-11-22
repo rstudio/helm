@@ -274,10 +274,6 @@ pod:
   sidecar: false
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
-  # set `securityContext: null` to run unprivileged
-  securityContext:
-    runAsUser: 999
-    runAsGroup: 999
 
 prometheusExporter:
   # -- whether the  prometheus exporter sidecar should be enabled
