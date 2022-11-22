@@ -1,6 +1,6 @@
 # Version: 2.1.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v1
+# Helm Version: v2
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -75,7 +75,7 @@ spec:
       {{- end }}
       restartPolicy: Never
       {{- with $templateData.pod.serviceAccountName }}
-      serviceAccountName: {{- . }}
+      serviceAccountName: {{ . }}
       {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
