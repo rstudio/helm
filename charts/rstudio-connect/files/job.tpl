@@ -93,29 +93,8 @@ spec:
         {{ .name }}: {{ toYaml .value }}
         {{- end }}
       {{- end }}
-      {{- $securityContext := dict }}
-      {{- if $templateData.job.securityContext }}
-        {{- $_ := set $securityContext $templateData.job.securityContext }}
-      {{- else }}
-        {{- if .Job.container.runAsUserId }}
-          {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
-        {{- end }}
-        {{- if .Job.container.runAsGroupId }}
-          {{- $_ := set $securityContext "runAsGroup" .Job.container.runAsGroupId }}
-        {{- end }}
-        {{- if .Job.container.supplementalGroupIds }}
-          {{- $groupIds := list }}
-          {{- range .Job.container.supplementalGroupIds }}
-            {{- $groupIds = append $groupIds . }}
-          {{- end }}
-          {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
-        {{- end }}
-        {{- if $securityContext }}
-        securityContext:
-          {{- range $key, $val := $securityContext }}
-          {{ $key }}: {{ $val }}
-          {{- end }}
-        {{- end }}
+      {{- with $templateData.pod.securityContext }}
+      securityContext: {{ toYaml . | nindent 12 }}
       {{- end }}
       {{- with $templateData.pod.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 12 }}
