@@ -87,6 +87,14 @@ spec:
         - {{ nindent 10 (toYaml .) | trim -}}
         {{- end }}
       {{- end }}
+      {{- with $templateData.pod.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $templateData.pod.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if ne (len .Job.placementConstraints) 0 }}
       nodeSelector:
         {{- range .Job.placementConstraints }}
