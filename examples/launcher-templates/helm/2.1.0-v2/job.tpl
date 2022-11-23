@@ -93,7 +93,7 @@ spec:
         {{ .name }}: {{ toYaml .value }}
         {{- end }}
       {{- end }}
-      {{- $securityContext := dict }}
+      {{- $securityContext := $templateData.pod.defaultSecurityContext }}
       {{- if .Job.container.runAsUserId }}
         {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
       {{- end }}
@@ -106,6 +106,7 @@ spec:
           {{- $groupIds = append $groupIds . }}
         {{- end }}
         {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
+        {{- $securityContext := mergeOverwrite $securityContext $templateData.pod.securityContext }}
       {{- end }}
       {{- if $securityContext }}
       securityContext:
@@ -195,6 +196,10 @@ spec:
             {{- if .publishedPort }}
               {{- $exposedPorts = append $exposedPorts . }}
             {{- end }}
+          {{- end }}
+          {{- with $templateData.pod.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if ne (len $exposedPorts) 0 }}
           ports:
