@@ -25,7 +25,7 @@ Individual helm charts have their own documentation
 
 - [RStudio Connect](./charts/rstudio-connect)
 - [RStudio Workbench](./charts/rstudio-workbench)
-- [RStudio Package Manager](./charts/rstudio-pm)
+- [Posit Package Manager](./charts/rstudio-pm)
 
 Examples:
 
@@ -44,10 +44,10 @@ Supporting and miscellaneous charts with varying levels of maintenance, usefulne
 
 ## Support
 
-**IMPORTANT:** 
+**IMPORTANT:**
 
 These charts are provided as a convenience to RStudio customers and are not formally supported by RStudio. If you
-have questions about these charts, you can ask them in the [issues](https://github.com/rstudio/helm/issues/new/choose) 
+have questions about these charts, you can ask them in the [issues](https://github.com/rstudio/helm/issues/new/choose)
 in the repository or to your support representative, who will route them appropriately.
 
 Bugs or feature requests should be opened in an [issue](https://github.com/rstudio/helm/issues/new/choose).
