@@ -2980,6 +2980,52 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-package-manager
+          image: rstudio/rstudio-package-manager:2022.11.2-18
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2022.11.2-18
+    created: "2022-11-24T04:23:17.264006672Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.23
+    description: Official Helm chart for RStudio Package Manager
+    digest: 6ce06018ee3d0fb73f38608a464055c6f3a0aea5562ba56a10b1ad5f1c46445b
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    - https://github.com/rstudio/rstudio-docker-products
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.5.0/rstudio-pm-0.5.0.tgz
+    version: 0.5.0
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-package-manager
           image: rstudio/rstudio-package-manager:2022.07.2-11
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -6599,4 +6645,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2022-11-21T14:03:54.815716158Z"
+generated: "2022-11-24T04:23:17.265318776Z"
