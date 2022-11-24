@@ -1,3 +1,8 @@
+# 0.5.1
+
+- Fix a bug in the image reference. Images now have an operating system reference
+  - Add an `image.tagPrefix` value for configuring the (current) `bionic-` prefix
+
 # 0.5.0
 
 - Update default Post Package Manager version to 2022.11.2-18
