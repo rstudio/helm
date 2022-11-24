@@ -2980,6 +2980,52 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-package-manager
+          image: rstudio/rstudio-package-manager:bionic-2022.11.2-18
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2022.11.2-18
+    created: "2022-11-24T04:37:37.856249917Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.23
+    description: Official Helm chart for RStudio Package Manager
+    digest: a8280522c796a9c00f4baedba10cd2461eff742303b3c53429d84865dc313be8
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    - https://github.com/rstudio/rstudio-docker-products
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.5.1/rstudio-pm-0.5.1.tgz
+    version: 0.5.1
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-package-manager
           image: rstudio/rstudio-package-manager:2022.11.2-18
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -6645,4 +6691,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2022-11-24T04:23:17.265318776Z"
+generated: "2022-11-24T04:37:37.858166839Z"
