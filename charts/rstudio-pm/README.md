@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![AppVersion: 2022.11.2-18](https://img.shields.io/badge/AppVersion-2022.11.2--18-informational?style=flat-square)
+![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square) ![AppVersion: 2022.11.2-18](https://img.shields.io/badge/AppVersion-2022.11.2--18-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.0:
+To install the chart with the release name `my-release` at version 0.5.1:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.5.0
+helm install my-release rstudio/rstudio-pm --version=0.5.1
 ```
 
 ## Upgrade Guidance
@@ -128,6 +128,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
 | image.repository | string | `"rstudio/rstudio-package-manager"` | the repository to use for the main pod image |
 | image.tag | string | `""` | the tag to use for the main pod image |
+| image.tagPrefix | string | `"bionic-"` | A tag prefix for the server image (common selections: bionic-, jammy-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |

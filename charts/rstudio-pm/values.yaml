@@ -30,6 +30,8 @@ sharedStorage:
 image:
   # -- the repository to use for the main pod image
   repository: rstudio/rstudio-package-manager
+  # -- A tag prefix for the server image (common selections: bionic-, jammy-). Only used if tag is not defined
+  tagPrefix: bionic-
   # -- the tag to use for the main pod image
   tag: ""
   # -- the imagePullPolicy for the main pod image
