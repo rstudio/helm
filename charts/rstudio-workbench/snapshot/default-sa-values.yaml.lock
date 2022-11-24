@@ -1,11 +1,4 @@
 ---
-# Source: rstudio-workbench/templates/rbac.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: release-name-rstudio-workbench
-  namespace: rstudio
----
 # Source: rstudio-workbench/templates/configmap-secret.yaml
 apiVersion: v1
 kind: Secret
@@ -92,7 +85,6 @@ data:
     monitor-graphite-host=127.0.0.1
     monitor-graphite-port=9109
     server-health-check-enabled=1
-    server-license-type=remote
     server-project-sharing=1
     www-port=8787
   vscode-user-settings.json: |
@@ -398,7 +390,7 @@ data:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: release-name-rstudio-workbench
+  name: default
   namespace: rstudio
 rules:
   - apiGroups:
@@ -462,15 +454,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: release-name-rstudio-workbench
+  name: default
   namespace: rstudio
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: release-name-rstudio-workbench
+  name: default
 subjects:
   - kind: ServiceAccount
-    name: release-name-rstudio-workbench
+    name: default
     namespace: rstudio
 ---
 # Source: rstudio-workbench/templates/svc.yaml
@@ -517,10 +509,11 @@ spec:
     matchLabels:
       app.kubernetes.io/name: rstudio-workbench
       app.kubernetes.io/instance: release-name
+  revisionHistoryLimit: 10
   template:
     metadata:
       annotations:
-        checksum/config-general: 45c9e1f18b76b5c4079453ec52d28185e66d5896415de372f70c78267d93c81e
+        checksum/config-general: 823039d7e624508d5d3c4e1eec0837872b640ed35c691b5f2988910eb14d274e
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
@@ -533,7 +526,7 @@ spec:
         app.kubernetes.io/name: rstudio-workbench
         app.kubernetes.io/instance: release-name
     spec:
-      serviceAccountName: release-name-rstudio-workbench
+      serviceAccountName: default
       shareProcessNamespace: false      
       containers:
       - name: rstudio
@@ -544,8 +537,6 @@ spec:
         - name: RSTUDIO_LAUNCHER_NAMESPACE
           value: "rstudio"
         
-        - name: RSW_LICENSE_SERVER
-          value: "http://my-license-server.example.com:9999"
         - name: RSW_LAUNCHER
           value: "true"
         - name: RSW_TESTUSER
@@ -600,6 +591,8 @@ spec:
         ports:
         - containerPort: 9108
           name: metrics
+        securityContext:
+          {}
       volumes:
       - name: rstudio-job-overrides-new
         configMap:
@@ -649,7 +642,7 @@ metadata:
   annotations:
    "helm.sh/hook": test
 spec:
-  serviceAccountName: release-name-rstudio-workbench
+  serviceAccountName: default
   shareProcessNamespace: false
   restartPolicy: Never
   
@@ -668,8 +661,6 @@ spec:
     - name: RSTUDIO_LAUNCHER_NAMESPACE
       value: "rstudio"
     
-    - name: RSW_LICENSE_SERVER
-      value: "http://my-license-server.example.com:9999"
     - name: RSW_LAUNCHER
       value: "true"
     - name: RSW_TESTUSER

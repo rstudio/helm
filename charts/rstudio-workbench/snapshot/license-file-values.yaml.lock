@@ -66,7 +66,7 @@ data:
     
   jupyter.conf: |
     default-session-cluster=Kubernetes
-    jupyter-exe=/opt/python/3.6.5/bin/jupyter
+    jupyter-exe=/usr/local/bin/jupyter
     labs-enabled=1
     notebooks-enabled=1
   launcher.conf: |
@@ -490,7 +490,7 @@ metadata:
   name: release-name-rstudio-workbench
   namespace: rstudio
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.22
+    helm.sh/chart: rstudio-workbench-0.5.23
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "2022.07.2-576.pro12"
@@ -530,7 +530,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 33f2fcbb714939c308ac1f209c9289bd344af3923a4814a3bb74e6460acb1956
+        checksum/config-general: 823039d7e624508d5d3c4e1eec0837872b640ed35c691b5f2988910eb14d274e
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
