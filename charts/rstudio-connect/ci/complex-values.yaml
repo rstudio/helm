@@ -1,7 +1,7 @@
 sharedStorage:
   create: true
   path: /var/lib/rstudio-connect
-  storageClassName: false
+  storageClassName: test-class
   requests:
     storage: "10Gi"
 strategy:

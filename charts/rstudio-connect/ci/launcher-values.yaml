@@ -4,4 +4,6 @@ rbac:
     create: true
 launcher:
   enabled: true
+sharedStorage:
+  create: true
 securityContext: null
