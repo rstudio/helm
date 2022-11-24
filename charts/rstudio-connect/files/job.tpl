@@ -1,6 +1,6 @@
 # Version: 2.1.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v1
+# Helm Version: v2
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -75,7 +75,7 @@ spec:
       {{- end }}
       restartPolicy: Never
       {{- with $templateData.pod.serviceAccountName }}
-      serviceAccountName: {{- . }}
+      serviceAccountName: {{ . }}
       {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
@@ -87,13 +87,21 @@ spec:
         - {{ nindent 10 (toYaml .) | trim -}}
         {{- end }}
       {{- end }}
+      {{- with $templateData.pod.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $templateData.pod.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if ne (len .Job.placementConstraints) 0 }}
       nodeSelector:
         {{- range .Job.placementConstraints }}
         {{ .name }}: {{ toYaml .value }}
         {{- end }}
       {{- end }}
-      {{- $securityContext := dict }}
+      {{- $securityContext := $templateData.pod.defaultSecurityContext }}
       {{- if .Job.container.runAsUserId }}
         {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
       {{- end }}
@@ -106,6 +114,7 @@ spec:
           {{- $groupIds = append $groupIds . }}
         {{- end }}
         {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
+        {{- $securityContext := mergeOverwrite $securityContext $templateData.pod.securityContext }}
       {{- end }}
       {{- if $securityContext }}
       securityContext:
@@ -196,6 +205,10 @@ spec:
               {{- $exposedPorts = append $exposedPorts . }}
             {{- end }}
           {{- end }}
+          {{- with $templateData.pod.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- if ne (len $exposedPorts) 0 }}
           ports:
             {{- range $exposedPorts }}
@@ -254,3 +267,6 @@ spec:
             - {{ nindent 14 (toYaml .) | trim -}}
             {{- end }}
           {{- end }}
+        {{- with $templateData.pod.extraContainers }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
