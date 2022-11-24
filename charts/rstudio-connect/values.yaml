@@ -221,6 +221,12 @@ launcher:
   launcherKubernetesProfilesConf: {}
   # -- Whether to use launcher templates when launching sessions. Defaults to true
   useTemplates: true
+  # -- extra templates to render in the template directory.
+  extraTemplates: {}
+  # -- whether to include the default `job.tpl` and `service.tpl` files included with the chart
+  includeDefaultTemplates: true
+  # -- whether to include the templateValues rendering process
+  includeTemplateValues: true
   # -- Values to pass along to the RStudio Connect session templating process
   templateValues:
     service:
@@ -237,6 +243,11 @@ launcher:
       imagePullSecrets: []
       initContainers: []
       extraContainers: []
+      containerSecurityContext: {}
+      defaultSecurityContext: {}
+      securityContext: {}
+      tolerations: []
+      affinity: {}
     job:
       annotations: {}
       labels: {}
