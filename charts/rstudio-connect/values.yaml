@@ -49,6 +49,8 @@ extraObjects: []
 image:
   # -- The repository to use for the main pod image
   repository: ghcr.io/rstudio/rstudio-connect
+  # -- A tag prefix for the server image (common selections: bionic-, centos-). Only used if tag is not defined
+  tagPrefix: bionic-
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- The imagePullPolicy for the main pod image
