@@ -86,8 +86,6 @@ pod:
   volumes: []
   # -- An array of maps that is injected as-is into the "volumeMounts" component of the pod spec
   volumeMounts: []
-  # -- A string representing the service account of the pod spec
-  serviceAccountName: false
   # -- Additional annotations to add to the rstudio-connect pods
   annotations: {}
   # -- Additional labels to add to the rstudio-connect pods

@@ -49,3 +49,7 @@ Please consider removing this configuration value.
 {{- if .Values.launcher.contentInitContainer }}
   {{- fail "\n\n`launcher.contentInitContainer` values are now stored at `launcher.defaultInitContainer`" }}
 {{- end }}
+
+{{- if .Values.pod.serviceAccountName }}
+  {{- fail "\n\n `pod.serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead."}}
+{{- end }}
