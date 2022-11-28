@@ -6,6 +6,7 @@
   - Fix typo in `serviceAccountName` implementation ([#251](https://github.com/rstudio/helm/issues/251))
   - Add `affinity` and `tolerations` ([#271](https://github.com/rstudio/helm/issues/271) and [#283](https://github.com/rstudio/helm/issues/283))
 - Add an `image.tagPrefix` value to make customizing the operating system easier
+- Add a `launcher.defaultInitContainer.tagPrefix` value to make customizing the operating system easier
 
 # 0.3.7
 

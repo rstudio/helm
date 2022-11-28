@@ -49,7 +49,7 @@ extraObjects: []
 image:
   # -- The repository to use for the main pod image
   repository: ghcr.io/rstudio/rstudio-connect
-  # -- A tag prefix for the server image (common selections: bionic-, centos-). Only used if tag is not defined
+  # -- A tag prefix for the server image (common selections: bionic-, ubuntu2204-). Only used if tag is not defined
   tagPrefix: bionic-
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -259,6 +259,8 @@ launcher:
     enabled: true
     # -- The repository to use for the Content InitContainer image
     repository: ghcr.io/rstudio/rstudio-connect-content-init
+    # -- A tag prefix for the Content InitContainer image (common selections: bionic-, ubuntu2204-). Only used if tag is not defined
+    tagPrefix: bionic-
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     # -- The imagePullPolicy for the default initContainer
