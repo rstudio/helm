@@ -12,6 +12,7 @@ service:
     key: value
 replicas: 2
 
+revisionHistoryLimit: 3
 pod:
   env:
     - name: TEST_ENV_WORKS
@@ -47,8 +48,12 @@ xdgConfigDirsExtra:
   - '/tmp/one/'
   - '/tmp/two/'
 
-rbac.create: true
-serviceAccountName: rstudio-server-job-launcher
+rbac:
+  create: true
+  serviceAccount:
+    name: rstudio-server-job-launcher
+    annotations:
+      one-two: three
 
 sharedStorage:
   create: true
@@ -65,6 +70,8 @@ homeStorage:
     storage: "500Gi"
 
 prometheusExporter:
+  securityContext:
+    privileged: false
   mappingYaml:
     mappings:
       - match: "rstudio\\.([\\w-]+)\\.system\\.load\\.(.*)"

@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
   namespace: rstudio
 ---
 # Source: rstudio-workbench/templates/configmap-secret.yaml
@@ -393,6 +393,7 @@ data:
     CRAN=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
     RSPM=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
   rsession.conf: |
+  rstudio-prefs.json: |
 ---
 # Source: rstudio-workbench/templates/configmap-startup.yaml
 apiVersion: v1
@@ -486,7 +487,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
   namespace: rstudio
 rules:
   - apiGroups:
@@ -550,15 +551,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
   namespace: rstudio
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: release-name-rstudio-workbench
+  name: rstudio-server-job-launcher
 subjects:
   - kind: ServiceAccount
-    name: release-name-rstudio-workbench
+    name: rstudio-server-job-launcher
     namespace: rstudio
 ---
 # Source: rstudio-workbench/templates/svc.yaml
@@ -568,7 +569,7 @@ metadata:
   name: release-name-rstudio-workbench
   namespace: rstudio
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.23
+    helm.sh/chart: rstudio-workbench-0.5.24
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "2022.07.2-576.pro12"
@@ -607,6 +608,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: rstudio-workbench
       app.kubernetes.io/instance: release-name
+  revisionHistoryLimit: 10
   template:
     metadata:
       annotations:
@@ -614,7 +616,7 @@ spec:
         checksum/config-graphite: ab090aebd9b73a011de2ba8d98eb62398fa39a4fdd7d137281ada8306c3909d8
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
-        checksum/config-session: b31fcdf8218c2b1feac32f7a9e15b119bb6a4f08c004ffce2c46cb642e22bf63
+        checksum/config-session: 0141a2ffc1025f68704c750899f9abd4e9f82bc284920c6eeea502e4062e61bb
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9108"
@@ -624,7 +626,8 @@ spec:
         app.kubernetes.io/name: rstudio-workbench
         app.kubernetes.io/instance: release-name
     spec:
-      serviceAccountName: release-name-rstudio-workbench
+      
+      serviceAccountName: rstudio-server-job-launcher
       shareProcessNamespace: false      
       containers:
       - name: rstudio
@@ -706,6 +709,8 @@ spec:
         ports:
         - containerPort: 9108
           name: metrics
+        securityContext:
+          {}
       - image: busybox
         imagePullPolicy: IfNotPresent
         name: test
@@ -770,7 +775,7 @@ metadata:
   annotations:
    "helm.sh/hook": test
 spec:
-  serviceAccountName: release-name-rstudio-workbench
+  serviceAccountName: rstudio-server-job-launcher
   shareProcessNamespace: false
   restartPolicy: Never
   

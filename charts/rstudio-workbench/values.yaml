@@ -260,6 +260,9 @@ affinity: {}
 nodeSelector: {}
 tolerations: []
 
+# -- The revisionHistoryLimit to use for the pod deployment. Do not set to 0
+revisionHistoryLimit: 10
+
 pod:
   # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
   env: []
@@ -281,6 +284,8 @@ prometheusExporter:
   enabled: true
   # -- Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
   mappingYaml: null
+  # -- securityContext for the prometheus exporter sidecar
+  securityContext: {}
   image:
     repository: "prom/graphite-exporter"
     tag: "v0.9.0"
@@ -365,6 +370,7 @@ config:
       CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
     rsession.conf: {}
     notifications.conf: {}
+    rstudio-prefs.json: {}
   # -- a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default
   sessionSecret: {}
   # -- a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions

@@ -16,6 +16,7 @@ spec:
   selector:
     matchLabels:
       {{- include "rstudio-workbench.selectorLabels" . | nindent 6 }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   template:
     metadata:
       annotations:
@@ -40,11 +41,21 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.rbac.create }}
-      serviceAccountName: {{ include "rstudio-workbench.fullname" . }}
-      {{- end }}
-      {{- if and (not .Values.rbac.create) (.Values.serviceAccountName) }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{/**
+         * NOTE: In the case where a service account was in use and
+         * then later removed, the behavior of kubernetes is to
+         * leave the `serviceAccount` / `serviceAccountName` value
+         * unchanged unless explicitly overwritten with an empty
+         * string. See linked issues tracing backward from:
+         * https://github.com/kubernetes/kubernetes/issues/108208#issuecomment-1262269204
+         * and also the "Note" callout at the end of this section:
+         * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
+         */}}
+      {{- $serviceAccountName := .Values.rbac.serviceAccount.name | default (include "rstudio-workbench.fullname" .)}}
+      {{- if or .Values.rbac.create (.Values.rbac.serviceAccount.name) }}
+      serviceAccountName: {{ $serviceAccountName }}
+      {{- else }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name | toString | quote }}
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:

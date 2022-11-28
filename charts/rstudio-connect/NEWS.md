@@ -1,3 +1,8 @@
+# 0.3.10
+
+- Deprecate `pod.serviceAccountName` in favor of `rbac.serviceAccount.name` ([#267](https://github.com/rstudio/helm/issues/267))
+- Allow un-setting `rbac.serviceAccount.name` ([#294](https://github.com/rstudio/helm/pull/294))
+
 # 0.3.9
 
 - Fix a typo in `launcher.defaultInitContainer.imagePullPolicy` ([#289](https://github.com/rstudio/helm/pull/289))

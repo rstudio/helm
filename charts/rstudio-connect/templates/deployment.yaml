@@ -40,11 +40,21 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{/**
+         * NOTE: In the case where a service account was in use and
+         * then later removed, the behavior of kubernetes is to
+         * leave the `serviceAccount` / `serviceAccountName` value
+         * unchanged unless explicitly overwritten with an empty
+         * string. See linked issues tracing backward from:
+         * https://github.com/kubernetes/kubernetes/issues/108208#issuecomment-1262269204
+         * and also the "Note" callout at the end of this section:
+         * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
+         */}}
       {{- if and .Values.rbac.create .Values.launcher.enabled }}
-      {{ $serviceAccountName := default .Values.rbac.serviceAccount.name (include "rstudio-connect.fullname" .) }}
+      {{ $serviceAccountName := default (default .Values.rbac.serviceAccount.name .Values.pod.serviceAccountName) (include "rstudio-connect.fullname" .) }}
       serviceAccountName: {{ $serviceAccountName }}
-      {{- else if .Values.pod.serviceAccountName }}
-      serviceAccountName: {{ .Values.pod.serviceAccountName }}
+      {{- else }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name | toString | quote }}
       {{- end }}
       {{- with .Values.pod.securityContext }}
       securityContext:
