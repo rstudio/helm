@@ -5,9 +5,21 @@ metadata:
   annotations:
    "helm.sh/hook": test
 spec:
+  {{/**
+     * NOTE: In the case where a service account was in use and
+     * then later removed, the behavior of kubernetes is to
+     * leave the `serviceAccount` / `serviceAccountName` value
+     * unchanged unless explicitly overwritten with an empty
+     * string. See linked issues tracing backward from:
+     * https://github.com/kubernetes/kubernetes/issues/108208#issuecomment-1262269204
+     * and also the "Note" callout at the end of this section:
+     * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
+     */}}
   {{- $serviceAccountName := .Values.rbac.serviceAccount.name | default (include "rstudio-workbench.fullname" .)}}
   {{- if or .Values.rbac.create (.Values.rbac.serviceAccount.name) }}
   serviceAccountName: {{ $serviceAccountName }}
+  {{- else }}
+  serviceAccountName: {{ .Values.rbac.serviceAccount.name | toString | quote }}
   {{- end }}
   {{- with .Values.image.imagePullSecrets }}
   imagePullSecrets:
