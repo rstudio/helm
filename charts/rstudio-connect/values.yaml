@@ -86,6 +86,8 @@ pod:
   volumes: []
   # -- An array of maps that is injected as-is into the "volumeMounts" component of the pod spec
   volumeMounts: []
+  # -- Deprecated. Use `rbac.serviceAccount.name` instead
+  serviceAccountName: false
   # -- Additional annotations to add to the rstudio-connect pods
   annotations: {}
   # -- Additional labels to add to the rstudio-connect pods

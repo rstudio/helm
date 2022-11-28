@@ -1,6 +1,6 @@
 # 0.3.10
 
-- BREAKING: Remove `pod.serviceAccountName` in favor of `rbac.serviceAccount.name`
+- Deprecate `pod.serviceAccountName` in favor of `rbac.serviceAccount.name` ([#267](https://github.com/rstudio/helm/issues/267))
 - Allow un-setting `rbac.serviceAccount.name` ([#294](https://github.com/rstudio/helm/pull/294))
 
 # 0.3.9

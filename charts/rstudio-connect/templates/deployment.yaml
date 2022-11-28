@@ -51,7 +51,7 @@ spec:
          * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
          */}}
       {{- if and .Values.rbac.create .Values.launcher.enabled }}
-      {{ $serviceAccountName := default .Values.rbac.serviceAccount.name (include "rstudio-connect.fullname" .) }}
+      {{ $serviceAccountName := default (default .Values.rbac.serviceAccount.name .Values.pod.serviceAccountName) (include "rstudio-connect.fullname" .) }}
       serviceAccountName: {{ $serviceAccountName }}
       {{- else }}
       serviceAccountName: {{ .Values.rbac.serviceAccount.name | toString | quote }}

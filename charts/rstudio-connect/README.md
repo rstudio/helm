@@ -125,6 +125,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
 | pod.port | int | `3939` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
+| pod.serviceAccountName | bool | `false` | Deprecated. Use `rbac.serviceAccount.name` instead |
 | pod.sidecar | bool | `false` | An array of containers that will be run alongside the main pod |
 | pod.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | An array of maps that is injected as-is into the "volumes:" component of the pod spec |
