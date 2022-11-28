@@ -1,3 +1,10 @@
+# 0.5.23
+
+- Add updated templates for `launcher.templateValues` and session container customization
+  - Add customization of `securityContext` and `containerSecurityContext` ([#293](https://github.com/rstudio/helm/issues/293))
+  - Fix typo in `serviceAccountName` implementation ([#251](https://github.com/rstudio/helm/issues/251))
+  - Add `affinity` and `tolerations` ([#271](https://github.com/rstudio/helm/issues/271) and [#283](https://github.com/rstudio/helm/issues/283))
+
 # 0.5.22
 
 - BREAKING: change jupyter path from `/opt/python/3.6.5/bin/jupyter` to `/usr/local/bin/jupyter`

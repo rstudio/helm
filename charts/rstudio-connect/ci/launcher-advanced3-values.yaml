@@ -3,6 +3,8 @@ rbac:
   serviceAccount:
     create: true
 securityContext: null
+sharedStorage:
+  create: true
 launcher:
   enabled: true
   customRuntimeYaml: pro

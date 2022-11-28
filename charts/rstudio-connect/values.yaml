@@ -49,6 +49,8 @@ extraObjects: []
 image:
   # -- The repository to use for the main pod image
   repository: ghcr.io/rstudio/rstudio-connect
+  # -- A tag prefix for the server image (common selections: bionic-, ubuntu2204-). Only used if tag is not defined
+  tagPrefix: bionic-
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- The imagePullPolicy for the main pod image
@@ -221,6 +223,12 @@ launcher:
   launcherKubernetesProfilesConf: {}
   # -- Whether to use launcher templates when launching sessions. Defaults to true
   useTemplates: true
+  # -- extra templates to render in the template directory.
+  extraTemplates: {}
+  # -- whether to include the default `job.tpl` and `service.tpl` files included with the chart
+  includeDefaultTemplates: true
+  # -- whether to include the templateValues rendering process
+  includeTemplateValues: true
   # -- Values to pass along to the RStudio Connect session templating process
   templateValues:
     service:
@@ -237,6 +245,11 @@ launcher:
       imagePullSecrets: []
       initContainers: []
       extraContainers: []
+      containerSecurityContext: {}
+      defaultSecurityContext: {}
+      securityContext: {}
+      tolerations: []
+      affinity: {}
     job:
       annotations: {}
       labels: {}
@@ -246,6 +259,8 @@ launcher:
     enabled: true
     # -- The repository to use for the Content InitContainer image
     repository: ghcr.io/rstudio/rstudio-connect-content-init
+    # -- A tag prefix for the Content InitContainer image (common selections: bionic-, ubuntu2204-). Only used if tag is not defined
+    tagPrefix: bionic-
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     # -- The imagePullPolicy for the default initContainer

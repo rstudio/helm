@@ -20,7 +20,8 @@ data:
       {{- $jobJsonRuntimeMount := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMount") "json" ( $rscVolumeMount ) }}
     {{- /* 3 - init container */ -}}
       {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-      {{- $initContainerImage := print .Values.launcher.defaultInitContainer.repository ":" ( .Values.launcher.defaultInitContainer.tag | default $defaultVersion ) }}
+      {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default (printf "%s%s" .Values.launcher.defaultInitContainer.tagPrefix $defaultVersion )}}
+      {{- $initContainerImage := print .Values.launcher.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
       {{- $initContainerPullPolicy := default .Values.launcher.defaultInitContainer.imagePullPolicy "IfNotPresent" }}
       {{- $initContainerVolumeMount := dict "name" ("rsc-volume") "mountPath" ("/mnt/rstudio-connect-runtime/") }}
       {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "imagePullPolicy" ($initContainerPullPolicy) "volumeMounts" ( list  $initContainerVolumeMount ) }}
@@ -68,12 +69,20 @@ metadata:
   name: {{ include "rstudio-connect.fullname" . }}-templates
   namespace: {{ $.Release.Namespace }}
 data:
+  {{- if .Values.launcher.includeTemplateValues }}
   rstudio-library-templates-data.tpl: |
     {{- $tplData := dict "name" "rstudio-library.templates.data" "value" $sessionTemplate }}
     {{- include "rstudio-library.templates.dataOutput" $tplData | nindent 4}}
+  {{- end }}
+  {{- if .Values.launcher.includeDefaultTemplates }}
   job.tpl: |
     {{- .Files.Get "files/job.tpl" | nindent 4 }}
   service.tpl: |
     {{- .Files.Get "files/service.tpl" | nindent 4 }}
+  {{- end }}
+  {{- range $key, $val := .Values.launcher.extraTemplates }}
+  {{ $key }}: |
+    {{- $val | nindent 4 }}
+  {{- end }}
 {{- end }}
 {{- end }}

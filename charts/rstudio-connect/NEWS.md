@@ -1,3 +1,13 @@
+# 0.3.8
+
+
+- Add updated templates for `launcher.templateValues` and session container customization
+  - Add customization of `securityContext` and `containerSecurityContext` ([#293](https://github.com/rstudio/helm/issues/293))
+  - Fix typo in `serviceAccountName` implementation ([#251](https://github.com/rstudio/helm/issues/251))
+  - Add `affinity` and `tolerations` ([#271](https://github.com/rstudio/helm/issues/271) and [#283](https://github.com/rstudio/helm/issues/283))
+- Add an `image.tagPrefix` value to make customizing the operating system easier
+- Add a `launcher.defaultInitContainer.tagPrefix` value to make customizing the operating system easier
+
 # 0.3.7
 
 - Bump Connect version to 2022.11.0

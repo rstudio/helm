@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.3.7](https://img.shields.io/badge/Version-0.3.7-informational?style=flat-square) ![AppVersion: bionic-2022.11.0](https://img.shields.io/badge/AppVersion-bionic--2022.11.0-informational?style=flat-square)
+![Version: 0.3.8](https://img.shields.io/badge/Version-0.3.8-informational?style=flat-square) ![AppVersion: 2022.11.0](https://img.shields.io/badge/AppVersion-2022.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.7:
+To install the chart with the release name `my-release` at version 0.3.8:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.3.7
+helm install my-release rstudio/rstudio-connect --version=0.3.8
 ```
 
 ### NOTE
@@ -80,11 +80,12 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | config | object | [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
-| image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":""}` | Defines the RStudio Connect image to deploy |
+| image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"bionic-"}` | Defines the RStudio Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
 | image.repository | string | `"ghcr.io/rstudio/rstudio-connect"` | The repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
+| image.tagPrefix | string | `"bionic-"` | A tag prefix for the server image (common selections: bionic-, ubuntu2204-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -93,15 +94,19 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
 | launcher.additionalRuntimeImages | list | `[]` | Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key). If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list". |
 | launcher.customRuntimeYaml | string | `"base"` | Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default runtime.yaml file. If changing this value, be careful to include the images that you have already used. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). |
-| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","tag":""}` | Image definition for the default RStudio Connect Content InitContainer |
+| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","tag":"","tagPrefix":"bionic-"}` | Image definition for the default RStudio Connect Content InitContainer |
 | launcher.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. |
 | launcher.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
 | launcher.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
 | launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
+| launcher.defaultInitContainer.tagPrefix | string | `"bionic-"` | A tag prefix for the Content InitContainer image (common selections: bionic-, ubuntu2204-). Only used if tag is not defined |
 | launcher.enabled | bool | `false` | Whether to enable the launcher |
+| launcher.extraTemplates | object | `{}` | extra templates to render in the template directory. |
+| launcher.includeDefaultTemplates | bool | `true` | whether to include the default `job.tpl` and `service.tpl` files included with the chart |
+| launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.launcherKubernetesProfilesConf | object | `{}` | User definition of launcher.kubernetes.profiles.conf for job customization |
 | launcher.namespace | string | `""` | The namespace to launch sessions into. Uses the Release namespace by default |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"annotations":{},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"serviceAccountName":"","volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the RStudio Connect session templating process |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"containerSecurityContext":{},"defaultSecurityContext":{},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the RStudio Connect session templating process |
 | launcher.useTemplates | bool | `true` | Whether to use launcher templates when launching sessions. Defaults to true |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |
