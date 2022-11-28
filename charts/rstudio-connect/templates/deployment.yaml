@@ -52,11 +52,9 @@ spec:
          */}}
       {{- if and .Values.rbac.create .Values.launcher.enabled }}
       {{ $serviceAccountName := default .Values.rbac.serviceAccount.name (include "rstudio-connect.fullname" .) }}
-      serviceAccount: {{ $serviceAccountName }}
       serviceAccountName: {{ $serviceAccountName }}
       {{- else }}
-      serviceAccount: {{ .Values.pod.serviceAccountName | toString | quote }}
-      serviceAccountName: {{ .Values.pod.serviceAccountName | toString | quote }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name | toString | quote }}
       {{- end }}
       {{- with .Values.pod.securityContext }}
       securityContext:
