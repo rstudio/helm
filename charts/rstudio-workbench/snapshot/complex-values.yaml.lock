@@ -453,6 +453,7 @@ data:
     CRAN=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
     RSPM=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
   rsession.conf: |
+  rstudio-prefs.json: |
 ---
 # Source: rstudio-workbench/templates/configmap-startup.yaml
 apiVersion: v1
@@ -655,7 +656,7 @@ metadata:
   name: release-name-rstudio-workbench
   namespace: rstudio
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.23
+    helm.sh/chart: rstudio-workbench-0.5.24
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "2022.07.2-576.pro12"
@@ -702,7 +703,7 @@ spec:
         checksum/config-graphite: 69dd73685cb821ebf5bcec3155d92801f31d72b031a4d681700bded2ff5700c2
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: fc06992d38b807a70a6f5722d670969573e2ee3f82293197a2bd0d840ca3a7d4
-        checksum/config-session: 1e1189618d9113414ca3b1ff32a6d723ccefa7eacb23a20c63c26910fdcca983
+        checksum/config-session: 75e2ce5c7bf075bab77ace7c86c3f9f97706137bec3b54eb0e5b7c022950bd6a
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9108"
@@ -890,7 +891,7 @@ kind: Ingress
 metadata:
   name: release-name-rstudio-workbench
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.23
+    helm.sh/chart: rstudio-workbench-0.5.24
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "2022.07.2-576.pro12"
