@@ -1,5 +1,8 @@
-# 0.3.8
+# 0.3.9
 
+- Fix a typo in `launcher.defaultInitContainer.imagePullPolicy` ([#289](https://github.com/rstudio/helm/pull/289))
+
+# 0.3.8
 
 - Add updated templates for `launcher.templateValues` and session container customization
   - Add customization of `securityContext` and `containerSecurityContext` ([#293](https://github.com/rstudio/helm/issues/293))
