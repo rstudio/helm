@@ -462,9 +462,10 @@ spec:
     - ReadWriteMany
   volumeMode: Filesystem
   storageClassName: nfs
+  volumeName: test2-volume
   resources:
     requests:
-      storage: 200Gi
+      storage: 20Mi
 ---
 # Source: rstudio-workbench/templates/pvc.yaml
 kind: PersistentVolumeClaim
@@ -479,9 +480,10 @@ spec:
     - ReadWriteMany
   volumeMode: Filesystem
   storageClassName: nfs
+  volumeName: test-volume
   resources:
     requests:
-      storage: 500Gi
+      storage: 50Mi
 ---
 # Source: rstudio-workbench/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -569,7 +571,7 @@ metadata:
   name: release-name-rstudio-workbench
   namespace: rstudio
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.24
+    helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "2022.07.2-576.pro12"
@@ -775,6 +777,7 @@ metadata:
   annotations:
    "helm.sh/hook": test
 spec:
+  
   serviceAccountName: rstudio-server-job-launcher
   shareProcessNamespace: false
   restartPolicy: Never

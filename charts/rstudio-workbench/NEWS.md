@@ -1,3 +1,8 @@
+# 0.5.25
+
+- Add `homeStorage.otherArgs` and `sharedStorage.otherArgs` for other PVC arguments
+  - This can be useful for arguments like `volumeName` when using a PVC that references a PV
+
 # 0.5.24
 
 - BREAKING: remove `serviceAccountName` in favor of `rbac.serviceAccount.name`.
