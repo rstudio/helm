@@ -480,7 +480,7 @@ metadata:
   name: release-name-rstudio-workbench
   namespace: rstudio
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.24
+    helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "2022.07.2-576.pro12"
@@ -649,7 +649,7 @@ kind: Ingress
 metadata:
   name: release-name-rstudio-workbench
   labels:
-    helm.sh/chart: rstudio-workbench-0.5.24
+    helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "2022.07.2-576.pro12"
@@ -678,6 +678,7 @@ metadata:
   annotations:
    "helm.sh/hook": test
 spec:
+  
   serviceAccountName: release-name-rstudio-workbench
   shareProcessNamespace: false
   restartPolicy: Never
