@@ -42,11 +42,11 @@ snapshot-rsw:
   #!/bin/bash
   set -xe
 
-  helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" > charts/rstudio-workbench/snapshot/default.yaml
-  
+  helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" | sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' > charts/rstudio-workbench/snapshot/default.yaml
+
   for file in `ls ./charts/rstudio-workbench/ci/*.yaml`; do
     filename=$(basename $file)
-    helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" -f $file > charts/rstudio-workbench/snapshot/$filename
+    helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" -f $file | sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' > charts/rstudio-workbench/snapshot/$filename
   done
 
 snapshot-rsw-lock:
