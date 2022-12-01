@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square) ![AppVersion: 2022.11.2-18](https://img.shields.io/badge/AppVersion-2022.11.2--18-informational?style=flat-square)
+![Version: 0.5.2](https://img.shields.io/badge/Version-0.5.2-informational?style=flat-square) ![AppVersion: 2022.11.2-18](https://img.shields.io/badge/AppVersion-2022.11.2--18-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.1:
+To install the chart with the release name `my-release` at version 0.5.2:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.5.1
+helm install my-release rstudio/rstudio-pm --version=0.5.2
 ```
 
 ## Upgrade Guidance
@@ -180,7 +180,9 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | sharedStorage.path | string | `"/var/lib/rstudio-pm"` | the path to mount the sharedStorage claim within the pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
+| sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
+| sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | The update strategy used by the main service pod. |
