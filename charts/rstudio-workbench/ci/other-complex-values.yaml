@@ -42,14 +42,16 @@ sharedStorage:
   path: "/var/lib/awesome"
   storageClassName: nfs
   requests:
-    storage: "200Gi"
+    storage: "20Mi"
+  volumeName: test2-volume
 
 homeStorage:
   create: true
   path: "/mnt/home"
   storageClassName: nfs
   requests:
-    storage: "500Gi"
+    storage: "50Mi"
+  volumeName: test-volume
 
 prometheusExporter:
   mappingYaml: |
