@@ -8,13 +8,20 @@ metadata:
     {{- .Values.sharedStorage.annotations | toYaml | nindent 4 }}
 spec:
   accessModes:
-{{ .Values.sharedStorage.accessModes | toYaml | indent 4 }}
+    {{- .Values.sharedStorage.accessModes | toYaml | nindent 4 }}
   volumeMode: Filesystem
   {{- if .Values.sharedStorage.storageClassName }}
   storageClassName: {{ .Values.sharedStorage.storageClassName }}
   {{- end }}
+  {{- with .Values.sharedStorage.volumeName }}
+  volumeName: {{ . }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.sharedStorage.requests.storage }}
+  {{- with .Values.sharedStorage.selector }}
+  selector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 ---
 {{- end }}

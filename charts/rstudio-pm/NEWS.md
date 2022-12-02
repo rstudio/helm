@@ -1,3 +1,8 @@
+# 0.5.2
+
+- Add `sharedStorage.volumeName` for PVCs that reference a PV
+- Add `sharedStorage.selector` as well
+
 # 0.5.1
 
 - Fix a bug in the image reference. Images now have an operating system reference

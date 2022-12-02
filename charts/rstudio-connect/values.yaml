@@ -28,6 +28,10 @@ sharedStorage:
   # -- Annotations for the Persistent Volume Claim
   annotations:
     helm.sh/resource-policy: keep
+  # -- selector for PVC definition
+  selector: {}
+  # -- the volumeName passed along to the persistentVolumeClaim. Optional
+  volumeName: ""
 
 rbac:
   # -- Whether to create rbac. (also depends on launcher.enabled = true)

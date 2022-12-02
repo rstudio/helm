@@ -4,6 +4,11 @@ image:
   imagePullPolicy: Always
   imagePullSecrets:
     - name: "some-secret"
+
+sharedStorage:
+  create: true
+  storageClassName: test-class
+  volumeName: test-volume
 license:
   key: test
 service:

@@ -1,3 +1,8 @@
+# 0.3.11
+
+- Add `sharedStorage.volumeName` for PVCs that reference a PV
+- Add `sharedStorage.selector` as well
+
 # 0.3.10
 
 - Deprecate `pod.serviceAccountName` in favor of `rbac.serviceAccount.name` ([#267](https://github.com/rstudio/helm/issues/267))

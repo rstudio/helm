@@ -26,6 +26,10 @@ sharedStorage:
   # -- Define the annotations for the Persistent Volume Claim resource
   annotations:
     helm.sh/resource-policy: keep
+  # -- selector for PVC definition
+  selector: {}
+  # -- the volumeName passed along to the persistentVolumeClaim. Optional
+  volumeName: ""
 
 image:
   # -- the repository to use for the main pod image
