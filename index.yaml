@@ -3152,6 +3152,52 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-package-manager
+          image: rstudio/rstudio-package-manager:bionic-2022.11.2
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2022.11.2
+    created: "2022-12-05T15:42:45.462785221Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.23
+    description: Official Helm chart for RStudio Package Manager
+    digest: 66cf0af3db3cacff4fdcba2e7a82ade14a33f199ebfe7991d73f7858fc692914
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    - https://github.com/rstudio/rstudio-docker-products
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.5.3/rstudio-pm-0.5.3.tgz
+    version: 0.5.3
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-package-manager
           image: rstudio/rstudio-package-manager:bionic-2022.11.2-18
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -7053,4 +7099,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2022-12-02T20:53:39.727641209Z"
+generated: "2022-12-05T15:42:45.464633788Z"
