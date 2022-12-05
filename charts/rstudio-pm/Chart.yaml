@@ -19,7 +19,7 @@ dependencies:
 annotations:
   artifacthub.io/images: |
     - name: rstudio-package-manager
-      image: rstudio/rstudio-package-manager:bionic-2022.11.2-18
+      image: rstudio/rstudio-package-manager:bionic-2022.11.2
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: RStudio Community
