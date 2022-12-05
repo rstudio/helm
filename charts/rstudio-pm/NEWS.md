@@ -1,3 +1,7 @@
+# 0.5.3
+
+- Fix Package Manager default image reference
+
 # 0.5.2
 
 - Add `sharedStorage.volumeName` for PVCs that reference a PV
