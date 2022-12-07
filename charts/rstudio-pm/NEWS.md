@@ -1,3 +1,7 @@
+# 0.5.4
+
+- Update default Posit Package Manager version to 2022.11.4-20
+
 # 0.5.3
 
 - Fix Package Manager default image reference
