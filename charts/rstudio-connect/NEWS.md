@@ -1,3 +1,7 @@
+# 0.3.12
+
+- Bump Connect version to 2022.12.0
+
 # 0.3.11
 
 - Add `sharedStorage.volumeName` for PVCs that reference a PV
