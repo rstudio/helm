@@ -269,6 +269,8 @@ launcher:
     tag: ""
     # -- The imagePullPolicy for the default initContainer
     imagePullPolicy: ""
+    # -- The securityContext for the default initContainer
+    securityContext: {}
 
 # -- A nested map of maps that generates the rstudio-connect.gcfg file
 # @default -- [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/)
