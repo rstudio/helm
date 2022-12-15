@@ -2,6 +2,8 @@
 
 - add `launcher.defaultInitContainer.securityContext` to configure the `securityContext` on the default `initContainer`
   ([#319](https://github.com/rstudio/helm/issues/319))
+- add `serviceMonitor` section for defining a ServiceMonitor object [(#126)[https://github.com/rstudio/helm/issues/126]]
+- improve consistency in the `prometheusExporter` configuration section (as compared to the `rstudio-workbench` chart)
 
 # 0.3.12
 

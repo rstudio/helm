@@ -7,6 +7,13 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 data:
   graphite-mapping.yaml: |-
+  {{- if .Values.prometheusExporter.mappingYaml }}
+    {{- if kindIs "string" .Values.prometheusExporter.mappingYaml }}
+      {{- .Values.prometheusExporter.mappingYaml | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.prometheusExporter.mappingYaml | nindent 4 }}
+    {{- end }}
+  {{- else }}
     mappings:
       - match: "rsconnect\\.([\\w-]+)\\.content-(\\d+)\\.(.*)"
         match_type: regex
@@ -57,4 +64,5 @@ data:
         name: "rsconnect_$2"
         labels:
           host: "$1"
+  {{- end }}
 {{- end }}

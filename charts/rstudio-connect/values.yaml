@@ -139,11 +139,27 @@ securityContext:
 prometheusExporter:
   # -- Whether the  prometheus exporter sidecar should be enabled
   enabled: true
+  # -- Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
+  mappingYaml: null
+  # -- securityContext for the prometheus exporter sidecar
+  securityContext: {}
+  # -- resource specification for the prometheus exporter sidecar
+  resources: {}
   image:
     repository: "prom/graphite-exporter"
     tag: "v0.9.0"
     imagePullPolicy: IfNotPresent
-  resources: {}
+
+serviceMonitor:
+  # -- Whether to create a ServiceMonitor CRD for use with a Prometheus Operator
+  enabled: false
+  # -- Namespace to create the ServiceMonitor in (usually the same as the one in
+  # which the Prometheus Operator is running). Defaults to the release namespace
+  namespace: ""
+  # -- additionalLabels normally includes the release name of the Prometheus
+  # Operator
+  additionalLabels: {}
+  #   release: kube-prometheus-stack
 
 # -- Defines resources for the rstudio-connect container
 resources: {}
