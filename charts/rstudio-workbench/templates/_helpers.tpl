@@ -206,6 +206,10 @@ containers:
   ports:
   - containerPort: 9108
     name: metrics
+  {{- with .Values.prometheusExporter.resources }}
+  resources:
+    {{ toYaml . | nindent 10 }}
+  {{- end }}
   securityContext:
     {{- toYaml .Values.prometheusExporter.securityContext | nindent 4 }}
 {{- end }}
