@@ -1,3 +1,7 @@
+# 0.5.26
+
+- Add a `prometheusExporter.resources` configuration section for consistency with the Connect chart
+
 # 0.5.25
 
 - Add `homeStorage.otherArgs` and `sharedStorage.otherArgs` for other PVC arguments

@@ -1,6 +1,6 @@
 name: rstudio-workbench
 description: Official Helm chart for RStudio Workbench
-version: 0.5.25
+version: 0.5.26
 apiVersion: v2
 appVersion: 2022.07.2-576.pro12
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png

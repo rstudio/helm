@@ -290,6 +290,8 @@ prometheusExporter:
   mappingYaml: null
   # -- securityContext for the prometheus exporter sidecar
   securityContext: {}
+  # -- resource specification for the prometheus exporter sidecar
+  resources: {}
   image:
     repository: "prom/graphite-exporter"
     tag: "v0.9.0"

@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2022.07.2-576.pro12](https://img.shields.io/badge/AppVersion-2022.07.2--576.pro12-informational?style=flat-square)
+![Version: 0.5.26](https://img.shields.io/badge/Version-0.5.26-informational?style=flat-square) ![AppVersion: 2022.07.2-576.pro12](https://img.shields.io/badge/AppVersion-2022.07.2--576.pro12-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -23,11 +23,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.25:
+To install the chart with the release name `my-release` at version 0.5.26:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.25
+helm install my-release rstudio/rstudio-workbench --version=0.5.26
 ```
 
 ## Required Configuration
@@ -403,6 +403,7 @@ config:
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |
 | prometheusExporter.mappingYaml | string | `nil` | Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file |
+| prometheusExporter.resources | object | `{}` | resource specification for the prometheus exporter sidecar |
 | prometheusExporter.securityContext | object | `{}` | securityContext for the prometheus exporter sidecar |
 | rbac.clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
 | rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
