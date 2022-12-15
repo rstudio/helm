@@ -23,8 +23,9 @@ data:
       {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default (printf "%s%s" .Values.launcher.defaultInitContainer.tagPrefix $defaultVersion )}}
       {{- $initContainerImage := print .Values.launcher.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
       {{- $initContainerPullPolicy := default "IfNotPresent" .Values.launcher.defaultInitContainer.imagePullPolicy }}
+      {{- $initContainerSecurityContext := .Values.launcher.defaultInitContainer.securityContext }}
       {{- $initContainerVolumeMount := dict "name" ("rsc-volume") "mountPath" ("/mnt/rstudio-connect-runtime/") }}
-      {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "imagePullPolicy" ($initContainerPullPolicy) "volumeMounts" ( list  $initContainerVolumeMount ) }}
+      {{- $initContainerJson := dict "name" ("init") "image" ($initContainerImage) "imagePullPolicy" ($initContainerPullPolicy) "volumeMounts" ( list  $initContainerVolumeMount ) "securityContext" $initContainerSecurityContext }}
       {{- $jobJsonInitContainer := dict "target" ("/spec/template/spec/initContainers/0") "name" ("defaultInitContainer") "json" $initContainerJson }}
     {{- /* set up job-json defaults */ -}}
       {{- $jobJsonDefaults := list }}

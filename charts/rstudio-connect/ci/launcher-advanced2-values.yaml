@@ -7,6 +7,10 @@ sharedStorage:
   create: true
 launcher:
   enabled: true
+  defaultInitContainer:
+    enabled: true
+    securityContext:
+      allowPrivilegedEscalation: false
   additionalRuntimeImages: |
     - name: ghcr.io/rstudio/content-base:r4.1.0-py3.9.2-bionic
       python:
