@@ -1,5 +1,5 @@
 # this example deploys RStudio Workbench with a PersistentVolume
-# 
+#
 # the PersistentVolume allows setting NFS mountOptions
 # it creates a storage class that RStudio Workbench then takes advantage of
 # when it creates its PersistentVolumeClaim
@@ -33,8 +33,6 @@ extraObjects:
         - rw
         - lookupcache=pos
         - vers=4
-        - noac
-        - actimeo=1
       nfs:
         path: /
         server: nfs.server.example.com
