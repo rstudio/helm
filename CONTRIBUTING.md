@@ -34,6 +34,60 @@ We'll try to be as responsive as possible in reviewing and accepting pull reques
 - If `index.yaml` gets out of date on the repository, see
   [`./scripts/`](./scripts) for a workflow to fix
 
+## Templates
+
+The `rstudio-workbench` and `rstudio-connect` charts both make heavy use of the "templating" feature of the Posit Job
+Launcher. The templates are embedded within the charts using the following paradigm:
+
+- copy "parent" templates as-is into the [./examples/launcher-templates/default](./examples/launcher-templates/default)
+  directory with a dedicated version folder. (i.e. `2.1.0`). NOTE that the "template version" is _not_ the "launcher version,"
+  although a given Launcher version _only works_ with a single major version of the templates.
+- Create a "helm-based" version (i.e. `v1`, `v2`, etc.) directory
+  in [./examples/launcher-templates/helm](./examples/launcher-templates/helm). For example, `2.1.0-v2`.
+    - Helm-based versions are simple integers with a `v` to delineate the difference
+- Copy the templates from the "parent"/"default" directory to the new directory. Use `vimdiff` or some other diffing tool
+  to make sure:
+    - All helm-based features from the current helm-based version (i.e. `v2`) should be supported
+    - All launcher-based features from the current launcher-based version (i.e. `2.1.0`) should be supported
+    - The canonical way to do this is:
+        - diff `helm/2.1.0-v2/job.tpl` against `default/2.1.0/job.tpl` (launcher version). You should see the helm modifications only
+        - diff `helm/2.1.0-v2/job.tpl` against `helm/2-v2/job.tpl` (previous launcher+helm version)
+          or `helm/2.1.0-v1/job.tpl` (previous helm version). You should see launcher changes or new helm features,
+          respectively.
+- Once the templates are stable, copy as-is to the chart `files/` directory (i.e. for `rstudio-workbench`,
+  to [./charts/rstudio-workbench/files](./charts/rstudio-workbench/files)).
+- Test using the [`launcher-template`](https://github.com/rstudio/launcher-template) utility (still under development).
+```bash
+helm template ./charts/rstudio-workbench | launcher-template
+```
+
+A diagram of the hierarchy / inheritance of templates is below:
+
+```mermaid
+flowchart TB;
+  subgraph Job Launcher
+  id1("Original Templates (i.e. 2.1.0)");
+  end
+  subgraph Helm Repository
+    id2("examples/launcher-templates/default/2.1.0")
+    id3("examples/launcher-templates/helm/2.1.0-v2")
+  end
+  subgraph "Helm Chart (i.e. workbench)"
+    id4("charts/rstudio-workbench/files/*")
+  end
+  id1-- "copy as-is" -->id2
+  id2-- "Helm modifications, add helm dedicated version, etc." -->id3
+  id3-- "copy as-is" -->id4
+```
+
+> **IMPORTANT NOTE**: The template version is _tied to the product version_, and may differ between 
+> products. Take care when updating a product's template versions, and ensure that you have tested
+> with a proper license to ensure that the product is functional.
+
+At some point, we plan to push some (all?) of the `helm`-based features upstream into the original. However, for now
+we are evaluating and gathering feedback on the mechanism. In particular, we need to explore what "sub-templating" and
+passing templated "values" look like inside of helm to simplify narrowly scoped logic injection by customers.
+
 ## Code of Conduct
 
 As contributors and maintainers of this project, we pledge to respect all people who contribute through reporting issues, posting feature requests, updating documentation, submitting pull requests or patches, and other activities.
