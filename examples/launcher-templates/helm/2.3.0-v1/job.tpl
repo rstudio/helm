@@ -75,8 +75,8 @@ spec:
       nodeName: {{ toYaml .Job.host }}
       {{- end }}
       restartPolicy: Never
-      {{- with $templateData.pod.serviceAccountName }}
-      serviceAccountName: {{ . }}
+      {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
+      serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName }}
       {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
@@ -122,9 +122,6 @@ spec:
         {{- range $key, $val := $securityContext }}
         {{ $key }}: {{ $val }}
         {{- end }}
-      {{- end }}
-      {{- if .Job.serviceAccountName }}
-      serviceAccountName: {{ .Job.serviceAccountName }}
       {{- end }}
       {{- with $templateData.pod.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 12 }}
