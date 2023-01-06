@@ -124,6 +124,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.haste | bool | `true` | A helper that defines the RSTUDIO_CONNECT_HASTE environment variable |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
+| pod.lifecycle | object | `{"preStop":{"exec":{"command":["/opt/rstudio-connect/bin/license-manager","deactivate"]}}}` | Definition for pod lifecycle hooks |
 | pod.port | int | `3939` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
 | pod.serviceAccountName | bool | `false` | Deprecated. Use `rbac.serviceAccount.name` instead |
