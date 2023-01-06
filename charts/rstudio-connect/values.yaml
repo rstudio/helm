@@ -104,6 +104,11 @@ pod:
   securityContext: {}
   # -- The containerPort used by the main pod container
   port: 3939
+  # -- Definition for pod lifecycle hooks
+  lifecycle: 
+    preStop:
+      exec:
+        command: ["/opt/rstudio-connect/bin/license-manager", "deactivate"]
 
 # -- The pod's run command. By default, it uses the container's default
 command: []

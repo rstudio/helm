@@ -94,9 +94,9 @@ spec:
         args: {{ .Values.args }}
         {{- end }}
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
-        {{- if .Values.pod.lifecycle }}
+        {{- with .Values.pod.lifecycle }}
         lifecycle:
-          {{- toYaml .Values.pod.lifecycle | nindent 10 }}
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         ports:
         - containerPort: 4242

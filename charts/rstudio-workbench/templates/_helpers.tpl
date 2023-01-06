@@ -198,6 +198,10 @@ containers:
 - name: exporter
   image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
   imagePullPolicy: "{{ .Values.prometheusExporter.image.imagePullPolicy }}"
+  {{- with .Values.pod.lifecycle }}
+  lifecycle:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   args:
     - "--graphite.mapping-config=/mnt/graphite/graphite-mapping.yaml"
   volumeMounts:

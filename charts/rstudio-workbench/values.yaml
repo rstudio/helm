@@ -282,6 +282,11 @@ pod:
   sidecar: false
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
+  # -- Definition for pod lifecycle hooks
+  lifecycle: 
+    preStop:
+      exec:
+        command: ["/usr/lib/rstudio-server/bin/license-manager", "deactivate"]
 
 prometheusExporter:
   # -- whether the  prometheus exporter sidecar should be enabled

@@ -123,7 +123,9 @@ pod:
   # -- Additional labels to add to the rstudio-pm pods
   labels: {}
   # -- Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
-  lifecycle: {}
+  lifecycle:
+    preStop:
+      command: ["/opt/rstudio-pm/bin/license-manager", "deactivate", "--userspace"]
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
   securityContext: {}
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template.
