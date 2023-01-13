@@ -12,6 +12,12 @@ metadata:
   name: rstudio-launcher-rbac
 rules:
   - apiGroups:
+    - ""
+    resources:
+    - "serviceaccounts"
+    verbs:
+    - "list"
+  - apiGroups:
       - ""
     resources:
       - "pods/log"
