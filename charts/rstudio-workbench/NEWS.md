@@ -1,3 +1,7 @@
+# 0.5.27
+
+- Bump Workbench version to 2022.12.0
+
 # 0.5.26
 
 - Add a `prometheusExporter.resources` configuration section for consistency with the Connect chart
