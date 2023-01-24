@@ -1,0 +1,37 @@
+strategy:
+  type: Recreate
+  rollingUpdate: null
+  
+config:
+  Database:
+    Provider: SQLite
+    Dir: /mnt/db
+    
+sharedStorage:
+  create: true
+  storageClassName: something-read-write-many # TODO: change this
+
+pod:
+  volumes:
+    - name: rspm-db
+      persistentVolumeClaim:
+        claimName: package-manager-database-claim
+  volumeMounts:
+    - name: rspm-db
+      mountPath: /mnt/db
+
+extraObjects:
+  - |
+    kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: package-manager-database-claim
+      namespace: {{ $.Release.Namespace }}
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      volumeMode: Filesystem
+      storageClassName: something-read-write-once # TODO: change this
+      resources:
+        requests:
+          storage: 32Gi

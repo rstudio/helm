@@ -1,0 +1,38 @@
+strategy:
+  type: Recreate
+
+config:
+  secret:
+    database.conf:
+      provider: sqlite
+      directory: /mnt/db
+
+homeStorage:
+  create: true
+  storageClassName: something-read-write-many # TODO: change this
+
+
+pod:
+  volumes:
+    - name: rsw-db
+      persistentVolumeClaim:
+        claimName: workbench-database-claim
+  volumeMounts:
+    - name: rsw-db
+      mountPath: /mnt/db
+
+extraObjects:
+  - |
+    kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: workbench-database-claim
+      namespace: {{ $.Release.Namespace }}
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      volumeMode: Filesystem
+      storageClassName: something-read-write-once # TODO: change this
+      resources:
+        requests:
+          storage: 32Gi
