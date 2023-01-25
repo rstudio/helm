@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![AppVersion: 2022.12.0](https://img.shields.io/badge/AppVersion-2022.12.0-informational?style=flat-square)
+![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![AppVersion: 2023.01.0](https://img.shields.io/badge/AppVersion-2023.01.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 

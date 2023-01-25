@@ -1,3 +1,7 @@
+# 0.3.14
+
+- Bump Connect version to 2023.01.0
+
 # 0.3.13
 
 - add `launcher.defaultInitContainer.securityContext` to configure the `securityContext` on the default `initContainer`
