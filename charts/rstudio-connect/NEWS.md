@@ -1,3 +1,7 @@
+# 0.3.15
+
+- Bump Connect Launcher templates to `2.3.0-v1`
+
 # 0.3.14
 
 - Bump Connect version to 2023.01.0
