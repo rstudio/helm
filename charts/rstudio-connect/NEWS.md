@@ -1,3 +1,12 @@
+# 0.3.15
+
+- Bump Connect Launcher templates to `2.3.0-v1`
+  - added `app.kubernetes.io/managed-by: "launcher"` in both `job.tpl` and `service.tpl`
+  - resource requests and limits calculations in `job.tpl`
+  - sets `serviceAccountName` in `job.tpl` for content jobs
+  - `launcher.templateValues.pod.serviceAccountName` to set the default service account for content pods
+
+
 # 0.3.14
 
 - Bump Connect version to 2023.01.0

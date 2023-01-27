@@ -1,6 +1,6 @@
-# Version: 2.1.0
+# Version: 2.3.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v2
+# Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -17,6 +17,7 @@ metadata:
     {{- end }}
     {{- end }}
   labels:
+    app.kubernetes.io/managed-by: "launcher"
     {{- with .Job.metadata.job.labels }}
     {{- range $key, $val := . }}
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
@@ -74,8 +75,8 @@ spec:
       nodeName: {{ toYaml .Job.host }}
       {{- end }}
       restartPolicy: Never
-      {{- with $templateData.pod.serviceAccountName }}
-      serviceAccountName: {{ . }}
+      {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
+      serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName }}
       {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
@@ -221,16 +222,12 @@ spec:
           {{- range .Job.resourceLimits }}
             {{- if eq .type "cpuCount" }}
               {{- $_ := set $limits "cpu" .value }}
-              {{- if ne $.Job.cpuRequestRatio 1.0 }}
-                {{- $val := mulf .value $.Job.cpuRequestRatio | toString }}
-                {{- $_ := set $requests "cpu" $val }}
-              {{- end }}
+            {{- else if eq .type "CPU Request" }}
+              {{- $_ := set $requests "cpu" .value }}
             {{- else if eq .type "memory" }}
               {{- $_ := set $limits "memory" (printf "%s%s" .value "M") }}
-              {{- if ne $.Job.memoryRequestRatio 1.0 }}
-                {{- $val := mulf .value $.Job.memoryRequestRatio }}
-                {{- $_ := set $requests "memory" (printf "%.2f%s" $val "M") }}
-              {{- end }}
+            {{- else if eq .type "Memory Request" }}
+              {{- $_ := set $requests "memory" (printf "%s%s" .value "M") }}
             {{- else if eq .type "NVIDIA GPUs" }}
               {{- $val := float64 .value }}
               {{- if ne $val 0.0 }}

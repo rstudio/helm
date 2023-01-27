@@ -1,6 +1,6 @@
-# Version: 2.1.0
+# Version: 2.3.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v2
+# Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: v1
 kind: Service
@@ -18,6 +18,7 @@ metadata:
     {{- end }}
     {{- end }}
   labels:
+    app.kubernetes.io/managed-by: "launcher"
     job-name: {{ toYaml .Job.id }}
     {{- with .Job.metadata.service.labels }}
     {{- range $key, $val := . }}
