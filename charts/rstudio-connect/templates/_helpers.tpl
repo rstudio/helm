@@ -72,9 +72,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- else }}
       {{- $_ := set $launcherSettingsDict "KubernetesUseTemplates" "false" }}
     {{- end }}
-    {{- if .Values.launcher.templateValues.pod.serviceAccountName }}
-      {{- $_ := set $launcherSettingsDict "KubernetesDefaultServiceAccount" .Values.launcher.templateValues.pod.serviceAccountName }}
-    {{- end }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
     {{- $pythonSettingsDict := dict "Enabled" ("true") }}
     {{- $pythonDict := dict "Python" ( $pythonSettingsDict ) }}
