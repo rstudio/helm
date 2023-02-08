@@ -122,6 +122,8 @@ pod:
   annotations: {}
   # -- Additional labels to add to the rstudio-pm pods
   labels: {}
+  # -- A map used verbatim as the pod's "nodeSelector" definition
+  nodeSelector: {}
   # -- Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
   lifecycle: {}
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod

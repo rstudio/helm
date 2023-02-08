@@ -40,6 +40,10 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.pod.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{/**
          * NOTE: In the case where a service account was in use and
          * then later removed, the behavior of kubernetes is to

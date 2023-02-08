@@ -95,6 +95,7 @@ launcher:
       securityContext: {}
       tolerations: []
       affinity: {}
+      nodeSelector: {}
     job:
       annotations: {}
       labels: {}
@@ -282,6 +283,8 @@ pod:
   sidecar: false
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
+  # -- A map used verbatim as the pod's "nodeSelector" definition
+  nodeSelector: {}
 
 prometheusExporter:
   # -- whether the  prometheus exporter sidecar should be enabled

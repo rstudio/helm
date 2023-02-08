@@ -100,6 +100,8 @@ pod:
   sidecar: false
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
+  # -- A map used verbatim as the pod's "nodeSelector" definition
+  nodeSelector: {}
   # -- Values to set the `securityContext` for the connect pod
   securityContext: {}
   # -- The containerPort used by the main pod container
@@ -270,6 +272,7 @@ launcher:
       securityContext: {}
       tolerations: []
       affinity: {}
+      nodeSelector: {}
     job:
       annotations: {}
       labels: {}
