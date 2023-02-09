@@ -1,3 +1,8 @@
+# 0.5.28
+
+- Bump rstudio-library to `0.1.24`
+  - Update RBAC definition to support listing of service accounts
+
 # 0.5.27
 
 - Bump Workbench version to 2022.12.0

@@ -1,3 +1,8 @@
+# 0.5.5
+
+- Bump rstudio-library to `0.1.24`
+  - Update RBAC definiton to support listing of service accounts
+
 # 0.5.4
 
 - Update default Posit Package Manager version to 2022.11.4-20

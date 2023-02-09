@@ -1,3 +1,7 @@
+# 0.3.16
+- Bump rstudio-library to `0.1.24`
+  - Update RBAC definition to support listing of service accounts
+
 # 0.3.15
 
 - Bump Connect Launcher templates to `2.3.0-v1`

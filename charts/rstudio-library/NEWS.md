@@ -1,3 +1,7 @@
+# 0.1.24
+
+- Update RBAC to support listing of service accounts
+
 # 0.1.23
 
 - Add helpers for launcher template usage
