@@ -1,3 +1,8 @@
+# 0.3.17
+
+- Bump Connect version to 2023.01.1
+
+
 # 0.3.16
 - Bump rstudio-library to `0.1.24`
   - Update RBAC definition to support listing of service accounts
