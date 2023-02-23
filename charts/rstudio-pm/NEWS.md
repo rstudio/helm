@@ -1,3 +1,7 @@
+# 0.5.6
+
+- Update documentation to remove "beta" label and explain production recommendations
+
 # 0.5.5
 
 - Bump rstudio-library to `0.1.24`
