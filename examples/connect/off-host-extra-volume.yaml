@@ -1,0 +1,20 @@
+# handles the primary application data
+# at /var/lib/rstudio-connect
+sharedStorage:
+  create: true
+  storageClassName: some-rwx-storage-class
+
+launcher:
+  enabled: true
+  templateValues:
+    pod:
+      # extra volumes and volume mounts for sessions
+      volumes:
+        - name: extra-volume
+          # could be any type of volume... nfs, configMap, etc.
+          # could also provision a PVC or PV via `extraObjects` if desired
+          persistentVolumeClaim:
+            claimName: some-claim
+      volumeMounts:
+        - name: extra-volume
+          mountPath: /some/path/with/jar-libraries
