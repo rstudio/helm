@@ -354,15 +354,45 @@ app.kubernetes.io/instance: {{ .Release.Name }}
             - Otherwise use .Values.config.serverDcf.launcher-mounts
 */}}
 {{- define "rstudio-workbench.config.launcherMounts" -}}
-{{ $currentMounts := index $.Values.config.serverDcf "launcher-mounts"  }}
-{{- if and ( empty $currentMounts ) ( or $.Values.homeStorage.create $.Values.homeStorage.mount ) -}}
+{{- $currentMounts := index $.Values.config.serverDcf "launcher-mounts"  }}
 {{- $claimNameDefault := printf "%s-home-storage" (include "rstudio-workbench.fullname" . ) }}
 {{- $claimName := default $claimNameDefault $.Values.homeStorage.name }}
-{{- $defaultMounts := (dict "launcher-mounts" (dict "MountType" "KubernetesPersistentVolumeClaim" "MountPath" $.Values.homeStorage.path "ClaimName" $claimName ) ) }}
-{{ include "rstudio-library.config.dcf" $defaultMounts }}
+{{- $finalMount := list }}
+{{- /* only alter things if homeStorage is defined */ -}}
+{{- if or $.Values.homeStorage.create $.Values.homeStorage.mount -}}
+    {{- /* preserve strings */ -}}
+    {{- if kindIs "string" $currentMounts }}
+        {{- $finalMount = $currentMounts }}
+    {{- /* for lists and dicts, potentially append */ -}}
+    {{- else if or (kindIs "map" $currentMounts) (kindIs "list" $currentMounts) }}
+        {{- $tmpMounts := list }}
+        {{- /* ensure $tmpMounts is a list */ }}
+        {{- if kindIs "map" $currentMounts }}
+            {{- $tmpMounts = append $tmpMounts $currentMounts }}
+        {{- else }}
+            {{- $tmpMounts = $currentMounts }}
+        {{- end }}
+
+        {{- /* check if the defaultMount (of the homeStorage PVC) is already defined by the user */ }}
+        {{- /* TODO: implement a helper that does this lookup for us... key on MountPath? Or ClaimName? */ }}
+        {{- /* TODO: also need an escape hatch to turn this magic off */ -}}
+        {{- $mountAlreadyDefined := false }}
+
+        {{- /* only alter $tmpMounts if claim is not provided by the user */ -}}
+        {{- if not $mountAlreadyDefined }}
+            {{- $defaultMount := (dict "MountType" "KubernetesPersistentVolumeClaim" "MountPath" $.Values.homeStorage.path "ClaimName" $claimName ) }}
+            {{- $tmpMounts = append $tmpMounts $defaultMount}}
+        {{- end }}
+
+        {{- $finalMount = $tmpMounts }}
+    {{- /* otherwise, fail */ -}}
+    {{- else }}
+        {{- /* TODO: fail - unexpected type */ }}
+    {{- end }}
 {{- else }}
-{{ include "rstudio-library.config.dcf" (dict "launcher-mounts" $currentMounts) }}
+    {{- $finalMount = $currentMounts }}
 {{- end }}
+{{- include "rstudio-library.config.dcf" (dict "launcher-mounts" $finalMount ) }}
 {{- end }}
 
 {{/*
