@@ -1,3 +1,7 @@
+# 0.2.15
+
+- Update documentation to remove "beta" label and explain production recommendations
+
 # 0.2.13+
 
 - Update `rstudio-library` chart dependency

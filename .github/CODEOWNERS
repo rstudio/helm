@@ -5,5 +5,5 @@
 /charts/rstudio-pm/* @rstudio/rspm-dev
 
 # connect resources
-/charts/rstudio-connect/* @rstudio/connect
-/examples/connect/* @rstudio/connect
+/charts/rstudio-connect/* @aronatkins @dbkegley @christierney @zackverham
+/examples/connect/* @aronatkins @dbkegley @christierney @zackverham

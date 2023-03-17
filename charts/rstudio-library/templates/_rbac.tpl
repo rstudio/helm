@@ -75,6 +75,12 @@ metadata:
   {{- end }}
 rules:
   - apiGroups:
+    - ""
+    resources:
+    - "serviceaccounts"
+    verbs:
+    - "list"
+  - apiGroups:
       - ""
     resources:
       - "pods/log"

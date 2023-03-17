@@ -1,18 +1,16 @@
 # rstudio-launcher-rbac
 
-![Version: 0.2.13](https://img.shields.io/badge/Version-0.2.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.13](https://img.shields.io/badge/AppVersion-0.2.13-informational?style=flat-square)
+![Version: 0.2.15](https://img.shields.io/badge/Version-0.2.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.15](https://img.shields.io/badge/AppVersion-0.2.15-informational?style=flat-square)
 
 #### _RBAC definition for the RStudio Job Launcher_
 
-## Disclaimer
+## For Production
 
-> This chart is "beta" quality. It will likely undergo
-> breaking changes without warning as it moves towards stability.
+To ensure a stable production deployment, please:
 
-As a result, please:
 * Ensure you "pin" the version of the Helm chart that you are using. You can do
   this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. IMPORTANT: This protects you from breaking changes
+  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
 * Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
   for breaking changes
 * Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
@@ -20,11 +18,11 @@ As a result, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.13:
+To install the chart with the release name `my-release` at version 0.2.15:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.13
+helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.15
 ```
 
 ## Common Usage

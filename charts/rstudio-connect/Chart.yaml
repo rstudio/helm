@@ -1,8 +1,8 @@
 name: rstudio-connect
 description: Official Helm chart for RStudio Connect
-version: 0.3.15
+version: 0.3.19
 apiVersion: v2
-appVersion: 2023.01.0
+appVersion: 2023.03.0
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
 sources:
@@ -13,12 +13,12 @@ maintainers:
     url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
-    version: 0.1.23
+    version: 0.1.25
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |
     - name: rstudio-connect
-      image: rstudio/rstudio-connect:bionic-2023.01.0
+      image: rstudio/rstudio-connect:bionic-2023.03.0
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images
