@@ -1,3 +1,7 @@
+# 0.1.25
+
+- Update documentation to remove "beta" label and explain production recommendations
+
 # 0.1.24
 
 - Update RBAC to support listing of service accounts

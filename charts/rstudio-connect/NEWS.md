@@ -1,3 +1,7 @@
+# 0.3.19
+
+- Update documentation to remove "beta" label and explain production recommendations
+
 # 0.3.18
 
 - Bump Connect version to 2023.03.0

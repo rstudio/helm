@@ -1,18 +1,16 @@
 # rstudio-library
 
-![Version: 0.1.24](https://img.shields.io/badge/Version-0.1.24-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.1.24](https://img.shields.io/badge/AppVersion-0.1.24-informational?style=flat-square)
+![Version: 0.1.25](https://img.shields.io/badge/Version-0.1.25-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.1.25](https://img.shields.io/badge/AppVersion-0.1.25-informational?style=flat-square)
 
 #### _Helm library helpers for use by Official RStudio charts_
 
-## Disclaimer
+## For Production
 
-> This chart is "beta" quality. It will likely undergo
-> breaking changes without warning as it moves towards stability.
+To ensure a stable production deployment, please:
 
-As a result, please:
 * Ensure you "pin" the version of the Helm chart that you are using. You can do
   this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. IMPORTANT: This protects you from breaking changes
+  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
 * Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
   for breaking changes
 * Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking

@@ -46,9 +46,10 @@ Supporting and miscellaneous charts with varying levels of maintenance, usefulne
 
 **IMPORTANT:**
 
-These charts are provided as a convenience to RStudio customers and are not formally supported by RStudio. If you
-have questions about these charts, you can ask them in the [issues](https://github.com/rstudio/helm/issues/new/choose)
-in the repository or to your support representative, who will route them appropriately.
+These charts are provided as a convenience to RStudio customers. If you have
+questions about these charts, you can ask them in the
+[issues](https://github.com/rstudio/helm/issues/new/choose) in the repository
+or to your support representative, who will route them appropriately.
 
 Bugs or feature requests should be opened in an [issue](https://github.com/rstudio/helm/issues/new/choose).
 
