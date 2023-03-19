@@ -1,6 +1,6 @@
 # Version: 2.3.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v1
+# Helm Version: v2
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -96,11 +96,19 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $templateData.pod.nodeSelector }}
+      {{- if or (ne (len .Job.placementConstraints) 0) (ne (len $templateData.pod.nodeSelector) 0) }}
       nodeSelector:
+        {{- range .Job.placementConstraints }}
+        {{ .name }}: {{ toYaml .value }}
+        {{- end }}
+        {{- range $key,$val := $templateData.pod.nodeSelector }}
+        {{ $key }}: {{- toYaml $val | nindent 10 }}
+        {{- end }}
+      {{- end }}
+      {{- with $templateData.pod.priorityClassName }}
+      priorityClassName:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if ne (len .Job.placementConstraints) 0 }}
       {{- $securityContext := $templateData.pod.defaultSecurityContext }}
       {{- if .Job.container.runAsUserId }}
         {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
@@ -185,7 +193,7 @@ spec:
               {{- $secrets = append $secrets $secret }}
             {{- end }}
           {{- end }}
-          {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) }}
+          {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) (ne (len $templateData.pod.env) 0) }}
           env:
             {{- range .Job.environment }}
             - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
@@ -198,16 +206,19 @@ spec:
                   name: {{ get . "secret" }}
                   key: {{ get . "key" }}
             {{- end }}
+            {{- if .Values.pod.env }}
+              {{- toYaml $templateData.pod.env | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- with $templateData.pod.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- $exposedPorts := list }}
           {{- range .Job.exposedPorts }}
             {{- if .publishedPort }}
               {{- $exposedPorts = append $exposedPorts . }}
             {{- end }}
-          {{- end }}
-          {{- with $templateData.pod.containerSecurityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if ne (len $exposedPorts) 0 }}
           ports:

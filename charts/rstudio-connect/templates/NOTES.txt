@@ -52,6 +52,12 @@ Please consider removing this configuration value.
 
 {{- if .Values.pod.serviceAccountName }}
 
-WARNING: `pod.serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead.
+{{- fail "\n\n`pod.serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead." }}
+
+{{- end }}
+
+{{- if .Values.pod.nodeSelector }}
+
+{{- fail "\n\n`pod.nodeSelector` is no longer used. Use `nodeSelector` instead!\nThis is more consistent with other charts and the community." }}
 
 {{- end }}
