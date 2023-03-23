@@ -31,6 +31,10 @@ containers:
   {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
   {{- $imageTag := .Values.image.tag | default (printf "%s%s" .Values.image.tagPrefix $defaultVersion )}}
   image: "{{ .Values.image.repository }}:{{ $imageTag }}"
+  {{- with .Values.pod.lifecycle }}
+  lifecycle:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   env:
   {{- if .Values.diagnostics.enabled }}
   - name: DIAGNOSTIC_DIR
