@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.29](https://img.shields.io/badge/Version-0.5.29-informational?style=flat-square) ![AppVersion: 2022.12.0](https://img.shields.io/badge/AppVersion-2022.12.0-informational?style=flat-square)
+![Version: 0.5.30](https://img.shields.io/badge/Version-0.5.30-informational?style=flat-square) ![AppVersion: 2022.12.0](https://img.shields.io/badge/AppVersion-2022.12.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.29:
+To install the chart with the release name `my-release` at version 0.5.30:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.29
+helm install my-release rstudio/rstudio-workbench --version=0.5.30
 ```
 
 ## Required Configuration
@@ -392,6 +392,7 @@ config:
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
+| pod.lifecycle | object | `{}` | container lifecycle hooks |
 | pod.sidecar | bool | `false` | sidecar is an array of containers that will be run alongside the main container |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
