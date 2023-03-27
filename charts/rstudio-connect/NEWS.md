@@ -1,9 +1,9 @@
 # 0.4.0
 
 - BREAKING: change `pod.nodeSelector` to `nodeSelector` for consistency with other charts
-  and the community. We error if this value is used to help highlight the change.
+  and the community. In order to highlight the change, we error if `pod.nodeSelector` is anything other than empty.
 - BREAKING: turn `pod.serviceAccountName` WARNING into an error as well.
-- Add support for `launcher.templateValues.pod.env`, `launcher.templateValues.pod.nodeSelector`, and 
+- Add provisional support for `launcher.templateValues.pod.env`, `launcher.templateValues.pod.nodeSelector`, and 
   `launcher.templateValues.pod.priorityClassName`
 - NOTE: we are making these values induce failure so that CI systems and other deployments
   are explicit about the unused values. Please share feedback if this creates problems
