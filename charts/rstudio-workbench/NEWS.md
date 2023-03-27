@@ -1,3 +1,7 @@
+# 0.5.30
+
+- Add `pod.lifecycle` hook
+
 # 0.5.29
 
 - Update documentation to remove "beta" label and explain production recommendations
