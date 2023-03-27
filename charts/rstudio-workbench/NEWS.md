@@ -1,3 +1,7 @@
+# 0.5.31
+
+Add `priorityClassName` to product configuration
+
 # 0.5.30
 
 - Add `pod.lifecycle` hook
