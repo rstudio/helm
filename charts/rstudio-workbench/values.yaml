@@ -285,6 +285,8 @@ pod:
   affinity: {}
   # -- A map used verbatim as the pod's "nodeSelector" definition
   nodeSelector: {}
+  # -- container lifecycle hooks
+  lifecycle: {}
 
 prometheusExporter:
   # -- whether the  prometheus exporter sidecar should be enabled
