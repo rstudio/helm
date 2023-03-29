@@ -223,26 +223,54 @@ config:
 
 Profiles are used to define product behavior (in `.ini` file format) based on user and group membership.
 
-Sections define whether a set of configuration is applied to a user's jobs based on the following criteria:
+Sections define whether a set of configurations is applied to a user's jobs based on the following criteria:
 
 - if section header is `[*]`, it applies to all users
 - if a user's username is `myusername`, the section `[myusername]` will apply to them
-- if a user is in the `allusers` group, then the section `[@allusers]` will applly to them
+- if a user is in the `allusers` group, then the section `[@allusers]` will apply to them
 
-The product reads configuration from top-to-bottom, and "last-in-wins" for a given configuration value.
+The product reads configuration from top to bottom and "last-in-wins" for a given configuration value.
 
-However, the `config.profiles` section has a couple of niceties that are added in by default.
+### `/etc/rstudio/profiles`
+
+The `/etc/rstudio/profiles` file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the Workbench Admin Guide [User and Group Profiles](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html) page for more details.
+
+In the `values.yaml`, the content of `/etc/rstudio/profiles` should be defined in `config.server.profiles`. For example:
+
+```yaml
+config:
+  server:
+    profiles:
+      "*":
+        session-limit: 5
+        session-timeout-minutes: 60
+```
+
+Becomes:
+
+_/etc/rstudio/profiles_
+
+```ini
+[*]
+session-limit=5
+session-timeout-minutes=60
+```
+
+### `/etc/rstudio/launcher.kubernetes.profiles.conf`
+
+The `/etc/rstudio/launcher.kubernetes.profiles.conf` contains the configuration of resource limits by user and group when using the Kubernetes Launcher Plugin. In the `values.yaml`, the content of `/etc/rstudio/launcher.kubernetes.profiles.conf	` should be defined in `config.profiles.launcher.kubernetes.profiles.conf`. The `config.profiles` section has a couple of niceties that are added in by default.
 
 - YAML arrays like the following will be "comma-joined." For instance, the following will become: `some-key=value1,value2`
+
 ```yaml
 some-key:
   - value1
   - value2
 ```
+
 - The `[*]` section will have arrays "appended" to user and group sections, along with "defaults" defined by the chart.
 
-Note that if you want to set user limits which are usually defined in `/etc/rstudio/profiles`, you would need to configure `config.profiles.profiles` as shown below.
-### A Full Example
+For example:
 
 ```yaml
 config:
@@ -256,15 +284,11 @@ config:
         some-key:
           - value4
           - value5
-    profiles:
-      "*":
-        some-key: value1
-        some-key2: value2
 ```
-
 Becomes:
 
 _/etc/rstudio/launcher.kubernetes.profiles.conf_
+
 ```ini
 [*]
 some-key: value1,value2
@@ -272,13 +296,7 @@ some-key: value1,value2
 some-key: value1,value2,value3,value4
 ```
 
-_/etc/rstudio/profiles_
-```ini
-[*]
-some-key: value1
-some-key2: value2
-```
-> NOTE: this appending / concatenation / array translation behavior only works with the helm chart
+> NOTE: this appending/concatenation/array translation behavior only works with the helm chart
 
 ### Job Json Overrides
 
