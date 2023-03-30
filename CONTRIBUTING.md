@@ -88,6 +88,24 @@ At some point, we plan to push some (all?) of the `helm`-based features upstream
 we are evaluating and gathering feedback on the mechanism. In particular, we need to explore what "sub-templating" and
 passing templated "values" look like inside of helm to simplify narrowly scoped logic injection by customers.
 
+## Values
+
+We try our best to build values across our charts in a consistent fashion. A handful of conventions that we follow:
+
+- where established conventions exist in the `helm` community (and they make sense), try to follow them
+- consistent values, types, and defaults (modified per product) across charts
+- namespace collections of related values where possible (i.e. inside of `pod:` or `service:`)
+
+To compare the different values (and types) across our charts, we have a naive python script that builds a diffable text
+file representing the keys / values / defaults / etc.!
+
+```
+python3 scripts/values.py                                    
+vimdiff connect-values.txt pm-values.txt workbench-values.txt
+```
+
+It's a little funky, but it is the best we have at present.
+
 ## Code of Conduct
 
 As contributors and maintainers of this project, we pledge to respect all people who contribute through reporting issues, posting feature requests, updating documentation, submitting pull requests or patches, and other activities.

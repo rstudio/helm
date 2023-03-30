@@ -121,13 +121,14 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | Used to configure the container's livenessProbe. Only included if enabled = true |
 | nameOverride | string | `""` | The name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
-| pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-connect pods |
+| pod.containerSecurityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Connect container. Evaluated as a template. |
 | pod.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.haste | bool | `true` | A helper that defines the RSTUDIO_CONNECT_HASTE environment variable |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
+| pod.lifecycle | object | `{}` | container lifecycle hooks |
 | pod.port | int | `3939` | The containerPort used by the main pod container |
-| pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
+| pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.sidecar | bool | `false` | An array of containers that will be run alongside the main pod |
 | pod.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | An array of maps that is injected as-is into the "volumes:" component of the pod spec |
@@ -145,8 +146,11 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | Used to configure the container's readinessProbe. Only included if enabled = true |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources | object | `{}` | Defines resources for the rstudio-connect container |
-| securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
+| revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
+| securityContext.privileged | bool | `true` |  |
 | service.annotations | object | `{}` | Annotations that will be added onto the service |
+| service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
+| service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
 | service.nodePort | bool | `false` | The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically |
 | service.port | int | `80` | The port to use for the Connect service |
 | service.targetPort | int | `3939` | The port to forward to on the Connect pod. Also see pod.port |
@@ -154,6 +158,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |
+| shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | A list of accessModes that are defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Annotations for the Persistent Volume Claim |
 | sharedStorage.create | bool | `false` | Whether to create the persistentVolumeClaim for shared storage |

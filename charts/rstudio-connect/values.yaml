@@ -78,17 +78,28 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 
+# -- whether to provide `shareProcessNamespace` to the pod.
+shareProcessNamespace: false
+
 service:
-  # -- Annotations that will be added onto the service
-  annotations: {}
   # -- The service type (LoadBalancer, NodePort, etc.)
   type: NodePort
+  # -- Annotations that will be added onto the service
+  annotations: {}
+  # -- The cluster-internal IP to use with `service.type` ClusterIP
+  clusterIP: ""
+  # -- The external IP to use with `service.type` LoadBalancer, when supported
+  # by the cloud provider
+  loadBalancerIP: ""
   # -- The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically
   nodePort: false
   # -- The port to use for the Connect service
   port: 80
   # -- The port to forward to on the Connect pod. Also see pod.port
   targetPort: 3939
+
+# -- The revisionHistoryLimit to use for the pod deployment. Do not set to 0
+revisionHistoryLimit: 10
 
 pod:
   # -- A helper that defines the RSTUDIO_CONNECT_HASTE environment variable
@@ -105,12 +116,14 @@ pod:
   labels: {}
   # -- An array of containers that will be run alongside the main pod
   sidecar: false
-  # -- A map used verbatim as the pod's "affinity" definition
-  affinity: {}
-  # -- Values to set the `securityContext` for the connect pod
+  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
   securityContext: {}
+  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Connect container. Evaluated as a template.
+  containerSecurityContext: {}
   # -- The containerPort used by the main pod container
   port: 3939
+  # -- container lifecycle hooks
+  lifecycle: {}
 
 # -- The pod's run command. By default, it uses the container's default
 command: []
@@ -138,6 +151,7 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
+# TODO: remove in favor of containerSecurityContext
 # -- Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
 # launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null`
 securityContext:

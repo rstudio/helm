@@ -407,11 +407,12 @@ config:
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
+| pod.containerSecurityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Workbench container. Evaluated as a template. |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.lifecycle | object | `{}` | container lifecycle hooks |
 | pod.port | int | `8787` | The containerPort used by the main pod container |
-| pod.securityContext | object | `{}` | Values to set the `securityContext` for the service pod |
+| pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
@@ -433,8 +434,11 @@ config:
 | secureCookieKey | string | `""` |  |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` | annotations for the service definition |
+| service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
+| service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
 | service.nodePort | bool | `false` | the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
+| service.targetPort | int | `3939` | The port to forward to on the main Workbench pod. Also see pod.port |
 | service.type | string | `"NodePort"` | the service type (i.e. NodePort, LoadBalancer, etc.) |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |

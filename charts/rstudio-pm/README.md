@@ -112,10 +112,10 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
-| args | bool | `false` | args is the pod's run arguments. By default, it uses the container's default |
+| args | list | `[]` | args is the pod's run arguments. By default, it uses the container's default |
 | awsAccessKeyId | bool | `false` | awsAccessKeyId is the access key id for s3 access, used also to gate file creation |
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
-| command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
+| command | list | `[]` | command is the pod's run command. By default, it uses the container's default |
 | config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true},"Server":{"RVersion":"/opt/R/3.6.2/"}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
 | enableMigration | bool | `true` | Enable migrations for shared storage (if necessary) using Helm hooks. |
 | enableSandboxing | bool | `true` | Enable sandboxing of Git builds, which requires elevated security privileges for the Package Manager container. |
@@ -149,14 +149,16 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
+| pod.port | int | `4242` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
-| pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
+| pod.serviceAccountName | string | `""` |  |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
 | priorityClassName | string | `""` | The pod's priorityClassName |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
+| revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | rootCheckIsFatal | bool | `true` | Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new helm chart version. |
 | rstudioPMKey | bool | `false` | rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
@@ -164,6 +166,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
 | service.nodePort | bool | `false` | The explicit nodePort to use for `service.type` NodePort. If not provided, Kubernetes will choose one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
+| service.targetPort | int | `3939` | The port to forward to on the Package Manager pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, if any |
 | serviceAccount.create | bool | `true` | Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) |
@@ -171,6 +174,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Operator is running). Defaults to the release namespace |
+| shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |
 | sharedStorage.create | bool | `false` | whether to create the persistentVolumeClaim for shared storage |

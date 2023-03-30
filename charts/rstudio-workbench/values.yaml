@@ -157,14 +157,21 @@ ingress:
 shareProcessNamespace: false
 
 service:
-  # -- annotations for the service definition
-  annotations: {}
   # -- the service type (i.e. NodePort, LoadBalancer, etc.)
   type: NodePort
+  # -- annotations for the service definition
+  annotations: {}
+  # -- The cluster-internal IP to use with `service.type` ClusterIP
+  clusterIP: ""
+  # -- The external IP to use with `service.type` LoadBalancer, when supported
+  # by the cloud provider
+  loadBalancerIP: ""
   # -- the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80
+  # -- The port to forward to on the main Workbench pod. Also see pod.port
+  targetPort: 3939
 
 # -- resources define requests and limits for the rstudio-server pod
 resources:
@@ -258,6 +265,7 @@ xdgConfigDirs: "/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/c
 # -- A list of additional XDG config dir paths
 xdgConfigDirsExtra: []
 
+# TODO: remove!
 securityContext: {}
 
 # -- The pod's priorityClassName
@@ -285,8 +293,10 @@ pod:
   labels: {}
   # -- sidecar is an array of containers that will be run alongside the main container
   sidecar: []
-  # -- Values to set the `securityContext` for the service pod
+  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
   securityContext: {}
+  # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Workbench container. Evaluated as a template.
+  containerSecurityContext: {}
   # -- The containerPort used by the main pod container
   port: 8787
   # -- container lifecycle hooks
