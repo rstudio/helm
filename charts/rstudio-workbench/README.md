@@ -406,12 +406,10 @@ config:
 | loadBalancer.forceEnabled | bool | `false` | whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
-| pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.lifecycle | object | `{}` | container lifecycle hooks |
-| pod.nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.port | int | `8787` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the service pod |
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |

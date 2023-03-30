@@ -75,22 +75,22 @@ containers:
   - name: XDG_CONFIG_DIRS
     value: "{{ template "rstudio-workbench.xdg-config-dirs" .}}"
   {{- if .Values.pod.env }}
-{{ toYaml .Values.pod.env | indent 2 }}
+  {{- toYaml .Values.pod.env | nindent 2 }}
   {{- end }}
   {{- if .Values.command }}
   command:
-{{ toYaml .Values.command | indent 4 }}
+    {{- toYaml .Values.command | nindent 4 }}
  {{- end }}
   {{- if .Values.args }}
   args:
-{{ toYaml .Values.args | indent 4 }}
+    {{- toYaml .Values.args | nindent 4 }}
   {{- end }}
   imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
   ports:
   - containerPort: 8787
     name: http
   securityContext:
-{{ toYaml .Values.securityContext | indent 4 }}
+    {{- toYaml .Values.securityContext | nindent 4 }}
   volumeMounts:
     {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
     - name: rstudio-shared-storage

@@ -289,10 +289,6 @@ pod:
   securityContext: {}
   # -- The containerPort used by the main pod container
   port: 8787
-  # -- A map used verbatim as the pod's "affinity" definition
-  affinity: {}
-  # -- A map used verbatim as the pod's "nodeSelector" definition
-  nodeSelector: {}
   # -- container lifecycle hooks
   lifecycle: {}
 
