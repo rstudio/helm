@@ -1,6 +1,11 @@
-# 0.5.31
+# 0.5.32
 
 Add `priorityClassName` to product configuration
+
+# 0.5.31
+
+- Update documentation to make `.Values.server.profiles` and `.Values.profiles.profiles` differences
+  more clear.
 
 # 0.5.30
 

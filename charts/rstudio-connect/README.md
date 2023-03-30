@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.3.19](https://img.shields.io/badge/Version-0.3.19-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.3.19:
+To install the chart with the release name `my-release` at version 0.4.0:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-connect --version=0.3.19
+helm install my-release rstudio/rstudio-connect --version=0.4.0
 ```
 
 ### NOTE
@@ -75,6 +75,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/) | A nested map of maps that generates the rstudio-connect.gcfg file |
@@ -107,7 +108,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.launcherKubernetesProfilesConf | object | `{}` | User definition of launcher.kubernetes.profiles.conf for job customization |
 | launcher.namespace | string | `""` | The namespace to launch sessions into. Uses the Release namespace by default |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"containerSecurityContext":{},"defaultSecurityContext":{},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the RStudio Connect session templating process |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the RStudio Connect session templating process |
 | launcher.useTemplates | bool | `true` | Whether to use launcher templates when launching sessions. Defaults to true |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |
@@ -119,6 +120,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | license.server | bool | `false` | server is the <hostname>:<port> for a license server |
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | Used to configure the container's livenessProbe. Only included if enabled = true |
 | nameOverride | string | `""` | The name of the chart deployment (can be overridden) |
+| nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-connect pods |
 | pod.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the pod.container spec |
@@ -126,10 +128,10 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
 | pod.port | int | `3939` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
-| pod.serviceAccountName | bool | `false` | Deprecated. Use `rbac.serviceAccount.name` instead |
 | pod.sidecar | bool | `false` | An array of containers that will be run alongside the main pod |
 | pod.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | An array of maps that is injected as-is into the "volumes:" component of the pod spec |
+| priorityClassName | string | `""` | The pod's priorityClassName |
 | prometheusExporter.enabled | bool | `true` | Whether the  prometheus exporter sidecar should be enabled |
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
@@ -166,6 +168,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | Used to configure the container's startupProbe. Only included if enabled = true |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | Defines the update strategy for a deployment |
+| tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | versionOverride | string | `""` | A Connect version to override the "tag" for the RStudio Connect image and the Content Init image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
