@@ -72,11 +72,9 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if ne (len .Job.placementConstraints) 0 }}
+      {{- with $templateData.pod.nodeSelector }}
       nodeSelector:
-        {{- range .Job.placementConstraints }}
-        {{ .name }}: {{ toYaml .value }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- $securityContext := $templateData.pod.defaultSecurityContext }}
       {{- if .Job.container.runAsUserId }}

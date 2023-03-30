@@ -1,3 +1,7 @@
+# 0.5.7
+
+- Remove `pod.nodeSelector` value. It was not used before
+
 # 0.5.6
 
 - Update documentation to remove "beta" label and explain production recommendations

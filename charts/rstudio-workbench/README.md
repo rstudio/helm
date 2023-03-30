@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.5.31](https://img.shields.io/badge/Version-0.5.31-informational?style=flat-square) ![AppVersion: 2022.12.0](https://img.shields.io/badge/AppVersion-2022.12.0-informational?style=flat-square)
+![Version: 0.5.32](https://img.shields.io/badge/Version-0.5.32-informational?style=flat-square) ![AppVersion: 2022.12.0](https://img.shields.io/badge/AppVersion-2022.12.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.31:
+To install the chart with the release name `my-release` at version 0.5.32:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-workbench --version=0.5.31
+helm install my-release rstudio/rstudio-workbench --version=0.5.32
 ```
 
 ## Required Configuration
@@ -336,7 +336,7 @@ config:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
+| affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
@@ -390,7 +390,7 @@ config:
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.kubernetesHealthCheck | object | `{"enabled":true,"extraCurlArgs":["-fsSL"]}` | configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup |
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"containerSecurityContext":{},"defaultSecurityContext":{},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"containerSecurityContext":{},"defaultSecurityContext":{},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
 | launcher.useTemplates | bool | `false` | whether to render and use templates in the job launching process |
 | launcherPem | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
@@ -405,16 +405,17 @@ config:
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | livenessProbe is used to configure the container's livenessProbe |
 | loadBalancer.forceEnabled | bool | `false` | whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
-| nodeSelector | object | `{}` |  |
-| pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
+| nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.lifecycle | object | `{}` | container lifecycle hooks |
-| pod.sidecar | bool | `false` | sidecar is an array of containers that will be run alongside the main container |
+| pod.port | int | `8787` | The containerPort used by the main pod container |
+| pod.securityContext | object | `{}` | Values to set the `securityContext` for the service pod |
+| pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
-| priorityClassName | string | `nil` |  |
+| priorityClassName | string | `""` | The pod's priorityClassName |
 | prometheusExporter.enabled | bool | `true` | whether the  prometheus exporter sidecar should be enabled |
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
@@ -457,7 +458,7 @@ config:
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but will not work well if your license only allows a single activation. |
-| tolerations | list | `[]` |  |
+| tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | userCreate | bool | `false` | userCreate determines whether a user should be created at startup (if true) |
 | userName | string | `"rstudio"` | userName determines the username of the created user |
 | userPassword | string | `"rstudio"` | userPassword determines the password of the created user |

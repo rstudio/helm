@@ -42,6 +42,9 @@ pod:
       command: ["sleep"]
       args: ["infinity"]
       imagePullPolicy: "IfNotPresent"
+  priorityClassName: something-fun
+  nodeSelector:
+    something: special
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:

@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.5.6](https://img.shields.io/badge/Version-0.5.6-informational?style=flat-square) ![AppVersion: 2022.11.4](https://img.shields.io/badge/AppVersion-2022.11.4-informational?style=flat-square)
+![Version: 0.5.7](https://img.shields.io/badge/Version-0.5.7-informational?style=flat-square) ![AppVersion: 2022.11.4](https://img.shields.io/badge/AppVersion-2022.11.4-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.6:
+To install the chart with the release name `my-release` at version 0.5.7:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-pm --version=0.5.6
+helm install my-release rstudio/rstudio-pm --version=0.5.7
 ```
 
 ## Upgrade Guidance
@@ -153,7 +153,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
-| priorityClassName | string | `nil` | The pod's priorityClassName |
+| priorityClassName | string | `""` | The pod's priorityClassName |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |

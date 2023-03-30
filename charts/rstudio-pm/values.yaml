@@ -243,4 +243,4 @@ nodeSelector: {}
 # -- An array used verbatim as the pod's "tolerations" definition
 tolerations: []
 # -- The pod's priorityClassName
-priorityClassName: null
+priorityClassName: ""

@@ -49,6 +49,15 @@ rbac:
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
 
+# -- A map used verbatim as the pod's "affinity" definition
+affinity: {}
+# -- A map used verbatim as the pod's "nodeSelector" definition
+nodeSelector: {}
+# -- An array used verbatim as the pod's "tolerations" definition
+tolerations: []
+# -- The pod's priorityClassName
+priorityClassName: ""
+
 # -- Defines the RStudio Connect image to deploy
 image:
   # -- The repository to use for the main pod image
@@ -90,8 +99,6 @@ pod:
   volumes: []
   # -- An array of maps that is injected as-is into the "volumeMounts" component of the pod spec
   volumeMounts: []
-  # -- Deprecated. Use `rbac.serviceAccount.name` instead
-  serviceAccountName: false
   # -- Additional annotations to add to the rstudio-connect pods
   annotations: {}
   # -- Additional labels to add to the rstudio-connect pods
@@ -261,6 +268,7 @@ launcher:
       serviceAccountName: ""
       volumes: []
       volumeMounts: []
+      env: []
       imagePullPolicy: ""
       imagePullSecrets: []
       initContainers: []
@@ -270,6 +278,8 @@ launcher:
       securityContext: {}
       tolerations: []
       affinity: {}
+      nodeSelector: {}
+      priorityClassName: ""
     job:
       annotations: {}
       labels: {}

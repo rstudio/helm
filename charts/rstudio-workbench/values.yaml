@@ -95,6 +95,7 @@ launcher:
       securityContext: {}
       tolerations: []
       affinity: {}
+      nodeSelector: {}
     job:
       annotations: {}
       labels: {}
@@ -259,9 +260,13 @@ xdgConfigDirsExtra: []
 
 securityContext: {}
 
-priorityClassName: null
+# -- The pod's priorityClassName
+priorityClassName: ""
+# -- A map used verbatim as the pod's "affinity" definition
 affinity: {}
+# -- A map used verbatim as the pod's "nodeSelector" definition
 nodeSelector: {}
+# -- An array used verbatim as the pod's "tolerations" definition
 tolerations: []
 
 # -- The revisionHistoryLimit to use for the pod deployment. Do not set to 0
@@ -279,9 +284,11 @@ pod:
   # -- Additional labels to add to the rstudio-workbench pods
   labels: {}
   # -- sidecar is an array of containers that will be run alongside the main container
-  sidecar: false
-  # -- A map used verbatim as the pod's "affinity" definition
-  affinity: {}
+  sidecar: []
+  # -- Values to set the `securityContext` for the service pod
+  securityContext: {}
+  # -- The containerPort used by the main pod container
+  port: 8787
   # -- container lifecycle hooks
   lifecycle: {}
 

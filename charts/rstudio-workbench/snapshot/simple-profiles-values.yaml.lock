@@ -122,8 +122,8 @@ data:
   
     [*]
     allow-unknown-images=0
-    container-images=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
-    default-container-image=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
+    container-images=rstudio/r-session-complete:bionic-2022.12.0
+    default-container-image=rstudio/r-session-complete:bionic-2022.12.0
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json"
   
     [cole]
@@ -434,6 +434,12 @@ metadata:
   namespace: rstudio
 rules:
   - apiGroups:
+    - ""
+    resources:
+    - "serviceaccounts"
+    verbs:
+    - "list"
+  - apiGroups:
       - ""
     resources:
       - "pods/log"
@@ -515,7 +521,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2022.07.2-576.pro12"
+    app.kubernetes.io/version: "2022.12.0"
     app.kubernetes.io/managed-by: Helm
   annotations:
     
@@ -553,7 +559,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 767d286a0bf6884136e4aeb5ca47c8f129322383a7414e1c4ee924eac80d96f4
+        checksum/config-general: 780aca3eb488a2ef40ea587e8e45ca7b386880ee6a28e6bb85f0fab9c52909b9
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
@@ -571,7 +577,7 @@ spec:
       shareProcessNamespace: false      
       containers:
       - name: rstudio
-        image: "rstudio/rstudio-workbench:bionic-2022.07.2-576.pro12"
+        image: "rstudio/rstudio-workbench:bionic-2022.12.0"
         env:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
@@ -704,7 +710,7 @@ spec:
   
   containers:
   - name: rstudio
-    image: "rstudio/rstudio-workbench:bionic-2022.07.2-576.pro12"
+    image: "rstudio/rstudio-workbench:bionic-2022.12.0"
     env:
     - name: DIAGNOSTIC_DIR
       value: "/var/log/rstudio"
