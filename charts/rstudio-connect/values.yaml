@@ -49,8 +49,6 @@ rbac:
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
 
-# -- sidecar container list
-extraContainers: []
 # -- A map used verbatim as the pod's "affinity" definition
 affinity: {}
 # -- A map used verbatim as the pod's "nodeSelector" definition
@@ -58,7 +56,7 @@ nodeSelector: {}
 # -- An array used verbatim as the pod's "tolerations" definition
 tolerations: []
 # -- The pod's priorityClassName
-priorityClassName: null
+priorityClassName: ""
 
 # -- Defines the RStudio Connect image to deploy
 image:

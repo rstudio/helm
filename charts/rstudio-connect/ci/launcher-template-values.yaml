@@ -32,6 +32,14 @@ launcher:
           mountPath: /tmp/mnt
       securityContext:
         runAsUser: 999
+      nodeSelector:
+        something: special
+      priorityClassName: some-priority-class
+      env:
+        - name: key
+          value: value
+        - other: key2
+          value: val2
       defaultSecurityContext:
         fsGroupChangePolicy: "Always"
         runAsGroup: 999
