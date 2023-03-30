@@ -21,6 +21,17 @@ stringData:
   secure-cookie-key: |
     abc
 ---
+# Source: rstudio-workbench/templates/configmap-session.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-rstudio-workbench-session-secret
+  namespace: rstudio
+stringData:
+  
+  example-file.json: |
+    {"some-contents": "test"}
+---
 # Source: rstudio-workbench/templates/configmap-general.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -113,8 +124,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
-    default-container-image=rstudio/r-session-complete:bionic-2022.07.2-576.pro12
+    container-images=rstudio/r-session-complete:bionic-2022.12.0
+    default-container-image=rstudio/r-session-complete:bionic-2022.12.0
   
   
   
@@ -133,7 +144,7 @@ metadata:
 data:
   rstudio-library-templates-data.tpl: |
     {{- define "rstudio-library.templates.data" -}}
-    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"}},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"securityContext":{"runAsUser":999},"serviceAccountName":"test","tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
+    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"}},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"nodeSelector":{},"securityContext":{"runAsUser":999},"serviceAccountName":"test","tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
     {{- end }}
   job.tpl: |
     # Version: 2
@@ -210,11 +221,9 @@ data:
           affinity:
             {{- toYaml . | nindent 8 }}
           {{- end }}
-          {{- if ne (len .Job.placementConstraints) 0 }}
+          {{- with $templateData.pod.nodeSelector }}
           nodeSelector:
-            {{- range .Job.placementConstraints }}
-            {{ .name }}: {{ toYaml .value }}
-            {{- end }}
+            {{- toYaml . | nindent 8 }}
           {{- end }}
           {{- $securityContext := $templateData.pod.defaultSecurityContext }}
           {{- if .Job.container.runAsUserId }}
@@ -677,6 +686,12 @@ metadata:
   namespace: rstudio
 rules:
   - apiGroups:
+    - ""
+    resources:
+    - "serviceaccounts"
+    verbs:
+    - "list"
+  - apiGroups:
       - ""
     resources:
       - "pods/log"
@@ -758,7 +773,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2022.07.2-576.pro12"
+    app.kubernetes.io/version: "2022.12.0"
     app.kubernetes.io/managed-by: Helm
   annotations:
     
@@ -796,11 +811,11 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: b56630637a4eb115f332e0cda26e1f264e26933aaf7c04683b1da6280952043d
+        checksum/config-general: 9761d98140194f7d02c9c8d9a719e6b8b6d788a0f8d135f64cd44488261c67c7
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
-        checksum/config-session: 8b9522bfc3b63d4206fc26da24bb36f66abed04014e732a9d3448b5a67531755
+        checksum/config-session: 89e1a6a82a51c83763653a4c034f7f41623f16b840369caf5189b759e6495b85
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9108"
@@ -814,7 +829,7 @@ spec:
       shareProcessNamespace: false      
       containers:
       - name: rstudio
-        image: "rstudio/rstudio-workbench:bionic-2022.07.2-576.pro12"
+        image: "rstudio/rstudio-workbench:bionic-2022.12.0"
         env:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
@@ -840,6 +855,8 @@ spec:
             mountPath: "/mnt/configmap/rstudio/"
           - name: rstudio-session-config
             mountPath: "/mnt/session-configmap/rstudio/"
+          - name: rstudio-session-secret
+            mountPath: /mnt/session-secret/
           - name: rstudio-secret
             mountPath: "/mnt/secret-configmap/rstudio/"
           - name: etc-rstudio
@@ -896,6 +913,10 @@ spec:
         configMap:
           name: release-name-rstudio-workbench-session
           defaultMode: 420
+      - name: rstudio-session-secret
+        secret:
+          secretName: release-name-rstudio-workbench-session-secret
+          defaultMode: 272
       - name: rstudio-prestart
         configMap:
           name: release-name-rstudio-workbench-prestart
@@ -941,7 +962,7 @@ spec:
   
   containers:
   - name: rstudio
-    image: "rstudio/rstudio-workbench:bionic-2022.07.2-576.pro12"
+    image: "rstudio/rstudio-workbench:bionic-2022.12.0"
     env:
     - name: DIAGNOSTIC_DIR
       value: "/var/log/rstudio"
@@ -977,6 +998,8 @@ spec:
         mountPath: "/mnt/configmap/rstudio/"
       - name: rstudio-session-config
         mountPath: "/mnt/session-configmap/rstudio/"
+      - name: rstudio-session-secret
+        mountPath: /mnt/session-secret/
       - name: rstudio-secret
         mountPath: "/mnt/secret-configmap/rstudio/"
       - name: etc-rstudio
@@ -1011,6 +1034,10 @@ spec:
     configMap:
       name: release-name-rstudio-workbench-session
       defaultMode: 420
+  - name: rstudio-session-secret
+    secret:
+      secretName: release-name-rstudio-workbench-session-secret
+      defaultMode: 272
   - name: rstudio-prestart
     configMap:
       name: release-name-rstudio-workbench-prestart
