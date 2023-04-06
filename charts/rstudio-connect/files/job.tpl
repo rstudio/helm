@@ -76,7 +76,7 @@ spec:
       {{- end }}
       restartPolicy: Never
       {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
-      serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName }}
+      serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
       {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
