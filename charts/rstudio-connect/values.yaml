@@ -244,7 +244,7 @@ launcher:
   # pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image).
   # Starting with Connect v2023.04.0, this configuration is used to bootstrap the initial set of execution environments
   # the first time the server starts. If any execution environments already exist in the database, these values are ignored;
-  # existing execution environments are not created or modified during subsequent restarts.
+  # execution environments are not created or modified during subsequent restarts.
   customRuntimeYaml: "base"
   # -- Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key).
   # If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list".
