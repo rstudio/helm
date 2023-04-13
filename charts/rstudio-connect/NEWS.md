@@ -1,3 +1,8 @@
+# 0.4.1
+
+- Allow launcher to configure the Kubernetes API URL and the Service Account token
+  from inside the pod instead of specifying on prestart via environment variables.
+
 # 0.4.0
 
 - BREAKING: change `pod.nodeSelector` to `nodeSelector` for consistency with other charts

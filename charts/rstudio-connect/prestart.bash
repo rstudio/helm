@@ -32,10 +32,6 @@ main() {
     "${k8s_url}/healthz" 2>&1 | _indent
   printf '\n'
 
-  _logf "Setting env vars"
-  export KUBERNETES_API_URL=${k8s_url}
-  export KUBERNETES_AUTH_TOKEN=${sa_token}
-
   _logf 'Configuring certs'
   cp -v "${cacert}" ${dyn_dir}/k8s-cert 2>&1 | _indent
   mkdir -p /usr/local/share/ca-certificates/Kubernetes
