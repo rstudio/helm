@@ -1,7 +1,11 @@
-# 0.4.1
+# 0.4.2
 
 - Allow launcher to configure the Kubernetes API URL and the Service Account token
   from inside the pod instead of specifying on prestart via environment variables.
+
+# 0.4.1
+
+- Fix issue in templates that prevented numeric service accounts from being used.
 
 # 0.4.0
 
