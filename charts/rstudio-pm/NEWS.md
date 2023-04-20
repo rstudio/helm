@@ -1,3 +1,7 @@
+# 0.5.8
+
+- Update docs and README for a bit more clarity
+
 # 0.5.7
 
 - Remove `pod.nodeSelector` value. It was not used before

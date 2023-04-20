@@ -30,7 +30,16 @@ To install the chart with the release name `my-release` at version 0.5.0-rc01:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-connect --version=0.5.0-rc01
+# to install latest release (NOTE: `--version` flag still recommended!)
+helm upgrade --install my-release rstudio/rstudio-connect
+
+# WARNING: to install devel version / release candidate / etc.
+helm upgrade --install --devel my-release rstudio/rstudio-connect --version=0.5.0-rc01
+```
+
+To explore other chart versions, take a look at:
+```
+helm search repo --devel rstudio/rstudio-connect -l
 ```
 
 ### NOTE

@@ -1,3 +1,7 @@
+# 0.2.16
+
+- Update documentation for more clarity
+
 # 0.2.15
 
 - Update documentation to remove "beta" label and explain production recommendations
