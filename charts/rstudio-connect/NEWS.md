@@ -1,4 +1,4 @@
-# 0.4.2
+# 0.5.0
 
 - Allow launcher to configure the Kubernetes API URL and the Service Account token
   from inside the pod instead of specifying on prestart via environment variables.
