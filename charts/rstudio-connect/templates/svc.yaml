@@ -13,10 +13,15 @@ spec:
   selector:
     {{- include "rstudio-connect.selectorLabels" . | nindent 4 }}
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: {{ .Values.service.port }}
     {{- if .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
     {{- end }}
     targetPort: {{ .Values.service.targetPort }}
+  {{- if .Values.prometheusExporter.enabled }}
+  - name: metrics
+    port: 9108
+  {{- end }}
 ---
