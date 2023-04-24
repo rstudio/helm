@@ -1,3 +1,11 @@
+# 0.4.2
+
+- Add a `metrics` port to the `service`, which ensures that the `ServiceMonitor` actually works
+
+# 0.4.1
+
+- Fix issue in templates that prevented numeric service accounts from being used.
+
 # 0.4.0
 
 - BREAKING: change `pod.nodeSelector` to `nodeSelector` for consistency with other charts
