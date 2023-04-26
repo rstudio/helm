@@ -1,11 +1,17 @@
 # RStudio Workbench
 
-![Version: 0.5.33-rc01](https://img.shields.io/badge/Version-0.5.33--rc01-informational?style=flat-square) ![AppVersion: 2022.12.0](https://img.shields.io/badge/AppVersion-2022.12.0-informational?style=flat-square)
+![Version: 0.6.0-rc01](https://img.shields.io/badge/Version-0.6.0--rc01-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
 Data Scientists use [RStudio Workbench](https://www.rstudio.com/products/workbench/) to analyze data and create data
 products using R and Python.
+
+## IMPORTANT
+
+> Chart version 0.6.0 introduces a change to the default operating system for Workbench and its sessions.
+> The default is now Ubuntu 22.04 / Ubuntu Jammy. See [`NEWS.md`](./NEWS.md) for more guidance on how to protect
+> yourself from this change.
 
 ## For Production
 
@@ -21,11 +27,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.33-rc01:
+To install the chart with the release name `my-release` at version 0.6.0-rc01:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install --devel my-release rstudio/rstudio-workbench --version=0.5.33-rc01
+helm install --devel my-release rstudio/rstudio-workbench --version=0.6.0-rc01
 ```
 
 ## Required Configuration
@@ -376,7 +382,7 @@ config:
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
 | image.repository | string | `"rstudio/rstudio-workbench"` | the repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.tagPrefix | string | `"bionic-"` | A tag prefix for the server image (common selections: bionic-, jammy-). Only used if tag is not defined |
+| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -444,7 +450,7 @@ config:
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
 | session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |
-| session.image.tagPrefix | string | `"bionic-"` | A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined |
+| session.image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for session images (common selections: ubuntu2204-, centos7-). Only used if tag is not defined |
 | shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |

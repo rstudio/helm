@@ -1,6 +1,17 @@
+# 0.6.0
+
+- BREAKING: Change default OS / OS prefix to `ubuntu2204-`.
+  [Bionic support is EOL as of 2023-04-30](https://posit.co/about/platform-support/)
+  - If you want to revert this change, set `session.image.tagPrefix=bionic-` (sessions) and `image.tagPrefix=bionic-` (
+    server)
+- Update product to version `2023.03.0`
+- Allow customizing the `pod.command` associated with sessions for some highly custom startup cases. This should
+  not be necessary in most cases and will be removed at a later date, once the product supports startup customization.
+  Please reach out if you have questions about this functionality!
+
 # 0.5.32
 
-Add `priorityClassName` to product configuration
+- Add `priorityClassName` to product configuration
 
 # 0.5.31
 
