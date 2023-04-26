@@ -3,6 +3,10 @@
 - Allow launcher to configure the Kubernetes API URL and the Service Account token
   from inside the pod instead of specifying on prestart via environment variables.
 
+# 0.4.2
+
+- Add a `metrics` port to the `service`, which ensures that the `ServiceMonitor` actually works
+
 # 0.4.1
 
 - Fix issue in templates that prevented numeric service accounts from being used.

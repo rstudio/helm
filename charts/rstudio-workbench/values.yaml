@@ -17,8 +17,8 @@ session:
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
-    # -- A tag prefix for session images (common selections: bionic-, centos-). Only used if tag is not defined
-    tagPrefix: bionic-
+    # -- A tag prefix for session images (common selections: ubuntu2204-, centos7-). Only used if tag is not defined
+    tagPrefix: ubuntu2204-
     # -- The repository to use for the session image
     repository: "rstudio/r-session-complete"
     # -- A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}`
@@ -127,8 +127,8 @@ homeStorage:
 image:
   # -- the repository to use for the main pod image
   repository: rstudio/rstudio-workbench
-  # -- A tag prefix for the server image (common selections: bionic-, jammy-). Only used if tag is not defined
-  tagPrefix: bionic-
+  # -- A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined
+  tagPrefix: ubuntu2204-
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- the imagePullPolicy for the main pod image
