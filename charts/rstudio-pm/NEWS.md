@@ -1,3 +1,7 @@
+# 0.5.8
+
+- Change default R version to 4.2.0 for compatibility with docker image changes
+
 # 0.5.7
 
 - Remove `pod.nodeSelector` value. It was not used before
