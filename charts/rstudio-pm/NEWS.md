@@ -1,3 +1,7 @@
+# 0.5.8
+
+- Update default Posit Package Manager version to 2023.04.0-6
+
 # 0.5.7
 
 - Remove `pod.nodeSelector` value. It was not used before
