@@ -1,7 +1,7 @@
 name: Kubernetes
 images:
   -
-    name: ghcr.io/rstudio/content-base:r3.6.3-py3.8.16-jammy
+    name: ghcr.io/rstudio/content-base:r3.6.3-py3.8.16-ubuntu2204
     python:
       installations:
         -
@@ -17,7 +17,7 @@ images:
         - path: /opt/quarto/1.3.340/bin/quarto
           version: 1.3.340
   -
-    name: ghcr.io/rstudio/content-base:r4.0.5-py3.9.16-jammy
+    name: ghcr.io/rstudio/content-base:r4.0.5-py3.9.16-ubuntu2204
     python:
       installations:
         -
@@ -33,7 +33,7 @@ images:
         - path: /opt/quarto/1.3.340/bin/quarto
           version: 1.3.340
   -
-    name: ghcr.io/rstudio/content-base:r4.1.3-py3.10.11-jammy
+    name: ghcr.io/rstudio/content-base:r4.1.3-py3.10.11-ubuntu2204
     python:
       installations:
         -
@@ -49,7 +49,7 @@ images:
         - path: /opt/quarto/1.3.340/bin/quarto
           version: 1.3.340
   -
-    name: ghcr.io/rstudio/content-base:r4.2.2-py3.11.3-jammy
+    name: ghcr.io/rstudio/content-base:r4.2.2-py3.11.3-ubuntu2204
     python:
       installations:
         -

@@ -1,7 +1,18 @@
 # 0.5.0
 
+- BREAKING: Change default OS / OS prefix to `ubuntu2204-`.
+  [Bionic support is EOL as of 2023-04-30](https://posit.co/about/platform-support/)
+  This change also impacts the default set of content execution images. Changing
+  the execution environment OS will cause a rebuild for all currently deployed content.
+  - If you want to revert this change, set `image.tagPrefix=bionic-` (server),
+    `launcher.defaultInitContainer.tagPrefix=bionic-` (content-init),
+    and modify the set of content images defined by `launcher.customRuntimeYaml`
+    to use `bionic` instead of `ubuntu2204`
+- Trim the default set of content execution images to the 4 latest releases of Python/R.
+  - A Quarto installation has been added to all content-base images.
 - Allow launcher to configure the Kubernetes API URL and the Service Account token
   from inside the pod instead of specifying on prestart via environment variables.
+- Update documentation and README for a bit more clarity.
 
 # 0.4.2
 
@@ -16,7 +27,7 @@
 - BREAKING: change `pod.nodeSelector` to `nodeSelector` for consistency with other charts
   and the community. In order to highlight the change, we error if `pod.nodeSelector` is anything other than empty.
 - BREAKING: turn `pod.serviceAccountName` WARNING into an error as well.
-- Add provisional support for `launcher.templateValues.pod.env`, `launcher.templateValues.pod.nodeSelector`, and 
+- Add provisional support for `launcher.templateValues.pod.env`, `launcher.templateValues.pod.nodeSelector`, and
   `launcher.templateValues.pod.priorityClassName`
 - NOTE: we are making these values induce failure so that CI systems and other deployments
   are explicit about the unused values. Please share feedback if this creates problems

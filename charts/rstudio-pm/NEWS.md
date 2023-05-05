@@ -1,3 +1,7 @@
+# 0.5.9
+
+- Update documentation and README for a bit more clarity
+
 # 0.5.8
 
 - Update default Posit Package Manager version to 2023.04.0-6

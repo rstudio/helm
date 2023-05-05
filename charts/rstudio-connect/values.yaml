@@ -63,7 +63,7 @@ image:
   # -- The repository to use for the main pod image
   repository: ghcr.io/rstudio/rstudio-connect
   # -- A tag prefix for the server image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-  tagPrefix: jammy-
+  tagPrefix: ubuntu2204-
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- The imagePullPolicy for the main pod image
@@ -293,7 +293,7 @@ launcher:
     # -- The repository to use for the Content InitContainer image
     repository: ghcr.io/rstudio/rstudio-connect-content-init
     # -- A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-    tagPrefix: jammy-
+    tagPrefix: ubuntu2204-
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     # -- The imagePullPolicy for the default initContainer

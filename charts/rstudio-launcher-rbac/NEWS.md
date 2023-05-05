@@ -22,7 +22,7 @@
 
 # 0.2.5
 
-- Added a new parameter `clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the         
+- Added a new parameter `clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the
   `ClusterRole` that allows for access to the nodes API. This API is used to ensure that all of the IP addresses
   for nodes are available when reporting the addresses of the node that is running a particular job so that
   clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is
