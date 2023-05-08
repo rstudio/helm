@@ -1,0 +1,261 @@
+launcher:
+  # The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default
+  # runtime.yaml file. If changing this value, be careful to include the images that you have already used. If set to "pro", will
+  # pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image).
+  # Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments
+  # the first time the server starts. If any execution environments already exist in the database, these values are ignored;
+  # execution environments are not created or modified during subsequent restarts.
+
+  # Bootstraps the default set of "pro" bionic images with "exact" matching. This means they must
+  # be selected explicitly by the publisher.
+  customRuntimeYaml:
+    name: Kubernetes
+    images:
+      - name: ghcr.io/rstudio/content-pro:r3.1.3-py2.7.18-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/2.7.18/bin/python2.7
+              version: 2.7.18
+        r:
+          installations:
+            - path: /opt/R/3.1.3/bin/R
+              version: 3.1.3
+      - name: ghcr.io/rstudio/content-pro:r3.2.5-py2.7.18-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/2.7.18/bin/python2.7
+              version: 2.7.18
+        r:
+          installations:
+            - path: /opt/R/3.2.5/bin/R
+              version: 3.2.5
+      - name: ghcr.io/rstudio/content-pro:r3.3.3-py3.6.13-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.6.13/bin/python3.6
+              version: 3.6.13
+        r:
+          installations:
+            - path: /opt/R/3.3.3/bin/R
+              version: 3.3.3
+      - name: ghcr.io/rstudio/content-pro:r3.4.4-py3.6.13-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.6.13/bin/python3.6
+              version: 3.6.13
+        r:
+          installations:
+            - path: /opt/R/3.4.4/bin/R
+              version: 3.4.4
+      - name: ghcr.io/rstudio/content-pro:r3.4.4-py3.7.10-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.7.10/bin/python3.7
+              version: 3.7.10
+        r:
+          installations:
+            - path: /opt/R/3.4.4/bin/R
+              version: 3.4.4
+      - name: ghcr.io/rstudio/content-pro:r3.5.3-py2.7.18-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/2.7.18/bin/python2.7
+              version: 2.7.18
+        r:
+          installations:
+            - path: /opt/R/3.5.3/bin/R
+              version: 3.5.3
+      - name: ghcr.io/rstudio/content-pro:r3.5.3-py3.7.10-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.7.10/bin/python3.7
+              version: 3.7.10
+        r:
+          installations:
+            - path: /opt/R/3.5.3/bin/R
+              version: 3.5.3
+      - name: ghcr.io/rstudio/content-pro:r3.6.3-py2.7.18-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/2.7.18/bin/python2.7
+              version: 2.7.18
+        r:
+          installations:
+            - path: /opt/R/3.6.3/bin/R
+              version: 3.6.3
+      - name: ghcr.io/rstudio/content-pro:r3.6.3-py3.6.13-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.6.13/bin/python3.6
+              version: 3.6.13
+        r:
+          installations:
+            - path: /opt/R/3.6.3/bin/R
+              version: 3.6.3
+      - name: ghcr.io/rstudio/content-pro:r3.6.3-py3.8.8-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.8.8/bin/python3.8
+              version: 3.8.8
+        r:
+          installations:
+            - path: /opt/R/3.6.3/bin/R
+              version: 3.6.3
+      - name: ghcr.io/rstudio/content-pro:r4.0.5-py3.6.13-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.6.13/bin/python3.6
+              version: 3.6.13
+        r:
+          installations:
+            - path: /opt/R/4.0.5/bin/R
+              version: 4.0.5
+      - name: ghcr.io/rstudio/content-pro:r4.0.5-py3.7.10-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.7.10/bin/python3.7
+              version: 3.7.10
+        r:
+          installations:
+            - path: /opt/R/4.0.5/bin/R
+              version: 4.0.5
+      - name: ghcr.io/rstudio/content-pro:r4.0.5-py3.8.8-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.8.8/bin/python3.8
+              version: 3.8.8
+        r:
+          installations:
+            - path: /opt/R/4.0.5/bin/R
+              version: 4.0.5
+      - name: ghcr.io/rstudio/content-pro:r4.0.5-py3.9.2-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.9.2/bin/python3.9
+              version: 3.9.2
+        r:
+          installations:
+            - path: /opt/R/4.0.5/bin/R
+              version: 4.0.5
+      - name: ghcr.io/rstudio/content-pro:r4.1.0-py3.8.8-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.8.8/bin/python3.8
+              version: 3.8.8
+        r:
+          installations:
+            - path: /opt/R/4.1.0/bin/R
+              version: 4.1.0
+      - name: ghcr.io/rstudio/content-pro:r4.1.0-py3.9.2-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.9.2/bin/python3.9
+              version: 3.9.2
+        r:
+          installations:
+            - path: /opt/R/4.1.0/bin/R
+              version: 4.1.0
+      - name: ghcr.io/rstudio/content-pro:r4.1.3-py3.10.4-bionic
+        matching: "exact"
+        python:
+          installations:
+            - path: /opt/python/3.10.4/bin/python3
+              version: 3.10.4
+        r:
+          installations:
+            - path: /opt/R/4.1.3/bin/R
+              version: 4.1.3
+        quarto:
+          installations:
+            - path: /opt/quarto/bin/quarto
+              version: 1.0.35
+
+  # Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key).
+  # If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list".
+
+  # Appends the new "jammy" images to the list of execution environments. This is the _new_ set of default images
+  # that will be used for content that does not explicitly request an execution environment.
+  # `matching` is unspecified and defaults to `any`, meaning Connect will select one of these images for new content.
+  additionalRuntimeImages:
+    - name: ghcr.io/rstudio/content-pro:r3.6.3-py3.8.16-ubuntu2204
+      python:
+        installations:
+          - path: /opt/python/3.8.16/bin/python3
+            version: 3.8.16
+      r:
+        installations:
+          - path: /opt/R/3.6.3/bin/R
+            version: 3.6.3
+      quarto:
+        installations:
+          - path: /opt/quarto/1.3.340/bin/quarto
+            version: 1.3.340
+    - name: ghcr.io/rstudio/content-pro:r4.0.5-py3.9.16-ubuntu2204
+      python:
+        installations:
+          - path: /opt/python/3.9.16/bin/python3
+            version: 3.9.16
+      r:
+        installations:
+          - path: /opt/R/4.0.5/bin/R
+            version: 4.0.5
+      quarto:
+        installations:
+          - path: /opt/quarto/1.3.340/bin/quarto
+            version: 1.3.340
+    - name: ghcr.io/rstudio/content-pro:r4.1.3-py3.10.11-ubuntu2204
+      python:
+        installations:
+          - path: /opt/python/3.10.11/bin/python3
+            version: 3.10.11
+      r:
+        installations:
+          - path: /opt/R/4.1.3/bin/R
+            version: 4.1.3
+      quarto:
+        installations:
+          - path: /opt/quarto/1.3.340/bin/quarto
+            version: 1.3.340
+    - name: ghcr.io/rstudio/content-pro:r4.2.2-py3.11.3-ubuntu2204
+      python:
+        installations:
+          - path: /opt/python/3.11.3/bin/python3
+            version: 3.11.3
+      r:
+        installations:
+          - path: /opt/R/4.2.2/bin/R
+            version: 4.2.2
+      quarto:
+        installations:
+          - path: /opt/quarto/1.3.340/bin/quarto
+            version: 1.3.340
+
+# -- A nested map of maps that generates the rstudio-connect.gcfg file
+# @default -- [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/)
+config:
+
+  # Overrides the package URLs to use source packages which are required if the list
+  # of execution environments contains multiple OS distributions.
+  'RPackageRepository "CRAN"':
+    URL: https://packagemanager.rstudio.com/cran/latest
+
+  # Overrides the package URLs to use source packages which are required if the list
+  # of execution environments contains multiple OS distributions.
+  'RPackageRepository "RSPM"':
+    URL: https://packagemanager.rstudio.com/cran/latest
