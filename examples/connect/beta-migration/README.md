@@ -22,5 +22,5 @@ Any new content that is building for the first time, or existing content that is
 will attempt to match against the set of `jammy` images. Content that has already been
 built with a `bionic` image can continue to _execute_ with that image until it rebuilds. If an existing
 piece of content needs to be rebuilt and requires `bionic` for some reason, the Publisher
-must _explcitly_ define a default execution enviornment for that content through the content-settings
+must _explicitly_ define a default execution environment for that content through the content-settings
 (access pane) on the dashboard or via the server API.
