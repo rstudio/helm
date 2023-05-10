@@ -45,9 +45,14 @@ helm search repo --devel rstudio/rstudio-connect -l
 ### NOTE
 
 > NOTE: Off-Host execution via Kubernetes (a.k.a. running Connect content in
-> their own dedicated pods) is now in Public Beta. Please
+> their own dedicated pods) is now Generally Available. Please
 > [see the formal documentation
-> here](https://docs.rstudio.com/helm/rstudio-connect/kubernetes-howto/intro/overview.html).
+> here](https://docs.posit.co/connect/admin/getting-started/off-host-install/).
+
+> BREAKING: Current Beta users should be aware that the default OS has changed from
+> bionic to jammy with the `2023.05.0` release. Existing content will be rebuilt
+> the first time it runs. For more information, please see the Beta migration
+> examples <https://github.com/rstudio/helm/tree/main/examples/connect/beta-migration>.
 
 ## Required Configuration
 
