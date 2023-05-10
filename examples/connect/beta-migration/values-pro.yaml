@@ -1,3 +1,17 @@
+# -- A nested map of maps that generates the rstudio-connect.gcfg file
+# @default -- [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/)
+config:
+
+  # Overrides the package URLs to use source packages which are required if the list
+  # of execution environments contains multiple OS distributions.
+  'RPackageRepository "CRAN"':
+    URL: https://packagemanager.rstudio.com/cran/latest
+
+  # Overrides the package URLs to use source packages which are required if the list
+  # of execution environments contains multiple OS distributions.
+  'RPackageRepository "RSPM"':
+    URL: https://packagemanager.rstudio.com/cran/latest
+
 launcher:
   # -- Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default
   # runtime.yaml file. If changing this value, be careful to include the images that you have already used. If set to "pro", will
@@ -186,17 +200,3 @@ launcher:
         installations:
           - path: /opt/quarto/bin/quarto
             version: 1.0.35
-
-# -- A nested map of maps that generates the rstudio-connect.gcfg file
-# @default -- [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/)
-config:
-
-  # Overrides the package URLs to use source packages which are required if the list
-  # of execution environments contains multiple OS distributions.
-  'RPackageRepository "CRAN"':
-    URL: https://packagemanager.rstudio.com/cran/latest
-
-  # Overrides the package URLs to use source packages which are required if the list
-  # of execution environments contains multiple OS distributions.
-  'RPackageRepository "RSPM"':
-    URL: https://packagemanager.rstudio.com/cran/latest

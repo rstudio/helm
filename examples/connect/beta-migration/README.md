@@ -13,17 +13,11 @@ requires both bionic and jammy images, then you must use R source packages.
 Binary packages will not work when multiple OS distributions are used.
 
 1. If you are currently using `customRuntimeImages: 'base'` (the default),
-apply these changes with:
+use `values-base.yaml` as a reference for updating your values file.
 
-```
-helm upgrade --install -f https://raw.githubusercontent.com/rstudio/helm/main/examples/connect/beta-migration/values-base.yaml
-```
+2. If you are currently using `customRuntimeImages: 'pro'`,
+use `values-prod.yaml` as a reference for updating your values file.
 
-2. If you are currently using `customRuntimeImages: 'pro'`, apply these changes with:
-
-```
-helm upgrade --install -f https://raw.githubusercontent.com/rstudio/helm/main/examples/connect/beta-migration/values-pro.yaml
-```
 
 #### Technical Details
 
