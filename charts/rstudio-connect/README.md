@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.5.0-rc01](https://img.shields.io/badge/Version-0.5.0--rc01-informational?style=flat-square) ![AppVersion: 2023.04.0](https://img.shields.io/badge/AppVersion-2023.04.0-informational?style=flat-square)
+![Version: 0.5.0-rc01](https://img.shields.io/badge/Version-0.5.0--rc01-informational?style=flat-square) ![AppVersion: 2023.05.0](https://img.shields.io/badge/AppVersion-2023.05.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -45,9 +45,14 @@ helm search repo --devel rstudio/rstudio-connect -l
 ### NOTE
 
 > NOTE: Off-Host execution via Kubernetes (a.k.a. running Connect content in
-> their own dedicated pods) is now in Public Beta. Please
+> their own dedicated pods) is now Generally Available. Please
 > [see the formal documentation
-> here](https://docs.rstudio.com/helm/rstudio-connect/kubernetes-howto/intro/overview.html).
+> here](https://docs.posit.co/connect/admin/getting-started/off-host-install/).
+
+> BREAKING: Current Beta users should be aware that the default OS has changed from
+> bionic to jammy with the `2023.05.0` release. Existing content will be rebuilt
+> the first time it runs. For more information, please see the Beta migration
+> examples <https://github.com/rstudio/helm/tree/main/examples/connect/beta-migration>.
 
 ## Required Configuration
 
@@ -103,7 +108,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | ingress.tls | list | `[]` |  |
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
 | launcher.additionalRuntimeImages | list | `[]` | Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key). If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list". |
-| launcher.customRuntimeYaml | string | `"base"` | Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default runtime.yaml file. If changing this value, be careful to include the images that you have already used. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). Starting with Connect v2023.04.0, this configuration is used to bootstrap the initial set of execution environments the first time the server starts. If any execution environments already exist in the database, these values are ignored; execution environments are not created or modified during subsequent restarts. |
+| launcher.customRuntimeYaml | string | `"base"` | Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default runtime.yaml file. If changing this value, be careful to include the images that you have already used. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments the first time the server starts. If any execution environments already exist in the database, these values are ignored; execution environments are not created or modified during subsequent restarts. |
 | launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","securityContext":{},"tag":"","tagPrefix":"ubuntu2204-"}` | Image definition for the default RStudio Connect Content InitContainer |
 | launcher.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. |
 | launcher.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
