@@ -8,9 +8,9 @@
     `launcher.defaultInitContainer.tagPrefix=bionic-` (content-init),
     and modify the set of content images defined by `launcher.customRuntimeYaml`
     to use `bionic` instead of `ubuntu2204`
-  - Off-Host Execution Beta users who are currently evaluating this feature set can use the
+  - BREAKING: Off-Host Execution Beta users who are currently evaluating this feature set can use the
     example values defined in <https://github.com/rstudio/helm/tree/main/examples/connect/beta-migration>
-    to assit with the migration from `bionic` to `jammy`
+    to assit with the content migration from `bionic` to `jammy`
 - Trim the default set of content execution images to the 4 latest releases of Python/R.
   - A Quarto installation has been added to all content-base images.
 - Allow launcher to configure the Kubernetes API URL and the Service Account token

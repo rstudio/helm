@@ -11,9 +11,14 @@
 ### NOTE
 
 > NOTE: Off-Host execution via Kubernetes (a.k.a. running Connect content in
-> their own dedicated pods) is now in Public Beta. Please
+> their own dedicated pods) is now Generally Available. Please
 > [see the formal documentation
-> here](https://docs.rstudio.com/helm/rstudio-connect/kubernetes-howto/intro/overview.html).
+> here](https://docs.posit.co/connect/admin/getting-started/off-host-install/).
+
+> BREAKING: Current Beta users should be aware that the default OS has changed from
+> bionic to jammy with the `2023.05.0` release. Existing content will be rebuilt
+> the first time it runs. For more information, please see the Beta migration
+> examples <https://github.com/rstudio/helm/tree/main/examples/connect/beta-migration>.
 
 ## Required Configuration
 
@@ -21,9 +26,9 @@ This chart requires the following in order to function:
 
 * A license key, license file, or address of a running license server. See the `license` configuration below.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for Connect.
-  * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume. 
-    Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box. 
-    In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then 
+  * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
+    Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
+    In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then
     mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
   * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
