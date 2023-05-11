@@ -1,6 +1,6 @@
 # Version: 2.3.1
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v2
+# Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job

@@ -1,5 +1,6 @@
 # 0.6.0
 
+- Update documentation and README for a bit more clarity
 - BREAKING: Change default OS / OS prefix to `ubuntu2204-`.
   [Bionic support is EOL as of 2023-04-30](https://posit.co/about/platform-support/)
   - If you want to revert this change, set `session.image.tagPrefix=bionic-` (sessions) and `image.tagPrefix=bionic-` (
@@ -75,8 +76,8 @@
 
 # 0.5.21
 
-- Fix an issue in the startup script to verify that the dir exists 
-  
+- Fix an issue in the startup script to verify that the dir exists
+
 # 0.5.20
 
 - Fix an issue where chowning fails in the startup script
@@ -220,10 +221,10 @@
 
 # 0.4.4
 
-- Added a new parameter `rbac.clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the 
+- Added a new parameter `rbac.clusterRoleCreate` to `values.yaml` to allow for disabling the creation of the
   `ClusterRole` that allows for access to the nodes API. This API is used to ensure that all of the IP addresses
-  for nodes are available when reporting the addresses of the node that is running a particular job so that 
-  clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is 
+  for nodes are available when reporting the addresses of the node that is running a particular job so that
+  clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is
   usually sufficient, so it is disabled by default.
 
 # 0.4.3
@@ -264,12 +265,12 @@ config:
         default-container-image: rstudio/r-session-complete:bionic-1.4.1106-5
         container-images: rstudio/r-session-complete:bionic-1.4.1106-5
         allow-unknown-images: 1
-```  
+```
 - BREAKING: we now automatically mount session configuration into the session pod
   - This adds default `job-json-overrides` using the mechanism above
   - This can be disabled by setting `session.defaultConfigMount=false`
   - This is useful for things like `repos.conf`, `rsession.conf` (default Connect server, etc.), etc.
-  
+
 - Switch to using the `rstudio-library` chart for configuration generation
   - This enables putting verbatim files in place if that is preferred to values-interpolation (converting values into a config file dynamically by the chart)
   - i.e. passing a string to the configuration value will short-circuit configuration generation
@@ -281,7 +282,7 @@ config:
 ```
 
 - Update appVersion to 1.4.1717-3
-  
+
 - Add a new `config.profiles` option for configuring profiles files more naturally.
   - This will only be used if the `launcher.kubernetes.profiles.conf` key is not in `config.server` (testing for key
     duplication is tricky in helm, so we pick the most common key)
@@ -311,7 +312,7 @@ config:
             json: "text"
             name: some
           - target: "other/target"
-            json: 
+            json:
               - an
               - array
             name: other
@@ -361,7 +362,7 @@ config:
 # 0.3.2
 
 - Fix a bug in the `load-balancer-manager` (`sidecar` container)
-    - The helm chart (as a result of previous changes) no longer defines an `app` label, but an `app.kubernetes.io/name` label. 
+    - The helm chart (as a result of previous changes) no longer defines an `app` label, but an `app.kubernetes.io/name` label.
     - update the selector, make error handling better, etc. This requires version 2.0 of the load-balancer-manager
 
 # 0.3.1
@@ -393,7 +394,7 @@ config:
     - Alternatively, you can set `fullnameOverride: "previous-release-name"` to force backwards compatibility
     - Finally, deployment selectors have changed, so you will need to delete the current deployment manually, then put back with `helm upgrade --install`
     - Use `helm diff upgrade` to ensure things are working as you expect before upgrading
-    
+
 # 0.0.8
 
 - add `jobJsonOverridesFiles` value option

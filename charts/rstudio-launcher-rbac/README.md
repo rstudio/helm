@@ -1,6 +1,6 @@
 # rstudio-launcher-rbac
 
-![Version: 0.2.15](https://img.shields.io/badge/Version-0.2.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.15](https://img.shields.io/badge/AppVersion-0.2.15-informational?style=flat-square)
+![Version: 0.2.16](https://img.shields.io/badge/Version-0.2.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.16](https://img.shields.io/badge/AppVersion-0.2.16-informational?style=flat-square)
 
 #### _RBAC definition for the RStudio Job Launcher_
 
@@ -18,11 +18,16 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.15:
+To install the chart with the release name `my-release` at version 0.2.16:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/rstudio-launcher-rbac --version=0.2.15
+helm upgrade --install my-release rstudio/rstudio-launcher-rbac --version=0.2.16
+```
+
+To explore other chart versions, take a look at:
+```
+helm search repo rstudio/rstudio-launcher-rbac -l
 ```
 
 ## Common Usage
