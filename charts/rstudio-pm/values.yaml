@@ -244,3 +244,5 @@ nodeSelector: {}
 tolerations: []
 # -- The pod's priorityClassName
 priorityClassName: ""
+# -- Pod disruption budget
+podDisruptionBudget: {}

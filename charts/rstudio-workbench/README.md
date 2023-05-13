@@ -431,6 +431,7 @@ config:
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
+| podDisruptionBudget | object | `{}` | Pod disruption budget |
 | priorityClassName | string | `""` | The pod's priorityClassName |
 | prometheusExporter.enabled | bool | `true` | whether the  prometheus exporter sidecar should be enabled |
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
