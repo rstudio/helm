@@ -114,6 +114,9 @@ loadBalancer:
     - name: FAIL_ON_ERROR
       value: "false"
 
+podDisruptionBudget:
+  minAvailable: 30%
+
 config:
   defaultMode:
     session: 0644
