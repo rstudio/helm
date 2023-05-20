@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.0-rc04](https://img.shields.io/badge/Version-0.6.0--rc04-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
+![Version: 0.6.0-rc05](https://img.shields.io/badge/Version-0.6.0--rc05-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,7 +27,7 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.0-rc04:
+To install the chart with the release name `my-release` at version 0.6.0-rc05:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
@@ -35,7 +35,7 @@ helm repo add rstudio https://helm.rstudio.com
 helm upgrade --install my-release rstudio/rstudio-workbench
 
 # WARNING: to install devel version / release candidate / etc.
-helm upgrade --install --devel my-release rstudio/rstudio-workbench --version=0.6.0-rc04
+helm upgrade --install --devel my-release rstudio/rstudio-workbench --version=0.6.0-rc05
 ```
 
 To explore other chart versions, take a look at:
@@ -476,6 +476,7 @@ config:
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but will not work well if your license only allows a single activation. |
 | tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
+| topologySpreadConstraints | list | `[]` | An array used verbatim as the pod's "topologySpreadConstraints" definition |
 | userCreate | bool | `false` | userCreate determines whether a user should be created at startup (if true) |
 | userName | string | `"rstudio"` | userName determines the username of the created user |
 | userPassword | string | `"rstudio"` | userPassword determines the password of the created user |

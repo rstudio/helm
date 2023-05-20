@@ -16,6 +16,8 @@
 - Allow launcher to configure the Kubernetes API URL and the Service Account token
   from inside the pod instead of specifying on prestart via environment variables.
 - Update documentation and README for a bit more clarity.
+- Add `podDisruptionBudget` values
+- Add `topologySpreadConstraints` values
 
 # 0.4.2
 

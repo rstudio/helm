@@ -53,6 +53,8 @@ extraObjects: []
 affinity: {}
 # -- A map used verbatim as the pod's "nodeSelector" definition
 nodeSelector: {}
+# -- An array used verbatim as the pod's "topologySpreadConstraints" definition
+topologySpreadConstraints: []
 # -- An array used verbatim as the pod's "tolerations" definition
 tolerations: []
 # -- The pod's priorityClassName
