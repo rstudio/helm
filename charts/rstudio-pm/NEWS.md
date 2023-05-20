@@ -1,3 +1,11 @@
+# 0.5.11
+
+- Add `topologySpreadConstraints` values
+
+# 0.5.10
+
+- Add `podDisruptionBudget` values
+
 # 0.5.9
 
 - Update documentation and README for a bit more clarity

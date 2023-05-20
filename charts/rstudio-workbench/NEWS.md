@@ -9,6 +9,8 @@
 - Allow customizing the `pod.command` associated with sessions for some highly custom startup cases. This should
   not be necessary in most cases and will be removed at a later date, once the product supports startup customization.
   Please reach out if you have questions about this functionality!
+- Add `podDisruptionBudget` values
+- Add `topologySpreadConstraints` values
 
 # 0.5.32
 
