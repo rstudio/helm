@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.0-rc03](https://img.shields.io/badge/Version-0.6.0--rc03-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
+![Version: 0.6.0-rc04](https://img.shields.io/badge/Version-0.6.0--rc04-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,7 +27,7 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.0-rc03:
+To install the chart with the release name `my-release` at version 0.6.0-rc04:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
@@ -35,7 +35,7 @@ helm repo add rstudio https://helm.rstudio.com
 helm upgrade --install my-release rstudio/rstudio-workbench
 
 # WARNING: to install devel version / release candidate / etc.
-helm upgrade --install --devel my-release rstudio/rstudio-workbench --version=0.6.0-rc03
+helm upgrade --install --devel my-release rstudio/rstudio-workbench --version=0.6.0-rc04
 ```
 
 To explore other chart versions, take a look at:
@@ -431,6 +431,7 @@ config:
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
+| podDisruptionBudget | object | `{}` | Pod disruption budget |
 | priorityClassName | string | `""` | The pod's priorityClassName |
 | prometheusExporter.enabled | bool | `true` | whether the  prometheus exporter sidecar should be enabled |
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |

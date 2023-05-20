@@ -22,6 +22,9 @@ service:
   annotations:
     testannotation: one
 
+podDisruptionBudget:
+  minAvailable: 30%
+
 pod:
   env:
     - name: RSTUDIO_CONNECT_HASTE

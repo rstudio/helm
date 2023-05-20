@@ -272,6 +272,8 @@ nodeSelector: {}
 topologySpreadConstraints: []
 # -- An array used verbatim as the pod's "tolerations" definition
 tolerations: []
+# -- Pod disruption budget
+podDisruptionBudget: {}
 
 # -- The revisionHistoryLimit to use for the pod deployment. Do not set to 0
 revisionHistoryLimit: 10

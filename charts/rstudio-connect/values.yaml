@@ -59,6 +59,8 @@ topologySpreadConstraints: []
 tolerations: []
 # -- The pod's priorityClassName
 priorityClassName: ""
+# -- Pod disruption budget
+podDisruptionBudget: {}
 
 # -- Defines the RStudio Connect image to deploy
 image:

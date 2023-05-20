@@ -5,6 +5,9 @@ image:
   imagePullSecrets:
     - name: "some-secret"
 
+podDisruptionBudget:
+  minAvailable: 30%
+
 sharedStorage:
   create: true
   storageClassName: test-class
