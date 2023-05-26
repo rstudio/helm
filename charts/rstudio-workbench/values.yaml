@@ -396,7 +396,7 @@ config:
   sessionSecret: {}
   # -- a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions
   secret:
-    "database.conf": {}
+    # "database.conf": {}
   # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
   userProvisioning: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
