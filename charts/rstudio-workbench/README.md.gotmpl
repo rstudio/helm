@@ -318,6 +318,19 @@ config:
           - "two-image:tag
 ```
 
+## Sealed Secrets
+This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
+
+To activate the use of `SealedSecret` templates instead of `Secret` templates in the chart, set `sealedSecret.enabled=true` and ensure the following values are all encrypted. The chart does not support mixing encrypted values with unencrypted values.
+
+- `config.secret`
+- `config.sessionSecret`
+- `config.userProvisioning`
+- `launcherPem`
+- `secureCookieKey` (or `global.secureCookieKey`)
+
+Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables the chart's auto-generation and reuse capabilities for `launcherPem` and `secureCookieKey`. `launcherPem` is an RSA private key which can be generated via an RSA tool such as helm's [`genPrivateKey`](https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey) function. `secureCookieKey` is typically a UUID which can be generated via a UUID generator such as helm's [`uuidv4`](https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions) function.
+
 {{ template "chart.valuesSection" . }}
 
 {{ template "helm-docs.versionFooter" . }}

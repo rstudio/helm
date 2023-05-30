@@ -158,6 +158,12 @@ ingress:
 # -- whether to provide `shareProcessNamespace` to the pod.
 shareProcessNamespace: false
 
+sealedSecret:
+  # -- use SealedSecret instead of Secret to deploy secrets
+  enabled: false
+  # -- annotations for SealedSecret resources
+  annotations: {}
+
 service:
   # -- annotations for the service definition
   annotations: {}

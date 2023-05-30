@@ -11,6 +11,7 @@
   Please reach out if you have questions about this functionality!
 - Add `podDisruptionBudget` values
 - Add `topologySpreadConstraints` values
+- Add support for [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)
 
 # 0.5.32
 
