@@ -349,7 +349,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
     Defines the default launcherMounts (if not defined)
         Precedence:
-            - If .Values.config.serverDcf.launcher-mounts is defined, use that verbatim
+            - If homeStorage.create or homeStorage.mount, then:
+                - If config.serverDcf.launcher-mounts is a string, use that
+                -
             - If not, and if homestorage.create is true, provision home storage and launcher-mounts automatically
             - Otherwise use .Values.config.serverDcf.launcher-mounts
 */}}
@@ -377,6 +379,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         {{- /* TODO: implement a helper that does this lookup for us... key on MountPath? Or ClaimName? */ }}
         {{- /* TODO: also need an escape hatch to turn this magic off */ -}}
         {{- $mountAlreadyDefined := false }}
+        {{- $elt := range $tmpMounts }}
+            {{- if hasKey $elt "MountPath" }}
+            {{- end }}
+            {{- if hasKey $elt "ClaimName" }}
+            {{- end }}
+        {{- end }}
 
         {{- /* only alter $tmpMounts if claim is not provided by the user */ -}}
         {{- if not $mountAlreadyDefined }}
