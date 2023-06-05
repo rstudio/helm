@@ -1,16 +1,27 @@
 # 0.6.0
 
-- Update documentation and README for a bit more clarity
 - BREAKING: Change default OS / OS prefix to `ubuntu2204-`.
   [Bionic support is EOL as of 2023-04-30](https://posit.co/about/platform-support/)
   - If you want to revert this change, set `session.image.tagPrefix=bionic-` (sessions) and `image.tagPrefix=bionic-` (
     server)
+- BREAKING: change the "home volume mount" for sessions to happen automatically, regardless of whether you define other
+  values in `config.serverDcf.launcher-mounts`
+  - Previously, if you specify anything in `launcher-mounts`, then we did not mount the home volume onto the session
+  - Now, we continue to mount the home volume onto the session, unless:
+    - You set `session.defaultHomeMount=false`
+    - You have the same (or a parent) `mountPath` defined in an existing `launcher-mounts` volume
+    - You have the same PVC `ClaimName` defined in an existing `launcher-mounts` volume
+  - If you mount the volume yourself and want to keep doing so, you can set `session.defaultHomeMount=false`
+  - If you mount the volume yourself and would like to stop doing so, you can now unset the home mount
+    in `launcher-mounts`
+- Update documentation and README for a bit more clarity
 - Update product to version `2023.03.0`
 - Allow customizing the `pod.command` associated with sessions for some highly custom startup cases. This should
   not be necessary in most cases and will be removed at a later date, once the product supports startup customization.
   Please reach out if you have questions about this functionality!
 - Add `podDisruptionBudget` values
 - Add `topologySpreadConstraints` values
+- Start to utilize the `pod.securityContext` values for pod `securityContext` values
 
 # 0.5.32
 

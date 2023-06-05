@@ -351,8 +351,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         Precedence:
             - If homeStorage.create or homeStorage.mount, then:
                 - If config.serverDcf.launcher-mounts is a string, use that
-                -
-            - If not, and if homestorage.create is true, provision home storage and launcher-mounts automatically
+                - If a list or dict, check if the MountPath or ClaimName is already in use
+                  - If so, use existing mounts
+                  - If not, add homeStorage mount
+                - Otherwise use existing mounts
             - Otherwise use .Values.config.serverDcf.launcher-mounts
 */}}
 {{- define "rstudio-workbench.config.launcherMounts" -}}
@@ -360,29 +362,40 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- $claimNameDefault := printf "%s-home-storage" (include "rstudio-workbench.fullname" . ) }}
 {{- $claimName := default $claimNameDefault $.Values.homeStorage.name }}
 {{- $finalMount := list }}
-{{- /* only alter things if homeStorage is defined */ -}}
-{{- if or $.Values.homeStorage.create $.Values.homeStorage.mount -}}
+{{- /* only alter things if homeStorage is defined and enabled */ -}}
+{{- if and (or $.Values.homeStorage.create $.Values.homeStorage.mount) $.Values.session.defaultHomeMount -}}
     {{- /* preserve strings */ -}}
     {{- if kindIs "string" $currentMounts }}
         {{- $finalMount = $currentMounts }}
     {{- /* for lists and dicts, potentially append */ -}}
-    {{- else if or (kindIs "map" $currentMounts) (kindIs "list" $currentMounts) }}
+    {{- else if or (kindIs "map" $currentMounts) (kindIs "slice" $currentMounts) }}
         {{- $tmpMounts := list }}
-        {{- /* ensure $tmpMounts is a list */ }}
+        {{- /* ensure $tmpMounts is a list */ -}}
         {{- if kindIs "map" $currentMounts }}
             {{- $tmpMounts = append $tmpMounts $currentMounts }}
         {{- else }}
             {{- $tmpMounts = $currentMounts }}
         {{- end }}
 
-        {{- /* check if the defaultMount (of the homeStorage PVC) is already defined by the user */ }}
-        {{- /* TODO: implement a helper that does this lookup for us... key on MountPath? Or ClaimName? */ }}
-        {{- /* TODO: also need an escape hatch to turn this magic off */ -}}
+        {{- /* check if the defaultMount (of the homeStorage PVC) is already defined by the user */ -}}
+        {{- /* TODO: implement a helper that does this lookup for us... so we can reuse in NOTES */ -}}
         {{- $mountAlreadyDefined := false }}
-        {{- $elt := range $tmpMounts }}
+        {{- range $i, $elt := $tmpMounts }}
             {{- if hasKey $elt "MountPath" }}
+              {{- if regexMatch (printf "^%s" (index $elt "MountPath" )) $.Values.homeStorage.path }}
+                {{- /* the existing volume is a prefix of the homeStorage path */ -}}
+                {{- $mountAlreadyDefined = true }}
+              {{- end }}
+              {{- if regexMatch (printf "^%s" $.Values.homeStorage.path) (index $elt "MountPath") }}
+                {{- /* the existing volume is prefixed by the homeStorage path */ -}}
+                {{- $mountAlreadyDefined = true }}
+              {{- end }}
             {{- end }}
             {{- if hasKey $elt "ClaimName" }}
+              {{- if eq (index $elt "ClaimName") $claimName }}
+                {{- /* the existing volume already targets this same claim */ -}}
+                {{- $mountAlreadyDefined = true }}
+              {{- end }}
             {{- end }}
         {{- end }}
 
@@ -393,9 +406,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         {{- end }}
 
         {{- $finalMount = $tmpMounts }}
-    {{- /* otherwise, fail */ -}}
+    {{- /* otherwise, do nothing */ -}}
     {{- else }}
-        {{- /* TODO: fail - unexpected type */ }}
+        {{- /* we do not know how to handle any other types */ -}}
+        {{- $finalMount = $currentMounts }}
     {{- end }}
 {{- else }}
     {{- $finalMount = $currentMounts }}

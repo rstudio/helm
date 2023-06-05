@@ -177,7 +177,7 @@ config:
   serverDcf:
     launcher-mounts:
       - MountType: KubernetesPersistentVolumeClaim
-        MountPath: /home
+        MountPath: /mnt/home
         ClaimName: rstudio-server-home-storage
       - MountType: KubernetesPersistentVolumeClaim
         MountPath: /shared
