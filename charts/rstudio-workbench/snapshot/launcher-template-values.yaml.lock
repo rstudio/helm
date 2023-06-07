@@ -124,9 +124,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:bionic-2022.12.0
-    default-container-image=rstudio/r-session-complete:bionic-2022.12.0
-  
+    container-images=rstudio/r-session-complete:ubuntu2204-2023.03.0
+    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.03.0
   
   
   
@@ -144,29 +143,40 @@ metadata:
 data:
   rstudio-library-templates-data.tpl: |
     {{- define "rstudio-library.templates.data" -}}
-    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"}},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"nodeSelector":{},"securityContext":{"runAsUser":999},"serviceAccountName":"test","tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
+    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"}},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"command":[],"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"nodeSelector":{},"securityContext":{"runAsUser":999},"serviceAccountName":"test","tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
     {{- end }}
   job.tpl: |
-    # Version: 2
+    # Version: 2.3.1
     # DO NOT MODIFY the "Version: " key
     # Helm Version: v2
     {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
     apiVersion: batch/v1
     kind: Job
     metadata:
-      generateName: {{ toYaml .Job.generateName }}
       annotations:
+        {{- with .Job.metadata.job.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
         {{- with $templateData.job.annotations }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
         {{- end }}
         {{- end }}
       labels:
+        app.kubernetes.io/managed-by: "launcher"
+        {{- with .Job.metadata.job.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
         {{- with $templateData.job.labels }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
         {{- end }}
         {{- end }}
+      generateName: {{ toYaml .Job.generateName }}
     spec:
       backoffLimit: 0
       template:
@@ -183,12 +193,25 @@ data:
             user: {{ toYaml .Job.user }}
             name: {{ toYaml .Job.name }}
             service_ports: {{ toYaml .Job.servicePortsJson }}
+            {{- if .Job.metadata }}
+            user_metadata: {{ toJson .Job.metadata | toYaml | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- with .Job.metadata.pod.annotations }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
             {{- with $templateData.pod.annotations }}
             {{- range $key, $val := . }}
             {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
             {{- end }}
             {{- end }}
           labels:
+            {{- with .Job.metadata.pod.labels }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
             {{- with $templateData.pod.labels }}
             {{- range $key, $val := . }}
             {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
@@ -200,8 +223,8 @@ data:
           nodeName: {{ toYaml .Job.host }}
           {{- end }}
           restartPolicy: Never
-          {{- with $templateData.pod.serviceAccountName }}
-          serviceAccountName: {{ . }}
+          {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
+          serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
           {{- end }}
           shareProcessNamespace: {{ .Job.shareProcessNamespace }}
           {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
@@ -221,8 +244,17 @@ data:
           affinity:
             {{- toYaml . | nindent 8 }}
           {{- end }}
-          {{- with $templateData.pod.nodeSelector }}
+          {{- if or (ne (len .Job.placementConstraints) 0) (ne (len $templateData.pod.nodeSelector) 0) }}
           nodeSelector:
+            {{- range .Job.placementConstraints }}
+            {{ .name }}: {{ toYaml .value }}
+            {{- end }}
+            {{- range $key,$val := $templateData.pod.nodeSelector }}
+            {{ $key }}: {{- toYaml $val | nindent 10 }}
+            {{- end }}
+          {{- end }}
+          {{- with $templateData.pod.priorityClassName }}
+          priorityClassName:
             {{- toYaml . | nindent 8 }}
           {{- end }}
           {{- $securityContext := $templateData.pod.defaultSecurityContext }}
@@ -250,6 +282,11 @@ data:
           imagePullSecrets: {{ toYaml . | nindent 12 }}
           {{- end }}
           initContainers:
+            {{- with .Job.metadata.pod.initContainers }}
+            {{- range . }}
+            - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
+            {{- end }}
+            {{- end }}
             {{- with $templateData.pod.initContainers }}
               {{- range . }}
             - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
@@ -262,7 +299,10 @@ data:
               imagePullPolicy: {{- . | nindent 12 }}
               {{- end }}
               {{- $isShell := false }}
-              {{- if .Job.command }}
+              {{- if $templateData.pod.command }}
+              command: {{- toYaml $templateData.pod.command | nindent 12 }}
+                {{- if .Job.command }}{{- $isShell = true }}{{- end }}
+              {{- else if .Job.command }}
               command: ['/bin/sh']
               {{- $isShell = true }}
               {{- else }}
@@ -304,7 +344,7 @@ data:
                   {{- $secrets = append $secrets $secret }}
                 {{- end }}
               {{- end }}
-              {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) }}
+              {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) (ne (len $templateData.pod.env) 0) }}
               env:
                 {{- range .Job.environment }}
                 - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
@@ -317,16 +357,19 @@ data:
                       name: {{ get . "secret" }}
                       key: {{ get . "key" }}
                 {{- end }}
+                {{- if .Values.pod.env }}
+                  {{- toYaml $templateData.pod.env | nindent 12 }}
+                {{- end }}
+              {{- end }}
+              {{- with $templateData.pod.containerSecurityContext }}
+              securityContext:
+                {{- toYaml . | nindent 12 }}
               {{- end }}
               {{- $exposedPorts := list }}
               {{- range .Job.exposedPorts }}
                 {{- if .publishedPort }}
                   {{- $exposedPorts = append $exposedPorts . }}
                 {{- end }}
-              {{- end }}
-              {{- with $templateData.pod.containerSecurityContext }}
-              securityContext:
-                {{- toYaml . | nindent 12 }}
               {{- end }}
               {{- if ne (len $exposedPorts) 0 }}
               ports:
@@ -340,16 +383,12 @@ data:
               {{- range .Job.resourceLimits }}
                 {{- if eq .type "cpuCount" }}
                   {{- $_ := set $limits "cpu" .value }}
-                  {{- if ne $.Job.cpuRequestRatio 1.0 }}
-                    {{- $val := mulf .value $.Job.cpuRequestRatio | toString }}
-                    {{- $_ := set $requests "cpu" $val }}
-                  {{- end }}
+                {{- else if eq .type "CPU Request" }}
+                  {{- $_ := set $requests "cpu" .value }}
                 {{- else if eq .type "memory" }}
                   {{- $_ := set $limits "memory" (printf "%s%s" .value "M") }}
-                  {{- if ne $.Job.memoryRequestRatio 1.0 }}
-                    {{- $val := mulf .value $.Job.memoryRequestRatio }}
-                    {{- $_ := set $requests "memory" (printf "%.2f%s" $val "M") }}
-                  {{- end }}
+                {{- else if eq .type "Memory Request" }}
+                  {{- $_ := set $requests "memory" (printf "%s%s" .value "M") }}
                 {{- else if eq .type "NVIDIA GPUs" }}
                   {{- $val := float64 .value }}
                   {{- if ne $val 0.0 }}
@@ -391,7 +430,7 @@ data:
             {{- end }}
     
   service.tpl: |
-    # Version: 2
+    # Version: 2.3.1
     # DO NOT MODIFY the "Version: " key
     # Helm Version: v2
     {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
@@ -400,13 +439,24 @@ data:
     metadata:
       name: {{ .Job.serviceName }}
       annotations:
+        {{- with .Job.metadata.service.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
         {{- with $templateData.service.annotations }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
         {{- end }}
         {{- end }}
       labels:
+        app.kubernetes.io/managed-by: "launcher"
         job-name: {{ toYaml .Job.id }}
+        {{- with .Job.metadata.service.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
         {{- with $templateData.service.labels }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
@@ -619,8 +669,7 @@ data:
   
   notifications.conf: |
   repos.conf: |
-    CRAN=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
-    RSPM=https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+    RSPM=https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
   rsession.conf: |
   rstudio-prefs.json: |
 ---
@@ -773,7 +822,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2022.12.0"
+    app.kubernetes.io/version: "2023.03.0"
     app.kubernetes.io/managed-by: Helm
   annotations:
     
@@ -811,11 +860,11 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 9761d98140194f7d02c9c8d9a719e6b8b6d788a0f8d135f64cd44488261c67c7
+        checksum/config-general: 604aeeee586a28238b9ac79cd2988e62decaf1323bf6de929c9d4d11ae13ba91
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
-        checksum/config-session: 89e1a6a82a51c83763653a4c034f7f41623f16b840369caf5189b759e6495b85
+        checksum/config-session: 50517ed3e09bf63cb4784fedfc7350ea1bd8a730a5f8302b3b2a9d96e950435a
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9108"
@@ -829,7 +878,7 @@ spec:
       shareProcessNamespace: false      
       containers:
       - name: rstudio
-        image: "rstudio/rstudio-workbench:bionic-2022.12.0"
+        image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.0"
         env:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
@@ -962,7 +1011,7 @@ spec:
   
   containers:
   - name: rstudio
-    image: "rstudio/rstudio-workbench:bionic-2022.12.0"
+    image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.0"
     env:
     - name: DIAGNOSTIC_DIR
       value: "/var/log/rstudio"
