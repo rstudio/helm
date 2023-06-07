@@ -517,7 +517,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.03.0"
+    app.kubernetes.io/version: "2023.03.1"
     app.kubernetes.io/managed-by: Helm
   annotations:
     
@@ -573,7 +573,7 @@ spec:
       shareProcessNamespace: false      
       containers:
       - name: rstudio
-        image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.0"
+        image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.1"
         env:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
@@ -706,7 +706,7 @@ spec:
   
   containers:
   - name: rstudio
-    image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.0"
+    image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.1"
     env:
     - name: DIAGNOSTIC_DIR
       value: "/var/log/rstudio"

@@ -105,8 +105,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:ubuntu2204-2023.03.0
-    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.03.0
+    container-images=rstudio/r-session-complete:ubuntu2204-2023.03.1
+    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.03.1
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json"
   
   
@@ -480,7 +480,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.03.0"
+    app.kubernetes.io/version: "2023.03.1"
     app.kubernetes.io/managed-by: Helm
   annotations:
     
@@ -518,7 +518,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 88e73249fd81f87b3d1e9244d366c115c2c3bee235f382758e87eda33e3cfec2
+        checksum/config-general: 2a98e6e784b4bdb4094b958506d3044af2dadadb443c54c2113243190c61bf22
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
@@ -536,7 +536,7 @@ spec:
       shareProcessNamespace: false      
       containers:
       - name: rstudio
-        image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.0"
+        image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.1"
         env:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
@@ -655,7 +655,7 @@ spec:
   
   containers:
   - name: rstudio
-    image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.0"
+    image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.1"
     env:
     - name: DIAGNOSTIC_DIR
       value: "/var/log/rstudio"

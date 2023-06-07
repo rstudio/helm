@@ -15,7 +15,7 @@
   - If you mount the volume yourself and would like to stop doing so, you can now unset the home mount
     in `launcher-mounts`
 - Update documentation and README for a bit more clarity
-- Update product to version `2023.03.0`
+- Update product to version `2023.03.1`
 - Allow customizing the `pod.command` associated with sessions for some highly custom startup cases. This should
   not be necessary in most cases and will be removed at a later date, once the product supports startup customization.
   Please reach out if you have questions about this functionality!
