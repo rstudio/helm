@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.03.0"
+    app.kubernetes.io/version: "2023.03.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -164,8 +164,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:ubuntu2204-2023.03.0
-    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.03.0
+    container-images=rstudio/r-session-complete:ubuntu2204-2023.03.1
+    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.03.1
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json","/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionSecretVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionSecretVolumeMount.json"
   
   
@@ -682,7 +682,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.03.0"
+    app.kubernetes.io/version: "2023.03.1"
     app.kubernetes.io/managed-by: Helm
   annotations:
     key: "value"
@@ -722,7 +722,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: d525c9dbb98c8df7406b93b60bc63a5471e68ab8f42eb3be2bbd26015dfbb65e
+        checksum/config-general: 8c2955067e67b3be0b6dbeb493955cfe1bc453bb808e9080be4ca9a177accfc8
         checksum/config-graphite: 69dd73685cb821ebf5bcec3155d92801f31d72b031a4d681700bded2ff5700c2
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: fc06992d38b807a70a6f5722d670969573e2ee3f82293197a2bd0d840ca3a7d4
@@ -917,7 +917,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.03.0"
+    app.kubernetes.io/version: "2023.03.1"
     app.kubernetes.io/managed-by: Helm
   annotations:
     kubernetes.io/ingress.class: traefik
