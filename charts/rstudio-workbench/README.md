@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.0-rc05](https://img.shields.io/badge/Version-0.6.0--rc05-informational?style=flat-square) ![AppVersion: 2023.03.0](https://img.shields.io/badge/AppVersion-2023.03.0-informational?style=flat-square)
+![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![AppVersion: 2023.03.1](https://img.shields.io/badge/AppVersion-2023.03.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,20 +27,16 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.0-rc05:
+To install the chart with the release name `my-release` at version 0.6.0:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-# to install latest release (NOTE: `--version` flag still recommended!)
-helm upgrade --install my-release rstudio/rstudio-workbench
-
-# WARNING: to install devel version / release candidate / etc.
-helm upgrade --install --devel my-release rstudio/rstudio-workbench --version=0.6.0-rc05
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.0
 ```
 
 To explore other chart versions, take a look at:
 ```
-helm search repo --devel rstudio/rstudio-workbench -l
+helm search repo rstudio/rstudio-workbench -l
 ```
 
 ## Required Configuration
@@ -368,7 +364,7 @@ config:
 | config.secret | object | `{"database.conf":{}}` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
 | config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
-| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.rstudio.com/cran/__linux__/bionic/latest","RSPM":"https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"},"rsession.conf":{},"rstudio-prefs.json":{}}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
+| config.session | object | `{"notifications.conf":{},"repos.conf":{"RSPM":"https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":{}}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
 | config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
 | config.startupUserProvisioning | object | `{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/ |
@@ -457,6 +453,7 @@ config:
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |
 | session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
+| session.defaultHomeMount | bool | `true` | Whether to automatically add the homeStorage PVC to the session (i.e. via the `launcher-mounts` file) |
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
 | session.image.repository | string | `"rstudio/r-session-complete"` | The repository to use for the session image |
 | session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |

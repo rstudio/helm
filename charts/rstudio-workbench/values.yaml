@@ -12,8 +12,12 @@ diagnostics:
   directory: /var/log/rstudio
 
 session:
-  # -- Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this
+  # -- Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is
+  # different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to
+  # facilitate this
   defaultConfigMount: true
+  # -- Whether to automatically add the homeStorage PVC to the session (i.e. via the `launcher-mounts` file)
+  defaultHomeMount: true
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
@@ -393,8 +397,7 @@ config:
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:
-      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
-      CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+      RSPM: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
     rsession.conf: {}
     notifications.conf: {}
     rstudio-prefs.json: {}
