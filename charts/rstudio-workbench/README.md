@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![AppVersion: 2023.03.1](https://img.shields.io/badge/AppVersion-2023.03.1-informational?style=flat-square)
+![Version: 0.6.1](https://img.shields.io/badge/Version-0.6.1-informational?style=flat-square) ![AppVersion: 2023.03.1](https://img.shields.io/badge/AppVersion-2023.03.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,11 +27,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.0:
+To install the chart with the release name `my-release` at version 0.6.1:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.1
 ```
 
 To explore other chart versions, take a look at:
@@ -343,6 +343,19 @@ config:
           - "two-image:tag
 ```
 
+## Sealed Secrets
+This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
+
+To activate the use of `SealedSecret` templates instead of `Secret` templates in the chart, set `sealedSecret.enabled=true` and ensure the following values are all encrypted. The chart does not support mixing encrypted values with unencrypted values.
+
+- `config.secret`
+- `config.sessionSecret`
+- `config.userProvisioning`
+- `launcherPem`
+- `secureCookieKey` (or `global.secureCookieKey`)
+
+Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables the chart's auto-generation and reuse capabilities for `launcherPem` and `secureCookieKey`. `launcherPem` is an RSA private key which can be generated via an RSA tool such as helm's [`genPrivateKey`](https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey) function. `secureCookieKey` is typically a UUID which can be generated via a UUID generator such as helm's [`uuidv4`](https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions) function.
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -361,14 +374,14 @@ config:
 | config.defaultMode.userProvisioning | int | 0600 | default mode for userProvisioning config |
 | config.pam | object | `{}` | a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files |
 | config.profiles | object | `{}` | a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information. |
-| config.secret | object | `{"database.conf":{}}` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
+| config.secret | string | `nil` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
 | config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
 | config.session | object | `{"notifications.conf":{},"repos.conf":{"RSPM":"https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":{}}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
 | config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
 | config.startupUserProvisioning | object | `{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/ |
-| config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
+| config.userProvisioning | object | `{}` |  |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
@@ -443,6 +456,8 @@ config:
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |
 | revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
+| sealedSecret.annotations | object | `{}` | annotations for SealedSecret resources |
+| sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
 | secureCookieKey | string | `""` |  |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` | annotations for the service definition |
