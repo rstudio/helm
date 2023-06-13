@@ -14,7 +14,6 @@ metadata:
   namespace: rstudio
 stringData:
   
-  database.conf: |
   launcher.pem: |
     abc
     
@@ -863,7 +862,7 @@ spec:
         checksum/config-general: 3c67c2119be6dcbf004cf8382f320d9ee1a1096d89a02f3de8e0db17d2d3faeb
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
-        checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
+        checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
         checksum/config-session: 50517ed3e09bf63cb4784fedfc7350ea1bd8a730a5f8302b3b2a9d96e950435a
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"

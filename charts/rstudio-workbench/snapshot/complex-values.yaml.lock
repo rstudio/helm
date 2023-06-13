@@ -26,43 +26,6 @@ metadata:
   annotations:
     one-two: three
 ---
-# Source: rstudio-workbench/templates/configmap-secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: release-name-rstudio-workbench-secret
-  namespace: rstudio
-stringData:
-  
-  database.conf: |
-  launcher.pem: |
-    abc
-    
-  secure-cookie-key: |
-    abc
----
-# Source: rstudio-workbench/templates/configmap-secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: release-name-rstudio-workbench-user
-  namespace: rstudio
-stringData:  
-  some-value.conf.test: |
-    some-value
----
-# Source: rstudio-workbench/templates/configmap-session.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: release-name-rstudio-workbench-session-secret
-  namespace: rstudio
-stringData:
-  
-  odbc.ini: |
-    [hello]
-    uid=someval
----
 # Source: rstudio-workbench/templates/license-secret.yaml
 apiVersion: v1
 kind: Secret
@@ -725,8 +688,8 @@ spec:
         checksum/config-general: 8c2955067e67b3be0b6dbeb493955cfe1bc453bb808e9080be4ca9a177accfc8
         checksum/config-graphite: 69dd73685cb821ebf5bcec3155d92801f31d72b031a4d681700bded2ff5700c2
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
-        checksum/config-secret: fc06992d38b807a70a6f5722d670969573e2ee3f82293197a2bd0d840ca3a7d4
-        checksum/config-session: 75e2ce5c7bf075bab77ace7c86c3f9f97706137bec3b54eb0e5b7c022950bd6a
+        checksum/config-secret: cab76a6f9b0e8168201b837f280ddee96f5306cb62d0ac022340cb8c88e40d52
+        checksum/config-session: 2e6919341541c8c6aafde7a426336a11df80ce62908ecc89b040bfccf16bf7ec
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9108"
@@ -935,6 +898,55 @@ spec:
                 port:
                   number: 80
 ---
+# Source: rstudio-workbench/templates/configmap-secret.yaml
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    is-a-sealed-secret: true
+  name: release-name-rstudio-workbench-secret
+  namespace: rstudio
+spec:
+  encryptedData:
+    
+    database.conf: |
+    launcher.pem: |
+      abc
+    secure-cookie-key: |
+      abc
+  template:
+    data:
+---
+# Source: rstudio-workbench/templates/configmap-secret.yaml
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    is-a-sealed-secret: true
+  name: release-name-rstudio-workbench-user
+  namespace: rstudio
+spec:
+  encryptedData:
+    
+    some-value.conf.test: |
+      some-value
+---
+# Source: rstudio-workbench/templates/configmap-session.yaml
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    is-a-sealed-secret: true
+  name: release-name-rstudio-workbench-session-secret
+  namespace: rstudio
+spec:
+  encryptedData:
+    data:
+      
+      odbc.ini: |
+        [hello]
+        uid=someval
+---
 # Source: rstudio-workbench/templates/tests/test-verify-installation.yaml
 apiVersion: v1
 kind: Pod
@@ -1018,11 +1030,11 @@ spec:
       - name: rstudio-custom-startup
         mountPath: "/startup/custom"
       - name: rstudio-pam
-        mountPath: "/etc/pam.d/pam-example"
-        subPath: "pam-example"
-      - name: rstudio-pam
         mountPath: "/etc/pam.d/pam-example-2"
         subPath: "pam-example-2"
+      - name: rstudio-pam
+        mountPath: "/etc/pam.d/pam-example"
+        subPath: "pam-example"
       
       - name: rstudio-job-overrides-old
         mountPath: "/mnt/job-json-overrides"
