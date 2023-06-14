@@ -5876,6 +5876,54 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-workbench
+          image: rstudio/rstudio-workbench:ubuntu2204-2023.06.0
+        - name: r-session-complete
+          image: rstudio/r-session-complete:ubuntu2204-2023.06.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Workbench
+          url: https://www.rstudio.com/products/workbench/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 2023.06.0
+    created: "2023-06-14T14:52:25.009027427Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.25
+    description: Official Helm chart for RStudio Workbench
+    digest: 1f81347c1eb461064f08b17c2988893da7fe5b11394228e514f7443c127e42e6
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - ide
+    - editor
+    - jupyter
+    - vscode
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.6.1/rstudio-workbench-0.6.1.tgz
+    version: 0.6.1
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-workbench
           image: rstudio/rstudio-workbench:ubuntu2204-2023.03.1
         - name: r-session-complete
           image: rstudio/r-session-complete:ubuntu2204-2023.03.1
@@ -8878,4 +8926,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2023-06-08T17:45:21.499442153Z"
+generated: "2023-06-14T14:52:25.010743809Z"
