@@ -1,3 +1,7 @@
+# 0.6.1
+
+- Bump Workbench version to 2023.06
+
 # 0.6.0
 
 - BREAKING: Change default OS / OS prefix to `ubuntu2204-`.
