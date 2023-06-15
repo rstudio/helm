@@ -1,6 +1,10 @@
-# 0.6.1
+# 0.6.2
 
 - Add support for [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)
+
+# 0.6.1
+
+- Bump Workbench version to 2023.06
 
 # 0.6.0
 
