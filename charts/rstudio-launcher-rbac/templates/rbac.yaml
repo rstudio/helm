@@ -17,6 +17,7 @@
 {{- $roleName := include "rstudio-launcher-rbac.fullname" . }}
 {{- $serviceAccountCreate := .Values.serviceAccount.create }}
 {{- $serviceAccountAnnotations := .Values.serviceAccount.annotations }}
+{{- $serviceAccountLabels := .Values.serviceAccount.labels }}
 {{- $clusterRoleCreate := .Values.clusterRoleCreate }}
 
 {{- $rbacValues := dict
@@ -25,6 +26,7 @@
   "targetNamespace"           ($targetNamespace)
   "serviceAccountCreate"      ($serviceAccountCreate)
   "serviceAccountAnnotations" ($serviceAccountAnnotations)
+  "serviceAccountLabels"      ($serviceAccountLabels)
   "removeNamespaceReferences" (.Values.removeNamespaceReferences)
   "roleName"                  ($roleName)
   "clusterRoleCreate"         ($clusterRoleCreate)
