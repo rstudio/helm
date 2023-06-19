@@ -5,6 +5,7 @@
 {{- $serviceAccountCreate := .Values.rbac.serviceAccount.create }}
 {{- $roleName := $serviceAccountName }}
 {{- $serviceAccountAnnotations := .Values.rbac.serviceAccount.annotations }}
+{{- $serviceAccountLabels := .Values.rbac.serviceAccount.labels }}
 {{- $clusterRoleCreate := .Values.rbac.clusterRoleCreate }}
 {{- $rbacValues1 := dict "namespace" $namespace "serviceAccountName" $serviceAccountName "targetNamespace" $targetNamespace }}
 {{- $rbacValues2 := dict "serviceAccountCreate" $serviceAccountCreate "serviceAccountAnnotations" $serviceAccountAnnotations "serviceAccountLabels" $serviceAccountLabels "roleName" ($roleName) }}
