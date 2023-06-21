@@ -14,7 +14,6 @@ metadata:
   namespace: rstudio
 stringData:
   
-  database.conf: |
   launcher.pem: |
     abc
     
@@ -112,8 +111,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:ubuntu2204-2023.03.1
-    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.03.1
+    container-images=rstudio/r-session-complete:ubuntu2204-2023.06.0
+    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.06.0
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json"
   
   
@@ -487,7 +486,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.03.1"
+    app.kubernetes.io/version: "2023.06.0"
     app.kubernetes.io/managed-by: Helm
   annotations:
     
@@ -525,10 +524,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 2a98e6e784b4bdb4094b958506d3044af2dadadb443c54c2113243190c61bf22
+        checksum/config-general: 8638da6b93d81b8212aadf0b1c465034bb9cab988ff5a07c137555726101f886
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
-        checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
+        checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
         checksum/config-session: dec54acfb2c889c81f4e3fe30eeefa38dd28126194d584d801f56774527442e7
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
@@ -543,7 +542,7 @@ spec:
       shareProcessNamespace: false      
       containers:
       - name: rstudio
-        image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.1"
+        image: "rstudio/rstudio-workbench:ubuntu2204-2023.06.0"
         env:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
@@ -662,7 +661,7 @@ spec:
   
   containers:
   - name: rstudio
-    image: "rstudio/rstudio-workbench:ubuntu2204-2023.03.1"
+    image: "rstudio/rstudio-workbench:ubuntu2204-2023.06.0"
     env:
     - name: DIAGNOSTIC_DIR
       value: "/var/log/rstudio"
