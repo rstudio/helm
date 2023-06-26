@@ -12,6 +12,11 @@ service:
     key: value
 replicas: 2
 
+sealedSecret:
+  enabled: true
+  annotations:
+    is-a-sealed-secret: yes
+
 revisionHistoryLimit: 3
 pod:
   env:

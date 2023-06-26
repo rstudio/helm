@@ -122,8 +122,8 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:ubuntu2204-2023.03.1
-    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.03.1
+    container-images=rstudio/r-session-complete:ubuntu2204-2023.06.0
+    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.06.0
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json"
   
   
@@ -583,7 +583,7 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.03.1"
+    app.kubernetes.io/version: "2023.06.0"
     app.kubernetes.io/managed-by: Helm
   annotations:
     key: "value"
@@ -623,7 +623,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 9501f7a76496c8adc186de87fdf905ac38bdd52aabd52e2712d891f738a3161e
+        checksum/config-general: 55550e25d705ad8dcab993c030edda88d1a0482e1cda60b0409d694b04d07ff4
         checksum/config-graphite: ab090aebd9b73a011de2ba8d98eb62398fa39a4fdd7d137281ada8306c3909d8
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4

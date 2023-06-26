@@ -1,3 +1,5 @@
+DIFF := "diff"
+
 setup:
   #!/bin/bash
   # TODO: idempotency
@@ -58,7 +60,10 @@ snapshot-rsw-lock:
 
 snapshot-rsw-diff:
   #!/bin/bash
+  set -x
   for file in `ls ./charts/rstudio-workbench/snapshot/*.yaml`; do
     echo Diffing $file
-    diff $file $file.lock
+    if [[ `diff -q $file $file.lock` ]]; then
+        {{ DIFF }} $file $file.lock
+    fi
   done

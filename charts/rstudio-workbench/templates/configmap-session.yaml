@@ -8,6 +8,19 @@ data:
   {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
 {{- if .Values.config.sessionSecret }}
 ---
+{{- if .Values.sealedSecret.enabled }}
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    {{- tpl ( toYaml .Values.sealedSecret.annotations ) . | nindent 4 }}
+  name: {{ include "rstudio-workbench.fullname" . }}-session-secret
+  namespace: {{ $.Release.Namespace }}
+spec:
+  encryptedData:
+    data:
+      {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 6 }}
+{{- else }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -15,6 +28,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 stringData:
   {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 2 }}
+{{- end }}
 {{- end }}
 
 {{- /*
@@ -36,6 +50,19 @@ data:
   {{- include "rstudio-library.config.ini" .Values.config.session | nindent 2 }}
 {{- if .Values.config.sessionSecret }}
 ---
+{{- if .Values.sealedSecret.enabled }}
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    {{- tpl ( toYaml .Values.sealedSecret.annotations ) . | nindent 4 }}
+  name: {{ include "rstudio-workbench.fullname" . }}-session-secret
+  namespace: {{ $targetNamespace }}
+spec:
+  encryptedData:
+    data:
+      {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 6 }}
+{{- else }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -43,5 +70,6 @@ metadata:
   namespace: {{ $targetNamespace }}
 stringData:
   {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- end }}
