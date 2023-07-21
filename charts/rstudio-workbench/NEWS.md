@@ -1,3 +1,7 @@
+# 0.6.3
+
+- Fix support for `pod.env` on sessions
+
 # 0.6.2
 
 - Add support for [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)
