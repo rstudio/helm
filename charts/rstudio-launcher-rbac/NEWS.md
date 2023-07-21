@@ -1,3 +1,8 @@
+# 0.2.17
+
+- Update `rstudio-library` chart dependency
+- Add the ability to add serviceAccount labels
+
 # 0.2.16
 
 - Update documentation for more clarity

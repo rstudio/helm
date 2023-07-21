@@ -1,6 +1,6 @@
 # rstudio-launcher-rbac
 
-![Version: 0.2.16](https://img.shields.io/badge/Version-0.2.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.16](https://img.shields.io/badge/AppVersion-0.2.16-informational?style=flat-square)
+![Version: 0.2.17](https://img.shields.io/badge/Version-0.2.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.17](https://img.shields.io/badge/AppVersion-0.2.17-informational?style=flat-square)
 
 #### _RBAC definition for the RStudio Job Launcher_
 
@@ -18,11 +18,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.16:
+To install the chart with the release name `my-release` at version 0.2.17:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-launcher-rbac --version=0.2.16
+helm upgrade --install my-release rstudio/rstudio-launcher-rbac --version=0.2.17
 ```
 
 To explore other chart versions, take a look at:
@@ -51,9 +51,10 @@ helm template -n rstudio rstudio-launcher-rbac rstudio/rstudio-launcher-rbac
 | includeReleaseNamespace | bool | `true` | Whether the helm release namespace should be a possible launcher target |
 | nameOverride | string | `""` | The override for "ChartName" in the "FullName" which defaults to "ReleaseName-ChartName" or "ReleaseName" (if "ReleaseName" contains "ChartName") |
 | removeNamespaceReferences | bool | `false` | remove explicit namespace references (problematic if targetNamespaces is defined) |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| serviceAccount.labels | object | `{}` | Labels to add to the service account |
+| serviceAccount.name | string | `""` | The name of the service account to use. If not set, a name is generated using the fullname template |
 | targetNamespaces | list | `[]` | The targetNamespaces that the launcher will be able to launch sessions into |
 
 ----------------------------------------------
