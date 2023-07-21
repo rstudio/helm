@@ -90,6 +90,7 @@ launcher:
       serviceAccountName: ""
       volumes: []
       volumeMounts: []
+      env: []
       imagePullPolicy: ""
       imagePullSecrets: []
       initContainers: []

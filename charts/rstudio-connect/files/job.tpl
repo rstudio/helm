@@ -1,6 +1,6 @@
 # Version: 2.3.1
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v1
+# Helm Version: v3
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -151,7 +151,10 @@ spec:
           imagePullPolicy: {{- . | nindent 12 }}
           {{- end }}
           {{- $isShell := false }}
-          {{- if .Job.command }}
+          {{- if $templateData.pod.command }}
+          command: {{- toYaml $templateData.pod.command | nindent 12 }}
+            {{- if .Job.command }}{{- $isShell = true }}{{- end }}
+          {{- else if .Job.command }}
           command: ['/bin/sh']
           {{- $isShell = true }}
           {{- else }}
@@ -206,7 +209,7 @@ spec:
                   name: {{ get . "secret" }}
                   key: {{ get . "key" }}
             {{- end }}
-            {{- if .Values.pod.env }}
+            {{- if $templateData.pod.env }}
               {{- toYaml $templateData.pod.env | nindent 12 }}
             {{- end }}
           {{- end }}
