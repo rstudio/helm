@@ -1,6 +1,6 @@
 # Version: 2.3.1
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v2
+# Helm Version: v3
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -209,7 +209,7 @@ spec:
                   name: {{ get . "secret" }}
                   key: {{ get . "key" }}
             {{- end }}
-            {{- if .Values.pod.env }}
+            {{- if $templateData.pod.env }}
               {{- toYaml $templateData.pod.env | nindent 12 }}
             {{- end }}
           {{- end }}

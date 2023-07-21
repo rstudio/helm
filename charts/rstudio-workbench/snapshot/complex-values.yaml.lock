@@ -763,11 +763,11 @@ spec:
           - name: rstudio-custom-startup
             mountPath: "/startup/custom"
           - name: rstudio-pam
-            mountPath: "/etc/pam.d/pam-example"
-            subPath: "pam-example"
-          - name: rstudio-pam
             mountPath: "/etc/pam.d/pam-example-2"
             subPath: "pam-example-2"
+          - name: rstudio-pam
+            mountPath: "/etc/pam.d/pam-example"
+            subPath: "pam-example"
           
           - name: rstudio-job-overrides-old
             mountPath: "/mnt/job-json-overrides"
@@ -1030,11 +1030,11 @@ spec:
       - name: rstudio-custom-startup
         mountPath: "/startup/custom"
       - name: rstudio-pam
-        mountPath: "/etc/pam.d/pam-example"
-        subPath: "pam-example"
-      - name: rstudio-pam
         mountPath: "/etc/pam.d/pam-example-2"
         subPath: "pam-example-2"
+      - name: rstudio-pam
+        mountPath: "/etc/pam.d/pam-example"
+        subPath: "pam-example"
       
       - name: rstudio-job-overrides-old
         mountPath: "/mnt/job-json-overrides"
