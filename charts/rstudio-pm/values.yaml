@@ -213,6 +213,8 @@ serviceAccount:
   # -- Annotations for the ServiceAccount, if any
   annotations: {}
   #   eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
+  # -- Labels for the ServiceAccount, if any
+  labels: {}
 
 serviceMonitor:
   # -- Whether to create a ServiceMonitor CRD for use with a Prometheus Operator
