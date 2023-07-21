@@ -1,3 +1,7 @@
+# 0.5.1
+
+- Bump Connect version to 2023.06.0
+
 # 0.5.0
 
 - BREAKING: Change default OS / OS prefix to `ubuntu2204-`.
