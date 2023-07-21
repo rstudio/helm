@@ -142,12 +142,12 @@ metadata:
 data:
   rstudio-library-templates-data.tpl: |
     {{- define "rstudio-library.templates.data" -}}
-    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"}},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"command":[],"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"nodeSelector":{},"securityContext":{"runAsUser":999},"serviceAccountName":"test","tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
+    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"}},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"command":[],"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"env":[{"name":"SOME_ENV_VAR","value":"the-env-var-value"}],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"nodeSelector":{},"securityContext":{"runAsUser":999},"serviceAccountName":"test","tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
     {{- end }}
   job.tpl: |
     # Version: 2.3.1
     # DO NOT MODIFY the "Version: " key
-    # Helm Version: v2
+    # Helm Version: v3
     {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
     apiVersion: batch/v1
     kind: Job
@@ -356,7 +356,7 @@ data:
                       name: {{ get . "secret" }}
                       key: {{ get . "key" }}
                 {{- end }}
-                {{- if .Values.pod.env }}
+                {{- if $templateData.pod.env }}
                   {{- toYaml $templateData.pod.env | nindent 12 }}
                 {{- end }}
               {{- end }}
@@ -431,7 +431,7 @@ data:
   service.tpl: |
     # Version: 2.3.1
     # DO NOT MODIFY the "Version: " key
-    # Helm Version: v2
+    # Helm Version: v3
     {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
     apiVersion: v1
     kind: Service
@@ -859,7 +859,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 55198bf3cd0c9395996d79d9d808358acf5cdc61d77ee8e4d4627d0967794601
+        checksum/config-general: 61ebdf4aaea69d39d94c8360f8ef39c65b689bf8c05916942325176c4b6dbbf3
         checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed

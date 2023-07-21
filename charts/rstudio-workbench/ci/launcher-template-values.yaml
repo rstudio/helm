@@ -26,6 +26,9 @@ launcher:
       volumeMounts:
         - name: test
           mountPath: /tmp/mnt
+      env:
+        - name: SOME_ENV_VAR
+          value: the-env-var-value
       securityContext:
         runAsUser: 999
       defaultSecurityContext:
