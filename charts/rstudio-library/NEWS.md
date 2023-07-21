@@ -1,3 +1,7 @@
+# 0.1.26
+
+- Add the capability to add labels to service accounts
+
 # 0.1.25
 
 - Update documentation to remove "beta" label and explain production recommendations

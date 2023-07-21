@@ -8,10 +8,12 @@
     "removeNamespaceReferences": "whether to remove namespace references"
     "serviceAccountCreate": "whether to create the service account"
     "serviceAccountAnnotations": "annotation object for the serviceAccount"
+    "serviceAccountLabels": "labels object for the serviceAccount"
     "clusterRoleCreate": "whether or not to create the ClusterRole that allows access to the nodes API"
 */ -}}
 {{- define "rstudio-library.rbac" -}}
 {{- $serviceAccountAnnotations := default (dict) .serviceAccountAnnotations }}
+{{- $serviceAccountLabels := default (dict) .serviceAccountLabels }}
 {{- include "rstudio-library.debug.type-check" (dict "name" "serviceAccountCreate" "object" .serviceAccountCreate "expected" "bool" "description" "enabling cluster service account creation") }}
 {{- $serviceAccountCreate := eq .serviceAccountCreate false | ternary false true }}
 {{- $serviceAccountName := .serviceAccountName }}
@@ -61,6 +63,10 @@ metadata:
   {{- end }}
   {{- with $serviceAccountAnnotations }}
   annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $serviceAccountLabels }}
+  labels:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}

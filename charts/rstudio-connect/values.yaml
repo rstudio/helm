@@ -45,6 +45,7 @@ rbac:
     create: true
     name: ""
     annotations: {}
+    labels: {}
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []

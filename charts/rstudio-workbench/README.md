@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.3](https://img.shields.io/badge/Version-0.6.3-informational?style=flat-square) ![AppVersion: 2023.06.0](https://img.shields.io/badge/AppVersion-2023.06.0-informational?style=flat-square)
+![Version: 0.6.4](https://img.shields.io/badge/Version-0.6.4-informational?style=flat-square) ![AppVersion: 2023.06.0](https://img.shields.io/badge/AppVersion-2023.06.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,11 +27,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.3:
+To install the chart with the release name `my-release` at version 0.6.4:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.3
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.4
 ```
 
 To explore other chart versions, take a look at:
@@ -451,7 +451,7 @@ Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | prometheusExporter.securityContext | object | `{}` | securityContext for the prometheus exporter sidecar |
 | rbac.clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
 | rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
-| rbac.serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
+| rbac.serviceAccount | object | `{"annotations":{},"create":true,"labels":{},"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |

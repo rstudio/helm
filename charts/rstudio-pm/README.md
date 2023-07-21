@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.5.11](https://img.shields.io/badge/Version-0.5.11-informational?style=flat-square) ![AppVersion: 2023.04.0](https://img.shields.io/badge/AppVersion-2023.04.0-informational?style=flat-square)
+![Version: 0.5.12](https://img.shields.io/badge/Version-0.5.12-informational?style=flat-square) ![AppVersion: 2023.04.0](https://img.shields.io/badge/AppVersion-2023.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.11:
+To install the chart with the release name `my-release` at version 0.5.12:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.11
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.12
 ```
 
 To explore other chart versions, take a look at:
@@ -173,6 +173,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, if any |
 | serviceAccount.create | bool | `true` | Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) |
+| serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | When `serviceAccount.create` is `true` this defaults to the full name of the release | ServiceAccount to use, if any, or an explicit name for the one we create |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |

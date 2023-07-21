@@ -1,6 +1,6 @@
 # rstudio-library
 
-![Version: 0.1.25](https://img.shields.io/badge/Version-0.1.25-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.1.25](https://img.shields.io/badge/AppVersion-0.1.25-informational?style=flat-square)
+![Version: 0.1.26](https://img.shields.io/badge/Version-0.1.26-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.1.26](https://img.shields.io/badge/AppVersion-0.1.26-informational?style=flat-square)
 
 #### _Helm library helpers for use by Official RStudio charts_
 
