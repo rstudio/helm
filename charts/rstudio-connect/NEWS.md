@@ -1,3 +1,8 @@
+# 0.5.2
+
+- Add support for `pod.command` and `pod.env` for Connect off-host execution sessions
+  - `pod.command` is a hack for now... it will be removed eventually
+
 # 0.5.1
 
 - Bump Connect version to 2023.06.0
