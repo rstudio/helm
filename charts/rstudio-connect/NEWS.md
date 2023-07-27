@@ -4,8 +4,7 @@
 
 # 0.5.3
 
-- Added ability to assign labels in service accounts in rstudio-workbench and
-  rstudio-connect charts.
+- Added ability to assign labels in service accounts.
 
 # 0.5.2
 
