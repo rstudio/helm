@@ -137,7 +137,7 @@ config:
     Provider: password
   Python:
     Enabled: true
-    Executable: /opt/python/3.6.5/bin/python
+    Executable: /opt/python/default/bin/python
   'RPackageRepository "CRAN"':
     URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
   'RPackageRepository "RSPM"':
@@ -147,4 +147,4 @@ config:
     DataDir: /var/lib/rstudio-connect
     RVersionScanning: false
     RVersion:
-      - /opt/R/3.6.2
+      - /opt/R/default
