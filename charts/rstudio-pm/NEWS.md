@@ -1,3 +1,7 @@
+# 0.6.0
+
+- Change R path to `/opt/R/default`, a generic symlink to the primary R version in the image.
+
 # 0.5.11
 
 - Add `topologySpreadConstraints` values

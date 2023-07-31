@@ -9,6 +9,6 @@ config:
   Server:
     DataDir: /var/lib/rstudio-pm
     RVersion:
-      - /opt/R/3.6.2
+      - /opt/R/default
   Git:
     BuilderDir: "/tmp/git"
