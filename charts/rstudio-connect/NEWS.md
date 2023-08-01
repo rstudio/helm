@@ -1,3 +1,11 @@
+# 0.5.4
+
+- Bump Connect version to 2023.07.0
+
+# 0.5.3
+
+- Added ability to assign labels in service accounts.
+
 # 0.5.2
 
 - Add support for `pod.command` and `pod.env` for Connect off-host execution sessions
