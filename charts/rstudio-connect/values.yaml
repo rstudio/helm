@@ -32,6 +32,8 @@ sharedStorage:
   selector: {}
   # -- the volumeName passed along to the persistentVolumeClaim. Optional
   volumeName: ""
+  # -- an optional subPath for the volume mount
+  subPath: ""
 
 rbac:
   # -- Whether to create rbac. (also depends on launcher.enabled = true)

@@ -128,6 +128,8 @@ homeStorage:
   selector: {}
   # -- the volumeName passed along to the persistentVolumeClaim. Optional
   volumeName: ""
+  # -- an optional subPath for the volume mount
+  subPath: ""
 
 image:
   # -- the repository to use for the main pod image

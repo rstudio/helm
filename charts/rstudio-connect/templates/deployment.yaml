@@ -150,6 +150,9 @@ spec:
           {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-connect-data
             mountPath: "{{ .Values.sharedStorage.path }}"
+            {{- if .Values.sharedStorage.subPath }}
+            subPath: "{{ .Values.sharedStorage.subPath }}"
+            {{- end }}
           {{- end }}
           {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
       {{- if .Values.pod.volumeMounts }}

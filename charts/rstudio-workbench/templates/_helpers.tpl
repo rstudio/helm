@@ -99,6 +99,9 @@ containers:
     {{- if or .Values.homeStorage.create .Values.homeStorage.mount }}
     - name: rstudio-home-storage
       mountPath: "{{ .Values.homeStorage.path }}"
+      {{- if .Values.homeStorage.subPath }}
+      subPath: "{{ .Values.homeStorage.subPath }}"
+      {{- end }}
     {{- end }}
     - name: rstudio-prestart
       mountPath: "/scripts/"
