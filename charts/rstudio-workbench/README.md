@@ -395,6 +395,7 @@ Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | homeStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | homeStorage.selector | object | `{}` | selector for PVC definition |
 | homeStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
+| homeStorage.subPath | string | `""` | an optional subPath for the volume mount |
 | homeStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
