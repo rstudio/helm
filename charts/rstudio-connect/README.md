@@ -176,6 +176,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | sharedStorage.requests.storage | string | `"10Gi"` | The volume of storage to request for this persistent volume claim |
 | sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | The type of storage to use. Must allow ReadWriteMany |
+| sharedStorage.subPath | string | `""` | an optional subPath for the volume mount |
 | sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | Used to configure the container's startupProbe. Only included if enabled = true |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
