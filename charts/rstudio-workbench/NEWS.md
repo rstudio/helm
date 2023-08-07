@@ -1,6 +1,6 @@
 # 0.6.5
 
-- Add support for `homeStorage.subDir` (and for launcher sessions)
+- Add support for `homeStorage.subPath` (and for launcher sessions)
 
 # 0.6.4
 

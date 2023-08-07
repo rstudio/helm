@@ -149,13 +149,14 @@ data:
   
   
   launcher-mounts: |
-    ClaimName: rstudio-server-home-storage
-    MountPath: /mnt/home
-    MountType: KubernetesPersistentVolumeClaim
-  
     ClaimName: rstudio-shared-data
     MountPath: /shared
     MountType: KubernetesPersistentVolumeClaim
+  
+    ClaimName: release-name-rstudio-workbench-home-storage
+    MountPath: /mnt/home
+    MountType: KubernetesPersistentVolumeClaim
+    SubPath: /another
 ---
 # Source: rstudio-workbench/templates/configmap-general.yaml
 apiVersion: v1
@@ -685,7 +686,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 6e9045d1445aa885f5b80ccb746a0f5bba05fff45baa100c04e509ec48dc8463
+        checksum/config-general: 0641da4c718599b1d351db140258190aae55cd3da97f44f2616140a4dc8980fc
         checksum/config-graphite: 69dd73685cb821ebf5bcec3155d92801f31d72b031a4d681700bded2ff5700c2
         checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
         checksum/config-secret: cab76a6f9b0e8168201b837f280ddee96f5306cb62d0ac022340cb8c88e40d52
@@ -740,6 +741,7 @@ spec:
             mountPath: "/var/lib/awesome"
           - name: rstudio-home-storage
             mountPath: "/mnt/home"
+            subPath: "/another"
           - name: rstudio-prestart
             mountPath: "/scripts/"
           - name: rstudio-config
@@ -763,11 +765,11 @@ spec:
           - name: rstudio-custom-startup
             mountPath: "/startup/custom"
           - name: rstudio-pam
-            mountPath: "/etc/pam.d/pam-example-2"
-            subPath: "pam-example-2"
-          - name: rstudio-pam
             mountPath: "/etc/pam.d/pam-example"
             subPath: "pam-example"
+          - name: rstudio-pam
+            mountPath: "/etc/pam.d/pam-example-2"
+            subPath: "pam-example-2"
           
           - name: rstudio-job-overrides-old
             mountPath: "/mnt/job-json-overrides"
@@ -1007,6 +1009,7 @@ spec:
         mountPath: "/var/lib/awesome"
       - name: rstudio-home-storage
         mountPath: "/mnt/home"
+        subPath: "/another"
       - name: rstudio-prestart
         mountPath: "/scripts/"
       - name: rstudio-config
@@ -1030,11 +1033,11 @@ spec:
       - name: rstudio-custom-startup
         mountPath: "/startup/custom"
       - name: rstudio-pam
-        mountPath: "/etc/pam.d/pam-example-2"
-        subPath: "pam-example-2"
-      - name: rstudio-pam
         mountPath: "/etc/pam.d/pam-example"
         subPath: "pam-example"
+      - name: rstudio-pam
+        mountPath: "/etc/pam.d/pam-example-2"
+        subPath: "pam-example-2"
       
       - name: rstudio-job-overrides-old
         mountPath: "/mnt/job-json-overrides"

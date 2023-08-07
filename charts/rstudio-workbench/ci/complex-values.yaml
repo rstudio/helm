@@ -73,6 +73,7 @@ homeStorage:
   storageClassName: nfs
   requests:
     storage: "500Gi"
+  subPath: "/another"
 
 prometheusExporter:
   securityContext:
@@ -181,9 +182,6 @@ config:
     logging.conf: {}
   serverDcf:
     launcher-mounts:
-      - MountType: KubernetesPersistentVolumeClaim
-        MountPath: /mnt/home
-        ClaimName: rstudio-server-home-storage
       - MountType: KubernetesPersistentVolumeClaim
         MountPath: /shared
         ClaimName: rstudio-shared-data

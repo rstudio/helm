@@ -1,6 +1,6 @@
 # 0.5.5
 
-- Add support for `sharedStorage.subDir`
+- Add support for `sharedStorage.subPath`
 
 # 0.5.4
 
