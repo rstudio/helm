@@ -1,12 +1,13 @@
 strategy:
   type: Recreate
   rollingUpdate: null
-  
+
 config:
   Database:
-    Provider: SQLite
+    Provider: sqlite3
+  SQLite:
     Dir: /mnt/db
-    
+
 sharedStorage:
   create: true
   storageClassName: something-read-write-many # TODO: change this
