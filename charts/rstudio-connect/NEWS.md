@@ -1,3 +1,7 @@
+# 0.5.5
+
+- Add support for `sharedStorage.subDir`
+
 # 0.5.4
 
 - Bump Connect version to 2023.07.0
