@@ -1,3 +1,11 @@
+# 0.6.5
+
+- Add support for `homeStorage.subPath` (and for launcher sessions)
+
+# 0.6.4
+
+- Add support for serviceAccount labels (`rbac.serviceAccount.labels`)
+
 # 0.6.3
 
 - Fix support for `pod.env` on sessions

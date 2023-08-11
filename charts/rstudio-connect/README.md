@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.5.4](https://img.shields.io/badge/Version-0.5.4-informational?style=flat-square) ![AppVersion: 2023.07.0](https://img.shields.io/badge/AppVersion-2023.07.0-informational?style=flat-square)
+![Version: 0.5.5](https://img.shields.io/badge/Version-0.5.5-informational?style=flat-square) ![AppVersion: 2023.07.0](https://img.shields.io/badge/AppVersion-2023.07.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.4:
+To install the chart with the release name `my-release` at version 0.5.5:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.5.4
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.5.5
 ```
 
 To explore other chart versions, take a look at:
@@ -176,6 +176,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | sharedStorage.requests.storage | string | `"10Gi"` | The volume of storage to request for this persistent volume claim |
 | sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | The type of storage to use. Must allow ReadWriteMany |
+| sharedStorage.subPath | string | `""` | an optional subPath for the volume mount |
 | sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | Used to configure the container's startupProbe. Only included if enabled = true |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |

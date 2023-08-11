@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.4](https://img.shields.io/badge/Version-0.6.4-informational?style=flat-square) ![AppVersion: 2023.06.0](https://img.shields.io/badge/AppVersion-2023.06.0-informational?style=flat-square)
+![Version: 0.6.5](https://img.shields.io/badge/Version-0.6.5-informational?style=flat-square) ![AppVersion: 2023.06.0](https://img.shields.io/badge/AppVersion-2023.06.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,11 +27,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.4:
+To install the chart with the release name `my-release` at version 0.6.5:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.4
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.5
 ```
 
 To explore other chart versions, take a look at:
@@ -395,6 +395,7 @@ Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | homeStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | homeStorage.selector | object | `{}` | selector for PVC definition |
 | homeStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
+| homeStorage.subPath | string | `""` | an optional subPath for the volume mount |
 | homeStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |

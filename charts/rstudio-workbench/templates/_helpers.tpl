@@ -99,6 +99,9 @@ containers:
     {{- if or .Values.homeStorage.create .Values.homeStorage.mount }}
     - name: rstudio-home-storage
       mountPath: "{{ .Values.homeStorage.path }}"
+      {{- if .Values.homeStorage.subPath }}
+      subPath: "{{ .Values.homeStorage.subPath }}"
+      {{- end }}
     {{- end }}
     - name: rstudio-prestart
       mountPath: "/scripts/"
@@ -402,6 +405,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         {{- /* only alter $tmpMounts if claim is not provided by the user */ -}}
         {{- if not $mountAlreadyDefined }}
             {{- $defaultMount := (dict "MountType" "KubernetesPersistentVolumeClaim" "MountPath" $.Values.homeStorage.path "ClaimName" $claimName ) }}
+            {{- if .Values.homeStorage.subPath }}
+              {{- $defaultMount = merge $defaultMount (dict "SubPath" .Values.homeStorage.subPath )}}
+            {{- end }}
             {{- $tmpMounts = append $tmpMounts $defaultMount}}
         {{- end }}
 
