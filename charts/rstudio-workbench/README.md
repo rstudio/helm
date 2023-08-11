@@ -27,11 +27,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.5:
+To install the chart with the release name `my-release` at version 0.6.6:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.5
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.6
 ```
 
 To explore other chart versions, take a look at:
