@@ -16,6 +16,11 @@
     {{- $volumeList := append $sessionTemplate.pod.volumes $sessionVolume }}
     {{- $_ := set $sessionTemplate.pod "volumes" $volumeList }}
     {{- $volumeMountList := append $sessionTemplate.pod.volumeMounts $sessionVolumeMount }}
+    {{- if hasKey .Values.config.session "pip.conf" }}
+      {{- /* set the pip volume mount on sessions if necessary... */ -}}
+      {{- $pipVolumeMount := dict "mountPath" "/etc/pip.conf" "subPath" "pip.conf" "name" "session-config" }}
+      {{- $volumeMountList = append $volumeMountList $pipVolumeMount }}
+    {{- end }}
     {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
   {{- end }}
   {{- if .Values.config.sessionSecret}}
