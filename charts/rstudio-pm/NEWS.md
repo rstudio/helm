@@ -1,4 +1,4 @@
-# 0.6.0
+# 0.5.13
 
 - Change R path to `/opt/R/default`, a generic symlink to the primary R version in the image.
 
