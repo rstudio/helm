@@ -1,3 +1,7 @@
+# 0.6.6
+
+- Bump Workbench version to 2023.06.1
+- 
 # 0.6.5
 
 - Add support for `homeStorage.subPath` (and for launcher sessions)
@@ -16,7 +20,7 @@
 
 # 0.6.1
 
-- Bump Workbench version to 2023.06
+- Bump Workbench version to 2023.06.0
 
 # 0.6.0
 
