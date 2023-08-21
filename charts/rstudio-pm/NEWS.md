@@ -1,3 +1,12 @@
+# 0.5.13 
+
+- Change default operating system from `bionic` to `ubuntu2204` (`jammy`)
+  - This is not a breaking change since it does not affect how Package Manager serves packages
+
+# 0.5.12
+
+- Add values for `serviceAccount.labels`
+
 # 0.5.11
 
 - Add `topologySpreadConstraints` values
