@@ -2,7 +2,7 @@
 * @colearendt @atheriel
 
 # package-manager resources
-/charts/rstudio-pm/* @rstudio/rspm-dev
+/charts/rstudio-pm/* @rstudio/ppm
 
 # connect resources
 /charts/rstudio-connect/* @aronatkins @dbkegley @christierney @zackverham
