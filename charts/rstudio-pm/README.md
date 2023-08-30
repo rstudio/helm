@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.5.13](https://img.shields.io/badge/Version-0.5.13-informational?style=flat-square) ![AppVersion: 2023.04.0](https://img.shields.io/badge/AppVersion-2023.04.0-informational?style=flat-square)
+![Version: 0.5.14-rc01](https://img.shields.io/badge/Version-0.5.14--rc01-informational?style=flat-square) ![AppVersion: 2023.04.0](https://img.shields.io/badge/AppVersion-2023.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -21,16 +21,20 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.13:
+To install the chart with the release name `my-release` at version 0.5.14-rc01:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.13
+# to install latest release (NOTE: `--version` flag still recommended!)
+helm upgrade --install my-release rstudio/rstudio-pm
+
+# WARNING: to install devel version / release candidate / etc.
+helm upgrade --install --devel my-release rstudio/rstudio-pm --version=0.5.14-rc01
 ```
 
 To explore other chart versions, take a look at:
 ```
-helm search repo rstudio/rstudio-pm -l
+helm search repo --devel rstudio/rstudio-pm -l
 ```
 
 ## Upgrade Guidance

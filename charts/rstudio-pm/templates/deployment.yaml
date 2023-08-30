@@ -80,13 +80,6 @@ spec:
         {{- if .Values.pod.env }}
         {{- toYaml .Values.pod.env | nindent 8 }}
         {{- end }}
-        {{- if .Values.rstudioPMKey }}
-        - name: PACKAGEMANAGER_ENCRYPTION_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
-              key: rstudio-pm.key
-        {{- end }}
         {{- if (not .Values.enableSandboxing) }}
         - name: PACKAGEMANAGER_GIT_ALLOWUNSANDBOXEDGITBUILDS
           value: "1"
@@ -116,6 +109,11 @@ spec:
           - name: rstudio-pm-config
             mountPath: "/etc/rstudio-pm/rstudio-pm.gcfg"
             subPath: "rstudio-pm.gcfg"
+          {{- if .Values.rstudioPMKey }}
+          - name: key-volume
+            mountPath: /var/lib/rstudio-pm/rstudio-pm.key
+            subPath: rstudio-pm.key
+          {{- end }}
           {{- if .Values.awsAccessKeyId }}
           - name: aws-creds
             readOnly: true
@@ -173,6 +171,12 @@ spec:
           items:
           - key: rstudio-pm.gcfg
             path: "rstudio-pm.gcfg"
+      {{- if .Values.rstudioPMKey }}
+      - name: key-volume
+        secret:
+          secretName: {{ include "rstudio-pm.fullname" . }}-rstudio-pm-key
+          defaultMode: 0600
+      {{- end }}
       {{- if .Values.awsAccessKeyId }}
       - name: aws-creds
         secret:
