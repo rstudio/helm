@@ -1,7 +1,13 @@
+# 0.6.7
+
+- Add native session support for `pip.conf`
+  - In order to mount a `pip.conf` file to `/etc/pip.conf` on server and sessions, 
+    just define the file in `config.session.pip\\.conf`
+
 # 0.6.6
 
 - Bump Workbench version to 2023.06.1
-- 
+
 # 0.6.5
 
 - Add support for `homeStorage.subPath` (and for launcher sessions)

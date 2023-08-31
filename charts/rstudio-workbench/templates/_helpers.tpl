@@ -109,6 +109,11 @@ containers:
       mountPath: "/mnt/configmap/rstudio/"
     - name: rstudio-session-config
       mountPath: "/mnt/session-configmap/rstudio/"
+    {{- if hasKey .Values.config.session "pip.conf" }}
+    - name: rstudio-session-config
+      mountPath: "/etc/pip.conf"
+      subPath: "pip.conf"
+    {{- end }}
     {{- if .Values.config.sessionSecret }}
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}
