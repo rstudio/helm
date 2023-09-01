@@ -1,3 +1,7 @@
+# 0.5.14-rc01
+
+- Switch PM encryption key to use a volume instead of environment variable
+
 # 0.5.13 
 
 - Change default operating system from `bionic` to `ubuntu2204` (`jammy`)
