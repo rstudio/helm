@@ -1,3 +1,7 @@
+# 0.5.14
+
+- Add option to set `pod.terminationGracePeriodSeconds`
+
 # 0.5.13 
 
 - Change default operating system from `bionic` to `ubuntu2204` (`jammy`)

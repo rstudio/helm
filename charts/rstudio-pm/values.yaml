@@ -135,6 +135,8 @@ pod:
       drop: ["ALL"]
     seccompProfile:
       type: "{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"
+  # -- The termination grace period seconds allowed for the pod before shutdown
+  terminationGracePeriodSeconds: 120
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []

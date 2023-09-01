@@ -1,3 +1,7 @@
+# 0.5.6
+
+- Add option to set `pod.terminationGracePeriodSeconds`
+
 # 0.5.5
 
 - Add support for `sharedStorage.subPath`

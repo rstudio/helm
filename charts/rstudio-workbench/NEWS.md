@@ -1,3 +1,7 @@
+# 0.6.8
+
+- Add option to set `pod.terminationGracePeriodSeconds`
+
 # 0.6.7
 
 - Add native session support for `pip.conf`

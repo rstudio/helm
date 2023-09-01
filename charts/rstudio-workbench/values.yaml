@@ -310,6 +310,8 @@ pod:
   port: 8787
   # -- container lifecycle hooks
   lifecycle: {}
+  # -- The termination grace period seconds allowed for the pod before shutdown
+  terminationGracePeriodSeconds: 120
 
 prometheusExporter:
   # -- whether the  prometheus exporter sidecar should be enabled

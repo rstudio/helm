@@ -86,6 +86,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.pod.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ . }}
+      {{- end }}
       {{- if .Values.initContainers }}
       initContainers:
         {{- toYaml .Values.initContainers | nindent 8 }}
@@ -95,5 +98,7 @@ spec:
   see "_helpers.tpl" for the definition
 
   we define in a helper so that the same definition can be used in tests
+
+  NOTE: this also includes volumes too!!
   */ -}}
 {{ include "rstudio-workbench.containers" . | indent 6 }}
