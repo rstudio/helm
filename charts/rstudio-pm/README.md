@@ -1,6 +1,6 @@
 # RStudio Package Manager
 
-![Version: 0.5.13](https://img.shields.io/badge/Version-0.5.13-informational?style=flat-square) ![AppVersion: 2023.04.0](https://img.shields.io/badge/AppVersion-2023.04.0-informational?style=flat-square)
+![Version: 0.5.14](https://img.shields.io/badge/Version-0.5.14-informational?style=flat-square) ![AppVersion: 2023.04.0](https://img.shields.io/badge/AppVersion-2023.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.13:
+To install the chart with the release name `my-release` at version 0.5.14:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.13
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.14
 ```
 
 To explore other chart versions, take a look at:
@@ -156,6 +156,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
 | pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
+| pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
