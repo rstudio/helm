@@ -1,3 +1,7 @@
+# 0.5.6
+
+- Bump Connect version to 2023.09.0
+
 # 0.5.5
 
 - Add support for `sharedStorage.subPath`
