@@ -1,3 +1,6 @@
+# 0.5.14
+
+- Update default Posit Package Manager version to 2023.08.0-16
 # 0.5.13 
 
 - Change default operating system from `bionic` to `ubuntu2204` (`jammy`)
