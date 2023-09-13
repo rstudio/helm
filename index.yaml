@@ -4247,6 +4247,52 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-package-manager
+          image: rstudio/rstudio-package-manager:ubuntu2204-2023.08.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2023.08.0
+    created: "2023-09-13T15:19:21.101984219Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.26
+    description: Official Helm chart for RStudio Package Manager
+    digest: e861347d8396df6f6aff41bef575e3ed34f9418b91c4afd4687455381f924864
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    - https://github.com/rstudio/rstudio-docker-products
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.5.14/rstudio-pm-0.5.14.tgz
+    version: 0.5.14
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-package-manager
           image: rstudio/rstudio-package-manager:ubuntu2204-2023.04.0
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -9662,4 +9708,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2023-09-12T18:48:45.560788456Z"
+generated: "2023-09-13T15:19:21.111336345Z"
