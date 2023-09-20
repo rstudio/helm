@@ -4,11 +4,6 @@ config:
 
   # Overrides the package URLs to use source packages which are required if the list
   # of execution environments contains multiple OS distributions.
-  'RPackageRepository "CRAN"':
-    URL: https://packagemanager.rstudio.com/cran/latest
-
-  # Overrides the package URLs to use source packages which are required if the list
-  # of execution environments contains multiple OS distributions.
   'RPackageRepository "RSPM"':
     URL: https://packagemanager.rstudio.com/cran/latest
 
