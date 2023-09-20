@@ -317,8 +317,6 @@ config:
     Listen: :3939
   Authentication:
     Provider: password
-  'RPackageRepository "CRAN"':
-    URL: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
   'RPackageRepository "RSPM"':
     URL: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
   Server:
