@@ -52,6 +52,7 @@
 - Add `podDisruptionBudget` values
 - Add `topologySpreadConstraints` values
 - Start to utilize the `pod.securityContext` values for pod `securityContext` values
+- Remove `CRAN` as a default repository entry in `session.repos.conf`
 
 # 0.5.32
 

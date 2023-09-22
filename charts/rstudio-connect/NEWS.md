@@ -1,3 +1,7 @@
+# 0.5.7
+
+- Remove `CRAN` as a default repository entry in `session.repos.conf`
+
 # 0.5.6
 
 - Bump Connect version to 2023.09.0
