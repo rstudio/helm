@@ -1,3 +1,7 @@
+# 0.5.7
+
+- Add support for setting `tolerations` for Connect
+
 # 0.5.6
 
 - Bump Connect version to 2023.09.0
