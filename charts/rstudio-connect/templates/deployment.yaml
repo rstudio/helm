@@ -52,6 +52,10 @@ spec:
       priorityClassName:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{/**
          * NOTE: In the case where a service account was in use and
          * then later removed, the behavior of kubernetes is to

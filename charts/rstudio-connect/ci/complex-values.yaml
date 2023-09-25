@@ -48,6 +48,10 @@ pod:
   priorityClassName: something-fun
   nodeSelector:
     something: special
+  tolerations:
+    - key: "example-key"
+      operator: "Exists"
+      effect: "NoSchedule"
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
