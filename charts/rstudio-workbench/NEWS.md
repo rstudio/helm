@@ -1,3 +1,7 @@
+# 0.6.8
+
+- Bump Workbench version to 2023.09.0
+
 # 0.6.7
 
 - Add native session support for `pip.conf`
