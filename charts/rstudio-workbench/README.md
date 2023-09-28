@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.8](https://img.shields.io/badge/Version-0.6.8-informational?style=flat-square) ![AppVersion: 2023.06.1](https://img.shields.io/badge/AppVersion-2023.06.1-informational?style=flat-square)
+![Version: 0.6.8](https://img.shields.io/badge/Version-0.6.8-informational?style=flat-square) ![AppVersion: 2023.09.0](https://img.shields.io/badge/AppVersion-2023.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
