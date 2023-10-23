@@ -14,6 +14,3 @@
   {{- end }}
 {{- end }}
 {{- end -}}{{- /* end define template */ -}}
-
-
-
