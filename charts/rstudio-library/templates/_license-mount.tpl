@@ -6,9 +6,14 @@
 {{- define "rstudio-library.license-mount" -}}
 {{- if or .license.file.contents .license.file.secret }}
 - name: license-file
-  mountPath: {{ .license.file.mountPath | quote }}
   {{- if .license.file.mountSubPath }}
+  mountPath: "{{ .license.file.mountPath }}/{{ .license.file.secretKey }}"
   subPath: {{ .license.file.secretKey | quote }}
+  {{ else }}
+  mountPath: {{ .license.file.mountPath | quote }}
   {{- end }}
 {{- end }}
 {{- end -}}{{- /* end define template */ -}}
+
+
+
