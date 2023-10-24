@@ -1,3 +1,8 @@
+# 0.5.15
+
+- Bump rstudio-library to `0.1.27`
+  - Fix an issue with `mountPath` and `subPath` when `license.file.mountSubPath` is `true`
+
 # 0.5.14
 
 - Update default Posit Package Manager version to 2023.08.0-16
