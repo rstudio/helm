@@ -18,11 +18,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.17:
+To install the chart with the release name `my-release` at version 0.2.18:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-launcher-rbac --version=0.2.17
+helm upgrade --install my-release rstudio/rstudio-launcher-rbac --version=0.2.18
 ```
 
 To explore other chart versions, take a look at:
