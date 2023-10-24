@@ -1,6 +1,13 @@
+# 0.5.15
+
+- Update documentation to provide guidance on using license files with `Secrets`.
+- Bump rstudio-library to `0.1.27`
+  - Fix an issue with `mountPath` and `subPath` when `license.file.mountSubPath` is `true`
+
 # 0.5.14
 
 - Update default Posit Package Manager version to 2023.08.0-16
+
 # 0.5.13 
 
 - Change default operating system from `bionic` to `ubuntu2204` (`jammy`)
