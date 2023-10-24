@@ -54,7 +54,7 @@ helm search repo rstudio/rstudio-connect -l
 
 This chart requires the following in order to function:
 
-* A license file, license key, or address of a running license server. See the [Licensing](#licensing) section below for more details.
+* A license key, license file, or address of a running license server. See the `license` configuration below.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for Connect.
   * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
@@ -62,39 +62,6 @@ This chart requires the following in order to function:
     mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
   * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
-
-## Licensing
-
-This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
-
-### License File
-
-We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
-
-First, create the secret using YAML or imperatively using the following command (replace `licenses/connect.lic` with the path and name of your license file):
-
-```bash
-kubectl create secret generic connect-license --from-file=licenses/connect.lic
-```
-
-Second, specify the following values:
-
-```yaml
-license:
-  file:
-    secret: connect-license
-    secretKey: connect.lic
-```
-
-Alternatively, license files can be set directly in your values file or during `helm install` with `--set-file license.file.contents=license_files/connect.lic`.
-
-### License Key
-
-Set a license key directly in your values file (`license.key`) or during `helm install` with `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
-
-### License Server
-
-Set a license server directly in your values file (`license.server`) or during `helm install` with `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>` (replace `<LICENSE_SERVER_HOST_ADDRESS>` with your actual server address).
 
 ## General Principles
 
