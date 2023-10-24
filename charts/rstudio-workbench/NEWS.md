@@ -1,3 +1,7 @@
+# 0.6.9
+
+- Bump Workbench version to 2023.09.1
+
 # 0.6.8
 
 - Bump Workbench version to 2023.09.0
