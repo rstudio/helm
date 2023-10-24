@@ -1,6 +1,6 @@
 # 0.6.10
 
-- Update documentation to provide guidance on using license files with `Secrets`.
+- Add licensing section to the README to provide guidance on using a license file, key or server.
 - Bump rstudio-library to `0.1.27`
   - Fix an issue with `mountPath` and `subPath` when `license.file.mountSubPath` is `true`
 
