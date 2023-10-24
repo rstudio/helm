@@ -1,8 +1,12 @@
-# 0.6.9
+# 0.6.10
 
 - Update documentation to provide guidance on using license files with `Secrets`.
 - Bump rstudio-library to `0.1.27`
   - Fix an issue with `mountPath` and `subPath` when `license.file.mountSubPath` is `true`
+
+# 0.6.9
+
+- Bump Workbench version to 2023.09.1
 
 # 0.6.8
 
