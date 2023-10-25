@@ -63,7 +63,7 @@ This chart supports activating the product using a license file, license key, or
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
-First, create the secret using YAML or imperatively using the following command (replace `licenses/package-manager.lic` with the path and name of your license file):
+First, create the secret declaratively with YAML or imperatively using the following command (replace `licenses/package-manager.lic` with the path and name of your license file):
 
 ```bash
 kubectl create secret generic package-manager-license --from-file=licenses/package-manager.lic
