@@ -43,7 +43,7 @@ helm search repo rstudio/rstudio-workbench -l
 
 This chart requires the following in order to function:
 
-* A license key, license file, or address of a running license server. See the `license` configuration below.
+* A license file, license key, or address of a running license server. See the [Licensing](#licensing) section below for more details.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the
   home directory for users.
   * If `homeStorage.create` is set, a PVC that relies on the default storage class will be created to generate the
@@ -88,6 +88,39 @@ In addition to the above required configuration, we recommend setting the follow
   by simply running the `uuid` command.
 * Some use-cases may require special PAM profiles to run. By default, no PAM profiles other than the basic `auth` profile will be used to authenticate users.
   If this is not sufficient then you will need to add your PAM profiles into the container using a volume and volumeMount.
+
+## Licensing
+
+This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
+
+### License File
+
+We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
+
+First, create the secret declaratively with YAML or imperatively using the following command (replace `licenses/workbench.lic` with the path and name of your license file):
+
+```bash
+kubectl create secret generic workbench-license --from-file=licenses/workbench.lic
+```
+
+Second, specify the following values:
+
+```yaml
+license:
+  file:
+    secret: workbench-license
+    secretKey: workbench.lic
+```
+
+Alternatively, license files can be set directly in your values file or during `helm install` with `--set-file license.file.contents=licenses/workbench.lic` (replace `licenses/workbench.lic` with the path and name of your license file).
+
+### License Key
+
+Set a license key directly in your values file (`license.key`) or during `helm install` with `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
+
+### License Server
+
+Set a license server directly in your values file (`license.server`) or during `helm install` with `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>` (replace `<LICENSE_SERVER_HOST_ADDRESS>` with your actual server address).
 
 ## General Principles
 
