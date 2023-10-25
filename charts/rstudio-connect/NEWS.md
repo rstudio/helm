@@ -1,3 +1,8 @@
+# 0.5.8
+
+- Bump rstudio-library to `0.1.27`
+  - Fix an issue with `mountPath` and `subPath` when `license.file.mountSubPath` is `true`
+
 # 0.5.7
 
 - Add support for setting `tolerations` for Connect
