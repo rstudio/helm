@@ -1,3 +1,7 @@
+# 0.5.9
+
+- Add licensing section to the README to provide guidance on using a license file, license key or license server.
+
 # 0.5.8
 
 - Bump rstudio-library to `0.1.27`
