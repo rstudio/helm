@@ -1,3 +1,7 @@
+# 0.5.16
+
+- Update default Posit Package Manager version to 2023.08.4-20
+
 # 0.5.15
 
 - Bump rstudio-library to `0.1.27`
