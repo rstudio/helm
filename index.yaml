@@ -4388,6 +4388,52 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-package-manager
+          image: rstudio/rstudio-package-manager:ubuntu2204-2023.08.4
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2023.08.4
+    created: "2023-11-02T18:32:13.446381796Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.27
+    description: Official Helm chart for RStudio Package Manager
+    digest: 3ef5111d1deb27536f281b509d1755286813a308789af7fcf8e8777976993754
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    - https://github.com/rstudio/rstudio-docker-products
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.5.16/rstudio-pm-0.5.16.tgz
+    version: 0.5.16
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-package-manager
           image: rstudio/rstudio-package-manager:ubuntu2204-2023.08.0
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -10039,4 +10085,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2023-10-25T16:07:40.327155373Z"
+generated: "2023-11-02T18:32:13.448971838Z"
