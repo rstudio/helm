@@ -1,3 +1,7 @@
+# 0.5.9
+
+- Bump Connect version to 2023.10.0
+
 # 0.5.8
 
 - Bump rstudio-library to `0.1.27`
