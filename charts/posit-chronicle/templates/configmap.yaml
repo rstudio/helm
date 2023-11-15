@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -44,3 +45,5 @@ data:
     ServiceLog = {{ .Values.config.logging.serviceLog }}
     ServiceLogLevel = {{ .Values.config.logging.serviceLogLevel }}
     ServiceLogFormat = {{ .Values.config.logging.serviceLogFormat }}
+---
+

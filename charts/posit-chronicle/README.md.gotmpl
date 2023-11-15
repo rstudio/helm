@@ -1,0 +1,19 @@
+{{ template "rstudio.header" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "rstudio.description" . }}
+
+{{ template "rstudio.disclaimer" . }}
+
+{{ template "rstudio.install" . }}
+
+# Usage
+
+The chronicle chart is meant to be used in tandem with other workbench and connect instances.
+To enable the chronicle agent, additional values will have to be passed to your
+workbench and connect values.
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

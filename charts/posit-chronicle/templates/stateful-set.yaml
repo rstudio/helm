@@ -1,25 +1,35 @@
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: chronicle-server
+  namespace: {{ $.Release.Namespace }}
 spec:
   serviceName: chronicle-server
-  replicas: {{ .Values.pod.replicas }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: chronicle-server
+      {{- include "posit-chronicle.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: chronicle-server
-      {{/* 
-      TODO: the timestamp annotation is to ensure new versions of the "latest" tagged image can be deployed. We will change this to be a git sha 
-      See: https://github.com/rstudio/platform-helm/issues/24
-      */}}
+        {{- include "posit-chronicle.pod.labels" . | nindent 8 }}
+        {{- include "posit-chronicle.selectorLabels" . | indent 8 }}
       annotations:
-        timestamp: {{ now | quote }}
-        {{ include "chronicle.pod.annotations" . | indent 8 }}
+        {{- include "posit-chronicle.pod.annotations" . | indent 8 }}
     spec:
+      {{- with .Values.pod.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.serviceaccount.enabled }}
       serviceAccountName: chronicle-sa
       {{- end }}
@@ -58,3 +68,4 @@ spec:
       resources:
         requests:
           storage: {{ .Values.storage.persistentVolumeSize }}
+---

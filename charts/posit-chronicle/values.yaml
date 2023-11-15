@@ -10,6 +10,8 @@ serviceaccount:
     # EKS role arn example
     # eks.amazonaws.com/role-arn: my-aws-iam-role-arn
   }
+  # -- Additional labels to add to the chronicle-server serviceaccount
+  labels: {}
 
 service:
   rest:
@@ -17,11 +19,15 @@ service:
     port: 80
     # -- The port to forward REST requests to on the pod. Also see pod.port
     targetPort: 5252
-  # -- Additional annotations to add to the chronicle-server service
-  annotations: {}
+    # -- Additional annotations to add to the chronicle-server service
+    annotations: {}
+    # -- Additional labels to add to the chronicle-server service
+    labels: {}
+
+# -- The number of replica pods to maintain for this service
+replicas: 1
 
 pod:
-  replicas: 1
   command: "/chronicle"
   args: ["start", "-c", "/opt/chronicle/config.gcfg"]
   rest:
@@ -30,6 +36,14 @@ pod:
   env: []
   # -- Additional annotations to add to the chronicle-server pods
   annotations: {}
+  # -- Additional labels to add to the chronicle-server pods
+  labels: {}
+  # -- A map used verbatim as the pod's "affinity" definition
+  affinity: {}
+  # -- A map used verbatim as the pod's "nodeSelector" definition
+  nodeSelector: {}
+  # -- An array used verbatim as the pod's "tolerations" definition
+  tolerations: []
 
 # We do want at least 1Gi of persistent volume space
 # to perform compaction/compression operations
@@ -47,11 +61,11 @@ config:
     key: ""
     certificate: ""
   localStorage:
-    enabled: false
+    enabled: true
     location: "./chronicle-data"
     retentionPeriod: "30d"
   s3Storage:
-    enabled: true
+    enabled: false
     bucket: "posit-chronicle"
     prefix: ""
     profile: ""
