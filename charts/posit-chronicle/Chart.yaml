@@ -3,7 +3,6 @@ name: chronicle
 description: Helm chart for the Chronicle Server
 version: 0.1.0
 appVersion: 2023.11.0
-
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.posit.co
 sources:

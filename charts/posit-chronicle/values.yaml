@@ -56,7 +56,7 @@ config:
   https:
     # If https.enabled=true, we will ignore any http
     # values and enable https in our config instead
-    enabled: false 
+    enabled: false
     listen: ":443"
     key: ""
     certificate: ""

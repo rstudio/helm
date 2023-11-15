@@ -61,7 +61,7 @@ Generate selector labels for  various resources
 app: chronicle-server
 {{- end -}}
 
-{{- define "posit-chronicle.serviceaccount.selectorLabels" -}}
+{{- define "posit-chronicle.service.selectorLabels" -}}
 {{- range $key,$value := $.Values.serviceaccount.selectorLabels -}}
 {{ $key }}: {{ $value | quote }}
 {{ end }}

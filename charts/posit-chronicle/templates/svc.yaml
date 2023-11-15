@@ -4,12 +4,13 @@ kind: Service
 metadata:
   name: chronicle-server
   labels:
-    {{ include "posit-chronicle.service.labels" . | indent 4 }}
+    {{- include "posit-chronicle.service.labels" . | nindent 4 }}
+    {{- include "posit-chronicle.service.selectorLabels" . | indent 4 }}
   annotations:
     {{ include "posit-chronicle.service.annotations" . | indent 4 }}
 spec:
   selector:
-    {{- include "posit-chronicle.selectorLabels" . | nindent 5 }}
+    {{- include "posit-chronicle.service.selectorLabels" . | indent 4 }}
   ports:
   - port: {{ .Values.service.rest.port }}
     targetPort: {{ .Values.service.rest.targetPort }}
