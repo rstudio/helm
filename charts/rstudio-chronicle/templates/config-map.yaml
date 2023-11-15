@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chronicle-server-config
+data:
+  server: |
+
+    # switch between http and https
+    {{- if .Values.config.https.enabled }}
+    [HTTPS]
+    Listen = {{ .Values.config.https.listen }}
+    Key = {{ .Values.config.https.key }}
+    Certificate = {{ .Values.config.https.certificate }}
+    {{- else}}
+    [HTTP]
+    Listen = {{ .Values.config.http.listen }}
+    {{- end }}
+
+    [LocalStorage]
+    Enabled = {{ .Values.config.localStorage.enabled }}
+    Location = {{ .Values.config.localStorage.location }}
+    RetentionPeriod = {{ .Values.config.localStorage.retentionPeriod }}
+    
+    [S3Storage]
+    Enabled = {{ .Values.config.s3Storage.enabled }}
+    Bucket = {{ .Values.config.s3Storage.bucket }}
+    Prefix = {{ .Values.config.s3Storage.prefix }}
+    Profile = {{ .Values.config.s3Storage.profile }}
+    Region = {{ .Values.config.s3Storage.region }}
+    CompactionEnabled = {{ .Values.config.s3Storage.compactionEnabled }}
+    
+    [Metrics]
+    Enabled = {{ .Values.config.metrics.enabled }}
+    
+    [Profiling]
+    Enabled = {{ .Values.config.profiling.enabled }}
+    Listen = {{ .Values.config.profiling.listen }}
+    
+    [Tracing]
+    Enabled = {{ .Values.config.tracing.enabled }}
+    Address = {{ .Values.config.tracing.address }}
+
+    [Logging]
+    ServiceLog = {{ .Values.config.logging.serviceLog }}
+    ServiceLogLevel = {{ .Values.config.logging.serviceLogLevel }}
+    ServiceLogFormat = {{ .Values.config.logging.serviceLogFormat }}

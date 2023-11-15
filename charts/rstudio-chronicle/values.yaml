@@ -1,0 +1,71 @@
+image:
+  repository: "935931255537.dkr.ecr.us-east-2.amazonaws.com/chronicle"
+  tag: "latest"
+  imagePullPolicy: "Always"
+
+serviceaccount:
+  enabled: false
+  # -- Additional annotations to add to the chronicle-server serviceaccount
+  annotations: {
+    # EKS role arn example
+    # eks.amazonaws.com/role-arn: my-aws-iam-role-arn
+  }
+
+service:
+  rest:
+    # -- The port to use for the REST service
+    port: 80
+    # -- The port to forward REST requests to on the pod. Also see pod.port
+    targetPort: 5252
+  # -- Additional annotations to add to the chronicle-server service
+  annotations: {}
+
+pod:
+  replicas: 1
+  command: "/chronicle"
+  args: ["start", "-c", "/opt/chronicle/config.gcfg"]
+  rest:
+    port: 5252
+  # -- Optional environment variables
+  env: []
+  # -- Additional annotations to add to the chronicle-server pods
+  annotations: {}
+
+# We do want at least 1Gi of persistent volume space
+# to perform compaction/compression operations
+storage:
+  persistentVolumeSize: 1Gi
+
+config:
+  http:
+    listen: ":5252"
+  https:
+    # If https.enabled=true, we will ignore any http
+    # values and enable https in our config instead
+    enabled: false 
+    listen: ":443"
+    key: ""
+    certificate: ""
+  localStorage:
+    enabled: false
+    location: "./chronicle-data"
+    retentionPeriod: "30d"
+  s3Storage:
+    enabled: true
+    bucket: "posit-chronicle"
+    prefix: ""
+    profile: ""
+    region: "us-east-2"
+    compactionEnabled: false
+  metrics:
+    enabled: true
+  profiling:
+    enabled: false
+    listen: :3030
+  tracing:
+    enabled: false
+    address: ""
+  logging:
+    serviceLog: "STDOUT"
+    serviceLogLevel: "INFO"
+    serviceLogFormat: "TEXT"

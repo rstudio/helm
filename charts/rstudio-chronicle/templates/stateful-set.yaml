@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chronicle-server
+spec:
+  serviceName: chronicle-server
+  replicas: {{ .Values.pod.replicas }}
+  selector:
+    matchLabels:
+      app: chronicle-server
+  template:
+    metadata:
+      labels:
+        app: chronicle-server
+      {{/* 
+      TODO: the timestamp annotation is to ensure new versions of the "latest" tagged image can be deployed. We will change this to be a git sha 
+      See: https://github.com/rstudio/platform-helm/issues/24
+      */}}
+      annotations:
+        timestamp: {{ now | quote }}
+        {{ include "chronicle.pod.annotations" . | indent 8 }}
+    spec:
+      {{- if .Values.serviceaccount.enabled }}
+      serviceAccountName: chronicle-sa
+      {{- end }}
+      containers:
+      - name: chronicle-server
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        command: 
+        - {{ .Values.pod.command }}
+        {{- if .Values.pod.args }}
+        args:
+        {{- toYaml .Values.pod.args | nindent 8 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.pod.rest.port }}
+          name: tcp
+        volumeMounts:
+        - name: data
+          mountPath: {{ .Values.config.localStorage.location }}
+        - name: chronicle-server-config
+          mountPath: /opt/chronicle/config.gcfg
+          subPath: server
+        {{- if .Values.pod.env }}
+        env: 
+        {{- toYaml .Values.pod.env | nindent 8 }}
+        {{- end }}
+      volumes:
+      - name: chronicle-server-config
+        configMap:
+          name: chronicle-server-config
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.storage.persistentVolumeSize }}

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chronicle-server
+  labels:
+    app: chronicle-server
+  annotations:
+    {{ include "chronicle.service.annotations" . | indent 4 }}
+spec:
+  ports:
+  - port: {{ .Values.service.rest.port }}
+    targetPort: {{ .Values.service.rest.targetPort }}
+    name: tcp
+  selector:
+    app: chronicle-server
