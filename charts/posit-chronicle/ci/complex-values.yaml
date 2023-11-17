@@ -1,0 +1,77 @@
+image:
+  tag: "latest"
+  imagePullPolicy: "IfNotPresent"
+
+serviceaccount:
+  enabled: false
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
+
+service:
+  rest:
+    # -- The port to use for the REST service
+    port: 12345
+    # -- The port to forward REST requests to on the pod. Also see pod.port
+    targetPort: 12346
+  annotations:
+    test-annotation: test-service-annotation
+  labels:
+    test-label: test-service-label
+    test-label2: test-service-label2
+  selectorLabels:
+    test-selector-label: test-service-selectorLabel
+    test-selector-label2: test-service-selectorLabel2
+
+pod:
+  replicas: 4
+  command: "/bash"
+  args: ["echo", "hello word"]
+  rest:
+    port: 12345
+  # -- Optional environment variables
+  env:
+  - name: "TEST_ENV_VAR"
+    value: "test-value"
+  annotations:
+    test-annotation: test-service-annotation
+  labels:
+    test-label: test-service-label
+    test-label2: test-service-label2
+  selectorLabels:
+    test-selector-label: test-service-selectorLabel
+    test-selector-label2: test-service-selectorLabel2
+
+storage:
+  persistentVolumeSize: 10Gi
+
+config:
+  https:
+    # If https.enabled=true, we will ignore any http
+    # values and enable https in our config instead
+    enabled: true
+    listen: ":443"
+    key: ""
+    certificate: ""
+  localStorage:
+    enabled: true
+    location: "./chronicle-data"
+    retentionPeriod: "5m"
+  s3Storage:
+    enabled: true
+    bucket: "posit-chronicle"
+    prefix: ""
+    profile: ""
+    region: "us-east-2"
+    compactionEnabled: false
+  metrics:
+    enabled: true
+  profiling:
+    enabled: true
+    listen: :3030
+  tracing:
+    enabled: true
+    address: ""
+  logging:
+    serviceLog: "STDOUT"
+    serviceLogLevel: "DEBUG"
+    serviceLogFormat: "JSON"

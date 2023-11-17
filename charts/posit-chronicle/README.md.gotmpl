@@ -8,11 +8,123 @@
 
 {{ template "rstudio.install" . }}
 
-# Usage
+## Usage
 
-The chronicle chart is meant to be used in tandem with other workbench and connect instances.
+The Chronicle chart is meant to be used in tandem with other workbench and connect instances.
 To enable the chronicle agent, additional values will have to be passed to your
 workbench and connect values.
+
+Here's some example agent helm values to run the agent sidecar in workbench:
+
+```yaml
+pod:
+  ...
+  sidecar:
+    - name: chronicle-agent
+      image: posit-chronicle:latest
+      volumeMounts:
+      - name: CHRONICLE_PRODUCT_CLUSTER_ID
+        value: "posit-cluster-1"
+      - name: logs
+        mountPath: "/var/lib/rstudio-server/audit"
+      env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://chronicle-server.default.svc.cluster.local"
+...
+```
+
+And here's some example agent helm values for connect, where we utilize an api key stored as a k8s secret
+to scrape the connect rest server:
+
+```yaml
+pod:
+  ...
+  sidecar:
+    - name: chronicle-agent
+      image: posit-chronicle:latest
+      env:
+      - name: CHRONICLE_PRODUCT_CLUSTER_ID
+        value: "posit-cluster-1"
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://chronicle-server.default.svc.cluster.local"
+      - name: CONNECT_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: connect
+            key: apikey
+```
+
+Note that it will be up to the user to provision that connect api key Kubernetes secret.
+
+## Storage Configuration
+
+Chronicle can be configured to store its data in a local kubernetes volime, in S3,
+or in both. 
+
+The default configuration uses a local volume, which is suitable if you'd like to 
+access and analyze the data within your cluster:
+
+``` yaml
+config:
+  localStorage:
+    enabled: true
+    location: "./chronicle-data"
+    retentionPeriod: "30d"
+```
+
+RetentionPeriod accepts a duration string input. 0 implies infinite retention, disabling file expiration.
+For example:
+1s for 1 second, 5m for 5 minutes, 12h for 12 hours, 7d for one week, 365d for one year, 0 for unbound retention.
+Units shorter than seconds or longer than days, such as milliseconds and weeks, are not supported.
+
+
+You can disable local storage by setting `localStorage.enabled` to `false`, and you can enable S3
+storage by setting `S3Storage.enabled` to `true`. Enabling both is also acceptable,
+and the server will store to both places. When using S3, you must also set the `S3Storage.Bucket`
+parameter, like so:
+
+``` yaml
+config:
+  s3Storage:
+    enabled: true
+    bucket: "posit-chronicle"
+    prefix: ""
+    profile: ""
+    region: "us-east-2"
+```
+
+If you are running on EKS, we strongly suggest using [IAM Roles for Service
+Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+to manage the credentials needed to access S3. In this scenario, once you have
+[created an IAM
+role](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
+you can use this role as an annotation on the existing Service Account:
+
+``` yaml
+serviceaccount:
+  enabled: false
+  # -- Additional annotations to add to the chronicle-server serviceaccount
+  annotations: {
+    eks.amazonaws.com/role-arn:  arn:aws:iam::123456789000:role/iam-role-name-here
+  }
+  # -- Additional labels to add to the chronicle-server serviceaccount
+  labels: {}
+```
+
+If you are unable to use IAM Roles for Service Accounts, there are any number of
+alternatives for injecting AWS credentials into a container. As a fallback, the
+s3 storage config allows specifying a profile:
+
+``` yaml
+config:
+  s3Storage:
+    enabled: true
+    bucket: "posit-chronicle"
+    prefix: ""
+    profile: "my-aws-account"
+    region: "us-east-2"
+```
+
 
 {{ template "chart.valuesSection" . }}
 

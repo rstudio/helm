@@ -46,9 +46,7 @@ Generate labels for  various resources
 {{- range $key,$value := $.Values.service.labels -}}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
-app: chronicle-server
 {{- end -}}
-
 
 {{/*
 Generate selector labels for  various resources
@@ -62,7 +60,7 @@ app: chronicle-server
 {{- end -}}
 
 {{- define "posit-chronicle.service.selectorLabels" -}}
-{{- range $key,$value := $.Values.serviceaccount.selectorLabels -}}
+{{- range $key,$value := $.Values.service.selectorLabels -}}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
 app: chronicle-server

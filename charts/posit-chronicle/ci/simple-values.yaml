@@ -1,26 +1,26 @@
 image:
-   tag: "latest"
+  tag: "latest"
 
 serviceaccount:
-   enabled: false
-   annotations: {
-      eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
-   }
+  enabled: false
+  annotations: {
+    eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
+  }
 
-config:
-   localStorage:
-      enabled: true
-      retentionPeriod: "7d"
-   logging:
-      serviceLog: "STDOUT"
-      serviceLogLevel: "DEBUG"
-      serviceLogFormat: "JSON"
-   profiling:
-      enabled: true
-   s3Storage:
-      enabled: true
-      bucket: "posit-chronicle-dev"
-      compactionEnabled: true
 
 storage:
-   persistentVolumeSize: 10Gi
+  persistentVolumeSize: 10Gi
+
+config:
+  localStorage:
+    enabled: true
+    retentionPeriod: "7d"
+  logging:
+    serviceLog: "STDOUT"
+    serviceLogLevel: "DEBUG"
+    serviceLogFormat: "JSON"
+  profiling:
+    enabled: true
+  s3Storage:
+    enabled: true
+    bucket: "posit-chronicle-dev"

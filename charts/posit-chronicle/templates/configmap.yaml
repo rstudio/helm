@@ -21,7 +21,7 @@ data:
     Enabled = {{ .Values.config.localStorage.enabled }}
     Location = {{ .Values.config.localStorage.location }}
     RetentionPeriod = {{ .Values.config.localStorage.retentionPeriod }}
-    
+
     [S3Storage]
     Enabled = {{ .Values.config.s3Storage.enabled }}
     Bucket = {{ .Values.config.s3Storage.bucket }}
@@ -29,14 +29,14 @@ data:
     Profile = {{ .Values.config.s3Storage.profile }}
     Region = {{ .Values.config.s3Storage.region }}
     CompactionEnabled = {{ .Values.config.s3Storage.compactionEnabled }}
-    
+
     [Metrics]
     Enabled = {{ .Values.config.metrics.enabled }}
-    
+
     [Profiling]
     Enabled = {{ .Values.config.profiling.enabled }}
     Listen = {{ .Values.config.profiling.listen }}
-    
+
     [Tracing]
     Enabled = {{ .Values.config.tracing.enabled }}
     Address = {{ .Values.config.tracing.address }}
