@@ -14,10 +14,9 @@ maintainers:
 annotations:
   artifacthub.io/license: MIT
   artifacthub.io/links: |
-    - name: Posit Community
-      url: https://community.rstudio.com/c/r-admin/5
     - name: About Posit Team
       url: https://posit.co/products/enterprise/team/
 keywords:
   - "rstudio"
+  - "posit"
   - "chronicle"

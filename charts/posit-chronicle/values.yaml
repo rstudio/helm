@@ -1,5 +1,5 @@
 image:
-  repository: "935931255537.dkr.ecr.us-east-2.amazonaws.com/chronicle"
+  repository: "ghcr.io/rstudio/chronicle"
   tag: "latest"
   imagePullPolicy: "Always"
 
