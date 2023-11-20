@@ -137,7 +137,7 @@ serviceaccount:
 
 If you are unable to use IAM Roles for Service Accounts, there are any number of
 alternatives for injecting AWS credentials into a container. As a fallback, the
-S3 storage config allows specifying a profile:
+s3 storage config allows specifying a profile:
 
 ``` yaml
 config:
