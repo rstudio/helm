@@ -176,7 +176,7 @@ config:
 | config.tracing.address | string | `""` |  |
 | config.tracing.enabled | bool | `false` |  |
 | image.imagePullPolicy | string | `"Always"` |  |
-| image.repository | string | `"935931255537.dkr.ecr.us-east-2.amazonaws.com/chronicle"` |  |
+| image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
 | image.tag | string | `"latest"` |  |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
