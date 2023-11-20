@@ -4,7 +4,7 @@
 
 #### _Helm chart for the Chronicle Server_
 
-IT Administrators and Business Users use Posit Chronicle](https://www.rstudio.com/chronicle/) to aggregate and monitor
+IT Administrators and Business Users use [Posit Chronicle](https://www.rstudio.com/chronicle/) to aggregate and monitor
 posit product usage.
 
 ## For Production
@@ -35,11 +35,11 @@ helm search repo rstudio/posit-chronicle -l
 
 ## Usage
 
-The Chronicle chart is meant to be used in tandem with other workbench and connect instances.
-To enable the chronicle agent, additional values will have to be passed to your
-workbench and connect values.
+The Chronicle chart is meant to be used in tandem with other Workbench and Connect instances.
+To enable the Chronicle agent, additional values will have to be passed to your
+Workbench and Connect values.
 
-Here's some example agent helm values to run the agent sidecar in workbench:
+Here's some example agent helm values to run the agent sidecar in Workbench:
 
 ```yaml
 pod:
@@ -58,8 +58,8 @@ pod:
 ...
 ```
 
-And here's some example agent helm values for connect, where we utilize an api key stored as a k8s secret
-to scrape the connect rest server:
+And here's some example agent helm values for Connect, where we utilize an API key stored as a k8s secret
+to scrape the Connect metrics REST service:
 
 ```yaml
 pod:
@@ -79,7 +79,7 @@ pod:
             key: apikey
 ```
 
-Note that it will be up to the user to provision that connect api key Kubernetes secret.
+Note that it will be up to the user to provision that Connect API key Kubernetes secret.
 
 ## Storage Configuration
 
@@ -97,9 +97,9 @@ config:
     retentionPeriod: "30d"
 ```
 
-RetentionPeriod accepts a duration string input. 0 implies infinite retention, disabling file expiration.
+`RetentionPeriod` accepts a duration string input. `0` implies infinite retention, disabling file expiration.
 For example:
-1s for 1 second, 5m for 5 minutes, 12h for 12 hours, 7d for one week, 365d for one year, 0 for unbound retention.
+`1s` for 1 second, `5m` for 5 minutes, `12h` for 12 hours, `7d` for one week, `365d` for one year, `0` for unbound retention.
 Units shorter than seconds or longer than days, such as milliseconds and weeks, are not supported.
 
 You can disable local storage by setting `localStorage.enabled` to `false`, and you can enable S3
@@ -137,7 +137,7 @@ serviceaccount:
 
 If you are unable to use IAM Roles for Service Accounts, there are any number of
 alternatives for injecting AWS credentials into a container. As a fallback, the
-s3 storage config allows specifying a profile:
+S3 storage config allows specifying a profile:
 
 ``` yaml
 config:
