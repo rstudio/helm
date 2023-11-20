@@ -4,7 +4,7 @@
 
 #### _Helm chart for the Chronicle Server_
 
-IT Administrators and Business Users use [Posit Chronicle](https://www.rstudio.com/chronicle/) to aggregate and monitor
+IT Administrators and Business Users use [Posit Chronicle](https://docs.posit.co/chronicle) to aggregate and monitor
 posit product usage.
 
 ## For Production
@@ -136,8 +136,8 @@ serviceaccount:
 ```
 
 If you are unable to use IAM Roles for Service Accounts, there are any number of
-alternatives for injecting AWS credentials into a container. As a fallback, the
-s3 storage config allows specifying a profile:
+alternatives for injecting AWS credentials into a container. As a fallback,
+the S3 storage config allows specifying a profile:
 
 ``` yaml
 config:

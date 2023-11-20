@@ -59,7 +59,7 @@ Note that it will be up to the user to provision that Connect API key Kubernetes
 ## Storage Configuration
 
 Chronicle can be configured to store its data in a local kubernetes volime, in S3,
-or in both. 
+or in both.
 
 The default configuration uses a local volume, which is suitable if you'd like to 
 access and analyze the data within your cluster:
@@ -112,8 +112,8 @@ serviceaccount:
 ```
 
 If you are unable to use IAM Roles for Service Accounts, there are any number of
-alternatives for injecting AWS credentials into a container. As a fallback, the
-s3 storage config allows specifying a profile:
+alternatives for injecting AWS credentials into a container. As a fallback,
+the S3 storage config allows specifying a profile:
 
 ``` yaml
 config:
