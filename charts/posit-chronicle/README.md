@@ -165,7 +165,6 @@ config:
 | config.metrics.enabled | bool | `true` |  |
 | config.profiling.enabled | bool | `false` |  |
 | config.s3Storage.bucket | string | `"posit-chronicle"` |  |
-| config.s3Storage.compactionEnabled | bool | `false` |  |
 | config.s3Storage.enabled | bool | `false` |  |
 | config.s3Storage.prefix | string | `""` |  |
 | config.s3Storage.profile | string | `""` |  |
