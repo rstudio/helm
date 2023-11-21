@@ -9,4 +9,5 @@ template:
 template-all:
 	helm template -f ci/empty-values.yaml .
 	helm template -f ci/simple-values.yaml .
+	helm template -f ci/no-local-storage-values.yaml .
 	helm template -f ci/complex-values.yaml .

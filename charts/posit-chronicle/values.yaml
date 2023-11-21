@@ -58,6 +58,8 @@ config:
     key: ""
     certificate: ""
   localStorage:
+    # If localStorage.enabled=false, the chronicle stateful-set
+    # won't submit a volume claim or be bound to a persistent volume
     enabled: true
     location: "./chronicle-data"
     retentionPeriod: "30d"
@@ -67,7 +69,6 @@ config:
     prefix: ""
     profile: ""
     region: ""
-    compactionEnabled: false
   metrics:
     enabled: true
   profiling:

@@ -1,0 +1,21 @@
+image:
+  tag: "latest"
+
+serviceaccount:
+  enabled: false
+  annotations: {
+    eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
+  }
+
+config:
+  localStorage:
+    enabled: false
+  logging:
+    serviceLog: "STDOUT"
+    serviceLogLevel: "DEBUG"
+    serviceLogFormat: "JSON"
+  profiling:
+    enabled: true
+  s3Storage:
+    enabled: true
+    bucket: "posit-chronicle-dev"

@@ -40,6 +40,5 @@ data:
     Prefix = {{ .Values.config.s3Storage.prefix }}
     Profile = {{ .Values.config.s3Storage.profile }}
     Region = {{ .Values.config.s3Storage.region }}
-    CompactionEnabled = {{ .Values.config.s3Storage.compactionEnabled }}
 ---
 

@@ -56,7 +56,6 @@ config:
     prefix: ""
     profile: ""
     region: "us-east-2"
-    compactionEnabled: false
   metrics:
     enabled: true
   profiling:
