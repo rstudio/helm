@@ -153,11 +153,9 @@ config:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| config.http.listen | string | `":5252"` |  |
 | config.https.certificate | string | `""` |  |
 | config.https.enabled | bool | `false` |  |
 | config.https.key | string | `""` |  |
-| config.https.listen | string | `":443"` |  |
 | config.localStorage.enabled | bool | `true` |  |
 | config.localStorage.location | string | `"./chronicle-data"` |  |
 | config.localStorage.retentionPeriod | string | `"30d"` |  |
@@ -166,15 +164,12 @@ config:
 | config.logging.serviceLogLevel | string | `"INFO"` |  |
 | config.metrics.enabled | bool | `true` |  |
 | config.profiling.enabled | bool | `false` |  |
-| config.profiling.listen | string | `":3030"` |  |
 | config.s3Storage.bucket | string | `"posit-chronicle"` |  |
 | config.s3Storage.compactionEnabled | bool | `false` |  |
 | config.s3Storage.enabled | bool | `false` |  |
 | config.s3Storage.prefix | string | `""` |  |
 | config.s3Storage.profile | string | `""` |  |
-| config.s3Storage.region | string | `"us-east-2"` |  |
-| config.tracing.address | string | `""` |  |
-| config.tracing.enabled | bool | `false` |  |
+| config.s3Storage.region | string | `""` |  |
 | image.imagePullPolicy | string | `"Always"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
 | image.tag | string | `"latest"` |  |
@@ -183,17 +178,17 @@ config:
 | pod.args[0] | string | `"start"` |  |
 | pod.args[1] | string | `"-c"` |  |
 | pod.args[2] | string | `"/opt/chronicle/config.gcfg"` |  |
-| pod.command | string | `"/chronicle"` |  |
+| pod.command | string | `"/chronicle"` | The command and args to run in the chronicle-server container |
 | pod.env | list | `[]` | Optional environment variables |
 | pod.labels | object | `{}` | Additional labels to add to the chronicle-server pods |
 | pod.nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
-| pod.rest.port | int | `5252` |  |
+| pod.selectorLabels | object | `{}` | Additional selector labels to add to the chronicle-server pods |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
-| service..annotations | object | `{}` | Additional annotations to add to the chronicle-server service |
-| service..labels | object | `{}` | Additional labels to add to the chronicle-server service |
-| service..port | int | `80` | The port to use for the REST service |
-| service..targetPort | int | `5252` | The port to forward REST requests to on the pod. Also see pod.port |
+| service.annotations | object | `{}` | Additional annotations to add to the chronicle-server service |
+| service.labels | object | `{}` | Additional labels to add to the chronicle-server service |
+| service.port | int | `80` | The port to use for the REST service |
+| service.selectorLabels | object | `{}` | Additional selector labels to add to the chronicle-server service |
 | serviceaccount.annotations | object | `{}` | Additional annotations to add to the chronicle-server serviceaccount |
 | serviceaccount.create | bool | `false` |  |
 | serviceaccount.labels | object | `{}` | Additional labels to add to the chronicle-server serviceaccount |
