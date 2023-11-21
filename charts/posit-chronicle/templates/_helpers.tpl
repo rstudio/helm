@@ -10,7 +10,7 @@ Generate annotations for  various resources
 {{ end }}
 {{- if .Values.config.metrics.enabled }}
 prometheus.io/scrape: "true"
-prometheus.io/port: "{{ .Values.pod.rest.port }}"
+prometheus.io/port: "{{ .Values.service.targetPort }}"
 {{- end }}
 {{- end -}}
 

@@ -4,7 +4,7 @@ image:
   imagePullPolicy: "Always"
 
 serviceaccount:
-  enabled: false
+  create: false
   # -- Additional annotations to add to the chronicle-server serviceaccount
   annotations: {
     # EKS role arn example
@@ -14,30 +14,30 @@ serviceaccount:
   labels: {}
 
 service:
-  rest:
-    # -- The port to use for the REST service
-    port: 80
-    # -- The port to forward REST requests to on the pod. Also see pod.port
-    targetPort: 5252
-    # -- Additional annotations to add to the chronicle-server service
-    annotations: {}
-    # -- Additional labels to add to the chronicle-server service
-    labels: {}
+  # -- The port to use for the REST service
+  port: 80
+  # -- Additional annotations to add to the chronicle-server service
+  annotations: {}
+  # -- Additional labels to add to the chronicle-server service
+  labels: {}
+  # -- Additional selector labels to add to the chronicle-server service
+  selectorLabels: {}
 
 # -- The number of replica pods to maintain for this service
 replicas: 1
 
 pod:
+  # -- The command and args to run in the chronicle-server container
   command: "/chronicle"
   args: ["start", "-c", "/opt/chronicle/config.gcfg"]
-  rest:
-    port: 5252
   # -- Optional environment variables
   env: []
   # -- Additional annotations to add to the chronicle-server pods
   annotations: {}
   # -- Additional labels to add to the chronicle-server pods
   labels: {}
+  # -- Additional selector labels to add to the chronicle-server pods
+  selectorLabels: {}
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
   # -- A map used verbatim as the pod's "nodeSelector" definition
@@ -51,13 +51,10 @@ storage:
   persistentVolumeSize: 1Gi
 
 config:
-  http:
-    listen: ":5252"
   https:
     # If https.enabled=true, we will ignore any http
     # values and enable https in our config instead
     enabled: false
-    listen: ":443"
     key: ""
     certificate: ""
   localStorage:
@@ -69,16 +66,12 @@ config:
     bucket: "posit-chronicle"
     prefix: ""
     profile: ""
-    region: "us-east-2"
+    region: ""
     compactionEnabled: false
   metrics:
     enabled: true
   profiling:
     enabled: false
-    listen: :3030
-  tracing:
-    enabled: false
-    address: ""
   logging:
     serviceLog: "STDOUT"
     serviceLogLevel: "INFO"

@@ -12,7 +12,13 @@ spec:
   selector:
     {{- include "posit-chronicle.service.selectorLabels" . | trim | nindent 4 }}
   ports:
-  - port: {{ .Values.service.rest.port }}
-    targetPort: {{ .Values.service.rest.targetPort }}
-    name: tcp
+  {{- if .Values.config.https.enabled }}
+  - port: {{ .Values.service.port }}
+    targetPort: 443
+    name: https
+  {{- else}}
+  - port: {{ .Values.service.port }}
+    targetPort: 5252
+    name: http
+  {{- end }}
 ---

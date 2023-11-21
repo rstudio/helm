@@ -7,7 +7,6 @@ serviceaccount:
     eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
   }
 
-
 storage:
   persistentVolumeSize: 10Gi
 

@@ -5,3 +5,8 @@ lint:
 
 template:
 	helm template -f ci/complex-values.yaml . --debug
+
+template-all:
+	helm template -f ci/empty-values.yaml .
+	helm template -f ci/simple-values.yaml .
+	helm template -f ci/complex-values.yaml .

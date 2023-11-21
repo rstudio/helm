@@ -8,11 +8,8 @@ serviceaccount:
     eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
 
 service:
-  rest:
-    # -- The port to use for the REST service
-    port: 12345
-    # -- The port to forward REST requests to on the pod. Also see pod.port
-    targetPort: 12346
+  # -- The port to use for the REST service
+  port: 12345
   annotations:
     test-annotation: test-service-annotation
   labels:
@@ -26,8 +23,6 @@ pod:
   replicas: 4
   command: "/bash"
   args: ["echo", "hello word"]
-  rest:
-    port: 12345
   # -- Optional environment variables
   env:
   - name: "TEST_ENV_VAR"
@@ -49,7 +44,6 @@ config:
     # If https.enabled=true, we will ignore any http
     # values and enable https in our config instead
     enabled: true
-    listen: ":443"
     key: ""
     certificate: ""
   localStorage:
@@ -68,9 +62,6 @@ config:
   profiling:
     enabled: true
     listen: :3030
-  tracing:
-    enabled: true
-    address: ""
   logging:
     serviceLog: "STDOUT"
     serviceLogLevel: "DEBUG"

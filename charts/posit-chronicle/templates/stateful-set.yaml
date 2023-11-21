@@ -13,10 +13,10 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "posit-chronicle.service.labels" . | trim |  nindent 8 }}
-        {{- include "posit-chronicle.service.selectorLabels" . | trim |  nindent 8 }}
+        {{- include "posit-chronicle.pod.labels" . | trim |  nindent 8 }}
+        {{- include "posit-chronicle.pod.selectorLabels" . | trim |  nindent 8 }}
       annotations:
-        {{- include "posit-chronicle.service.annotations" . | trim |  nindent 8 }}
+        {{- include "posit-chronicle.pod.annotations" . | trim |  nindent 8 }}
     spec:
       {{- with .Values.pod.affinity }}
       affinity:
@@ -30,7 +30,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.serviceaccount.enabled }}
+      {{- if .Values.serviceaccount.create }}
       serviceAccountName: chronicle-sa
       {{- end }}
       containers:
@@ -44,8 +44,13 @@ spec:
         {{- toYaml .Values.pod.args | nindent 8 }}
         {{- end }}
         ports:
-        - containerPort: {{ .Values.pod.rest.port }}
-          name: tcp
+        {{- if .Values.config.https.enabled }}
+        - containerPort: 443
+          name: https
+        {{- else}}
+        - containerPort: 5252
+          name: http
+        {{- end }}
         volumeMounts:
         - name: data
           mountPath: {{ .Values.config.localStorage.location }}

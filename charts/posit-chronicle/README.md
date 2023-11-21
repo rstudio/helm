@@ -190,12 +190,12 @@ config:
 | pod.rest.port | int | `5252` |  |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
-| service.rest.annotations | object | `{}` | Additional annotations to add to the chronicle-server service |
-| service.rest.labels | object | `{}` | Additional labels to add to the chronicle-server service |
-| service.rest.port | int | `80` | The port to use for the REST service |
-| service.rest.targetPort | int | `5252` | The port to forward REST requests to on the pod. Also see pod.port |
+| service..annotations | object | `{}` | Additional annotations to add to the chronicle-server service |
+| service..labels | object | `{}` | Additional labels to add to the chronicle-server service |
+| service..port | int | `80` | The port to use for the REST service |
+| service..targetPort | int | `5252` | The port to forward REST requests to on the pod. Also see pod.port |
 | serviceaccount.annotations | object | `{}` | Additional annotations to add to the chronicle-server serviceaccount |
-| serviceaccount.enabled | bool | `false` |  |
+| serviceaccount.create | bool | `false` |  |
 | serviceaccount.labels | object | `{}` | Additional labels to add to the chronicle-server serviceaccount |
 | storage.persistentVolumeSize | string | `"1Gi"` |  |
 
