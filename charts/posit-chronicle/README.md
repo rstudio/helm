@@ -4,8 +4,9 @@
 
 #### _Helm chart for the Chronicle Server_
 
-IT Administrators and Business Users use [Posit Chronicle](https://docs.posit.co/chronicle) to aggregate and monitor
-posit product usage.
+Chronicle helps data science managers and other stakeholders understand their
+organization's use of other Posit products, primarily Posit Connect and
+Workbench.
 
 ## For Production
 
@@ -35,11 +36,13 @@ helm search repo rstudio/posit-chronicle -l
 
 ## Usage
 
-The Chronicle chart is meant to be used in tandem with other Workbench and Connect instances.
-To enable the Chronicle agent, additional values will have to be passed to your
-Workbench and Connect values.
+This chart deploys only the Chronicle server and is meant to be used in tandem
+with the Workbench and Connect charts. To actually send data to the server, you
+will need to run the Chronicle agent as a sidecar container on all of your
+Workbench or Connect server pods by setting `pod.sidecar` in their respective
+`values.yaml` files.
 
-Here's some example agent helm values to run the agent sidecar in Workbench:
+Here are some example Helm values to run the agent sidecar in Workbench:
 
 ```yaml
 pod:
@@ -58,8 +61,8 @@ pod:
 ...
 ```
 
-And here's some example agent helm values for Connect, where we utilize an API key stored as a k8s secret
-to scrape the Connect metrics REST service:
+And here are some example Helm values for Connect, where we also pass a Connect
+API key from a Kubernetes Secret to unlock more detailed metrics:
 
 ```yaml
 pod:
@@ -79,12 +82,13 @@ pod:
             key: apikey
 ```
 
-Note that it will be up to the user to provision that Connect API key Kubernetes secret.
+Note that it is up to the user to provision this Kubernetes Secret for the
+Connect API key.
 
 ## Storage Configuration
 
-Chronicle can be configured to store its data in a local kubernetes volime, in S3,
-or in both.
+Chronicle can be configured to persist data to a local Kubernetes volume, AWS
+S3, or both.
 
 The default configuration uses a local volume, which is suitable if you'd like to
 access and analyze the data within your cluster:
@@ -93,27 +97,23 @@ access and analyze the data within your cluster:
 config:
   localStorage:
     enabled: true
-    location: "./chronicle-data"
+    location: "/chronicle-data"
     retentionPeriod: "30d"
 ```
 
-`RetentionPeriod` accepts a duration string input. `0` implies infinite retention, disabling file expiration.
-For example:
-`1s` for 1 second, `5m` for 5 minutes, `12h` for 12 hours, `7d` for one week, `365d` for one year, `0` for unbound retention.
-Units shorter than seconds or longer than days, such as milliseconds and weeks, are not supported.
+`retentionPeriod` controls how long usage data are kept. For example, `"120m"`
+for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for
+unbounded retention. (Units smaller than seconds or larger than days are not
+supported.)
 
-You can disable local storage by setting `localStorage.enabled` to `false`, and you can enable S3
-storage by setting `S3Storage.enabled` to `true`. Enabling both is also acceptable,
-and the server will store to both places. When using S3, you must also set the `S3Storage.Bucket`
-parameter, like so:
+You can also persist data to AWS S3 instead of (or in addition to) local
+storage:
 
 ``` yaml
 config:
   s3Storage:
     enabled: true
     bucket: "posit-chronicle"
-    prefix: ""
-    profile: ""
     region: "us-east-2"
 ```
 
@@ -144,7 +144,6 @@ config:
   s3Storage:
     enabled: true
     bucket: "posit-chronicle"
-    prefix: ""
     profile: "my-aws-account"
     region: "us-east-2"
 ```
