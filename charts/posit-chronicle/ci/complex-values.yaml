@@ -3,7 +3,7 @@ image:
   imagePullPolicy: "IfNotPresent"
 
 serviceaccount:
-  enabled: false
+  create: true
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
 
@@ -22,7 +22,7 @@ service:
 pod:
   replicas: 4
   command: "/bash"
-  args: ["echo", "hello word"]
+  args: ["echo", "hello world"]
   # -- Optional environment variables
   env:
   - name: "TEST_ENV_VAR"
@@ -44,8 +44,8 @@ config:
     # If https.enabled=true, we will ignore any http
     # values and enable https in our config instead
     enabled: true
-    key: ""
-    certificate: ""
+    key: /path/to/key
+    certificate: /path/to/cert
   localStorage:
     enabled: true
     location: "./chronicle-data"
@@ -53,8 +53,6 @@ config:
   s3Storage:
     enabled: true
     bucket: "posit-chronicle"
-    prefix: ""
-    profile: ""
     region: "us-east-2"
   metrics:
     enabled: true

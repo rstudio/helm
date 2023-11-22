@@ -19,3 +19,4 @@ config:
   s3Storage:
     enabled: true
     bucket: "posit-chronicle-dev"
+    region: "ap-northeast-2"

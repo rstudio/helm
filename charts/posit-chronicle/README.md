@@ -46,7 +46,6 @@ Here are some example Helm values to run the agent sidecar in Workbench:
 
 ```yaml
 pod:
-  ...
   sidecar:
     - name: chronicle-agent
       image: posit-chronicle:latest
@@ -58,7 +57,6 @@ pod:
       env:
       - name: CHRONICLE_SERVER_ADDRESS
         value: "http://chronicle-server.default.svc.cluster.local"
-...
 ```
 
 And here are some example Helm values for Connect, where we also pass a Connect
@@ -66,7 +64,6 @@ API key from a Kubernetes Secret to unlock more detailed metrics:
 
 ```yaml
 pod:
-  ...
   sidecar:
     - name: chronicle-agent
       image: posit-chronicle:latest
@@ -93,7 +90,7 @@ S3, or both.
 The default configuration uses a local volume, which is suitable if you'd like to
 access and analyze the data within your cluster:
 
-``` yaml
+```yaml
 config:
   localStorage:
     enabled: true
@@ -126,7 +123,7 @@ you can use this role as an annotation on the existing Service Account:
 
 ``` yaml
 serviceaccount:
-  enabled: false
+  create: false
   # -- Additional annotations to add to the chronicle-server serviceaccount
   annotations: {
     eks.amazonaws.com/role-arn:  arn:aws:iam::123456789000:role/iam-role-name-here

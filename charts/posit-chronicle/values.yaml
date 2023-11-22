@@ -68,7 +68,8 @@ config:
     bucket: "posit-chronicle"
     prefix: ""
     profile: ""
-    region: ""
+    # An AWS region must be set if S3 Storage is enabled
+    region: "us-east-2"
   metrics:
     enabled: true
   profiling:

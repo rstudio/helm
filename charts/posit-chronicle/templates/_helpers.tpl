@@ -10,7 +10,12 @@ Generate annotations for  various resources
 {{ end }}
 {{- if .Values.config.metrics.enabled }}
 prometheus.io/scrape: "true"
-prometheus.io/port: "{{ .Values.service.targetPort }}"
+{{- if .Values.config.https.enabled }}
+prometheus.io/port: "443"
+{{- else}}
+prometheus.io/port: "5252"
+{{- end }}
+
 {{- end }}
 {{- end -}}
 

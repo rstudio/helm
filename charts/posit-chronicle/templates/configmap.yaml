@@ -9,12 +9,12 @@ data:
     # switch between http and https
     {{- if .Values.config.https.enabled }}
     [HTTPS]
-    Listen = 443
+    Listen = :443
     Key = {{ .Values.config.https.key }}
     Certificate = {{ .Values.config.https.certificate }}
     {{- else}}
     [HTTP]
-    Listen = 5252
+    Listen = :5252
     {{- end }}
 
     [Logging]
