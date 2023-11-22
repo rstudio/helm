@@ -2,7 +2,7 @@ image:
   tag: "latest"
 
 serviceaccount:
-  enabled: false
+  create: true
   annotations: {
     eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
   }

@@ -1,5 +1,4 @@
 # 0.1.0
 
-- Initial release
-- Migrated from a private repo, and integrated with rstudio helm shared libraries
-- Add ci components and starting documentation
+- Initial public release and integration into Posit's Helm repository. Includes
+  the new `posit-chronicle` chart, CI components, and documentation.
