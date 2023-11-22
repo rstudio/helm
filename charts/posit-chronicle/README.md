@@ -106,7 +106,7 @@ supported.)
 You can also persist data to AWS S3 instead of (or in addition to) local
 storage:
 
-``` yaml
+```yaml
 config:
   s3Storage:
     enabled: true
@@ -121,22 +121,18 @@ to manage the credentials needed to access S3. In this scenario, once you have
 role](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
 you can use this role as an annotation on the existing Service Account:
 
-``` yaml
+```yaml
 serviceaccount:
-  create: false
-  # -- Additional annotations to add to the chronicle-server serviceaccount
-  annotations: {
+  create: true
+  annotations:
     eks.amazonaws.com/role-arn:  arn:aws:iam::123456789000:role/iam-role-name-here
-  }
-  # -- Additional labels to add to the chronicle-server serviceaccount
-  labels: {}
 ```
 
 If you are unable to use IAM Roles for Service Accounts, there are any number of
 alternatives for injecting AWS credentials into a container. As a fallback,
 the S3 storage config allows specifying a profile:
 
-``` yaml
+```yaml
 config:
   s3Storage:
     enabled: true
@@ -164,7 +160,7 @@ config:
 | config.s3Storage.enabled | bool | `false` |  |
 | config.s3Storage.prefix | string | `""` |  |
 | config.s3Storage.profile | string | `""` |  |
-| config.s3Storage.region | string | `""` |  |
+| config.s3Storage.region | string | `"us-east-2"` |  |
 | image.imagePullPolicy | string | `"Always"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
 | image.tag | string | `"latest"` |  |
