@@ -57,7 +57,7 @@ spec:
           mountPath: {{ .Values.config.LocalStorage.Location }}
         {{- end }}
         - name: chronicle-server-config
-          mountPath: /opt/chronicle/config.gcfg
+          mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
           subPath: server
         {{- if .Values.pod.env }}
         env:

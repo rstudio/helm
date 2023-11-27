@@ -29,7 +29,7 @@ replicas: 1
 pod:
   # -- The command and args to run in the chronicle-server container
   command: "/chronicle"
-  args: ["start", "-c", "/opt/chronicle/config.gcfg"]
+  args: ["start", "-c", "/etc/posit-chronicle/posit-chronicle.gcfg"]
   # -- Optional environment variables
   env: []
   # -- Additional annotations to add to the chronicle-server pods
