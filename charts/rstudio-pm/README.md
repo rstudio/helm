@@ -73,10 +73,8 @@ Second, specify the following values:
 ```yaml
 license:
   file:
- 
     secret: package-manager-license
     secretKey: package-manager.lic
- 
 ```
 
 Alternatively, license files can be set during `helm install` with the following argument:

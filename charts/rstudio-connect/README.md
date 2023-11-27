@@ -81,10 +81,8 @@ Second, specify the following values:
 ```yaml
 license:
   file:
- 
     secret: connect-license
     secretKey: connect.lic
- 
 ```
 
 Alternatively, license files can be set during `helm install` with the following argument:

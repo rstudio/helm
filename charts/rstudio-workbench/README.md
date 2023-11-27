@@ -107,10 +107,8 @@ Second, specify the following values:
 ```yaml
 license:
   file:
- 
     secret: workbench-license
     secretKey: workbench.lic
- 
 ```
 
 Alternatively, license files can be set during `helm install` with the following argument:
