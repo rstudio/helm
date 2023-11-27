@@ -42,7 +42,7 @@ will need to run the Chronicle agent as a sidecar container on all of your
 Workbench or Connect server pods by setting `pod.sidecar` in their respective
 `values.yaml` files.
 
-Here are some example Helm values to run the agent sidecar in Workbench:
+Here is an example of Helm values to run the agent sidecar in Workbench:
 
 ```yaml
 pod:
@@ -59,8 +59,8 @@ pod:
         value: "http://chronicle-server.default.svc.cluster.local"
 ```
 
-And here are some example Helm values for Connect, where we also pass a Connect
-API key from a Kubernetes Secret to unlock more detailed metrics:
+And here is an example of Helm values for Connect, where a Connect
+API key from a Kubernetes Secret is used to unlock more detailed metrics:
 
 ```yaml
 pod:
