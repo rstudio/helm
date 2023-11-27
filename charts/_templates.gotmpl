@@ -115,7 +115,7 @@ First, create the secret declaratively with YAML or imperatively using the follo
   {{ else if eq .Name "rstudio-workbench" -}}
 `kubectl create secret generic workbench-license --from-file=licenses/workbench.lic`
   {{ else -}}
-{{ template "chart.header" . }}
+`kubectl create secret generic license --from-file=licenses/license.lic`
   {{- end }}
 
 Second, specify the following values:
@@ -123,17 +123,18 @@ Second, specify the following values:
 ```yaml
 license:
   file:
-  {{ if eq .Name "rstudio-connect" }}
+    {{- if eq .Name "rstudio-connect" }}
     secret: connect-license
     secretKey: connect.lic
-  {{ else if eq .Name "rstudio-pm" }}
+    {{- else if eq .Name "rstudio-pm" }}
     secret: package-manager-license
     secretKey: package-manager.lic
-  {{ else if eq .Name "rstudio-workbench" }}
+    {{- else if eq .Name "rstudio-workbench" }}
     secret: workbench-license
     secretKey: workbench.lic
-  {{ else }}
-{{ template "chart.header" . }}
+    {{- else }}
+    secret: license
+    secretKey: license.lic
   {{ end }}
 ```
 
@@ -147,7 +148,7 @@ Alternatively, license files can be set during `helm install` with the following
   {{ else if eq .Name "rstudio-workbench" -}}
 `--set-file license.file.contents=licenses/workbench.lic`
   {{ else -}}
-{{ template "chart.header" . }}
+`--set-file license.file.contents=licenses/license.lic`
   {{- end }}
 
 ### License Key
