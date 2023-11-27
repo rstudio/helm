@@ -63,9 +63,7 @@ This chart supports activating the product using a license file, license key, or
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
-First, create the secret declaratively with YAML or imperatively using the following command:```bash
-kubectl create secret generic package-manager-license --from-file=licenses/package-manager.lic
-```
+First, create the secret declaratively with YAML or imperatively using the following command:`kubectl create secret generic package-manager-license --from-file=licenses/package-manager.lic`
 
 Second, specify the following values:
 
@@ -75,9 +73,7 @@ license:
     secretKey: package-manager.lic
 ```
 
-Alternatively, license files can be set directly in your values file or during `helm install` with:```bash
---set-file license.file.contents=licenses/package-manager.lic
-```
+Alternatively, license files can be set directly in your values file or during `helm install` with the following arguement:`--set-file license.file.contents=licenses/package-manager.lic`
 
 ### License Key
 
