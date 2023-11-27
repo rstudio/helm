@@ -73,9 +73,8 @@ We recommend storing a license file as a `Secret` and setting the `license.file.
 
 First, create the secret declaratively with YAML or imperatively using the following command:`kubectl create secret generic connect-license --from-file=licenses/connect.lic`
 
-Second, specify the following values:
-
-```yamllicense:
+Second, specify the following values:```yaml
+license:
   file:
     secret: connect-license
     secretKey: connect.lic
