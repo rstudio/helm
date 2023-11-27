@@ -73,7 +73,8 @@ Second, specify the following values:
 ```yaml
 license:
   file:
-  secret: package-manager-license
+ 
+    secret: package-manager-license
     secretKey: package-manager.lic
  
 ```

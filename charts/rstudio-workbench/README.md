@@ -107,7 +107,8 @@ Second, specify the following values:
 ```yaml
 license:
   file:
-  secret: workbench-license
+ 
+    secret: workbench-license
     secretKey: workbench.lic
  
 ```

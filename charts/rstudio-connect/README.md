@@ -81,7 +81,8 @@ Second, specify the following values:
 ```yaml
 license:
   file:
-  secret: connect-license
+ 
+    secret: connect-license
     secretKey: connect.lic
  
 ```
