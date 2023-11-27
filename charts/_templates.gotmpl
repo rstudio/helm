@@ -108,48 +108,20 @@ We recommend storing a license file as a `Secret` and setting the `license.file.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-  {{ if eq .Name "rstudio-connect" -}}
-`kubectl create secret generic connect-license --from-file=licenses/connect.lic`
-  {{ else if eq .Name "rstudio-pm" -}}
-`kubectl create secret generic package-manager-license --from-file=licenses/package-manager.lic`
-  {{ else if eq .Name "rstudio-workbench" -}}
-`kubectl create secret generic workbench-license --from-file=licenses/workbench.lic`
-  {{ else -}}
-`kubectl create secret generic license --from-file=licenses/license.lic`
-  {{- end }}
+`kubectl create secret generic {{ .Name }}-license --from-file=licenses/{{ .Name }}.lic`
 
 Second, specify the following values:
 
 ```yaml
 license:
   file:
-    {{- if eq .Name "rstudio-connect" }}
-    secret: connect-license
-    secretKey: connect.lic
-    {{- else if eq .Name "rstudio-pm" }}
-    secret: package-manager-license
-    secretKey: package-manager.lic
-    {{- else if eq .Name "rstudio-workbench" }}
-    secret: workbench-license
-    secretKey: workbench.lic
-    {{- else }}
-    secret: license
-    secretKey: license.lic
-  {{ end }}
+    secret: {{ .Name }}-license
+    secretKey: {{ .Name }}.lic
 ```
-
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-  {{ if eq .Name "rstudio-connect" -}}
-`--set-file license.file.contents=licenses/connect.lic`
-  {{ else if eq .Name "rstudio-pm" -}}
-`--set-file license.file.contents=licenses/package-manager.lic`
-  {{ else if eq .Name "rstudio-workbench" -}}
-`--set-file license.file.contents=licenses/workbench.lic`
-  {{ else -}}
-`--set-file license.file.contents=licenses/license.lic`
-  {{- end }}
+`--set-file license.file.contents=licenses/{{ .Name }}.lic`
 
 ### License Key
 
