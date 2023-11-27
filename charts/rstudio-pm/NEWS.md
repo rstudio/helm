@@ -1,3 +1,7 @@
+# 0.5.17
+
+- Add licensing section to the README to provide guidance on using a license file, license key or license server.
+
 # 0.5.16
 
 - Update default Posit Package Manager version to 2023.08.4-20
@@ -10,6 +14,7 @@
 # 0.5.14
 
 - Update default Posit Package Manager version to 2023.08.0-16
+
 # 0.5.13 
 
 - Change default operating system from `bionic` to `ubuntu2204` (`jammy`)

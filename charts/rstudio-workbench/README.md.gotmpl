@@ -18,7 +18,7 @@
 
 This chart requires the following in order to function:
 
-* A license key, license file, or address of a running license server. See the `license` configuration below.
+* A license file, license key, or address of a running license server. See the [Licensing](#licensing) section below for more details.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the
   home directory for users.
   * If `homeStorage.create` is set, a PVC that relies on the default storage class will be created to generate the
@@ -63,6 +63,8 @@ In addition to the above required configuration, we recommend setting the follow
   by simply running the `uuid` command.
 * Some use-cases may require special PAM profiles to run. By default, no PAM profiles other than the basic `auth` profile will be used to authenticate users.
   If this is not sufficient then you will need to add your PAM profiles into the container using a volume and volumeMount.
+
+{{ template "rstudio.licensing" . }}
 
 ## General Principles
 

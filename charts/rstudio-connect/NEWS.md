@@ -1,3 +1,7 @@
+# 0.5.10
+
+- Add licensing section to the README to provide guidance on using a license file, license key or license server.
+
 # 0.5.9
 
 - Bump Connect version to 2023.10.0

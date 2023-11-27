@@ -96,6 +96,43 @@ helm search repo {{ if $isDev }}--devel {{ end }}rstudio/{{ template "chart.name
 
 {{- end }}
 
+{{- define "rstudio.licensing" }}
+
+## Licensing
+
+This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
+
+### License File
+
+We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
+
+First, create the secret declaratively with YAML or imperatively using the following command:
+
+`kubectl create secret generic {{ .Name }}-license --from-file=licenses/{{ .Name }}.lic`
+
+Second, specify the following values:
+
+```yaml
+license:
+  file:
+    secret: {{ .Name }}-license
+    secretKey: {{ .Name }}.lic
+```
+
+Alternatively, license files can be set during `helm install` with the following argument:
+
+`--set-file license.file.contents=licenses/{{ .Name }}.lic`
+
+### License Key
+
+Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
+
+### License Server
+
+Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+
+{{- end }}
+
 {{ define "rstudio.examples1" -}}
   {{ . }}
   {{ kindOf . }}
