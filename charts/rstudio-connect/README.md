@@ -75,21 +75,21 @@ First, create the secret declaratively with YAML or imperatively using the follo
 
 Second, specify the following values:
 
-```yaml
-license:
-  file:secret: connect-license
+```yamllicense:
+  file:
+    secret: connect-license
     secretKey: connect.lic
 ```
 
-Alternatively, license files can be set directly in your values file or during `helm install` with the following arguement:`--set-file license.file.contents=licenses/connect.lic`
+Alternatively, license files can be set during `helm install` with the following argument:`--set-file license.file.contents=licenses/connect.lic`
 
 ### License Key
 
-Set a license key directly in your values file (`license.key`) or during `helm install` with `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
+Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
 
 ### License Server
 
-Set a license server directly in your values file (`license.server`) or during `helm install` with `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>` (replace `<LICENSE_SERVER_HOST_ADDRESS>` with your actual server address).
+Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
 
 ## General Principles
 
