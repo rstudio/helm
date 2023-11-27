@@ -33,38 +33,7 @@ This chart requires the following in order to function:
   * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
 
-## Licensing
-
-This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
-
-### License File
-
-We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
-
-First, create the secret declaratively with YAML or imperatively using the following command (replace `licenses/connect.lic` with the path and name of your license file):
-
-```bash
-kubectl create secret generic connect-license --from-file=licenses/connect.lic
-```
-
-Second, specify the following values:
-
-```yaml
-license:
-  file:
-    secret: connect-license
-    secretKey: connect.lic
-```
-
-Alternatively, license files can be set directly in your values file or during `helm install` with `--set-file license.file.contents=licenses/connect.lic` (replace `licenses/connect.lic` with the path and name of your license file).
-
-### License Key
-
-Set a license key directly in your values file (`license.key`) or during `helm install` with `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
-
-### License Server
-
-Set a license server directly in your values file (`license.server`) or during `helm install` with `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>` (replace `<LICENSE_SERVER_HOST_ADDRESS>` with your actual server address).
+{{ template "rstudio.licensing" . }}
 
 ## General Principles
 
