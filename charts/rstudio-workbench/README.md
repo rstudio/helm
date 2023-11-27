@@ -97,9 +97,8 @@ This chart supports activating the product using a license file, license key, or
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
-First, create the secret declaratively with YAML or imperatively using the following command:
-
-```bashkubectl create secret generic workbench-license --from-file=licenses/workbench.lic
+First, create the secret declaratively with YAML or imperatively using the following command:```bash
+kubectl create secret generic workbench-license --from-file=licenses/workbench.lic
 ```
 
 Second, specify the following values:
@@ -110,9 +109,8 @@ license:
     secretKey: workbench.lic
 ```
 
-Alternatively, license files can be set directly in your values file or during `helm install` with:
-
-```bash--set-file license.file.contents=licenses/workbench.lic
+Alternatively, license files can be set directly in your values file or during `helm install` with:```bash
+--set-file license.file.contents=licenses/workbench.lic
 ```
 
 ### License Key
