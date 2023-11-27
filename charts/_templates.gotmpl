@@ -120,31 +120,23 @@ First, create the secret declaratively with YAML or imperatively using the follo
 
 Second, specify the following values:
 
+```yaml
+license:
+  file:
 
   {{- if eq .Name "rstudio-connect" -}}
-```yaml
-license:
-  file:
     secret: connect-license
     secretKey: connect.lic
-```
   {{- else if eq .Name "rstudio-pm" -}}
-```yaml
-license:
-  file:
     secret: package-manager-license
     secretKey: package-manager.lic
-```
   {{- else if eq .Name "rstudio-workbench" -}}
-```yaml
-license:
-  file:
     secret: workbench-license
     secretKey: workbench.lic
-```
   {{- else -}}
 {{ template "chart.header" . }}
   {{- end }}
+```
 
 
 Alternatively, license files can be set during `helm install` with the following argument:
