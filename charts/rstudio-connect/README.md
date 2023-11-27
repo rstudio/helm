@@ -73,22 +73,20 @@ We recommend storing a license file as a `Secret` and setting the `license.file.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-  `kubectl create secret generic connect-license --from-file=licenses/connect.lic`
- 
+`kubectl create secret generic rstudio-connect-license --from-file=licenses/rstudio-connect.lic`
 
 Second, specify the following values:
 
 ```yaml
 license:
   file:
-    secret: connect-license
-    secretKey: connect.lic
+    secret: rstudio-connect-license
+    secretKey: rstudio-connect.lic
 ```
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-  `--set-file license.file.contents=licenses/connect.lic`
- 
+`--set-file license.file.contents=licenses/rstudio-connect.lic`
 
 ### License Key
 

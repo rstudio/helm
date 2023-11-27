@@ -65,22 +65,20 @@ We recommend storing a license file as a `Secret` and setting the `license.file.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-  `kubectl create secret generic package-manager-license --from-file=licenses/package-manager.lic`
- 
+`kubectl create secret generic rstudio-pm-license --from-file=licenses/rstudio-pm.lic`
 
 Second, specify the following values:
 
 ```yaml
 license:
   file:
-    secret: package-manager-license
-    secretKey: package-manager.lic
+    secret: rstudio-pm-license
+    secretKey: rstudio-pm.lic
 ```
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-  `--set-file license.file.contents=licenses/package-manager.lic`
- 
+`--set-file license.file.contents=licenses/rstudio-pm.lic`
 
 ### License Key
 
