@@ -106,7 +106,7 @@ This chart supports activating the product using a license file, license key, or
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
-First, create the secret declaratively with YAML or imperatively using the following command:
+First, create the secret declaratively with YAML or imperatively using the following command: 
   {{- if eq .Name "rstudio-connect" -}}
 `kubectl create secret generic connect-license --from-file=licenses/connect.lic`
   {{- else if eq .Name "rstudio-pm" -}}
@@ -120,15 +120,19 @@ First, create the secret declaratively with YAML or imperatively using the follo
 Second, specify the following values:
 
 ```yaml
+  {{- if eq .Name "rstudio-connect" -}}
 license:
   file:
-  {{- if eq .Name "rstudio-connect" -}}
     secret: connect-license
     secretKey: connect.lic
   {{- else if eq .Name "rstudio-pm" -}}
+license:
+  file:
     secret: package-manager-license
     secretKey: package-manager.lic
   {{- else if eq .Name "rstudio-workbench" -}}
+license:
+  file:
     secret: workbench-license
     secretKey: workbench.lic
   {{- else -}}
@@ -136,7 +140,7 @@ license:
   {{- end }}
 ```
 
-Alternatively, license files can be set directly in your values file or during `helm install` with the following arguement:
+Alternatively, license files can be set during `helm install` with the following argument: 
   {{- if eq .Name "rstudio-connect" -}}
 `--set-file license.file.contents=licenses/connect.lic`
   {{- else if eq .Name "rstudio-pm" -}}
@@ -149,11 +153,11 @@ Alternatively, license files can be set directly in your values file or during `
 
 ### License Key
 
-Set a license key directly in your values file (`license.key`) or during `helm install` with `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
+Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
 
 ### License Server
 
-Set a license server directly in your values file (`license.server`) or during `helm install` with `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>` (replace `<LICENSE_SERVER_HOST_ADDRESS>` with your actual server address).
+Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
 
 {{- end }}
 
