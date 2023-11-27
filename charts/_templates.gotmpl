@@ -123,18 +123,18 @@ Second, specify the following values:
 ```yaml
 license:
   file:
-  {{ if eq .Name "rstudio-connect" -}}
+  {{ if eq .Name "rstudio-connect" }}
     secret: connect-license
     secretKey: connect.lic
-  {{ else if eq .Name "rstudio-pm" -}}
+  {{ else if eq .Name "rstudio-pm" }}
     secret: package-manager-license
     secretKey: package-manager.lic
-  {{ else if eq .Name "rstudio-workbench" -}}
+  {{ else if eq .Name "rstudio-workbench" }}
     secret: workbench-license
     secretKey: workbench.lic
-  {{ else -}}
+  {{ else }}
 {{ template "chart.header" . }}
-  {{- end }}
+  {{ end }}
 ```
 
 
