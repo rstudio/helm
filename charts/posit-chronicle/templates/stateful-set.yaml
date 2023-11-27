@@ -44,7 +44,7 @@ spec:
         {{- toYaml .Values.pod.args | nindent 8 }}
         {{- end }}
         ports:
-        {{- if .Values.config.https.enabled }}
+        {{- if .Values.config.HTTPS.Enabled }}
         - containerPort: 443
           name: https
         {{- else}}
@@ -52,9 +52,9 @@ spec:
           name: http
         {{- end }}
         volumeMounts:
-        {{- if .Values.config.localStorage.enabled }}
+        {{- if .Values.config.LocalStorage.Enabled }}
         - name: data
-          mountPath: {{ .Values.config.localStorage.location }}
+          mountPath: {{ .Values.config.LocalStorage.Location }}
         {{- end }}
         - name: chronicle-server-config
           mountPath: /opt/chronicle/config.gcfg
@@ -67,7 +67,7 @@ spec:
       - name: chronicle-server-config
         configMap:
           name: chronicle-server-config
-{{- if .Values.config.localStorage.enabled }}
+{{- if .Values.config.LocalStorage.Enabled }}
   volumeClaimTemplates:
   - metadata:
       name: data

@@ -1,8 +1,8 @@
 # Posit Chronicle
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 2023.11.0](https://img.shields.io/badge/AppVersion-2023.11.0-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 2023.11.2](https://img.shields.io/badge/AppVersion-2023.11.2-informational?style=flat-square)
 
-#### _Helm chart for the Chronicle Server_
+#### _Official Helm chart for Posit Chronicle Server_
 
 Chronicle helps data science managers and other stakeholders understand their
 organization's use of other Posit products, primarily Posit Connect and
@@ -48,7 +48,7 @@ Here is an example of Helm values to run the agent sidecar in Workbench:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:latest
+      image: posit-chronicle:2023.11.2
       volumeMounts:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"
@@ -66,7 +66,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:latest
+      image: posit-chronicle:2023.11.2
       env:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"
@@ -92,10 +92,10 @@ access and analyze the data within your cluster:
 
 ```yaml
 config:
-  localStorage:
-    enabled: true
-    location: "/chronicle-data"
-    retentionPeriod: "30d"
+  LocalStorage:
+    Enabled: true
+    Location: "/chronicle-data"
+    RetentionPeriod: "30d"
 ```
 
 `retentionPeriod` controls how long usage data are kept. For example, `"120m"`
@@ -108,13 +108,15 @@ storage:
 
 ```yaml
 config:
-  s3Storage:
-    enabled: true
-    bucket: "posit-chronicle"
-    region: "us-east-2"
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle"
+    Region: "us-east-2"
 ```
 
-If you are running on EKS, we strongly suggest using [IAM Roles for Service
+### Using Iam for S3
+
+If you are running on EKS, you can use [IAM Roles for Service
 Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
 to manage the credentials needed to access S3. In this scenario, once you have
 [created an IAM
@@ -134,36 +136,44 @@ the S3 storage config allows specifying a profile:
 
 ```yaml
 config:
-  s3Storage:
-    enabled: true
-    bucket: "posit-chronicle"
-    profile: "my-aws-account"
-    region: "us-east-2"
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle"
+    Profile: "my-aws-account"
+    Region: "us-east-2"
 ```
+
+### Needed S3 Policy Permissions
+
+The credentials Chronicle uses for S3 storage must have the following permissions enabled:
+- `s3:GetObject`
+- `s3:ListBucket`
+- `s3:PutObject`
+- `s3:DeleteObject`
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| config.https.certificate | string | `""` |  |
-| config.https.enabled | bool | `false` |  |
-| config.https.key | string | `""` |  |
-| config.localStorage.enabled | bool | `true` |  |
-| config.localStorage.location | string | `"./chronicle-data"` |  |
-| config.localStorage.retentionPeriod | string | `"30d"` |  |
-| config.logging.serviceLog | string | `"STDOUT"` |  |
-| config.logging.serviceLogFormat | string | `"TEXT"` |  |
-| config.logging.serviceLogLevel | string | `"INFO"` |  |
-| config.metrics.enabled | bool | `true` |  |
-| config.profiling.enabled | bool | `false` |  |
-| config.s3Storage.bucket | string | `"posit-chronicle"` |  |
-| config.s3Storage.enabled | bool | `false` |  |
-| config.s3Storage.prefix | string | `""` |  |
-| config.s3Storage.profile | string | `""` |  |
-| config.s3Storage.region | string | `"us-east-2"` |  |
+| config.HTTPS.Certificate | string | `""` |  |
+| config.HTTPS.Enabled | bool | `false` |  |
+| config.HTTPS.Key | string | `""` |  |
+| config.LocalStorage.Enabled | bool | `true` |  |
+| config.LocalStorage.Location | string | `"./chronicle-data"` |  |
+| config.LocalStorage.RetentionPeriod | string | `"30d"` |  |
+| config.Logging.ServiceLog | string | `"STDOUT"` |  |
+| config.Logging.ServiceLogFormat | string | `"TEXT"` |  |
+| config.Logging.ServiceLogLevel | string | `"INFO"` |  |
+| config.Metrics.Enabled | bool | `true` |  |
+| config.Profiling.Enabled | bool | `false` |  |
+| config.S3Storage.Bucket | string | `"posit-chronicle"` |  |
+| config.S3Storage.Enabled | bool | `false` |  |
+| config.S3Storage.Prefix | string | `""` |  |
+| config.S3Storage.Profile | string | `""` |  |
+| config.S3Storage.Region | string | `"us-east-2"` |  |
 | image.imagePullPolicy | string | `"Always"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
-| image.tag | string | `"latest"` |  |
+| image.tag | string | `"2023.11.2"` |  |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
 | pod.args[0] | string | `"start"` |  |
@@ -186,5 +196,5 @@ config:
 | storage.persistentVolumeSize | string | `"1Gi"` |  |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.5.0](https://github.com/norwoodj/helm-docs/releases/v1.5.0)
+Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)
 

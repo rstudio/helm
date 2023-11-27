@@ -16,13 +16,13 @@ will need to run the Chronicle agent as a sidecar container on all of your
 Workbench or Connect server pods by setting `pod.sidecar` in their respective
 `values.yaml` files.
 
-Here are some example Helm values to run the agent sidecar in Workbench:
+Here is an example of Helm values to run the agent sidecar in Workbench:
 
 ```yaml
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:latest
+      image: posit-chronicle:2023.11.2
       volumeMounts:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"
@@ -33,14 +33,14 @@ pod:
         value: "http://chronicle-server.default.svc.cluster.local"
 ```
 
-And here are some example Helm values for Connect, where we also pass a Connect
-API key from a Kubernetes Secret to unlock more detailed metrics:
+And here is an example of Helm values for Connect, where a Connect
+API key from a Kubernetes Secret is used to unlock more detailed metrics:
 
 ```yaml
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:latest
+      image: posit-chronicle:2023.11.2
       env:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"
@@ -61,15 +61,15 @@ Connect API key.
 Chronicle can be configured to persist data to a local Kubernetes volume, AWS
 S3, or both.
 
-The default configuration uses a local volume, which is suitable if you'd like to 
+The default configuration uses a local volume, which is suitable if you'd like to
 access and analyze the data within your cluster:
 
 ```yaml
 config:
-  localStorage:
-    enabled: true
-    location: "/chronicle-data"
-    retentionPeriod: "30d"
+  LocalStorage:
+    Enabled: true
+    Location: "/chronicle-data"
+    RetentionPeriod: "30d"
 ```
 
 `retentionPeriod` controls how long usage data are kept. For example, `"120m"`
@@ -82,13 +82,15 @@ storage:
 
 ```yaml
 config:
-  s3Storage:
-    enabled: true
-    bucket: "posit-chronicle"
-    region: "us-east-2"
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle"
+    Region: "us-east-2"
 ```
 
-If you are running on EKS, we strongly suggest using [IAM Roles for Service
+### Using Iam for S3
+
+If you are running on EKS, you can use [IAM Roles for Service
 Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
 to manage the credentials needed to access S3. In this scenario, once you have
 [created an IAM
@@ -108,12 +110,20 @@ the S3 storage config allows specifying a profile:
 
 ```yaml
 config:
-  s3Storage:
-    enabled: true
-    bucket: "posit-chronicle"
-    profile: "my-aws-account"
-    region: "us-east-2"
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle"
+    Profile: "my-aws-account"
+    Region: "us-east-2"
 ```
+
+
+### Needed S3 Policy Permissions
+The credentials Chronicle uses for S3 storage must have the following permissions enabled:
+- `s3:GetObject`
+- `s3:ListBucket`
+- `s3:PutObject`
+- `s3:DeleteObject`
 
 {{ template "chart.valuesSection" . }}
 

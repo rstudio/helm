@@ -8,9 +8,9 @@ Generate annotations for  various resources
 {{- range $key,$value := $.Values.pod.annotations -}}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
-{{- if .Values.config.metrics.enabled }}
+{{- if .Values.config.Metrics.Enabled }}
 prometheus.io/scrape: "true"
-{{- if .Values.config.https.enabled }}
+{{- if .Values.config.HTTPS.Enabled }}
 prometheus.io/port: "443"
 {{- else}}
 prometheus.io/port: "5252"

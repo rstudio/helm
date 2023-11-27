@@ -7,38 +7,38 @@ data:
   server: |
 
     # switch between http and https
-    {{- if .Values.config.https.enabled }}
+    {{- if .Values.config.HTTPS.Enabled }}
     [HTTPS]
     Listen = :443
-    Key = {{ .Values.config.https.key }}
-    Certificate = {{ .Values.config.https.certificate }}
+    Key = {{ .Values.config.HTTPS.Key }}
+    Certificate = {{ .Values.config.HTTPS.Certificate }}
     {{- else}}
     [HTTP]
     Listen = :5252
     {{- end }}
 
     [Logging]
-    ServiceLog = {{ .Values.config.logging.serviceLog }}
-    ServiceLogLevel = {{ .Values.config.logging.serviceLogLevel }}
-    ServiceLogFormat = {{ .Values.config.logging.serviceLogFormat }}
+    ServiceLog = {{ .Values.config.Logging.ServiceLog }}
+    ServiceLogLevel = {{ .Values.config.Logging.ServiceLogLevel }}
+    ServiceLogFormat = {{ .Values.config.Logging.ServiceLogFormat }}
 
     [Metrics]
-    Enabled = {{ .Values.config.metrics.enabled }}
+    Enabled = {{ .Values.config.Metrics.Enabled }}
 
     [Profiling]
-    Enabled = {{ .Values.config.profiling.enabled }}
+    Enabled = {{ .Values.config.Profiling.Enabled }}
     Listen = 3030
 
     [LocalStorage]
-    Enabled = {{ .Values.config.localStorage.enabled }}
-    Location = {{ .Values.config.localStorage.location }}
-    RetentionPeriod = {{ .Values.config.localStorage.retentionPeriod }}
+    Enabled = {{ .Values.config.LocalStorage.Enabled }}
+    Location = {{ .Values.config.LocalStorage.Location }}
+    RetentionPeriod = {{ .Values.config.LocalStorage.RetentionPeriod }}
 
     [S3Storage]
-    Enabled = {{ .Values.config.s3Storage.enabled }}
-    Bucket = {{ .Values.config.s3Storage.bucket }}
-    Prefix = {{ .Values.config.s3Storage.prefix }}
-    Profile = {{ .Values.config.s3Storage.profile }}
-    Region = {{ .Values.config.s3Storage.region }}
+    Enabled = {{ .Values.config.S3Storage.Enabled }}
+    Bucket = {{ .Values.config.S3Storage.Bucket }}
+    Prefix = {{ .Values.config.S3Storage.Prefix }}
+    Profile = {{ .Values.config.S3Storage.Profile }}
+    Region = {{ .Values.config.S3Storage.Region }}
 ---
 

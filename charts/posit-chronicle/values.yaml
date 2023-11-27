@@ -1,6 +1,6 @@
 image:
   repository: "ghcr.io/rstudio/chronicle"
-  tag: "latest"
+  tag: "2023.11.2"
   imagePullPolicy: "Always"
 
 serviceaccount:
@@ -45,36 +45,37 @@ pod:
   # -- An array used verbatim as the pod's "tolerations" definition
   tolerations: []
 
-# We do want at least 1Gi of persistent volume space
-# to perform compaction/compression operations
+# If config.LocalStorage.Enabled is set to true,
+# the chart will provision a pvc of size storage.persistentVolumeSize for
+# the chronicle server stateful-set
 storage:
   persistentVolumeSize: 1Gi
 
 config:
-  https:
-    # If https.enabled=true, we will ignore any http
-    # values and enable https in our config instead
-    enabled: false
-    key: ""
-    certificate: ""
-  localStorage:
+  HTTPS:
+    # If https.enabled=true, ignore any http
+    # values and enable https in the config instead
+    Enabled: false
+    Key: ""
+    Certificate: ""
+  LocalStorage:
     # If localStorage.enabled=false, the chronicle stateful-set
     # won't submit a volume claim or be bound to a persistent volume
-    enabled: true
-    location: "./chronicle-data"
-    retentionPeriod: "30d"
-  s3Storage:
-    enabled: false
-    bucket: "posit-chronicle"
-    prefix: ""
-    profile: ""
+    Enabled: true
+    Location: "./chronicle-data"
+    RetentionPeriod: "30d"
+  S3Storage:
+    Enabled: false
+    Bucket: "posit-chronicle"
+    Prefix: ""
+    Profile: ""
     # An AWS region must be set if S3 Storage is enabled
-    region: "us-east-2"
-  metrics:
-    enabled: true
-  profiling:
-    enabled: false
-  logging:
-    serviceLog: "STDOUT"
-    serviceLogLevel: "INFO"
-    serviceLogFormat: "TEXT"
+    Region: "us-east-2"
+  Metrics:
+    Enabled: true
+  Profiling:
+    Enabled: false
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "INFO"
+    ServiceLogFormat: "TEXT"
