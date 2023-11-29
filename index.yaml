@@ -1,5 +1,36 @@
 apiVersion: v1
 entries:
+  posit-chronicle:
+  - annotations:
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: Posit Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2023.11.3
+    created: "2023-11-29T21:52:15.532836804Z"
+    description: Official Helm chart for Posit Chronicle Server
+    digest: f44fa941aad964335c3891115bb0949e44dc2f8a9862ea4de5a68ead52ad7846
+    home: https://www.posit.co
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - rstudio
+    - posit
+    - chronicle
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: posit-chronicle
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/posit-chronicle-0.1.0/posit-chronicle-0.1.0.tgz
+    version: 0.1.0
   prepull-daemonset:
   - annotations:
       artifacthub.io/images: |
@@ -10265,4 +10296,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2023-11-27T20:50:50.687562695Z"
+generated: "2023-11-29T21:52:15.534565873Z"
