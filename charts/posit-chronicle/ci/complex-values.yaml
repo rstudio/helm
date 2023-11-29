@@ -40,26 +40,26 @@ storage:
   persistentVolumeSize: 10Gi
 
 config:
-  https:
+  HTTPS:
     # If https.enabled=true, we will ignore any http
     # values and enable https in our config instead
-    enabled: true
-    key: /path/to/key
-    certificate: /path/to/cert
-  localStorage:
-    enabled: true
-    location: "./chronicle-data"
-    retentionPeriod: "5m"
-  s3Storage:
-    enabled: true
-    bucket: "posit-chronicle"
-    region: "us-east-2"
-  metrics:
-    enabled: true
-  profiling:
-    enabled: true
-    listen: :3030
-  logging:
-    serviceLog: "STDOUT"
-    serviceLogLevel: "DEBUG"
-    serviceLogFormat: "JSON"
+    Enabled: true
+    Key: /path/to/key
+    Certificate: /path/to/cert
+  LocalStorage:
+    Enabled: true
+    Location: "./chronicle-data"
+    RetentionPeriod: "5m"
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle"
+    Region: "us-east-2"
+  Metrics:
+    Enabled: true
+  Profiling:
+    Enabled: true
+    Listen: :3030
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "DEBUG"
+    ServiceLogFormat: "JSON"

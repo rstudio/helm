@@ -8,15 +8,15 @@ serviceaccount:
   }
 
 config:
-  localStorage:
-    enabled: false
-  logging:
-    serviceLog: "STDOUT"
-    serviceLogLevel: "DEBUG"
-    serviceLogFormat: "JSON"
-  profiling:
-    enabled: true
-  s3Storage:
-    enabled: true
-    bucket: "posit-chronicle-dev"
-    region: "ap-northeast-2"
+  LocalStorage:
+    Enabled: false
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "DEBUG"
+    ServiceLogFormat: "JSON"
+  Profiling:
+    Enabled: true
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle-dev"
+    Region: "ap-northeast-2"

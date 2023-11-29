@@ -22,7 +22,7 @@ Here is an example of Helm values to run the agent sidecar in Workbench:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:2023.11.2
+      image: posit-chronicle:2023.11.3
       volumeMounts:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"
@@ -40,7 +40,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:2023.11.2
+      image: posit-chronicle:2023.11.3
       env:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"

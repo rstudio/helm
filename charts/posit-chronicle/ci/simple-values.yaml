@@ -8,16 +8,16 @@ storage:
   persistentVolumeSize: 10Gi
 
 config:
-  localStorage:
-    enabled: true
-    retentionPeriod: "7d"
-  logging:
-    serviceLog: "STDOUT"
-    serviceLogLevel: "DEBUG"
-    serviceLogFormat: "JSON"
-  profiling:
-    enabled: true
-  s3Storage:
-    enabled: true
-    bucket: "posit-chronicle-dev"
-    region: "us-east-1"
+  LocalStorage:
+    Enabled: true
+    RetentionPeriod: "7d"
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "DEBUG"
+    ServiceLogFormat: "JSON"
+  Profiling:
+    Enabled: true
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle-dev"
+    Region: "us-east-1"

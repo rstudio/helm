@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 2023.11.2](https://img.shields.io/badge/AppVersion-2023.11.2-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -48,7 +48,7 @@ Here is an example of Helm values to run the agent sidecar in Workbench:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:2023.11.2
+      image: posit-chronicle:2023.11.3
       volumeMounts:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"
@@ -66,7 +66,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:2023.11.2
+      image: posit-chronicle:2023.11.3
       env:
       - name: CHRONICLE_PRODUCT_CLUSTER_ID
         value: "posit-cluster-1"
@@ -172,7 +172,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | config.S3Storage.Region | string | `"us-east-2"` |  |
 | image.imagePullPolicy | string | `"Always"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
-| image.tag | string | `"2023.11.2"` |  |
+| image.tag | string | `"2023.11.3"` |  |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
 | pod.args[0] | string | `"start"` |  |
