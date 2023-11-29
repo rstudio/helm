@@ -177,7 +177,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
 | pod.args[0] | string | `"start"` |  |
 | pod.args[1] | string | `"-c"` |  |
-| pod.args[2] | string | `"/opt/chronicle/config.gcfg"` |  |
+| pod.args[2] | string | `"/etc/posit-chronicle/posit-chronicle.gcfg"` |  |
 | pod.command | string | `"/chronicle"` | The command and args to run in the chronicle-server container |
 | pod.env | list | `[]` | Optional environment variables |
 | pod.labels | object | `{}` | Additional labels to add to the chronicle-server pods |
