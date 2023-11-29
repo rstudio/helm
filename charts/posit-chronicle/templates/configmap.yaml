@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chronicle-server-config
+data:
+  server: |
+
+    # switch between http and https
+    {{- if .Values.config.HTTPS.Enabled }}
+    [HTTPS]
+    Listen = :443
+    Key = {{ .Values.config.HTTPS.Key }}
+    Certificate = {{ .Values.config.HTTPS.Certificate }}
+    {{- else}}
+    [HTTP]
+    Listen = :5252
+    {{- end }}
+
+    [Logging]
+    ServiceLog = {{ .Values.config.Logging.ServiceLog }}
+    ServiceLogLevel = {{ .Values.config.Logging.ServiceLogLevel }}
+    ServiceLogFormat = {{ .Values.config.Logging.ServiceLogFormat }}
+
+    [Metrics]
+    Enabled = {{ .Values.config.Metrics.Enabled }}
+
+    [Profiling]
+    Enabled = {{ .Values.config.Profiling.Enabled }}
+    Listen = 3030
+
+    [LocalStorage]
+    Enabled = {{ .Values.config.LocalStorage.Enabled }}
+    Location = {{ .Values.config.LocalStorage.Location }}
+    RetentionPeriod = {{ .Values.config.LocalStorage.RetentionPeriod }}
+
+    [S3Storage]
+    Enabled = {{ .Values.config.S3Storage.Enabled }}
+    Bucket = {{ .Values.config.S3Storage.Bucket }}
+    Prefix = {{ .Values.config.S3Storage.Prefix }}
+    Profile = {{ .Values.config.S3Storage.Profile }}
+    Region = {{ .Values.config.S3Storage.Region }}
+---
+

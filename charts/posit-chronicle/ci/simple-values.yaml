@@ -1,0 +1,23 @@
+image:
+  tag: "latest"
+
+serviceaccount:
+  create: false
+
+storage:
+  persistentVolumeSize: 10Gi
+
+config:
+  LocalStorage:
+    Enabled: true
+    RetentionPeriod: "7d"
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "DEBUG"
+    ServiceLogFormat: "JSON"
+  Profiling:
+    Enabled: true
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle-dev"
+    Region: "us-east-1"

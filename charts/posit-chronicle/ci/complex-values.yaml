@@ -1,0 +1,65 @@
+image:
+  tag: "latest"
+  imagePullPolicy: "IfNotPresent"
+
+serviceaccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
+
+service:
+  # -- The port to use for the REST service
+  port: 12345
+  annotations:
+    test-annotation: test-service-annotation
+  labels:
+    test-label: test-service-label
+    test-label2: test-service-label2
+  selectorLabels:
+    test-selector-label: test-service-selectorLabel
+    test-selector-label2: test-service-selectorLabel2
+
+pod:
+  replicas: 4
+  command: "/bash"
+  args: ["echo", "hello world"]
+  # -- Optional environment variables
+  env:
+  - name: "TEST_ENV_VAR"
+    value: "test-value"
+  annotations:
+    test-annotation: test-service-annotation
+  labels:
+    test-label: test-service-label
+    test-label2: test-service-label2
+  selectorLabels:
+    test-selector-label: test-service-selectorLabel
+    test-selector-label2: test-service-selectorLabel2
+
+storage:
+  persistentVolumeSize: 10Gi
+
+config:
+  HTTPS:
+    # If https.enabled=true, we will ignore any http
+    # values and enable https in our config instead
+    Enabled: true
+    Key: /path/to/key
+    Certificate: /path/to/cert
+  LocalStorage:
+    Enabled: true
+    Location: "./chronicle-data"
+    RetentionPeriod: "5m"
+  S3Storage:
+    Enabled: true
+    Bucket: "posit-chronicle"
+    Region: "us-east-2"
+  Metrics:
+    Enabled: true
+  Profiling:
+    Enabled: true
+    Listen: :3030
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "DEBUG"
+    ServiceLogFormat: "JSON"

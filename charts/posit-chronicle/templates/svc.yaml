@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chronicle-server
+  labels:
+    {{- include "posit-chronicle.service.labels" . | trim | nindent 4 }}
+    {{- include "posit-chronicle.service.selectorLabels" . | trim | nindent 4 }}
+  annotations:
+    {{- include "posit-chronicle.service.annotations" . | trim | nindent 4 }}
+spec:
+  selector:
+    {{- include "posit-chronicle.service.selectorLabels" . | trim | nindent 4 }}
+  ports:
+  {{- if .Values.config.HTTPS.Enabled }}
+  - port: {{ .Values.service.port }}
+    targetPort: 443
+    name: https
+  {{- else}}
+  - port: {{ .Values.service.port }}
+    targetPort: 5252
+    name: http
+  {{- end }}
+---
