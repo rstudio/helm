@@ -63,6 +63,7 @@ spec:
         env:
         {{- toYaml .Values.pod.env | nindent 8 }}
         {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
       volumes:
       - name: chronicle-server-config
         configMap:

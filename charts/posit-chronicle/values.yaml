@@ -44,6 +44,8 @@ pod:
   nodeSelector: {}
   # -- An array used verbatim as the pod's "tolerations" definition
   tolerations: []
+  # -- The termination grace period seconds allowed for the pod before shutdown
+  terminationGracePeriodSeconds: 30
 
 # If config.LocalStorage.Enabled is set to true,
 # the chart will provision a pvc of size storage.persistentVolumeSize for
