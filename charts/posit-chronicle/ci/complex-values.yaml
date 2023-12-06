@@ -6,6 +6,8 @@ serviceaccount:
   create: true
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::123123123123123:role/chronicle-serviceaccount-role
+  labels:
+    test-label: test-serviceaccount-label
 
 service:
   # -- The port to use for the REST service
@@ -35,6 +37,21 @@ pod:
   selectorLabels:
     test-selector-label: test-service-selectorLabel
     test-selector-label2: test-service-selectorLabel2
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: "fake-spot-instance/test"
+                operator: In
+                values:
+                  - "spot"
+  nodeSelector:
+    something: test-nodeSelector
+  tolerations:
+  - key: "test-tolerations-key"
+    operator: "Exists"
+    effect: "NoSchedule"
 
 storage:
   persistentVolumeSize: 10Gi
@@ -46,6 +63,14 @@ config:
     Enabled: true
     Key: /path/to/key
     Certificate: /path/to/cert
+  Metrics:
+    Enabled: true
+  Profiling:
+    Enabled: true
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "DEBUG"
+    ServiceLogFormat: "JSON"
   LocalStorage:
     Enabled: true
     Location: "./chronicle-data"
@@ -54,12 +79,3 @@ config:
     Enabled: true
     Bucket: "posit-chronicle"
     Region: "us-east-2"
-  Metrics:
-    Enabled: true
-  Profiling:
-    Enabled: true
-    Listen: :3030
-  Logging:
-    ServiceLog: "STDOUT"
-    ServiceLogLevel: "DEBUG"
-    ServiceLogFormat: "JSON"

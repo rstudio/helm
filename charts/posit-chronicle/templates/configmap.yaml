@@ -27,7 +27,7 @@ data:
 
     [Profiling]
     Enabled = {{ .Values.config.Profiling.Enabled }}
-    Listen = 3030
+    Listen = :3030
 
     [LocalStorage]
     Enabled = {{ .Values.config.LocalStorage.Enabled }}
