@@ -41,7 +41,7 @@ with the Workbench and Connect charts. To actually send data to the server, you
 will need to run the Chronicle agent as a sidecar container on your
 Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files
 
-Here is an example of Helm values to run the agent sidecar in Workbench:
+Here is an example of Helm values to run the agent sidecar in **Workbench**:
 
 ```yaml
 pod:
@@ -58,7 +58,7 @@ pod:
         value: "http://chronicle-server.default.svc.cluster.local"
 ```
 
-And here is an example of Helm values for Connect, where a Connect
+And here is an example of Helm values for **Connect**, where a Connect
 API key from a Kubernetes Secret is used to unlock more detailed metrics:
 
 ```yaml
