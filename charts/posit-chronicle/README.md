@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -22,11 +22,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.1.0:
+To install the chart with the release name `my-release` at version 0.2.0:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.1.0
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.2.0
 ```
 
 To explore other chart versions, take a look at:
@@ -38,9 +38,8 @@ helm search repo rstudio/posit-chronicle -l
 
 This chart deploys only the Chronicle server and is meant to be used in tandem
 with the Workbench and Connect charts. To actually send data to the server, you
-will need to run the Chronicle agent as a sidecar container on all of your
-Workbench or Connect server pods by setting `pod.sidecar` in their respective
-`values.yaml` files.
+will need to run the Chronicle agent as a sidecar container on your
+Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files
 
 Here is an example of Helm values to run the agent sidecar in Workbench:
 
@@ -84,8 +83,7 @@ Connect API key.
 
 ## Storage Configuration
 
-Chronicle can be configured to persist data to a local Kubernetes volume, AWS
-S3, or both.
+Chronicle can be configured to persist data to a local Kubernetes Volume, AWS S3, or both.
 
 The default configuration uses a local volume, which is suitable if you'd like to
 access and analyze the data within your cluster:
@@ -99,9 +97,8 @@ config:
 ```
 
 `retentionPeriod` controls how long usage data are kept. For example, `"120m"`
-for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for
-unbounded retention. (Units smaller than seconds or larger than days are not
-supported.)
+for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for unbounded retention.
+(Units smaller than seconds or larger than days are not supported.)
 
 You can also persist data to AWS S3 instead of (or in addition to) local
 storage:
@@ -118,8 +115,7 @@ config:
 
 If you are running on EKS, you can use [IAM Roles for Service
 Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
-to manage the credentials needed to access S3. In this scenario, once you have
-[created an IAM
+to manage the credentials needed to access S3. In this scenario, once you have [created an IAM
 role](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
 you can use this role as an annotation on the existing Service Account:
 
@@ -170,7 +166,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | config.S3Storage.Prefix | string | `""` |  |
 | config.S3Storage.Profile | string | `""` |  |
 | config.S3Storage.Region | string | `"us-east-2"` |  |
-| image.imagePullPolicy | string | `"Always"` |  |
+| image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
 | image.tag | string | `"2023.11.3"` |  |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
@@ -183,6 +179,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | pod.labels | object | `{}` | Additional labels to add to the chronicle-server pods |
 | pod.nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.selectorLabels | object | `{}` | Additional selector labels to add to the chronicle-server pods |
+| pod.terminationGracePeriodSeconds | int | `30` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | service.annotations | object | `{}` | Additional annotations to add to the chronicle-server service |

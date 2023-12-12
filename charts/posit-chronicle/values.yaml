@@ -1,7 +1,7 @@
 image:
   repository: "ghcr.io/rstudio/chronicle"
   tag: "2023.11.3"
-  imagePullPolicy: "Always"
+  imagePullPolicy: "IfNotPresent"
 
 serviceaccount:
   create: false
@@ -44,6 +44,8 @@ pod:
   nodeSelector: {}
   # -- An array used verbatim as the pod's "tolerations" definition
   tolerations: []
+  # -- The termination grace period seconds allowed for the pod before shutdown
+  terminationGracePeriodSeconds: 30
 
 # If config.LocalStorage.Enabled is set to true,
 # the chart will provision a pvc of size storage.persistentVolumeSize for
@@ -58,6 +60,14 @@ config:
     Enabled: false
     Key: ""
     Certificate: ""
+  Metrics:
+    Enabled: true
+  Profiling:
+    Enabled: false
+  Logging:
+    ServiceLog: "STDOUT"
+    ServiceLogLevel: "INFO"
+    ServiceLogFormat: "TEXT"
   LocalStorage:
     # If localStorage.enabled=false, the chronicle stateful-set
     # won't submit a volume claim or be bound to a persistent volume
@@ -71,11 +81,3 @@ config:
     Profile: ""
     # An AWS region must be set if S3 Storage is enabled
     Region: "us-east-2"
-  Metrics:
-    Enabled: true
-  Profiling:
-    Enabled: false
-  Logging:
-    ServiceLog: "STDOUT"
-    ServiceLogLevel: "INFO"
-    ServiceLogFormat: "TEXT"
