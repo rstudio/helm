@@ -1,3 +1,7 @@
+# 0.5.18
+
+- Update default Posit Package Manager version to 2023.12.0-13
+
 # 0.5.17
 
 - Add licensing section to the README to provide guidance on using a license file, license key or license server.
