@@ -2,7 +2,7 @@
 
 ![Version: 0.1.27](https://img.shields.io/badge/Version-0.1.27-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 0.1.27](https://img.shields.io/badge/AppVersion-0.1.27-informational?style=flat-square)
 
-#### _Helm library helpers for use by Official RStudio charts_
+#### _Helm library helpers for use by Official Posit charts_
 
 ## For Production
 
@@ -23,7 +23,7 @@ To ensure a stable production deployment, please:
 A ["library" chart](https://helm.sh/docs/topics/library_charts/) exists to provide helper functions for use by other
 helm charts.
 
-The functions and helpers defined in the `rstudio-library` chart are utilized by the other RStudio Helm charts.
+The functions and helpers defined in the `rstudio-library` chart are utilized by the other Posit Helm charts.
 
 It cannot be used directly.
 

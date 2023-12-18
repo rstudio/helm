@@ -23,14 +23,14 @@
 
 Individual helm charts have their own documentation
 
-- [RStudio Connect](./charts/rstudio-connect)
-- [RStudio Workbench](./charts/rstudio-workbench)
+- [Posit Connect](./charts/rstudio-connect)
+- [Posit Workbench](./charts/rstudio-workbench)
 - [Posit Package Manager](./charts/rstudio-pm)
 
 Examples:
 
 - [All Examples](./examples)
-    - [RStudio Connect](./examples/connect/)
+    - [Posit Connect](./examples/connect/)
     - [Standalone RBAC for the Job Launcher](./examples/rbac)
 
 ### Other Charts
@@ -46,7 +46,7 @@ Supporting and miscellaneous charts with varying levels of maintenance, usefulne
 
 **IMPORTANT:**
 
-These charts are provided as a convenience to RStudio customers. If you have
+These charts are provided as a convenience to Posit customers. If you have
 questions about these charts, you can ask them in the
 [issues](https://github.com/rstudio/helm/issues/new/choose) in the repository
 or to your support representative, who will route them appropriately.
