@@ -1,10 +1,10 @@
-# Posit Workbench
+# RStudio Workbench
 
 ![Version: 0.6.11](https://img.shields.io/badge/Version-0.6.11-informational?style=flat-square) ![AppVersion: 2023.09.1](https://img.shields.io/badge/AppVersion-2023.09.1-informational?style=flat-square)
 
-#### _Official Helm chart for Posit Workbench_
+#### _Official Helm chart for RStudio Workbench_
 
-Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
+Data Scientists use [RStudio Workbench](https://www.rstudio.com/products/workbench/) to analyze data and create data
 products using R and Python.
 
 ## IMPORTANT
@@ -83,7 +83,7 @@ In addition to the above required configuration, we recommend setting the follow
 
 * Set the `launcherPem` value to ensure that it stays the same between releases.
   This will ensure that users can continue to properly connect to older sessions even after a redeployment of the chart. See the
-  [Posit Workbench Admin Guide](https://docs.posit.co/ide/server-pro/job_launcher/job_launcher.html) for details on generating the file.
+  [RSW Admin Guide](https://docs.rstudio.com/ide/server-pro/job-launcher.html#authentication) for details on generating the file.
 * Set the `global.secureCookieKey` so that user authentication continues to work between deployments. A valid value can be obtained
   by simply running the `uuid` command.
 * Some use-cases may require special PAM profiles to run. By default, no PAM profiles other than the basic `auth` profile will be used to authenticate users.
@@ -125,18 +125,18 @@ Set a license server directly in your values file (`license.server`) or during `
 ## General Principles
 
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
-  valid `.ini` or `.dcf` file formats required by Posit Workbench. Those config files and their mount locations are
+  valid `.ini` or `.dcf` file formats required by RStudio Workbench. Those config files and their mount locations are
   below.
-- If you need to modify the jobs launched by Posit Workbench, you want to use `job-json-overrides`. There is a section on this below
+- If you need to modify the jobs launched by RStudio Workbench, you want to use `job-json-overrides`. There is a section on this below
   and [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
   on the topic in general.
-- The prestart scripts for Posit Workbench and Posit Launcher are highly customized to:
-  - Get the service account information off of the Posit Workbench pod for use in launching jobs
+- The prestart scripts for RStudio Workbench and RStudio Launcher are highly customized to:
+  - Get the service account information off of the RStudio Workbench pod for use in launching jobs
   - Generate `launcher.pub` as needed (if `launcher.pem` is provided). If it is not provided, the Helm chart will
     generate it automatically but this information can be lost if deleting the chart or moving to a new cluster. This
     can cause users to be locked out sessions started by a previous deployment.
-- Posit Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
-  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite).
+- RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
+  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
 ## Configuration files
 
@@ -220,12 +220,12 @@ config:
 
 ## User Provisioning
 
-Provisioning users in Posit Workbench containers is challenging. Session images have users created automatically (with
+Provisioning users in RStudio Workbench containers is challenging. Session images have users created automatically (with
 consistent UIDs / GIDs), but creating users in the Workbench containers is a responsibility that falls to the
 administrator today.
 
 The most common way to provision users is via `sssd`.
-The [latest Posit Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
+The [latest RStudio Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
 has `sssd` included and running by default (see `userProvisioning` configuration files above).
 
 The other way that this can be managed is via a lightweight "startup service" (runs once at startup and then sleeps forever)
@@ -234,19 +234,19 @@ However, it is important to be careful of a few points:
 
 - UID / GID consistency: linux usernames and their matching to UID/GID must be consistent across all nodes and across
   time. Failing this can cause security issues and access by some users to files they should not be allowed to see
-- usernames cannot have `@`. The `@` sign (often used in emails with SSO) is a problem for Posit Workbench because
+- usernames cannot have `@`. The `@` sign (often used in emails with SSO) is a problem for RStudio Workbench because
   some operating systems disallow `@` signs in linux usernames
 - `supervisord` is configured by default to exit if any of its child processes exit. If you use `config.startupCustom`
   to configure a user management service, be careful that it does not exit unnecessarily
 
-We do not provide such a service out of the box because we intend for Posit Workbench to solve this problem in a
+We do not provide such a service out of the box because we intend for RStudio Workbench to solve this problem in a
 future release. Please get in touch with your account representative if you have feedback or questions about this
 workflow.
 
 ### PAM
 
-When starting sessions on Posit Workbench, PAM configuration is often very important, even if PAM is not being used as
-an authentication mechanism. The Posit Workbench helm chart allows creating custom PAM files via the `config.pam`
+When starting sessions on RStudio Workbench, PAM configuration is often very important, even if PAM is not being used as
+an authentication mechanism. The RStudio Workbench helm chart allows creating custom PAM files via the `config.pam`
 values section.
 
 Each key under `config.pam` will become a PAM config file, and will be mounted into `/etc/pam.d/` in the container. For
@@ -263,7 +263,7 @@ config:
       # will be used verbatim
 ```
 
-## Posit Profiles
+## RStudio Profiles
 
 Profiles are used to define product behavior (in `.ini` file format) based on user and group membership.
 
@@ -408,7 +408,7 @@ Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | config.pam | object | `{}` | a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files |
 | config.profiles | object | `{}` | a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information. |
 | config.secret | string | `nil` | a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
-| config.server | object | [Posit Workbench Configuration Reference](https://docs.posit.co/ide/server-pro/reference/rserver_conf.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
+| config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
 | config.session | object | `{"notifications.conf":{},"repos.conf":{"RSPM":"https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":{}}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |

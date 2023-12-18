@@ -2,7 +2,7 @@
 
 ![Version: 0.2.18](https://img.shields.io/badge/Version-0.2.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.18](https://img.shields.io/badge/AppVersion-0.2.18-informational?style=flat-square)
 
-#### _RBAC definition for the Posit Job Launcher_
+#### _RBAC definition for the RStudio Job Launcher_
 
 ## For Production
 
@@ -35,7 +35,7 @@ helm search repo rstudio/rstudio-launcher-rbac -l
 > NOTE: this chart is intended primarily for use by individuals who _do not_
 > want to use our other Helm charts. This chart ONLY deploys RBAC or generates RBAC yaml directly
 >
-> It is _not needed_ if you are using other Posit Helm charts
+> It is _not needed_ if you are using other RStudio Helm charts
 
 To generate RBAC yaml for use with `kubectl apply`:
 ```
