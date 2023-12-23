@@ -1,0 +1,28 @@
+project: 
+  type: website
+  render: 
+    - README.md
+    - charts/rstudio-workbench/README.md 
+    - charts/rstudio-workbench/NEWS.md 
+    - charts/rstudio-connect/README.md
+    - charts/rstudio-connect/NEWS.md
+    - charts/rstudio-pm/README.md
+    - charts/rstudio-pm/NEWS.md
+    - charts/posit-chronicle/README.md
+    - charts/posit-chronicle/NEWS.md
+    - examples/auto-scaling/README.md
+    - examples/connect/README.md
+    - examples/rbac/README.md
+    - examples/workbench/README.md
+    - docs/customize.md
+
+format: 
+  html: 
+    theme:
+      dark: darkly
+    toc: true
+
+website: 
+  title: Posit Helm Charts
+  sidebar:
+    contents: auto
