@@ -4,3 +4,6 @@ charts/**/charts/
 /.cr-release-packages
 bin/**
 !bin/README.md
+
+/.quarto/
+_site/
