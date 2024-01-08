@@ -11,10 +11,13 @@ project:
     - charts/posit-chronicle/README.md
     - charts/posit-chronicle/NEWS.md
     - examples/auto-scaling/README.md
-    - examples/connect/README.md
     - examples/rbac/README.md
     - examples/workbench/README.md
     - docs/customize.md
+    - "*.qmd"
+
+filters:
+  - include-code-files
 
 format: 
   html: 
@@ -25,4 +28,50 @@ format:
 website: 
   title: Posit Helm Charts
   sidebar:
-    contents: auto
+    - id: guide
+      title: "Posit Helm Charts"
+      collapse-level: 1
+      contents:
+        - text: Overview
+          file: README.md
+        - section: "Posit Workbench"
+          contents:
+            - text: Overview
+              file: charts/rstudio-workbench/README.md
+            - text: Changelog
+              file: charts/rstudio-workbench/NEWS.md
+            - section: Examples
+              contents:
+                - text: Auto Scaling
+                  file: examples/auto-scaling/README.md
+                - text: Workbench
+                  file: examples/workbench/README.md
+
+        - section: "Posit Connect"
+          contents:
+            - text: Overview
+              file: charts/rstudio-connect/README.md
+            - text: Changelog
+              file: charts/rstudio-connect/NEWS.md
+            - section: Examples
+              contents:
+                - text: Custom Images with Off-Host Execution
+                  file: examples/connect/off-host-custom-images/index.qmd
+                - text: Using an AWS ELB for ingress
+                  file: examples/connect/aws-elb/index.qmd
+                - text: High Availability with NGINX Ingress
+                  file: examples/connect/high-availability-nginx-launcher/index.qmd
+                - text: High Availability with Traefik Ingress
+                  file: examples/connect/high-availability-traefik/index.qmd
+        - section: "Posit Package Manager"
+          contents:
+            - text: Overview
+              file: charts/rstudio-pm/README.md
+            - text: Changelog
+              file: charts/rstudio-pm/NEWS.md
+        - section: "Posit Chronicle"
+          contents:
+            - text: Overview
+              file: charts/posit-chronicle/README.md
+            - text: Changelog
+              file: charts/posit-chronicle/NEWS.md
