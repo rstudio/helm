@@ -19,7 +19,7 @@ project:
 format: 
   html: 
     theme:
-      dark: darkly
+      light: cosmo
     toc: true
 
 website: 
