@@ -44,8 +44,10 @@ website:
               contents:
                 - text: Auto Scaling
                   file: examples/auto-scaling/README.md
-                - text: Workbench
-                  file: examples/workbench/README.md
+                - text: Custom NFS Mounts
+                  file: examples/workbench/custom-nfs-mounts.qmd
+                - text: Single Node and `sssd`
+                  file: examples/workbench/single-node-workbench.qmd
 
         - section: "Posit Connect"
           contents:
