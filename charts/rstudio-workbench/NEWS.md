@@ -1,3 +1,7 @@
+# 0.6.12
+
+- Bump Workbench version to 2023.12.0
+
 # 0.6.11
 
 - Add licensing section to the README to provide guidance on using a license file, license key or license server.
