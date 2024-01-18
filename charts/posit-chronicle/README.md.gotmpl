@@ -36,7 +36,7 @@ pod:
         mountPath: "/var/lib/rstudio-server/audit"
       env:
       - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default.svc.cluster.local"
+        value: "http://chronicle-server.default"
 ```
 
 And here is an example of Helm values for Connect, where a **Connect**
@@ -49,7 +49,7 @@ pod:
       image: ghcr.io/rstudio/chronicle-agent:2023.10.4
       env:
       - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default.svc.cluster.local"
+        value: "http://chronicle-server.default"
       - name: CONNECT_API_KEY
         valueFrom:
           secretKeyRef:

@@ -53,12 +53,7 @@ pod:
       image: ghcr.io/rstudio/chronicle-agent:2023.10.4
       env:
       - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default.svc.cluster.local"
-      - name: CONNECT_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: connect
-            key: apikey
+        value: "http://chronicle-server.default"
   priorityClassName: something-fun
   tolerations:
     - key: "example-key"

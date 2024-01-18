@@ -42,7 +42,7 @@ pod:
         mountPath: "/var/lib/rstudio-server/audit"
       env:
       - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default.svc.cluster.local"
+        value: "http://chronicle-server.default"
     - name: busybox-sidecar
       image: "busybox"
       imagePullPolicy: "IfNotPresent"
