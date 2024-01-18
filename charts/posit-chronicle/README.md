@@ -79,7 +79,7 @@ pod:
       - name: CONNECT_API_KEY
         valueFrom:
           secretKeyRef:
-            name: connect-api-key
+            name: connect
             key: apikey
 ```
 
