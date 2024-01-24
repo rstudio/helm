@@ -1,6 +1,8 @@
 # 0.6.13
 
 - Add option to set `pod.terminationGracePeriodSeconds`
+- Add protection for `prestart-launcher.bash` to be OS-agnostic in certificate modification 
+  ([#453](https://github.com/rstudio/helm/pull/453))
 
 # 0.6.12
 
