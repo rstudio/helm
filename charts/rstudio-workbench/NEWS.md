@@ -1,3 +1,7 @@
+# 0.6.13
+
+- Add option to set `pod.terminationGracePeriodSeconds`
+
 # 0.6.12
 
 - Bump Workbench version to 2023.12.0

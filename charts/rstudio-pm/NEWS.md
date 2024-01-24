@@ -1,3 +1,7 @@
+# 0.5.19
+
+- Add option to set `pod.terminationGracePeriodSeconds`
+
 # 0.5.18
 
 - Update default Posit Package Manager version to 2023.12.0-13

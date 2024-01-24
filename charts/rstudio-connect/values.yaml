@@ -118,6 +118,8 @@ pod:
   securityContext: {}
   # -- The containerPort used by the main pod container
   port: 3939
+  # -- The termination grace period seconds allowed for the pod before shutdown
+  terminationGracePeriodSeconds: 120
 
 # -- The pod's run command. By default, it uses the container's default
 command: []
