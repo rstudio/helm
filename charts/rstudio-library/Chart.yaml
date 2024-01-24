@@ -1,6 +1,6 @@
 apiVersion: v2
 name: rstudio-library
-description: Helm library helpers for use by Official RStudio charts
+description: Helm library helpers for use by official RStudio charts
 type: library
 version: 0.1.27
 appVersion: 0.1.27
@@ -23,3 +23,4 @@ annotations:
 keywords:
   - "rstudio"
   - "library"
+  - "posit"
