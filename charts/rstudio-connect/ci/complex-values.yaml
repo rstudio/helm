@@ -25,6 +25,9 @@ service:
 podDisruptionBudget:
   minAvailable: 30%
 
+nodeSelector:
+  something: special
+
 pod:
   env:
     - name: RSTUDIO_CONNECT_HASTE
@@ -45,9 +48,13 @@ pod:
       command: ["sleep"]
       args: ["infinity"]
       imagePullPolicy: "IfNotPresent"
+    # This will spin up the chronicle-agent sidecar container
+    - name: chronicle-agent
+      image: ghcr.io/rstudio/chronicle-agent:2023.10.4
+      env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://chronicle-server.default"
   priorityClassName: something-fun
-  nodeSelector:
-    something: special
   tolerations:
     - key: "example-key"
       operator: "Exists"
