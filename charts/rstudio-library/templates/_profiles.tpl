@@ -155,7 +155,7 @@
   Builds a single ini file
   Modified from rstudio-library.config.ini to:
     - collapse arrays
-    - via rstudio-library.profiles.collapse-array.ini
+    - via rstudio-library.profiles.ini.collapse-array
 */}}
 {{- define "rstudio-library.profiles.ini.singleFile" -}}
 {{- range $parent, $child := . -}}
