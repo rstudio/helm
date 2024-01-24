@@ -209,9 +209,7 @@ spec:
       {{- if .Values.pod.sidecar }}
 {{ toYaml .Values.pod.sidecar | indent 6 }}
       {{- end }}
-      {{- with .Values.pod.terminationGracePeriodSeconds }}
-      terminationGracePeriodSeconds: {{ . }}
-      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
       volumes:
       - name: rstudio-connect-config
         configMap:
