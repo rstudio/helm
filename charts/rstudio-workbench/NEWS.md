@@ -1,8 +1,12 @@
-# 0.6.13
+# 0.6.14
 
 - Add option to set `pod.terminationGracePeriodSeconds`
 - Add protection for `prestart-launcher.bash` to be OS-agnostic in certificate modification 
   ([#453](https://github.com/rstudio/helm/pull/453))
+
+# 0.6.13
+
+- Bump Workbench version to 2023.12.1
 
 # 0.6.12
 
