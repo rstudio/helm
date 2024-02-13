@@ -1,3 +1,7 @@
+# 0.1.28
+
+- Tweak docs a bit
+
 # 0.1.27
 
 - Fix an issue with `mountPath` and `subPath` when `license.file.mountSubPath` is `true` ([#427](https://github.com/rstudio/helm/issues/427)).

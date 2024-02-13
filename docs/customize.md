@@ -1,12 +1,12 @@
 # Customize Kubernetes Jobs
 
-This doc discusses customizing Kubernetes Jobs in the context of the RStudio Job Launcher.
-This is relevant for both RStudio Workbench and RStudio Connect when the job launcher is enabled.
+This doc discusses customizing Kubernetes Jobs in the context of the Posit Job Launcher.
+This is relevant for both Posit Workbench and Posit Connect when the job launcher is enabled.
 
 ## Job Json Overrides
 
 The original mechanism for modifying kubernetes jobs using the Job Launcher is to use 
-[`job-json-overrides`](https://docs.rstudio.com/job-launcher/kube.html#kube-json).
+[`job-json-overrides`](https://docs.posit.co/ide/server-pro/job_launcher/job_launcher.html).
 
 [There is a support article discussing the topic and examples in a legacy context 
 here](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
@@ -36,10 +36,10 @@ See examples below.
 
 ### Override Syntax
 
-The `job-json-override` spec is discussed in detail [in the RStudio Launcher documentation](https://docs.rstudio.com/job-launcher/kube.html#kube-json).
+The `job-json-override` spec is discussed in detail [in the Posit Launcher documentation](https://docs.posit.co/ide/server-pro/job_launcher/job_launcher.html).
 It uses the [JSON Pointer RFC](https://tools.ietf.org/html/rfc6901).
 
-Some points that will be helpful to reference:
+Some points that are helpful to reference:
 
 - An array suffixed with `-` will "append" to the array (i.e. `/spec/templates/spec/volumes/-` will leave pre-defined volumes
   intact, but add a new entry)
@@ -61,7 +61,7 @@ Add a placement constraint to the session pod with key `kubernetes.io/key` and v
 ```
 
 **NOTE**: it is possible to use
-the [`placement-constraints` configuration](https://docs.rstudio.com/job-launcher/kube.html#kube-profiles) within the "
+the [`placement-constraints` configuration](https://docs.posit.co/ide/server-pro/job_launcher/job_launcher.html) within the "
 Profiles" configuration. However, this modifies the Workbench UI and is not enabled by default. (It requires user input to have
 the profiles included)
 

@@ -166,6 +166,7 @@ spec:
       {{- if .Values.extraContainers }}
         {{- toYaml .Values.extraContainers | nindent 6 }}
       {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
       volumes:
       - name: rstudio-pm-config
         configMap:

@@ -1,3 +1,7 @@
+# 0.5.13
+
+- Add option to set `pod.terminationGracePeriodSeconds`
+
 # 0.5.12
 
 - Bump Connect version to 2024.01.0

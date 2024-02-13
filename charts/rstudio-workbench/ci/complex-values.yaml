@@ -15,25 +15,35 @@ replicas: 2
 sealedSecret:
   enabled: true
   annotations:
-    is-a-sealed-secret: yes
+    is-a-sealed-secret: "yes"
 
 revisionHistoryLimit: 3
+
 pod:
   env:
     - name: TEST_ENV_WORKS
       value: "true"
   volumeMounts:
-    - name: key
-      mountPath: /tmp/somepath
+    - name: logs
+      mountPath: "/var/lib/rstudio-server/audit"
   volumes:
-    - name: key
+    - name: logs
       emptyDir: {}
   labels:
     app.kubernetes.io/part-of: rstudio-team
   annotations:
     testannotation2: three
+  # This will spin up the chronicle-agent sidecar container
   sidecar:
-    - name: test
+    - name: chronicle-agent
+      image: ghcr.io/rstudio/chronicle-agent:2023.10.4
+      volumeMounts:
+      - name: logs
+        mountPath: "/var/lib/rstudio-server/audit"
+      env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://chronicle-server.default"
+    - name: busybox-sidecar
       image: "busybox"
       imagePullPolicy: "IfNotPresent"
 

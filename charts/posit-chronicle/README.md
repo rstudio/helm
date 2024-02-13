@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -22,11 +22,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.0:
+To install the chart with the release name `my-release` at version 0.2.1:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.2.0
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.2.1
 ```
 
 To explore other chart versions, take a look at:
@@ -41,36 +41,41 @@ with the Workbench and Connect charts. To actually send data to the server, you
 will need to run the Chronicle agent as a sidecar container on your
 Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files
 
-Here is an example of Helm values to run the agent sidecar in Workbench:
+Here is an example of Helm values to run the agent sidecar in **Workbench**,
+where we set up a shared volume between containers for audit logs:
 
 ```yaml
 pod:
+  # We will need to create a new volume to share audit logs between
+  # the rstudio (workbench) and chronicle-agent containers
+  volumes:
+    - name: logs
+      emptyDir: {}
+  volumeMounts:
+    - name: logs
+      mountPath: "/var/lib/rstudio-server/audit"
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:2023.11.3
+      image: ghcr.io/rstudio/chronicle-agent:2023.10.4
       volumeMounts:
-      - name: CHRONICLE_PRODUCT_CLUSTER_ID
-        value: "posit-cluster-1"
       - name: logs
         mountPath: "/var/lib/rstudio-server/audit"
       env:
       - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default.svc.cluster.local"
+        value: "http://chronicle-server.default"
 ```
 
-And here is an example of Helm values for Connect, where a Connect
+And here is an example of Helm values for Connect, where a **Connect**
 API key from a Kubernetes Secret is used to unlock more detailed metrics:
 
 ```yaml
 pod:
   sidecar:
     - name: chronicle-agent
-      image: posit-chronicle:2023.11.3
+      image: ghcr.io/rstudio/chronicle-agent:2023.10.4
       env:
-      - name: CHRONICLE_PRODUCT_CLUSTER_ID
-        value: "posit-cluster-1"
       - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default.svc.cluster.local"
+        value: "http://chronicle-server.default"
       - name: CONNECT_API_KEY
         valueFrom:
           secretKeyRef:

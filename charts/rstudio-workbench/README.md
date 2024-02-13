@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.13](https://img.shields.io/badge/Version-0.6.13-informational?style=flat-square) ![AppVersion: 2023.12.1](https://img.shields.io/badge/AppVersion-2023.12.1-informational?style=flat-square)
+![Version: 0.6.14](https://img.shields.io/badge/Version-0.6.14-informational?style=flat-square) ![AppVersion: 2023.12.1](https://img.shields.io/badge/AppVersion-2023.12.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,11 +27,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.13:
+To install the chart with the release name `my-release` at version 0.6.14:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.13
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.14
 ```
 
 To explore other chart versions, take a look at:
@@ -472,6 +472,7 @@ Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | pod.port | int | `8787` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the service pod |
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
+| pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
