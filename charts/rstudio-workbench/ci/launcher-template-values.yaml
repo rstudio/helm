@@ -10,6 +10,7 @@ launcher:
       annotations:
         five: six
     job:
+      ttlSecondsAfterFinished: 99
       annotations:
         seven: eight
       labels:

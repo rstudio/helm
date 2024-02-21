@@ -1,7 +1,11 @@
+# 0.6.15
+
+- Added `ttlSecondsAfterFinished` to `job.tpl` for session jobs.
+
 # 0.6.14
 
 - Add option to set `pod.terminationGracePeriodSeconds`
-- Add protection for `prestart-launcher.bash` to be OS-agnostic in certificate modification 
+- Add protection for `prestart-launcher.bash` to be OS-agnostic in certificate modification
   ([#453](https://github.com/rstudio/helm/pull/453))
 
 # 0.6.13
@@ -32,7 +36,7 @@
 # 0.6.7
 
 - Add native session support for `pip.conf`
-  - In order to mount a `pip.conf` file to `/etc/pip.conf` on server and sessions, 
+  - In order to mount a `pip.conf` file to `/etc/pip.conf` on server and sessions,
     just define the file in `config.session.pip\\.conf`
 
 # 0.6.6

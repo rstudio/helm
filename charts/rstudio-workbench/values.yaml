@@ -106,6 +106,7 @@ launcher:
     job:
       annotations: {}
       labels: {}
+      ttlSecondsAfterFinished: null
 
 homeStorage:
   # -- whether to create the persistentVolumeClaim for homeStorage
