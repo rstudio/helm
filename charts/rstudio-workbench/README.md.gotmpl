@@ -117,7 +117,7 @@ the `XDG_CONFIG_DIRS` environment variable
   - mounted at `/mnt/session-secret/`
 - Secret Configuration
   - These configuration files are mounted into the server with more restrictive permissions (0600)
-  - `database.conf`, `openid-client-secret`, etc.
+  - `database.conf`, `openid-client-secret`, `databricks.conf`
   - They are located in the `config.secret.<< name of file >>` helm values
   - mounted at `/mnt/secret-configmap/rstudio/`
 - Server Configuration
@@ -161,6 +161,37 @@ config:
   - `pam` configuration files
   - Located at `config.pam.<< name of file >>` helm values
   - Will be mounted verbatim as individual files (using `subPath` mounts) at `/etc/pam.d/<< name of file >>`
+
+### Configuring R and Python repositories
+
+#### R repositories
+
+R package repositories can be configured with `config.session.repos.conf`.
+
+```
+config:
+  session:
+    repos.conf:
+      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+```
+
+For more information about configuring CRAN repositories in Workbench refer to the [Admin Guide](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories).
+
+#### Python repositories
+
+pip can be configured with `config.session.pip.conf`. To ensure `pip.conf` is mounted into the session pods it is important that `launcher.useTemplates: true` is set and `pip.conf` settings are listed under `config.session` like in the example below for adding Posit Public Package Manager's PyPI.
+
+```
+launcher:
+  useTemplates: true
+
+config:
+  session:
+    pip.conf:
+      "global":
+        index-url: https://packagemanager.posit.co/pypi/latest/simple
+        trusted-host: packagemanager.posit.co
+```
 
 ## User Provisioning
 
