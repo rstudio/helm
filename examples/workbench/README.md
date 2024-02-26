@@ -1,5 +1,16 @@
 # RStudio Workbench examples
 
+The examples in this directory provide a starting point for deploying RStudio Workbench in
+different configurations. Each example has a beginning description and a series of `# TODO` comments.
+Before using an example, read through all the comments and ensure you address each `# TODO`.
+
+While each example focuses on one or more particular configurations, RStudio Workbench has some
+standard requirements listed in each example. Each example will need the following to run correctly:
+- PostgreSQL database specified in the Workbench configuration
+- License key or file specified
+- homeStorage configured
+- sharedStorage configured
+
 ## Application Configuration
 
 ### [Recommended Application Configuration](./application-configuration/rstudio-workbench-recommended-app-config.yaml)
