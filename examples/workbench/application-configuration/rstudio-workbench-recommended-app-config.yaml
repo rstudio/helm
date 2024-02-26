@@ -1,0 +1,98 @@
+# This example deploys RStudio Workbench with Recommended Application
+# Configuration.
+#
+# These settings are recommend for most deployments and are described below:
+# - Set replicas > 1 to deploy Workbench load balanced
+# - Set a default Posit Connect URL
+# - Set a default Posit Package Manager CRAN URL
+# - Set a default Posit Package Manager PyPI URL
+# - Set RStudio Pro IDE timeout settings
+# - Set Jupyter IDE timeout settings
+# - Enable the administrator dashboard
+# - Set user group(s) to have admin and admin super user permissions
+# - Set default and max resource limits for users
+#
+# The focus of this example is on best practice application
+# configuration, however there are a few requirements to run Workbench.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for homeStorage and userStorage provisioning
+# and a PostgreSQL database.
+
+replicas: 2 # TODO: Adjust the amount depending on your requirements
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: workbench.lic # TODO: Change to the secret key containing your Workbench license
+
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-home-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 1G
+
+launcher:
+  useTemplates: true # Required when specifying custom PyPI repos in `pip.conf`
+
+config:
+  session:
+    rsession.conf:
+      default-rsconnect-server: "" # TODO: Add your Posit Connect URL to auto populate for users
+      # These settings apply to RStudio Pro IDE sessions
+      session-timeout-minutes: 60 # TODO: Adjust based on your requirements
+      session-timeout-suspend: 1
+      session-quit-child-processes-on-exit: 1
+    repos.conf:
+      # By default Posit Public Package Manager (P3M) is the default R 
+      # repository for Workbench users. This is recommended as P3M provides
+      # linux binaries for many R packages which will decrease package 
+      # installation time. If you have your own Posit Package Manager server
+      # then replace with the URL. Note you can list multiple repos in 
+      # `repos.conf` but you must include one repo named "CRAN".
+      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest # TODO: Change this URL to point to your own Package Manager CRAN URL if desired
+    pip.conf:
+      "global":
+        index-url: https://packagemanager.posit.co/pypi/latest/simple # TODO: Change this URL to point to your own Package Manager PyPI URL if desired
+        trusted-host: packagemanager.posit.co # TODO: Change this to match the domain name specified in `index-url`. Do NOT include http:// or https://
+  server:
+    rserver.conf:
+      admin-enabled: 1 # More information at https://docs.posit.co/ide/server-pro/server_management/administrative_dashboard.html
+      admin-group: "admingroup" # TODO: Specify Linux group(s) to give administrator privileges
+      admin-superuser-group: "admin-superuser-group" # TODO: Specify Linux group(s) to give administrator superuser privileges
+    jupyter.conf:
+      # These settings apply to Jupyter Notebook and JupyterLab IDE sessions
+      session-cull-minutes: 60 # TODO: Adjust based on your requirements
+      session-shutdown-minutes: 5
+  profiles:
+    launcher.kubernetes.profiles.conf:
+      "*": # TODO: Adjust based on your requirements
+        # These settings are applied for all users and can be changed to suit
+        # your particular user needs. See the following resources for more information:
+        # https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#etcrstudiolauncherkubernetesprofilesconf
+        # https://docs.posit.co/ide/server-pro/job_launcher/kubernetes_plugin.html#kube-profiles
+        default-cpus: "1.0"
+        default-mem-mb: "2048"
+        max-cpus: "4.0"
+        max-mem-mb: "8192"
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=verify-full" # TODO: Change this URI to reach your Postgres database.
+      password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.secret.database\.conf.password=<your-postgres-password>.
+  

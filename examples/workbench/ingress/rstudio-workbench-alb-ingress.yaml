@@ -1,0 +1,72 @@
+# This example deploys RStudio Workbench with an Ingress using the
+# AWS Load Balancer Controller to create an Application Load Balancer (ALB).
+#
+# This example is provided to show how to set the proper annotations to
+# enabled session affinity, redirect HTTP traffic to HTTPS and use AWS
+# Certificate Manager if desired.
+# The AWS Load Balancer Controller has a variety of settings and modes of
+# operation. Please visit the AWS documentation for more details specific
+# to your use case:
+# https://kubernetes-sigs.github.io/aws-load-balancer-controller/
+#
+# The focus of this example is on ALB Ingress setup, however there are a
+# few requirements to run Workbench.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for homeStorage and userStorage provisioning
+# and a PostgreSQL database.
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: workbench.lic # TODO: Change to the secret key containing your Workbench license
+
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-home-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 1G
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  ingressClassName: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=86400
+    alb.ingress.kubernetes.io/target-type: ip # target-type: ip is required to work with sticky sessions
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/scheme: internet-facing # TODO: Set to internet-facing or internal
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:<REGION>:<AWS_ACCOUNT_ID>:certificate/<CERT_ID> # TODO: If you are using AWS Certificate Manager, enter one or more ARNs
+  hosts:
+    - host: workbench.example.com # TODO: Change to your domain
+      paths: 
+        - "/" # TODO: Change to your desired path
+  tls: # This tls section is only required if you are manually supplying a certificate/key, it may not be required if you are using AWS Certificate Manager, cert-manager, or another automatic TLS certificate manager.
+    - secretName: posit-workbench-tls # TODO: Change to the name of your secret of type kubernetes.io/tls
+      hosts:
+        - workbench.example.com # TODO: Change to your domain
+
+config:
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=verify-full" # TODO: Change this URI to reach your Postgres database.
+      password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.secret.database\.conf.password=<your-postgres-password>.

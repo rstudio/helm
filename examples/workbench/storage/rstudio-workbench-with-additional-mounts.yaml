@@ -1,0 +1,79 @@
+# This example deploys RStudio Workbench with Additional Mounts
+#
+# The PersistentVolume allows setting NFS mountOptions
+# it creates a storage class that RStudio Workbench then takes advantage of
+# when it creates its PersistentVolumeClaim.
+#
+# sharedStorage is not needed in this example as
+# `config.server.rserver.conf.server-shared-storage-path` is set to put the 
+# required shared storage folder in /home
+#
+# Both the PVC and PV will be left around after the helm release is removed (for manual cleanup)
+#
+# The focus of this example is on setting up a PV backed by NFS, however there
+# are a few requirements to run Workbench.
+# To use the example you will need a license file or key, a NFS server and a PostgreSQL database.
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: workbench.lic # TODO: Change to the secret key containing your Workbench license
+
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-home-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 1G
+
+# This section is used to mount to the Workbench container which is
+# often used to add in additional configuration and TLS certificates
+# which are not needed in the session containers.
+pod:
+  volumeMounts:
+  - mountPath: /mnt/data # TODO: Change to your desired mount path
+    name: shared-data
+  volumes:
+  - name: shared-data
+      # Could be any type of volume... persistentVolumeClaim, configMap, etc.
+      # Could also provision a PVC or PV via `extraObjects` if desired
+    persistentVolumeClaim:
+      claimName: shared-data-pvc # TODO: Change to an available PVC
+
+# This section is only needed if you need to mount to the session containers
+# which is often the case if you need to mount data for users to access
+# in their IDE sessions.
+launcher:
+  useTemplates: true # Required to mount the session pods
+  templateValues:
+    volumeMounts:
+    - mountPath: /mnt/data # TODO: Change to your desired mount path
+      name: shared-data
+    volumes:
+    - name: shared-data
+      # Could be any type of volume... persistentVolumeClaim, configMap, etc.
+      # Could also provision a PVC or PV via `extraObjects` if desired
+      persistentVolumeClaim:
+        claimName: shared-data-pvc # TODO: Change to an available PVC
+
+config:
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=verify-full" # TODO: Change this URI to reach your Postgres database.
+      password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.secret.database\.conf.password=<your-postgres-password>.

@@ -1,0 +1,69 @@
+# This example deploys RStudio Workbench using Private Container Images.
+#
+# Both the Workbench and session container images may be customized in
+# the helm chart to pull from your own container registry instead of the
+# public Posit provided images. This example also shows where to provide
+# private registry credentials in the form of a Kubernetes secret of type
+# kubernetes.io/dockercfg
+# Note the credentials secret must be specified twice to apply to Workbench
+# and the session images (shown in the example).
+#
+# The focus of this example is on private container images, however there
+# are a few requirements to run Workbench.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for homeStorage and userStorage provisioning
+# and a PostgreSQL database.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: workbench.lic # TODO: Change to the secret key containing your Workbench license
+
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-home-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 1G
+
+image:
+  tagPrefix: ubuntu2204- # TODO: Change to match your custom image tag prefix
+  repository: "rstudio/r-session-complete" # TODO: Change to match your custom image repository
+  tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
+  imagePullSecrets:
+    - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
+
+session:
+  image:
+    tagPrefix: ubuntu2204- # TODO: Change to match your custom image tag prefix
+    repository: "rstudio/r-session-complete" # TODO: Change to match your custom image repository
+    tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
+
+launcher:
+  useTemplates: true # Required to set `imagePullSecrets` for `session.image`
+  templateValues:
+    imagePullSecrets:
+    - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
+
+config:
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=verify-full" # TODO: Change this URI to reach your Postgres database.
+      password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.secret.database\.conf.password=<your-postgres-password>.

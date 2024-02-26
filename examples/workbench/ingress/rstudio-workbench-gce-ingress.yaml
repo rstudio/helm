@@ -1,0 +1,92 @@
+# This example deploys RStudio Workbench with an Ingress using the
+# GKE Ingress Controller to create a GCP Application Load Balancer.
+#
+# This example is provided to show how to set the proper annotations to
+# enabled session affinity, redirect HTTP traffic to HTTPS and use GCP
+# Certificate Manager if desired.
+# The GKE Ingress Controller has a variety of settings and modes of
+# operation. Please visit the GCP documentation for more details specific
+# to your use case:
+# https://cloud.google.com/kubernetes-engine/docs/how-to/load-balance-ingress
+#
+# The focus of this example is on GKE Ingress setup, however there are a few 
+# requirements to run Workbench.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for homeStorage and userStorage provisioning
+# and a PostgreSQL database.
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: workbench.lic # TODO: Change to the secret key containing your Workbench license
+
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-home-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 1G
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: gce # Note ingress.ingressClassName cannot be used for gce, it must be supplied as an annotation.
+    kubernetes.io/ingress.global-static-ip-name: workbench-static-ip # TODO: Change to your static IP name 
+    networking.gke.io/managed-certificates: workbench-managed-cert # TODO: If you are using GCP Certificate Manager, change this to match your ManagedCertificate name
+    networking.gke.io/v1beta1.FrontendConfig: workbench-frontend-config
+    kubernetes.io/ingress.allow-http: "true" # FrontendConfig defined in extraObjects redirects HTTP to HTTPS with a 301
+  hosts:
+    - host: workbench.example.com # TODO: Change to your domain
+      paths: 
+        - "/" # TODO: Change to your desired path
+  tls: # This tls section is only required if you are manually supplying a certificate/key, it may not be required if you are using cert-manager, GCP Certificage Manager, or another automatic TLS certificate manager.
+    - secretName: posit-workbench-tls # TODO: Change to the name of your secret of type kubernetes.io/tls
+      hosts:
+        - workbench.example.com # TODO: Change to your domain
+
+service:
+  type: NodePort # Required by gce ingress
+  annotations:
+    cloud.google.com/backend-config: '{"ports": {"http":"workbench-backend-config"}}'
+
+# GCE uses custom resources to configure the load balancer/service
+extraObjects:
+  - apiVersion: networking.gke.io/v1beta1
+    kind: FrontendConfig
+    metadata:
+      name: workbench-frontend-config
+    spec:
+      redirectToHttps:
+        enabled: true
+        responseCodeName: MOVED_PERMANENTLY_DEFAULT
+  - apiVersion: cloud.google.com/v1
+    kind: BackendConfig
+    metadata:
+      name: workbench-backend-config
+    spec:
+      timeoutSec: 60
+      sessionAffinity:
+        affinityType: "GENERATED_COOKIE"  
+        affinityCookieTtlSec: 86400
+
+config:
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=verify-full" # TODO: Change this URI to reach your Postgres database.
+      password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.secret.database\.conf.password=<your-postgres-password>.
