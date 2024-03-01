@@ -1,0 +1,17 @@
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: efs-client
+  requests:
+    storage: 8G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: efs-client
+  requests:
+    storage: 1G
+
+userCreate: true
