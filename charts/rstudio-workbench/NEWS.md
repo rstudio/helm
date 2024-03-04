@@ -1,6 +1,15 @@
+# 0.6.16
+
+- Update default package manager repo in `config.session.repos.conf`
+- Remove `--verbose` from args in `config.server.vscode.conf`
+- Add instructions for configuring R and Python repos in the README
+- Add empty JSON to `rstudio-prefs.json` default
+- Add documentation for `databricks.conf`
+- Increase `readinessProbe.initialDelaySeconds` to `10`
+
 # 0.6.15
 
-- Added `ttlSecondsAfterFinished` to `job.tpl` for session jobs.
+- Add `ttlSecondsAfterFinished` to `job.tpl` for session jobs.
 
 # 0.6.14
 

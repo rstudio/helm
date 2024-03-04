@@ -222,7 +222,7 @@ readinessProbe:
   httpGet:
     path: /health-check
     port: 8787
-  initialDelaySeconds: 3
+  initialDelaySeconds: 10
   periodSeconds: 3
   timeoutSeconds: 1
   successThreshold: 1
@@ -404,15 +404,15 @@ config:
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:
-      RSPM: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
     rsession.conf: {}
     notifications.conf: {}
-    rstudio-prefs.json: {}
+    rstudio-prefs.json: |
+      {}
   # -- a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default
   sessionSecret: {}
-  # -- a map of secret, server-scoped config files. Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions
+  # -- a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions
   secret:
-    # "database.conf": {}
   # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
   userProvisioning: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
@@ -452,7 +452,7 @@ config:
     vscode.conf:
       enabled: 1
       exe: /opt/code-server/bin/code-server
-      args: --verbose --host=0.0.0.0
+      args: --host=0.0.0.0
     vscode-user-settings.json: |
       {
             "terminal.integrated.shell.linux": "/bin/bash",
