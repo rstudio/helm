@@ -3,7 +3,7 @@ nameOverride: ""
 # -- The full name of the release (can be overridden)
 fullnameOverride: ""
 
-# -- A Connect version to override the "tag" for the RStudio Connect image and the Content Init image. Necessary until https://github.com/helm/helm/issues/8194
+# -- A Connect version to override the "tag" for the Posit Connect image and the Content Init image. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
 sharedStorage:
@@ -65,7 +65,7 @@ priorityClassName: ""
 # -- Pod disruption budget
 podDisruptionBudget: {}
 
-# -- Defines the RStudio Connect image to deploy
+# -- Defines the Posit Connect image to deploy
 image:
   # -- The repository to use for the main pod image
   repository: ghcr.io/rstudio/rstudio-connect
@@ -268,7 +268,7 @@ launcher:
   includeDefaultTemplates: true
   # -- whether to include the templateValues rendering process
   includeTemplateValues: true
-  # -- Values to pass along to the RStudio Connect session templating process
+  # -- Values to pass along to the Posit Connect session templating process
   templateValues:
     service:
       type: ClusterIP
@@ -297,7 +297,7 @@ launcher:
     job:
       annotations: {}
       labels: {}
-  # -- Image definition for the default RStudio Connect Content InitContainer
+  # -- Image definition for the default Posit Connect Content InitContainer
   defaultInitContainer:
     # -- Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way.
     enabled: true
@@ -313,7 +313,7 @@ launcher:
     securityContext: {}
 
 # -- A nested map of maps that generates the rstudio-connect.gcfg file
-# @default -- [RStudio Connect Configuration Reference](https://docs.rstudio.com/connect/admin/appendix/configuration/)
+# @default -- [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/)
 config:
   HTTP:
     Listen: :3939
