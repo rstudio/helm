@@ -145,7 +145,9 @@ config:
 ```
 
 ### Needed S3 Policy Permissions
+
 The credentials Chronicle uses for S3 storage must have the following permissions enabled:
+
 - `s3:GetObject`
 - `s3:ListBucket`
 - `s3:PutObject`

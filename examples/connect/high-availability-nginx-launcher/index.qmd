@@ -1,0 +1,6 @@
+# High Availability with NGINX and Launcher
+
+High availability using `nginx` as an ingress controller and the Job Launcher to launch sessions separate from the Posit Connect host itself (BETA).
+
+```{.yaml include="values.yaml" filename="values.yaml"}
+```
