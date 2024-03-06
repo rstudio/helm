@@ -479,12 +479,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ print $myvar }}
 {{ end }}
 
-{{- define "rstudio-workbench.annotations" -}}
-{{- range $key,$value := .Values.service.annotations -}}
-{{ $key }}: {{ $value | quote }}
-{{ end }}
-{{- end -}}
-
 {{- define "rstudio-workbench.pod.annotations" -}}
 {{- range $key,$value := $.Values.pod.annotations -}}
 {{ $key }}: {{ $value | quote }}
