@@ -15,7 +15,7 @@
 # The focus of this example is on NGINX Ingress setup, however there are a few 
 # requirements to run Workbench.
 # To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for homeStorage and userStorage
+# POSIX compliant storage class for homeStorage and sharedStorage
 # and a PostgreSQL database.
 
 # Using a license file with the helm chart:
