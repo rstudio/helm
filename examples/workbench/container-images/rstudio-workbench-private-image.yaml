@@ -1,4 +1,5 @@
-# This example deploys RStudio Workbench using Private Container Images.
+# This example deploys RStudio Workbench using images in a private
+# container registry.
 #
 # Both the Workbench and session container images may be customized in
 # the helm chart to pull from your own container registry instead of the
@@ -6,12 +7,12 @@
 # private registry credentials in the form of a Kubernetes secret of type
 # kubernetes.io/dockercfg
 # Note the credentials secret must be specified twice to apply to Workbench
-# and the session images (shown in the example).
+# and the session images (shown in the example below).
 #
 # The focus of this example is on private container images, however there
 # are a few requirements to run Workbench.
 # To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for homeStorage and userStorage provisioning
+# POSIX compliant storage class for homeStorage and userStorage
 # and a PostgreSQL database.
 
 
@@ -44,7 +45,7 @@ sharedStorage:
 
 image:
   tagPrefix: ubuntu2204- # TODO: Change to match your custom image tag prefix
-  repository: "rstudio/r-session-complete" # TODO: Change to match your custom image repository
+  repository: "rstudio/rstudio-workbench" # TODO: Change to match your custom image repository
   tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
   imagePullSecrets:
     - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets

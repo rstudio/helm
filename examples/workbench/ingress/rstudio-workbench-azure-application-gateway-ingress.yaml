@@ -2,7 +2,7 @@
 # Azure Application Gateway Ingress Controller to create a
 # Azure Application Gateway load balancer.
 #
-# This example is provided to show how to set the proper annotations to
+# This example is provided to show how to set annotations to
 # enabled session affinity and to redirect HTTP traffic to HTTPS.
 # The Azure Application Gateway Ingress Controller has a variety of settings 
 # and modes of operation. Please visit the Azure documentation for more details
@@ -12,7 +12,7 @@
 # The focus of this example is on Azure Application Gateway Ingress setup,
 # however there are a few requirements to run Workbench.
 # To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for homeStorage and userStorage provisioning
+# POSIX compliant storage class for homeStorage and userStorage
 # and a PostgreSQL database.
 
 # Using a license file with the helm chart:
@@ -41,9 +41,6 @@ sharedStorage:
   # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
   requests:
     storage: 1G
-
-service:
-  type: ClusterIP
 
 ingress:
   enabled: true

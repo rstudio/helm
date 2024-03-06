@@ -10,7 +10,7 @@
 # The focus of this example is on authentication and user provisioning
 # configuration, however there are a few requirements to run Workbench.
 # To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for homeStorage and userStorage provisioning
+# POSIX compliant storage class for homeStorage and userStorage
 # and a PostgreSQL database.
 
 
@@ -46,7 +46,7 @@ config:
     rserver.conf:
       auth-openid: 1
       auth-openid-issuer: https://login.example.com # TODO: Change to match your IdP
-      auth-openid-username-claim: preferred_username # TODO: Verify this works with your IdP
+      auth-openid-username-claim: preferred_username # TODO: Verify this works with your IdP. This claim must match the Linux account usernames.
   secret:
     database.conf:
       provider: "postgresql"
@@ -55,7 +55,7 @@ config:
     openid-client-secret:
       client-id: lllllllllllll-xxxxxxxxxxxxxxxxxxxxxx # TODO: Change to your client-id
       client-secret: BhCC6rK7Sj2ZtPH0ord7lO1w # TODO: Change to your client-secret
-  # TODO: Fill out the details of sssd.conf for your specific LDAP endpoint. sssd is already present in the Workbench image.
+  # TODO: Fill out the details of sssd.conf for your specific AD/LDAP setup. sssd is already present in the Workbench image.
   userProvisioning:
     example.com.conf:
       sssd:
