@@ -91,7 +91,8 @@ service:
   # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
   # expose the service using your cloud provider's load balancer)
   type: ClusterIP
-  # -- The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically
+  # -- The explicit nodePort to use for `service.type` NodePort. If not
+  # provided, Kubernetes will choose one automatically
   nodePort: false
   # -- The port to use for the Connect service
   port: 80
