@@ -1,6 +1,6 @@
 # RStudio Connect
 
-![Version: 0.5.14](https://img.shields.io/badge/Version-0.5.14-informational?style=flat-square) ![AppVersion: 2024.02.0](https://img.shields.io/badge/AppVersion-2024.02.0-informational?style=flat-square)
+![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![AppVersion: 2024.02.0](https://img.shields.io/badge/AppVersion-2024.02.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.14:
+To install the chart with the release name `my-release` at version 0.6.0:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.5.14
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.0
 ```
 
 To explore other chart versions, take a look at:
@@ -192,11 +192,13 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources | object | `{}` | Defines resources for the rstudio-connect container |
 | securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
-| service.annotations | object | `{}` | Annotations that will be added onto the service |
-| service.nodePort | bool | `false` | The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically |
+| service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
+| service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
+| service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
+| service.nodePort | bool | `false` | The explicit nodePort to use for `service.type` NodePort. If not provided, Kubernetes will choose one automatically |
 | service.port | int | `80` | The port to use for the Connect service |
 | service.targetPort | int | `3939` | The port to forward to on the Connect pod. Also see pod.port |
-| service.type | string | `"NodePort"` | The service type (LoadBalancer, NodePort, etc.) |
+| service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |
