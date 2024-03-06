@@ -47,4 +47,4 @@ standard requirements listed in each example. Each example will need the followi
 
 ## Migration
 
-### [Beta Migration](./beta-migration/README.md)
+### [Beta Migration](./beta-migration)
