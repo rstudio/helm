@@ -175,8 +175,9 @@ sealedSecret:
 service:
   # -- annotations for the service definition
   annotations: {}
-  # -- the service type (i.e. NodePort, LoadBalancer, etc.)
-  type: NodePort
+  # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
+  # expose the service using your cloud provider's load balancer)
+  type: ClusterIP
   # -- the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically
   nodePort: false
   # -- The Service port. This is the port your service will run under.
