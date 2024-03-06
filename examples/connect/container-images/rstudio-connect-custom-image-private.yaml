@@ -6,6 +6,10 @@
 # and content init container. Additional content containers may be added to
 # provide more R, Python and Quarto versions and other system dependencies.
 #
+# These images can be pulled from your own container registry instead of the
+# public Posit provided images. This example also shows where to provide
+# private registry credentials in the form of a Kubernetes secret of type
+# kubernetes.io/dockercfg
 # Note the registry credentials secret must be specified in two places in the
 # values to apply to Connect, content and init containers
 # (shown in the example below).
