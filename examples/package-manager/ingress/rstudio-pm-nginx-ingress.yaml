@@ -1,0 +1,59 @@
+# This example deploys RStudio Package Manager with an Ingress using the
+# Ingress NGINX Controller.
+#
+# The Ingress NGINX Controller has a variety of settings 
+# and modes of operation. Please visit the NGINX controller documentation for more details
+# specific to your use case:
+# https://kubernetes.github.io/ingress-nginx/
+#
+# NOTE: this example is for the Ingress NGINX Controller which is part of
+# Kubernetes. If you are using the NGINX or NGINX Plus Ingress Controllers from # NGINX Inc located at https://github.com/nginxinc/kubernetes-ingress then
+# different annotations will need to be applied.
+#
+# The focus of this example is on NGINX Ingress setup, however there
+# are a few requirements to run Package manager.
+# To use the example you will need a license file or key,
+# a PostgreSQL database and either a ReadWriteMany
+# POSIX compliant storage class for sharedStorage or S3.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-pm#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-pm#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: packagemanager.lic # TODO: Change to the secret key containing your Package Manager license
+
+# Configures Package Manager shared storage
+# This should NOT be set if using S3 for storage
+# Docs here on using S3 instead: https://github.com/rstudio/helm/tree/main/charts/rstudio-pm#s3-configuration
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: pm-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+ingress:
+  enabled: true
+  ingressClassName: "nginx"  # TODO: Fill in your desired ingressClassName for the ingress resource. If blank it will use the cluster default.
+  hosts:
+    - host: packagemanager.example.com # TODO: Change to your domain
+      paths: 
+        - "/" # TODO: Change to your desired path
+  tls: # This section is only required if you are supplying a certificate/key secret.
+    - secretName: posit-packagemanager-tls # TODO: Change to the name of your secret of type kubernetes.io/tls
+      hosts:
+        - packagemanager.example.com # TODO: Change to your domain
+
+config:
+  Database:
+    Provider: postgres
+  Postgres:
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>" # TODO: Change this URI to reach your Postgres database.
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>
+    UsageDataURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>" # TODO: Change this URI to reach your Postgres database for metrics. This must be either a seperate database or scheam from the main Package Manager database.
+    UsageDataPassword: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>

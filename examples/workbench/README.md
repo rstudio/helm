@@ -1,26 +1,46 @@
 # RStudio Workbench examples
 
-### [RStudio Workbench with Custom NFS Mount Options](./rstudio-workbench-with-pv.yaml)
+The examples in this directory provide a starting point for deploying RStudio Workbench in
+different configurations. Each example has a beginning description and a series of `# TODO` comments.
+Before using an example, read through all the comments and ensure you address each `# TODO`.
 
-This example deploys RStudio Workbench with a PersistentVolume.
+While each example focuses on one or more particular configurations, RStudio Workbench has some
+standard requirements listed in each example. Each example will need the following to run correctly:
+- PostgreSQL database specified in the Workbench configuration
+- License key or file specified
+- `homeStorage` configured
+- `sharedStorage` configured
 
-The PersistentVolume allows setting NFS mountOptions. It creates a storage class that RStudio Workbench then takes
-advantage of when it creates its PersistentVolumeClaim.
+## Application Configuration
 
-PVC and PV will be left around after the helm release is removed (for manual cleanup). This protects data from being
-deleted
+### [Recommended Application Configuration](./application-configuration/rstudio-workbench-recommended-app-config.yaml)
 
-### [RStudio Workbench with a Single Node and `sssd`](./rstudio-workbench-single-node-with-sssd.yaml)
+## Container Image Configuration
 
-This example deploys RStudio Workbench with a single node. `strategy` and `replicas` are set accordingly, and this setup
-should work even if using a `ReadWriteOnce` storage class. NOTE that the SQLite database will reside on the `sharedStorage`
-persistent volume claim.
+### [Custom Images](./container-images/rstudio-workbench-custom-image.yaml)
 
-- Set `replicas: 1`
-- Set strategy to `Recreate` so that the pod is stopped before starting another
-- Create separate `homeStorage` and `sharedStorage` PVCs
-- Configure `sssd` to point at an example domain and connect to LDAP with a bind account and password
+### [Custom Images in Private Registry](./container-images/rstudio-workbench-custom-image-private.yaml)
 
-NOTE: before upgrading to HA, you will need to:
-- Switch / migrate to using PostgreSQL as a database
-- Migrate the `sharedStorage` and `homeStorage` to a `ReadWriteMany` (`RWX`) storage class like NFS
+## Authentication & User Provisioning
+
+### [OIDC SSO Authentication and SSSD User Provisioning](./auth-user-provisioning/rstudio-workbench-oidc-sssd.yaml)
+
+### [SAML SSO Authentication and SSSD User Provisioning](./auth-user-provisioning/rstudio-workbench-saml-sssd.yaml)
+
+## Ingress
+
+### [NGINX Ingress](./ingress/rstudio-workbench-nginx-ingress.yaml)
+
+### [Traefik Ingress](./ingress/rstudio-workbench-traefik-ingress.yaml)
+
+### [ALB Ingress](./ingress/rstudio-workbench-alb-ingress.yaml)
+
+### [GCE Ingress](./ingress/rstudio-workbench-gce-ingress.yaml)
+
+### [Azure Application Gateway Ingress](./ingress/rstudio-workbench-azure-application-gateway-ingress.yaml)
+
+## Storage
+
+### [Additional volumes](./storage/rstudio-workbench-with-additional-mounts.yaml)
+
+### [NFS backed PersistentVolume](./storage/rstudio-workbench-with-pv.yaml)
