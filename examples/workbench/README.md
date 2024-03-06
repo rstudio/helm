@@ -17,7 +17,9 @@ standard requirements listed in each example. Each example will need the followi
 
 ## Container Image Configuration
 
-### [Using Private Images](./container-images/rstudio-workbench-private-image.yaml)
+### [Custom Images](./container-images/rstudio-workbench-custom-image.yaml)
+
+### [Custom Images in Private Registry](./container-images/rstudio-workbench-custom-image-private.yaml)
 
 ## Authentication & User Provisioning
 
