@@ -178,6 +178,11 @@ service:
   # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
   # expose the service using your cloud provider's load balancer)
   type: ClusterIP
+  # -- The cluster-internal IP to use with `service.type` ClusterIP
+  clusterIP: ""
+  # -- The external IP to use with `service.type` LoadBalancer, when supported
+  # by the cloud provider
+  loadBalancerIP: ""
   # -- The explicit nodePort to use for `service.type` NodePort. If not
   # provided, Kubernetes will choose one automatically
   nodePort: false
