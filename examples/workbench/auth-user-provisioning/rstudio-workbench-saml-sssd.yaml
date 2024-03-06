@@ -8,7 +8,7 @@
 # The focus of this example is on authentication and user provisioning
 # configuration, however there are a few requirements to run Workbench.
 # To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for homeStorage and userStorage provisioning
+# POSIX compliant storage class for homeStorage and userStorage
 # and a PostgreSQL database.
 
 
@@ -48,11 +48,11 @@ config:
   server:
     rserver.conf:
       auth-saml: 1
-      auth-saml-sp-attribute-username: NameID # TODO: Verify this works with your IdP
+      auth-saml-sp-attribute-username: NameID # TODO: Verify this works with your IdP. This attribute must match the Linux account usernames.
       auth-saml-metadata-url: https://idp.example.com/saml/metadata # TODO: Change to match your IdP
-      # auth-saml-idp-post-binding is set to 0 by default but some IdPs require it be set to 1
+      # auth-saml-idp-post-binding is set to 0 by default but some IdPs require it be set to 1 (see below):
       # auth-saml-idp-post-binding: 1
-  # TODO: Fill out the details of sssd.conf for your specific LDAP endpoint. sssd is already present in the Workbench image.
+  # TODO: Fill out the details of sssd.conf for your specific AD/LDAP setup. sssd is already present in the Workbench image.
   userProvisioning:
     example.com.conf:
       sssd:

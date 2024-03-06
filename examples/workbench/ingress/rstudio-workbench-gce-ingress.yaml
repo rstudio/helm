@@ -1,7 +1,7 @@
 # This example deploys RStudio Workbench with an Ingress using the
 # GKE Ingress Controller to create a GCP Application Load Balancer.
 #
-# This example is provided to show how to set the proper annotations to
+# This example is provided to show how to set annotations to
 # enabled session affinity, redirect HTTP traffic to HTTPS and use GCP
 # Certificate Manager if desired.
 # The GKE Ingress Controller has a variety of settings and modes of
@@ -12,7 +12,7 @@
 # The focus of this example is on GKE Ingress setup, however there are a few 
 # requirements to run Workbench.
 # To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for homeStorage and userStorage provisioning
+# POSIX compliant storage class for homeStorage and userStorage
 # and a PostgreSQL database.
 
 # Using a license file with the helm chart:
@@ -47,7 +47,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: gce # Note ingress.ingressClassName cannot be used for gce, it must be supplied as an annotation.
     kubernetes.io/ingress.global-static-ip-name: workbench-static-ip # TODO: Change to your static IP name 
-    networking.gke.io/managed-certificates: workbench-managed-cert # TODO: If you are using GCP Certificate Manager, change this to match your ManagedCertificate name
+    networking.gke.io/managed-certificates: workbench-managed-cert # TODO: If you are using GCP Certificate Manager, change this to match your ManagedCertificate name (example created in extraObjects below)
     networking.gke.io/v1beta1.FrontendConfig: workbench-frontend-config
     kubernetes.io/ingress.allow-http: "true" # FrontendConfig defined in extraObjects redirects HTTP to HTTPS with a 301
   hosts:
@@ -60,7 +60,6 @@ ingress:
         - workbench.example.com # TODO: Change to your domain
 
 service:
-  type: NodePort # Required by gce ingress
   annotations:
     cloud.google.com/backend-config: '{"ports": {"http":"workbench-backend-config"}}'
 
@@ -83,6 +82,23 @@ extraObjects:
       sessionAffinity:
         affinityType: "GENERATED_COOKIE"  
         affinityCookieTtlSec: 86400
+      healthCheck:
+        checkIntervalSec: 15
+        timeoutSec: 5
+        healthyThreshold: 1
+        unhealthyThreshold: 3
+        type: HTTP
+        requestPath: "/health-check"
+        port: 8787
+  - apiVersion: networking.gke.io/v1
+    kind: ManagedCertificate
+    metadata:
+      name: workbench-managed-cert
+    spec:
+      domains:
+        # TODO: if you want to use GCP managed certificates, change this to your domain, otherwise delete this ManagedCertificate object
+        # Please note that wildcard domains are NOT allowed
+        - workbench.example.com   
 
 config:
   secret:

@@ -1,7 +1,7 @@
 # This example deploys RStudio Workbench with an Ingress using the
 # Traefik Ingress Controller.
 #
-# This example is provided to show how to set the proper annotations to
+# This example is provided to show how to set annotations to
 # enabled session affinity and to redirect HTTP traffic to HTTPS.
 # The Traefik Ingress Controller has a variety of settings 
 # and modes of operation. Please visit the Traefik documentation for more details
@@ -11,7 +11,7 @@
 # The focus of this example is on Traefik Ingress setup, however there are a
 # few requirements to run Workbench.
 # To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for homeStorage and userStorage provisioning
+# POSIX compliant storage class for homeStorage and userStorage
 # and a PostgreSQL database.
 
 # Using a license file with the helm chart:

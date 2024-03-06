@@ -8,8 +8,8 @@ While each example focuses on one or more particular configurations, RStudio Wor
 standard requirements listed in each example. Each example will need the following to run correctly:
 - PostgreSQL database specified in the Workbench configuration
 - License key or file specified
-- homeStorage configured
-- sharedStorage configured
+- `homeStorage` configured
+- `sharedStorage` configured
 
 ## Application Configuration
 
@@ -39,6 +39,6 @@ standard requirements listed in each example. Each example will need the followi
 
 ## Storage
 
-### [Additional volumeMounts](./storage/rstudio-workbench-with-additional-mounts.yaml)
+### [Additional volumes](./storage/rstudio-workbench-with-additional-mounts.yaml)
 
 ### [NFS backed PersistentVolume](./storage/rstudio-workbench-with-pv.yaml)

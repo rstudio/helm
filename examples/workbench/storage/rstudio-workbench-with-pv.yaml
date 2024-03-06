@@ -1,4 +1,5 @@
-# This example deploys RStudio Workbench with a single PersistentVolume
+# This example deploys RStudio Workbench with a single PersistentVolume backed
+# by an NFS server
 #
 # The PersistentVolume allows setting NFS mountOptions
 # it creates a storage class that RStudio Workbench then takes advantage of
@@ -8,7 +9,8 @@
 # `config.server.rserver.conf.server-shared-storage-path` is set to put the 
 # required shared storage folder in /home
 #
-# Both the PVC and PV will be left around after the helm release is removed (for manual cleanup)
+# Both the PVC and PV will be left around after the helm release is removed
+# (for manual cleanup)
 #
 # The focus of this example is on setting up a PV backed by NFS, however there
 # are a few requirements to run Workbench.
@@ -27,7 +29,7 @@ homeStorage:
   create: true
   storageClassName: "nfs-workbench-home-pv"
   requests:
-    storage: "64Gi"
+    storage: 100G
 
 # This is evaluated as a template
 # Change the `mountOptions` and `nfs` settings to suite your NFS setup
