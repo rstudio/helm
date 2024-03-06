@@ -22,9 +22,9 @@ spec:
   - name: http
     protocol: TCP
     port: {{ .Values.service.port }}
-    {{- if .Values.service.nodePort }}
+{{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
-    {{- end }}
+{{- end }}
     targetPort: {{ .Values.service.targetPort }}
   {{- if .Values.prometheusExporter.enabled }}
   - name: metrics
