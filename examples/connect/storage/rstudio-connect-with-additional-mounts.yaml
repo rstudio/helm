@@ -1,0 +1,77 @@
+# This example deploys RStudio Connect with additional mounts
+#
+# This example shows how to mount an additional PVC to the Connect and 
+# the content pods. This pattern of specifying the volumes and volumeMounts
+# will work for a variety of volume types PVC, ConfigMap, etc. Depending on the
+# need to add additional volumes, you may only need to mount to Connect or
+# content pods but not both. For example, if you need to add TLS certificates
+# for Connect then the session pods do not need the volumes.
+#
+# The focus of this example is on setting up additional mounts, however there
+# are a few requirements to run Connect.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: connect-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# This section is used to mount to the Connect container which is
+# often used to add in additional configuration and TLS certificates
+# which are not needed in the session containers.
+pod:
+  volumeMounts:
+  - mountPath: /mnt/data # TODO: Change to your desired mount path
+    name: shared-data
+  volumes:
+  - name: shared-data
+    # Could be any type of volume... persistentVolumeClaim, configMap, etc.
+    # Could also provision a PVC or PV via `extraObjects` if desired
+    persistentVolumeClaim:
+      claimName: shared-data-pvc # TODO: Change to an available PVC
+
+# This section is only needed if you need to mount to the content containers
+# which is often the case if you need to mount data for content to access.
+launcher:
+  enabled: true # Required for Off-Host Execution mode
+  useTemplates: true
+  templateValues:
+    pod:
+      volumeMounts:
+        - mountPath: /mnt/data # TODO: Change to match your desired mount path
+          name: shared-data
+      volumes:
+        - name: shared-data
+          # Could be any type of volume... persistentVolumeClaim, configMap, etc.
+          # Could also provision a PVC or PV via `extraObjects` if desired
+          persistentVolumeClaim:
+            claimName: shared-data-pvc # TODO: Change to match your desired PVC
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.

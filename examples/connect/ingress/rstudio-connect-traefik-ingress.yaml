@@ -1,0 +1,67 @@
+# This example deploys RStudio Connect with an Ingress using the
+# Traefik Ingress Controller.
+#
+# This example is provided to show how to set annotations to
+# enabled session affinity and to redirect HTTP traffic to HTTPS.
+# The Traefik Ingress Controller has a variety of settings 
+# and modes of operation. Please visit the Traefik documentation for more
+# details specific to your use case:
+# https://doc.traefik.io/traefik/providers/kubernetes-ingress/
+#
+# The focus of this example is on Traefik Ingress setup, however there are a few # requirements to run Connect.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: connect-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+ingress:
+  enabled: true
+  ingressClassName: "traefik"  # TODO: Fill in your desired ingressClassName for the ingress resource. If blank it will use the cluster default.
+  hosts:
+    - host: connect.example.com # TODO: Change to your domain
+      paths: 
+        - "/" # TODO: Change to your desired path
+  tls: # This section is only required if you are supplying a certificate/key secret.
+    - secretName: posit-connect-tls # TODO: Change to the name of your secret of type kubernetes.io/tls
+      hosts:
+        - connect.example.com # TODO: Change to your domain
+
+service:
+  # Required to set session affinity
+  annotations: 
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.name: posit-connect
+    traefik.ingress.kubernetes.io/service.sticky.cookie.secure: "true"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.samesite: "none"
+    traefik.ingress.kubernetes.io/service.sticky.cookie.httponly: "true"
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.

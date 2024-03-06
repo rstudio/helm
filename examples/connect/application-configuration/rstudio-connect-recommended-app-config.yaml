@@ -1,0 +1,92 @@
+# This example deploys RStudio Connect with the recommended application
+# configuration.
+#
+# These settings are recommend for most deployments and are described below:
+# - Set replicas > 1 to deploy Connect load balanced across multiple pods
+#   https://docs.posit.co/connect/admin/load-balancing/
+# - Set a default Posit Package Manager CRAN URL
+#   https://docs.posit.co/connect/admin/r/package-management/#configuring-on-posit-connect
+# - Set a default Posit Package Manager PyPI URL
+#   https://docs.posit.co/connect/admin/python/package-management/#configuring-pip
+# - Enable Quarto content
+#   https://docs.posit.co/connect/admin/quarto/#enabling-quarto-support
+#
+# The focus of this example is on best practice application
+# configuration, however there are a few requirements to run Connect.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+replicas: 2 # TODO: Adjust the amount depending on your requirements
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: connect-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Required to set a custom PyPI repo
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: pip-config-connect
+    data:
+      # TODO: if using Posit Package Manager, edit the below to match your package manager python repo URL
+      pip.conf: |
+        [global]
+        timeout = 60
+        index-url = https://packagemanager.posit.co/pypi/latest/simple
+        trusted-host = packagemanager.posit.co
+
+launcher:
+  enabled: true
+  useTemplates: true
+  # Required to set a custom PyPI repo
+  templateValues:
+    pod:
+      volumes:
+        - name: pip-config-volume
+          configMap:
+            name: pip-config-connect
+      volumeMounts:
+        - mountPath: /etc/pip.conf
+          name: pip-config-volume
+          subPath: pip.conf
+
+securityContext:
+  privileged: false
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.
+
+  Authentication:
+  "RPackageRepository \"CRAN\"":
+    URL: https://packagemanager.posit.co/cran/__linux__/jammy/latest # TODO: If using Package Manager change to match your package manager R repo url
+  # If using other R repos, add them here using the below format  
+  # "RPackageRepository \"INTERNAL\"":
+  #   URL: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+  Quarto:
+    Enabled: true

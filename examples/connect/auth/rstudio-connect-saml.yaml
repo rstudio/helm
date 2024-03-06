@@ -1,0 +1,76 @@
+# This example deploys RStudio Connect using SAML SSO for authentication.
+#
+# Users will be authenticated via SSO (using SAML) and users will be created
+# in Connect upon first login or creation via the Connect API using certain
+# attributes received from the IdP.
+#
+# The focus of this example is on authentication configuration, however there
+# are a few requirements to run Connect.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: connect-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+launcher:
+  enabled: true # Required for Off-Host Execution mode
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  Authentication:
+    Provider: saml
+  SAML:
+    # Please see https://docs.posit.co/connect/admin/authentication/saml-based/saml/ for more examples of custom SAML integrations
+    IdPMetaDataURL: "https://idp.example.com/saml/metadata" # TODO: Change to match your saml provider's metadata url
+    IdPAttributeProfile: default # TODO: Change to match your auth provider. Accepted values are "okta", "azure" (Azure AD/Entra ID), and "default" (all others)
+    # Setting IdPAttributeProfile will match Connect with certain attributes.
+    # These can be customized instead by not setting SAML.IdPAttributeProfile
+    # and defining each attribute instead in this section.
+    # https://docs.posit.co/connect/admin/authentication/saml-based/azure-ad-saml/#saml-attributes
+    # 
+    # Enable this for a better user experience, unless
+    # managing a large number of groups is a concern:
+    # GroupsAutoProvision: true
+    #
+    # When troubleshooting a SAML problem, more verbose logging
+    # is produced by uncommenting the following line:
+    # Logging: true
+    #
+  # By default all users get created with the Viewer role which is the default
+  # setting in Authorization.DefaultUserRole, which can be modified.
+  # Users can be automatically mapped to different roles based on group
+  # membership.
+  # https://docs.posit.co/connect/admin/authentication/oauth2-openid-based/openid-connect/#user-role-mapping
+  #
+  # Authorization:
+  #   UserRoleGroupMapping: true
+  #   PublisherRoleMapping: "Developers"
+  #   AdministratorRoleMapping: "Administrators"
+  #
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.

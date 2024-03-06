@@ -1,0 +1,98 @@
+# This example deploys RStudio Connect with an Ingress using the
+# GKE Ingress Controller to create a GCP Application Load Balancer.
+#
+# This example is provided to show how to set annotations to
+# enabled session affinity, redirect HTTP traffic to HTTPS and use GCP
+# Certificate Manager if desired.
+# The GKE Ingress Controller has a variety of settings and modes of
+# operation. Please visit the GCP documentation for more details specific
+# to your use case:
+# https://cloud.google.com/kubernetes-engine/docs/how-to/load-balance-ingress
+#
+# The focus of this example is on a GKE Ingress setup, however there are a few # requirements to run Connect.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: connect-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: gce # TODO: Fill in your desired ingress class for the ingress resource. Note ingress.ingressClassName cannot be used for GKE ingress, it must be supplied as an annotation.
+    kubernetes.io/ingress.global-static-ip-name: connect-static-ip # TODO: Change to your static IP name 
+    networking.gke.io/managed-certificates: connect-managed-cert # TODO: If you are using GCP Certificate Manager, change this to match your ManagedCertificate name
+    networking.gke.io/v1beta1.FrontendConfig: connect-frontend-config # TODO: Change to match the name of the FrontendConfig defined in extraObjects
+    kubernetes.io/ingress.allow-http: "true" # FrontendConfig defined in extraObjects redirects HTTP to HTTPS with a 301
+  hosts:
+    - host: connect.example.com # TODO: Change to your domain
+      paths: 
+        - "/" # TODO: Change to your desired path
+  tls: # This section is only required if you are supplying a certificate/key secret.
+    - secretName: posit-connect-tls # TODO: Change to the name of your secret of type kubernetes.io/tls
+      hosts:
+        - connect.example.com # TODO: Change to your domain
+
+service:
+  annotations:
+    cloud.google.com/backend-config: '{"ports": {"http":"connect-backend-config"}}' # TODO: Change to match the name of the BackendConfig defined in extraObjects
+
+extraObjects:
+  # GCE uses custom resources to configure the load balancer/service
+  - apiVersion: networking.gke.io/v1beta1
+    kind: FrontendConfig
+    metadata:
+      name: connect-frontend-config
+    spec:
+      redirectToHttps:
+        enabled: true
+        responseCodeName: MOVED_PERMANENTLY_DEFAULT
+  - apiVersion: cloud.google.com/v1
+    kind: BackendConfig
+    metadata:
+      name: connect-backend-config
+    spec:
+      timeoutSec: 60
+      # Required for session affinity
+      sessionAffinity:
+        affinityType: "GENERATED_COOKIE"  
+        affinityCookieTtlSec: 86400
+  - apiVersion: networking.gke.io/v1
+    kind: ManagedCertificate
+    metadata:
+      name: connect-managed-cert
+    spec:
+      domains:
+        # TODO: if you want to use GCP managed certificates, change this to your domain, otherwise delete this ManagedCertificate object
+        # Please note that wildcard domains are NOT allowed
+        - connect.example.com   
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.

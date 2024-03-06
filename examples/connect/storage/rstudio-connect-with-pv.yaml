@@ -1,0 +1,72 @@
+# This example deploys RStudio Connect with a single PersistentVolume backed
+# by an NFS server
+#
+# The PersistentVolume allows setting NFS mountOptions
+# it creates a storage class that RStudio Connect then takes advantage of
+# when it creates its PersistentVolumeClaim.
+#
+# Both the PVC and PV will be left around after the helm release is removed
+# (for manual cleanup)
+#
+# The focus of this example is on setting up a PV backed by NFS, however there
+# are a few requirements to run Connect.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: "nfs-connect-sharedstorage-pv" # TODO: Ensure this name matches the name and storageClassName defined in the PV created below in extraObjects.
+  requests:
+    storage: 100G
+
+# This is evaluated as a template
+# Change the `mountOptions` and `nfs` settings to suite your NFS setup
+extraObjects:
+  - |
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: nfs-connect-sharedstorage-pv
+      annotations:
+        "helm.sh/resource-policy": keep
+    spec:
+      capacity:
+        storage: {{ .Values.sharedStorage.requests.storage }}
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteMany
+      persistentVolumeReclaimPolicy: Retain
+      storageClassName: nfs-connect-sharedstorage-pv
+      mountOptions:
+        - rw
+        - lookupcache=pos
+        - vers=4
+      nfs:
+        path: /
+        server: nfs.server.example.com
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.
