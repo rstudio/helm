@@ -1,4 +1,4 @@
-# 0.6.17
+# 0.7.0
 
 - BREAKING: The generated service will now have type `ClusterIP` by default.
 - Add support for setting the `loadBalancerIP` or `clusterIP`.
