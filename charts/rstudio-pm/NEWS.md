@@ -1,7 +1,6 @@
 # 0.5.20
 
-- Configured the default value of `config.Server.RVersion` to `""` so that R version auto-detection will be used ([#473](https://github.com/rstudio/helm/issues/473)).
-- Configured the default value of `config.Server.PythonVersion` to `""` so that R version auto-detection will be used ([#473](https://github.com/rstudio/helm/issues/473)).
+- Removed`config.Server.RVersion` from the values.yaml. This does not need to be configured, R version auto-detection will be used ([#473](https://github.com/rstudio/helm/issues/473)).
 
 # 0.5.19
 
