@@ -47,7 +47,7 @@ sharedStorage:
 
 ingress:
   enabled: true
-  ingressClassName: "nginx"
+  ingressClassName: "nginx" # TODO: Fill in your desired ingressClassName for the ingress resource. If blank it will use the cluster default.
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/affinity-mode: persistent

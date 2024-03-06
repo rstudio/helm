@@ -6,8 +6,9 @@
 # public Posit provided images. This example also shows where to provide
 # private registry credentials in the form of a Kubernetes secret of type
 # kubernetes.io/dockercfg
-# Note the credentials secret must be specified twice to apply to Workbench
-# and the session images (shown in the example below).
+# Note the registry credentials secret must be specified in two places in the
+# values to apply to Workbench and the session images
+# (shown in the example below).
 #
 # The focus of this example is on private container images, however there
 # are a few requirements to run Workbench.
@@ -48,7 +49,7 @@ image:
   repository: "rstudio/rstudio-workbench" # TODO: Change to match your custom image repository
   tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
   imagePullSecrets:
-    - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
+    - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster containing authentication credentials to your registry. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
 
 session:
   image:
@@ -60,7 +61,7 @@ launcher:
   useTemplates: true # Required to set `imagePullSecrets` for `session.image`
   templateValues:
     imagePullSecrets:
-    - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
+    - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster containing authentication credentials to your registry. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
 
 config:
   secret:

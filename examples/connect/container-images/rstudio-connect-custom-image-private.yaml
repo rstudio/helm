@@ -1,0 +1,98 @@
+# This example deploys RStudio Connect using custom images in registries
+# requiring authentication instead of the default public Posit provided images.
+#
+# There are a minimum of three images that Connect requires to function in
+# Off-Host Execution mode include the Connect container, content container
+# and content init container. Additional content containers may be added to
+# provide more R, Python and Quarto versions and other system dependencies.
+#
+# Note the registry credentials secret must be specified in two places in the
+# values to apply to Connect, content and init containers
+# (shown in the example below).
+#
+# Also note the launcher.templateValues.pod.imagePullSecrets provides the
+# pod-level imagePullSecret that provides the secret to pull the 
+# launcher.defaultInitContainer as well.
+#
+# The focus of this example is on using custom images in private registries,
+# however there are a few requirements to run Connect.
+# To use the example you will need a license file or key, a ReadWriteMany
+# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: connect-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Define the custom image for the Connect pod(s)
+image:
+  repository: ghcr.io/rstudio/rstudio-connect # TODO: Change to match your custom image repository
+  tagPrefix: ubuntu2204- # TODO: Change to match your custom image tag prefix
+  tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
+  imagePullSecrets:
+    - name: private-registery-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster containing authentication credentials to your registry. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
+
+launcher:
+  enabled: true # Required for Off-Host Execution mode
+  useTemplates: true
+  # Define the custom image(s) for the content pod(s)
+  # Note these are only used on the initial creation of the Connect cluster
+  # with an empty database. Once Connect is running you should add enviornments
+  # via the UI or Connect API. More information is available in the Admin Guide:
+  # https://docs.posit.co/connect/admin/appendix/off-host/execution-environments
+  templateValues:
+    pod:
+      imagePullSecrets:
+        - name: private-registery-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster containing authentication credentials to your registry. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
+  customRuntimeYaml:
+    name: "Kubernetes"
+    images:
+      # TODO: Add custom images based on the below template
+      - name: ghcr.io/rstudio/content-base:r4.2.2-py3.11.3-ubuntu2204 # TODO: Change to match your custom image repository
+        python:
+          installations:
+            -
+              path: /opt/python/3.11.3/bin/python3 # TODO: Change to match the Python path available in your image
+              version: 3.11.3 # TODO: Change to match the Python version available in your image
+        r:
+          installations:
+            -
+              path: /opt/R/4.2.2/bin/R # TODO: Change to match the R path available in your image
+              version: 4.2.2 # TODO: Change to match the R version available in your image
+        quarto:
+          installations:
+            - path: /opt/quarto/1.3.340/bin/quarto # TODO: Change to match the quarto path available in your image
+              version: 1.3.340 # TODO: Change to match the Quarto version available in your image
+  # Define the custom image(s) for the content pod(s) init container
+  defaultInitContainer:
+    repository: ghcr.io/rstudio/rstudio-connect-content-init # TODO: Change to match your custom image repository
+    tagPrefix: ubuntu2204- # TODO: Change to match your custom image tag prefix
+    tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.
