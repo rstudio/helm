@@ -232,10 +232,7 @@ serviceMonitor:
 # -- config is a nested map of maps that generates the rstudio-pm.gcfg file
 config:
   Server:
-    # An empty string will configure Package Manager to autodetect R
-    RVersion: ""
-    # An empty string will configure Package Manager to autodetect Python
-    PythonVersion: ""
+    Address: http://localhost:4242
   HTTP:
     Listen: :4242
   Metrics:
