@@ -6,8 +6,10 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     {{- include "rstudio-connect.labels" . | nindent 4 }}
+{{- with .Values.service.annotations }}
   annotations:
-{{ include "rstudio-connect.annotations" . | indent 4 }}
+  {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   type: {{ .Values.service.type }}
 {{- if and (eq .Values.service.type "ClusterIP") .Values.service.clusterIP }}

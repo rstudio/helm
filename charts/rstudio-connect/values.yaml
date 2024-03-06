@@ -86,7 +86,7 @@ strategy:
     maxUnavailable: 0
 
 service:
-  # -- Annotations that will be added onto the service
+  # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}
   # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
   # expose the service using your cloud provider's load balancer)
