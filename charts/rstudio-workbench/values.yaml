@@ -173,11 +173,18 @@ sealedSecret:
   annotations: {}
 
 service:
-  # -- annotations for the service definition
+  # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}
-  # -- the service type (i.e. NodePort, LoadBalancer, etc.)
-  type: NodePort
-  # -- the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically
+  # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
+  # expose the service using your cloud provider's load balancer)
+  type: ClusterIP
+  # -- The cluster-internal IP to use with `service.type` ClusterIP
+  clusterIP: ""
+  # -- The external IP to use with `service.type` LoadBalancer, when supported
+  # by the cloud provider
+  loadBalancerIP: ""
+  # -- The explicit nodePort to use for `service.type` NodePort. If not
+  # provided, Kubernetes will choose one automatically
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80

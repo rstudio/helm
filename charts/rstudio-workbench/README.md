@@ -1,6 +1,6 @@
 # RStudio Workbench
 
-![Version: 0.6.16](https://img.shields.io/badge/Version-0.6.16-informational?style=flat-square) ![AppVersion: 2023.12.1](https://img.shields.io/badge/AppVersion-2023.12.1-informational?style=flat-square)
+![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![AppVersion: 2023.12.1](https://img.shields.io/badge/AppVersion-2023.12.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -27,11 +27,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.16:
+To install the chart with the release name `my-release` at version 0.7.0:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.6.16
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.0
 ```
 
 To explore other chart versions, take a look at:
@@ -526,10 +526,12 @@ Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
 | secureCookieKey | string | `""` |  |
 | securityContext | object | `{}` |  |
-| service.annotations | object | `{}` | annotations for the service definition |
-| service.nodePort | bool | `false` | the nodePort to use when using service type NodePort. If not defined, Kubernetes will provide one automatically |
+| service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
+| service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
+| service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
+| service.nodePort | bool | `false` | The explicit nodePort to use for `service.type` NodePort. If not provided, Kubernetes will choose one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
-| service.type | string | `"NodePort"` | the service type (i.e. NodePort, LoadBalancer, etc.) |
+| service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |

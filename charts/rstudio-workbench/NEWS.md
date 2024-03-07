@@ -1,3 +1,10 @@
+# 0.7.0
+
+- BREAKING: The generated service will now have type `ClusterIP` set by default.
+- Add support for setting the `loadBalancerIP` or `clusterIP`.
+- Ignore `nodePort` settings when the service is not a `NodePort`.
+- Improve the documentation for some service-related settings.
+
 # 0.6.16
 
 - Update default package manager repo in `config.session.repos.conf`
