@@ -1,0 +1,12 @@
+# Configuring Posit Connect with Custom Container Images
+
+This example deploys Posit Connect using custom images instead of the default public Posit provided images.
+There are a minimum of three images that Connect requires to function in Off-Host Execution mode include the Connect container, content container and content init container.
+Additional content containers may be added to provide more R, Python and Quarto versions and other system dependencies.
+
+The focus of this example is on using custom images, however there are a few requirements to run Connect.
+
+To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+```{.yaml include="rstudio-connect-custom-image.yaml" filename="values.yaml"}
+```

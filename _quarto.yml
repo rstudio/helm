@@ -13,6 +13,7 @@ project:
     - examples/auto-scaling/README.md
     - examples/rbac/README.md
     - examples/workbench/README.md
+    - examples/connect/README.md
     - docs/customize.md
     - "*.qmd"
 
@@ -24,6 +25,7 @@ format:
 
 website: 
   title: Posit Helm Charts
+  bread-crumbs: true
   page-footer: 
     center: Posit Helm Charts
   sidebar:
@@ -40,14 +42,8 @@ website:
             file: charts/rstudio-workbench/README.md
           - text: Changelog
             file: charts/rstudio-workbench/NEWS.md
-          - section: Examples
-            contents:
-              - text: Auto Scaling
-                file: examples/auto-scaling/README.md
-              - text: Custom NFS Mounts
-                file: examples/workbench/custom-nfs-mounts.qmd
-              - text: Single Node and `sssd`
-                file: examples/workbench/single-node-workbench.qmd
+          - text: Examples
+            file: examples/workbench/index.qmd
 
       - section: "Posit Connect"
         contents:
@@ -55,22 +51,16 @@ website:
             file: charts/rstudio-connect/README.md
           - text: Changelog
             file: charts/rstudio-connect/NEWS.md
-          - section: Examples
-            contents:
-              - text: Custom Images with Off-Host Execution
-                file: examples/connect/off-host-custom-images/index.qmd
-              - text: Using an AWS ELB for ingress
-                file: examples/connect/aws-elb/index.qmd
-              - text: High Availability with NGINX Ingress
-                file: examples/connect/high-availability-nginx-launcher/index.qmd
-              - text: High Availability with Traefik Ingress
-                file: examples/connect/high-availability-traefik/index.qmd
+          - text: Examples
+            file: examples/connect/index.qmd
       - section: "Posit Package Manager"
         contents:
           - text: Overview
             file: charts/rstudio-pm/README.md
           - text: Changelog
             file: charts/rstudio-pm/NEWS.md
+          - text: Examples
+            file: examples/package-manager/index.qmd
       - section: "Posit Chronicle"
         contents:
           - text: Overview

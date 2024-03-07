@@ -1,0 +1,13 @@
+# Configuring Posit Connect with SAML
+
+This example deploys RStudio Connect using SAML SSO for authentication.
+
+Users will be authenticated via SSO (using SAML) and users will be createdin Connect upon first login or creation via the Connect API using certain attributes received from the IdP.
+
+The focus of this example is on authentication configuration, however there are a few requirements to run Connect.
+
+To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+
+
+```{.yaml include="rstudio-connect-saml.yaml" filename="values.yaml"}
+```

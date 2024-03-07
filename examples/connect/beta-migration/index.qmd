@@ -1,4 +1,4 @@
-### Off-Host Execution Beta User Migration
+# Off-Host Execution Beta User Migration
 
 The off-host execution beta moving to GA also moves your content from Bionic to
 Jammy by default. This will cause all content to get rebuilt. If all content being
@@ -19,7 +19,7 @@ use `values-base.yaml` as a reference for updating your values file.
 use `values-prod.yaml` as a reference for updating your values file.
 
 
-#### Technical Details
+## Technical Details
 
 The values files in this directory contain overrides for the
 chart's default `runtime.yaml` configurations. The `v0.5.0` version of the rstudio-connect
@@ -43,3 +43,13 @@ built with a `bionic` image can continue to _execute_ with that image until it r
 existing piece of content needs to be rebuilt and requires `bionic` for some reason, the Publisher
 must _explicitly_ define a default execution environment for that content through the
 content-settings (access pane) on the dashboard or via the server API.
+
+## `values-base.yaml`
+
+```{.yaml include="values-base.yaml" filename="values-base.yaml"}
+```
+
+## `values-pro.yaml`
+
+```{.yaml include="values-pro.yaml" filename="values-pro.yaml"}
+```
