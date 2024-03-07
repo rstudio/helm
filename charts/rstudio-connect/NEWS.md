@@ -1,3 +1,10 @@
+# 0.6.0
+
+- BREAKING: The generated service will now have type `ClusterIP` set by default.
+- Add support for setting the `loadBalancerIP` or `clusterIP`.
+- Ignore `nodePort` settings when the service is not a `NodePort`.
+- Improve the documentation for some service-related settings.
+
 # 0.5.14
 
 - Bump Connect version to 2024.02.0

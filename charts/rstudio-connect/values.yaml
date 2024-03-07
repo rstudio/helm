@@ -86,11 +86,18 @@ strategy:
     maxUnavailable: 0
 
 service:
-  # -- Annotations that will be added onto the service
+  # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}
-  # -- The service type (LoadBalancer, NodePort, etc.)
-  type: NodePort
-  # -- The nodePort to use when using service type NodePort. If not provided, Kubernetes will provide one automatically
+  # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
+  # expose the service using your cloud provider's load balancer)
+  type: ClusterIP
+  # -- The cluster-internal IP to use with `service.type` ClusterIP
+  clusterIP: ""
+  # -- The external IP to use with `service.type` LoadBalancer, when supported
+  # by the cloud provider
+  loadBalancerIP: ""
+  # -- The explicit nodePort to use for `service.type` NodePort. If not
+  # provided, Kubernetes will choose one automatically
   nodePort: false
   # -- The port to use for the Connect service
   port: 80

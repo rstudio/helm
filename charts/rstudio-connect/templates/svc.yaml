@@ -6,19 +6,27 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     {{- include "rstudio-connect.labels" . | nindent 4 }}
+{{- with .Values.service.annotations }}
   annotations:
-{{ include "rstudio-connect.annotations" . | indent 4 }}
+  {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   type: {{ .Values.service.type }}
+{{- if and (eq .Values.service.type "ClusterIP") .Values.service.clusterIP }}
+  clusterIP: {{ .Values.service.clusterIP }}
+{{- end }}
+{{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+{{- end }}  
   selector:
     {{- include "rstudio-connect.selectorLabels" . | nindent 4 }}
   ports:
   - name: http
     protocol: TCP
     port: {{ .Values.service.port }}
-    {{- if .Values.service.nodePort }}
+{{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
-    {{- end }}
+{{- end }}
     targetPort: {{ .Values.service.targetPort }}
   {{- if .Values.prometheusExporter.enabled }}
   - name: metrics

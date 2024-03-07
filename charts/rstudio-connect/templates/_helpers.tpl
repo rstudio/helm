@@ -85,12 +85,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig .Values.config ) }}
 {{- end -}}
 
-{{- define "rstudio-connect.annotations" -}}
-{{- range $key,$value := $.Values.service.annotations -}}
-{{ $key }}: {{ $value | quote }}
-{{ end }}
-{{- end -}}
-
 {{/*
   - Define the runtime.yaml file
     - If a string:
