@@ -1,6 +1,0 @@
-# High Availability with Traefik
-
-High Availability using `traefik` as an ingress controller
-
-```{.yaml include="values.yaml" filename="values.yaml"}
-```

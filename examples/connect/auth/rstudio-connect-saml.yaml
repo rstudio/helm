@@ -1,15 +1,3 @@
-# This example deploys RStudio Connect using SAML SSO for authentication.
-#
-# Users will be authenticated via SSO (using SAML) and users will be created
-# in Connect upon first login or creation via the Connect API using certain
-# attributes received from the IdP.
-#
-# The focus of this example is on authentication configuration, however there
-# are a few requirements to run Connect.
-# To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
-
-
 # Using a license file with the helm chart:
 # https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
 # If you would like to use a license key see this documentation:

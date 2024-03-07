@@ -1,22 +1,3 @@
-# This example deploys RStudio Connect with an Ingress using the
-# Ingress NGINX Controller.
-#
-# This example is provided to show how to set annotations to
-# enabled session affinity and to redirect HTTP traffic to HTTPS.
-# The Ingress NGINX Controller has a variety of settings 
-# and modes of operation. Please visit the NGINX controller documentation for more details
-# specific to your use case:
-# https://kubernetes.github.io/ingress-nginx/
-#
-# NOTE: this example is for the Ingress NGINX Controller which is part of
-# Kubernetes. If you are using the NGINX or NGINX Plus Ingress Controllers from # NGINX Inc located at https://github.com/nginxinc/kubernetes-ingress then
-# different annotations will need to be applied.
-#
-# The focus of this example is on NGINX Ingress setup, however there are a few # requirements to run Connect.
-# To use the example you will need a license file or key, a ReadWriteMany
-# POSIX compliant storage class for sharedStorage and a PostgreSQL database.
-
-
 # Using a license file with the helm chart:
 # https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
 # If you would like to use a license key see this documentation:
