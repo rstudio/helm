@@ -1,0 +1,16 @@
+---
+category: "Storage"
+---
+
+# Configuring Posit Package Manager with an NFS-backed PersistentVolume
+
+This example deploys RStudio Package Manager with a single PersistentVolume backed by an NFS server.
+The PersistentVolume allows setting NFS mountOptions.
+It creates a storage class that RStudio Package Manager then takes advantage of when it creates its PersistentVolumeClaim.
+Both the PVC and PV will be left around after the helm release is removed (for manual cleanup).
+
+The focus of this example is on setting up a PV backed by NFS, however there are a few requirements to run Package Manager.
+To use the example you will need a license file or key, a PostgreSQL database and either a ReadWriteMany POSIX compliant storage class for sharedStorage or S3.
+
+```{.yaml include="rstudio-pm-with-pv.yaml" filename="values.yaml"}
+```

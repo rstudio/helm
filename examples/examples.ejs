@@ -1,0 +1,21 @@
+<%
+const postsByCategory = {};
+items.forEach(item => {
+  if (!postsByCategory[item.category]) {
+    postsByCategory[item.category] = [];
+  }
+  postsByCategory[item.category].push(item);
+})
+
+// Loop through each category
+for (const [category, categoryPosts] of Object.entries(postsByCategory)) {
+%>
+  <h2><%= category %></h2>
+  <ul>
+    <% categoryPosts.forEach(post => { %>
+      <li>
+        <a href="<%= post.path %>"><%= post.title %></a>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>

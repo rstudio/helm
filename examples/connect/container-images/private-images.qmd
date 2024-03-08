@@ -1,3 +1,7 @@
+---
+category: "Container Images"
+---
+
 # Configuring Posit Connect to Access Authenticated Image Registries
 
 This example deploys Posit Connect using custom images in registries requiring authentication instead of the default public Posit provided images.

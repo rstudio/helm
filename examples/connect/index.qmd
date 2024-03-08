@@ -1,4 +1,10 @@
-# Posit Connect examples
+---
+title: Posit Connect Examples
+listing:
+  template: ../examples.ejs
+  contents: "*.qmd"
+---
+
 
 The examples in this directory provide a starting point for deploying Posit Connect in
 different configurations. Each example has a beginning description and a series of `# TODO` comments.
@@ -11,40 +17,3 @@ standard requirements listed in each example. Each example will need the followi
 - License key or file specified
 - `sharedStorage` configured
 
-## Application Configuration
-
-### [Recommended Application Configuration](application-configuration/index.qmd)
-
-## Container Image Configuration
-
-### [Off-Host with Custom Images](container-images/custom-images.qmd)
-
-### [Off-Host with Custom Images in Private Registry](container-images/private-images.qmd)
-
-## Authentication & User Provisioning
-
-### [OIDC SSO Authentication](auth/oidc.qmd)
-
-### [SAML SSO Authentication](auth/saml.qmd)
-
-## Ingress
-
-### [AWS ALB Ingress](ingress/aws-alb.qmd)
-
-### [Azure Application Gateway Ingress](ingress/azure-gateway.qmd)
-
-### [GCE Ingress](ingress/gce.qmd)
-
-### [NGINX Ingress](ingress/nginx.qmd)
-
-### [Traefik Ingress](ingress/traefik.qmd)
-
-## Storage
-
-### [Additional volumes](storage/additional-volumes.qmd)
-
-### [NFS backed `PersistentVolume`](storage/nfs-pv.qmd)
-
-## Migration
-
-### [Beta Migration](beta-migration/index.qmd)

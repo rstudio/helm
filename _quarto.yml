@@ -1,7 +1,6 @@
 project: 
   type: posit-docs
   render: 
-    - README.md
     - charts/rstudio-workbench/README.md 
     - charts/rstudio-workbench/NEWS.md 
     - charts/rstudio-connect/README.md
@@ -35,7 +34,7 @@ website:
     pinned: false
     contents:
       - text: Overview
-        file: README.md
+        file: index.qmd
       - section: "Posit Workbench"
         contents:
           - text: Overview

@@ -2,16 +2,16 @@
 category: "Ingress"
 ---
 
-# Configuring Posit Connect with GKE Ingress
+# Configuring Posit Workbench with GKE Ingress
 
-This example deploys Posit Connect with an Ingress using the GKE Ingress Controller to create a GCP Application Load Balancer.
+This example deploys Posit Workbench with an Ingress using the GKE Ingress Controller to create a GCP Application Load Balancer.
 This example is provided to show how to set annotations to enabled session affinity, redirect HTTP traffic to HTTPS and use GCP Certificate Manager if desired.
-The GKE Ingress Controller has a variety of settings and modes of operation. 
+The GKE Ingress Controller has a variety of settings and modes of operation.
 Please visit the GCP documentation for more details specific to your use case:
 https://cloud.google.com/kubernetes-engine/docs/how-to/load-balance-ingress
 
-The focus of this example is on a GKE Ingress setup, however there are a few requirements to run Connect.
+The focus of this example is on a GKE Ingress setup, however there are a few requirements to run Workbench.
 To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
 
-```{.yaml include="rstudio-connect-gce-ingress.yaml" filename="values.yaml"}
+```{.yaml include="rstudio-workbench-gce-ingress.yaml" filename="values.yaml"}
 ```

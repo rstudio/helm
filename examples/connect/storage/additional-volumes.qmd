@@ -1,3 +1,7 @@
+---
+category: "Storage"
+---
+
 # Configuring Posit Connect with additional mounts
 
 This example shows how to mount an additional PVC to the Connect and  the content pods. 

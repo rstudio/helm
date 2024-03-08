@@ -2,21 +2,21 @@
 category: "Ingress"
 ---
 
-# Configuring Posit Connect with NGINX Ingress
+# Configuring Posit Workbench with NGINX Ingress
 
-This example deploys RStudio Connect with an Ingress using the Ingress NGINX Controller.
+This example deploys Posit Workbench with an Ingress using the Ingress NGINX Controller.
 This example is provided to show how to set annotations to enabled session affinity and to redirect HTTP traffic to HTTPS.
-The Ingress NGINX Controller has a variety of settings  and modes of operation. 
+The Ingress NGINX Controller has a variety of settings  and modes of operation.
 Please visit the NGINX controller documentation for more details specific to your use case:
 https://kubernetes.github.io/ingress-nginx/
 
 ::: callout-note
-This example is for the Ingress NGINX Controller which is part of Kubernetes. 
+This example is for the Ingress NGINX Controller which is part of Kubernetes.
 If you are using the NGINX or NGINX Plus Ingress Controllers from NGINX Inc located at https://github.com/nginxinc/kubernetes-ingress then different annotations will need to be applied.
 :::
 
-The focus of this example is on NGINX Ingress setup, however there are a few requirements to run Connect.
+The focus of this example is on NGINX Ingress setup, however there are a few requirements to run Workbench.
 To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
 
-```{.yaml include="rstudio-connect-nginx-ingress.yaml" filename="values.yaml"}
+```{.yaml include="rstudio-workbench-nginx-ingress.yaml" filename="values.yaml"}
 ```

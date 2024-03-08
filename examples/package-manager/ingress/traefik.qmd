@@ -1,0 +1,17 @@
+---
+category: "Ingress"
+---
+
+# Configuring Posit Package Manager with Traefik Ingress
+
+This example deploys RStudio Package Manager with an Ingress using the Traefik Ingress Controller.
+The Traefik Ingress Controller has a variety of settings and modes of operation.
+
+Please visit the Traefik documentation for more details specific to your use case:
+https://doc.traefik.io/traefik/providers/kubernetes-ingress/
+
+The focus of this example is on Traefik Ingress setup, however there are a few requirements to run Package Manager.
+To use the example you will need a license file or key, a PostgreSQL database and either a ReadWriteMany POSIX compliant storage class for sharedStorage or S3.
+
+```{.yaml include="rstudio-pm-traefik-ingress.yaml" filename="values.yaml"}
+```

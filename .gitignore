@@ -8,3 +8,5 @@ bin/**
 /.quarto/
 _site/
 _publish.yml
+
+/.quarto/
