@@ -1,18 +1,3 @@
-# This example deploys RStudio Package Manager with an Ingress using the
-# Traefik Ingress Controller.
-#
-# The Traefik Ingress Controller has a variety of settings 
-# and modes of operation. Please visit the Traefik documentation for more details
-# specific to your use case:
-# https://doc.traefik.io/traefik/providers/kubernetes-ingress/
-#
-# The focus of this example is on Traefik Ingress setup, however there
-# are a few requirements to run Package manager.
-# To use the example you will need a license file or key,
-# a PostgreSQL database and either a ReadWriteMany
-# POSIX compliant storage class for sharedStorage or S3.
-
-
 # Using a license file with the helm chart:
 # https://github.com/rstudio/helm/tree/main/charts/rstudio-pm#license-file
 # If you would like to use a license key see this documentation:

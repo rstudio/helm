@@ -1,3 +1,7 @@
+---
+category: "Basic Configuration"
+---
+
 # Application Configuration
 
 This example deploys RStudio Connect with the recommended application

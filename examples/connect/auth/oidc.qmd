@@ -1,3 +1,7 @@
+---
+category: "Authentication"
+---
+
 # Configuring Posit Connect with OIDC
 
 This example deploys RStudio Connect using OpenID Connect (OIDC) SSO for

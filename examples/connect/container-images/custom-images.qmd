@@ -1,3 +1,7 @@
+---
+category: "Container Images"
+---
+
 # Configuring Posit Connect with Custom Container Images
 
 This example deploys Posit Connect using custom images instead of the default public Posit provided images.

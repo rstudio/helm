@@ -1,3 +1,7 @@
+---
+category: "Storage"
+---
+
 # Configuring Posit Connect with an NFS-backed PersistentVolume
 
 This example deploys Posit Connect with a single PersistentVolume backed by an NFS server.
@@ -6,7 +10,7 @@ it creates a storage class that Posit Connect then takes advantage of when it cr
 Both the PVC and PV will be left around after the helm release is removed (for manual cleanup).
 
 The focus of this example is on setting up a PV backed by NFS, however there are a few requirements to run Connect.
-To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+To use the example you will need a license file or key, a `ReadWriteMany` POSIX compliant storage class for `sharedStorage` and a PostgreSQL database.
 
 ```{.yaml include="rstudio-connect-with-pv.yaml" filename="values.yaml"}
 ```

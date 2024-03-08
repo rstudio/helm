@@ -1,0 +1,18 @@
+---
+category: "Ingress"
+---
+
+# Configuring Posit Package Manager with AWS ALB Ingress
+
+This example deploys RStudio Package Manager with an Ingress using the AWS Load Balancer Controller to create an Application Load Balancer (ALB).
+This example is provided to show how to set annotations to redirect HTTP traffic to HTTPS and use AWS Certificate Manager if desired.
+The AWS Load Balancer Controller has a variety of settings and modes of operation. 
+
+Please visit the AWS documentation for more details specific to your use case:
+https://kubernetes-sigs.github.io/aws-load-balancer-controller/
+
+The focus of this example is on an ALB Ingress setup, however there are a few requirements to run Package Manager.
+To use the example you will need a license file or key, a PostgreSQL database and either a ReadWriteMany POSIX compliant storage class for sharedStorage or S3.
+
+```{.yaml include="rstudio-pm-alb-ingress.yaml" filename="values.yaml"}
+```

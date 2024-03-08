@@ -1,0 +1,6 @@
+---
+title: Posit Workbench Examples
+listing:
+  template: ../examples.ejs
+  contents: "*.qmd"
+---

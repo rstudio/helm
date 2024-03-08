@@ -1,0 +1,17 @@
+---
+category: "Container Images"
+---
+
+# Configuring Posit Package Manager to Access Authenticated Image Registries
+
+This example deploys RStudio Package Manager using custom images in registries requiring authentication instead of the default public Posit provided images.
+
+The image can be pulled from your own container registry instead of the public Posit provided image. 
+This example shows where to provide private registry credentials in the form of a Kubernetes secret of type
+`kubernetes.io/dockercfg`
+
+The focus of this example is on using custom images in private registries, however there are a few requirements to run Package Manager.
+To use the example you will need a license file or key, a PostgreSQL database and either a `ReadWriteMany` POSIX compliant storage class for `sharedStorage` or S3.
+
+```{.yaml include="rstudio-pm-custom-image-private.yaml" filename="values.yaml"}
+```
