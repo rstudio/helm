@@ -15,8 +15,7 @@ This example is for the Ingress NGINX Controller which is part of Kubernetes.
 If you are using the NGINX or NGINX Plus Ingress Controllers from NGINX Inc located at https://github.com/nginxinc/kubernetes-ingress then different annotations will need to be applied.
 :::
 
-The focus of this example is on NGINX Ingress setup, however there are a few requirements to run Workbench.
-To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-workbench-nginx-ingress.yaml" filename="values.yaml"}
 ```

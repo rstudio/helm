@@ -4,12 +4,9 @@ category: "Storage"
 
 # Configuring Posit Package Manager with S3
 
-This example deploys RStudio Package Manager using S3 instead of
-a PV and PVC for sharedStorage.
-The focus of this example is on using S3, however there
-are a few requirements to run Package manager.
-To use the example you will need a license file or key
-and a PostgreSQL database.
+This example deploys Posit Package Manager using S3 instead of a PV and PVC for sharedStorage.
+
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-pm-with-s3.yaml" filename="values.yaml"}
 ```

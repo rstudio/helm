@@ -10,9 +10,7 @@ The Traefik Ingress Controller has a variety of settings and modes of operation.
 Please visit the Traefik documentation for more details specific to your use case:
 https://doc.traefik.io/traefik/providers/kubernetes-ingress/
 
-The focus of this example is on Traefik Ingress setup, however there are a few # requirements to run Workbench.
-To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
-
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-workbench-traefik-ingress.yaml" filename="values.yaml"}
 ```

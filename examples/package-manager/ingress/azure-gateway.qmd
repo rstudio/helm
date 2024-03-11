@@ -4,21 +4,14 @@ category: "Ingress"
 
 # Configuring Posit Package Manager with Azure Application Gateway
 
-This example deploys Posit Package Manager with an Ingress using the
-Azure Application Gateway Ingress Controller to create a
-Azure Application Gateway load balancer.
-This example is provided to show how to set annotations to redirect HTTP
-traffic to HTTPS.
-The Azure Application Gateway Ingress Controller has a variety of settings 
-and modes of operation. Please visit the Azure documentation for more details
-specific to your use case:
-https://azure.github.io/application-gateway-kubernetes-ingress/
-The focus of this example is on an Azure Application Gateway setup,
-however there are a few requirements to run Package manager.
-To use the example you will need a license file or key,
-a PostgreSQL database and either a ReadWriteMany
-POSIX compliant storage class for sharedStorage or S3.
+This example deploys Posit Package Manager with an Ingress using the Azure Application Gateway Ingress Controller to create a Azure Application Gateway load balancer.
+This example is provided to show how to set annotations to redirect HTTP traffic to HTTPS.
 
+The Azure Application Gateway Ingress Controller has a variety of settings 
+and modes of operation.
+[Please visit the Azure documentation for more details:](https://azure.github.io/application-gateway-kubernetes-ingress/)
+
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-pm-azure-application-gateway-ingress.yaml" filename="values.yaml"}
 ```

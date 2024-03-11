@@ -1,0 +1,16 @@
+---
+category: "Container Images"
+---
+
+# Configuring Posit Workbench to Access Authenticated Image Registries
+
+This example deploys Posit Workbench using custom images in registries requiring authentication instead of the default public Posit provided images.
+Both the Workbench and session container images may be customized in the helm chart to pull from your own container registry instead of the public Posit provided images.
+This example also shows where to provide private registry credentials in the form of a Kubernetes secret of type `kubernetes.io/dockercfg`.
+ 
+Note the registry credentials secret must be specified in two places in the values to apply to Workbench and session containers (shown in the example below).
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-workbench-custom-image-private.yaml" filename="values.yaml"}
+```
