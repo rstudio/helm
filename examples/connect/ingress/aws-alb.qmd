@@ -5,14 +5,13 @@ category: "Ingress"
 # Configuring Posit Connect with AWS ALB Ingress
 
 This example deploys Posit Connect with an Ingress using the AWS Load Balancer Controller to create an Application Load Balancer (ALB).
+
 This example is provided to show how to set annotations to enabled session affinity, redirect HTTP traffic to HTTPS and use AWS Certificate Manager if desired.
-The AWS Load Balancer Controller has a variety of settings and modes of operation. Please visit the AWS documentation for more details specific to your use case:
 
-https://kubernetes-sigs.github.io/aws-load-balancer-controller/
+The AWS Load Balancer Controller has a variety of settings and modes of operation.
+[Please visit the AWS documentation for more details:](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
 
-The focus of this example is on an ALB Ingress setup, however there are a few requirements to run Connect.
-
-To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-connect-alb-ingress.yaml" filename="values.yaml"}
 ```

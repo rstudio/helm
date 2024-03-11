@@ -2,16 +2,14 @@
 category: "Storage"
 ---
 
-# Configuring Posit Connect with additional mounts
+# Configuring Posit Connect with additional volumes
 
 This example shows how to mount an additional PVC to the Connect and  the content pods. 
 This pattern of specifying the volumes and volumeMounts will work for a variety of volume types PVC, ConfigMap, etc.
 Depending on the need to add additional volumes, you may only need to mount to Connect or content pods but not both.
 For example, if you need to add TLS certificates for Connect then the session pods do not need the volumes.
 
-The focus of this example is on setting up additional mounts, however there are a few requirements to run Connect.
-To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
-
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-connect-with-additional-mounts.yaml" filename="values.yaml"}
 ```

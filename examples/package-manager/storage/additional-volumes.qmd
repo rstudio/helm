@@ -4,12 +4,10 @@ category: "Storage"
 
 # Configuring Posit Package Manager with additional volumes
 
-This example deploys Posit Package Manager with additional mounts.
 This example shows how to mount an additional PVC to the Package Manager pods.
 This pattern of specifying the volumes and volumeMounts will work for a variety of volume types: PVC, ConfigMap, etc.
 
-The focus of this example is on setting up additional mounts, however there are a few requirements to run Package manager.
-To use the example you will need a license file or key, a PostgreSQL database and either a ReadWriteMany POSIX compliant storage class for sharedStorage or S3.
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-pm-with-additional-mounts.yaml" filename="values.yaml"}
 ```

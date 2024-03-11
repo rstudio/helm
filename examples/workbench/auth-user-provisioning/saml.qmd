@@ -1,0 +1,15 @@
+---
+category: Authentication
+---
+
+# Configuring Posit Workbench with SAML
+
+This example deploys Posit Workbench using SAML for authentication and `sssd` for user provisioning.
+
+Users will be authenticated via SSO (using SAML) and Workbench will match an attribute (`NameID` by default) to a Linux user account in the Workbench container.
+`sssd` is already running in the Workbench container and can be used to automatically provision local user accounts using LDAP or Active Directory.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-workbench-saml-sssd.yaml" filename="values.yaml"}
+```

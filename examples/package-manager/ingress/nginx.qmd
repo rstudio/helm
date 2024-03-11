@@ -5,19 +5,16 @@ category: "Ingress"
 # Configuring Posit Package Manager with NGINX Ingress
 
 This example deploys Posit Package Manager with an Ingress using the Ingress NGINX Controller.
+
 The Ingress NGINX Controller has a variety of settings and modes of operation.
-
-Please visit the NGINX controller documentation for more details specific to your use case:
-https://kubernetes.github.io/ingress-nginx/
-
+[Please visit the NGINX controller documentation for more details specific to your use case:](https://kubernetes.github.io/ingress-nginx/)
 
 ::: callout-note
 This example is for the Ingress NGINX Controller which is part of Kubernetes. 
 If you are using the NGINX or NGINX Plus Ingress Controllers from NGINX Inc located at https://github.com/nginxinc/kubernetes-ingress then different annotations will need to be applied.
 :::
 
-The focus of this example is on NGINX Ingress setup, however there are a few requirements to run Package Manager.
-To use the example you will need a license file or key, a PostgreSQL database and either a ReadWriteMany POSIX compliant storage class for sharedStorage or S3.
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-pm-nginx-ingress.yaml" filename="values.yaml"}
 ```

@@ -17,12 +17,7 @@ These settings are recommend for most deployments and are described below:
  - [Enable the administrator dashboard and set user group(s) to have admin and admin super user permissions](https://docs.posit.co/ide/server-pro/server_management/administrative_dashboard.html)
  - [Set default and max resource limits for users](https://docs.posit.co/ide/server-pro/job_launcher/kubernetes_plugin.htmlkube-profiles)
 
- The focus of this example is on best practice application
- configuration, however there are a few requirements to run Workbench.
- To use the example you will need a license file or key, a ReadWriteMany
- POSIX compliant storage class for homeStorage and sharedStorage
- and a PostgreSQL database.
-
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-workbench-recommended-app-config.yaml" filename="values.yaml"}
 ```

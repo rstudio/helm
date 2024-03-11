@@ -6,12 +6,11 @@ category: "Ingress"
 
 This example deploys Posit Connect with an Ingress using the Azure Application Gateway Ingress Controller to create an Azure Application Gateway load balancer.
 This example is provided to show how to set annotations to enabled session affinity and to redirect HTTP traffic to HTTPS.
-The Azure Application Gateway Ingress Controller has a variety of settings and modes of operation.
-Please visit the Azure documentation for more details specific to your use case:
-https://azure.github.io/application-gateway-kubernetes-ingress/
 
-The focus of this example is on Azure Application Gateway Ingress setup, however there are a few requirements to run Connect.
-To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+The Azure Application Gateway Ingress Controller has a variety of settings and modes of operation.
+[Please visit the Azure documentation for more details:](https://azure.github.io/application-gateway-kubernetes-ingress/)
+
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-connect-azure-application-gateway-ingress.yaml" filename="values.yaml"}
 ```

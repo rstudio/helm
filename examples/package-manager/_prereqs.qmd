@@ -1,0 +1,7 @@
+To use this example you will need:
+
+- a license file or key
+- a PostgreSQL database
+- either
+  - a `ReadWriteMany` POSIX compliant storage class for `sharedStorage`
+  - S3

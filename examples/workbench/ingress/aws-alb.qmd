@@ -10,9 +10,7 @@ The AWS Load Balancer Controller has a variety of settings and modes of operatio
 
 https://kubernetes-sigs.github.io/aws-load-balancer-controller/
 
-The focus of this example is on an ALB Ingress setup, however there are a few requirements to run Connect.
-
-To use the example you will need a license file or key, a ReadWriteMany POSIX compliant storage class for sharedStorage and a PostgreSQL database.
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-workbench-alb-ingress.yaml" filename="values.yaml"}
 ```
