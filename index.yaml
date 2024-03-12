@@ -4851,6 +4851,53 @@ entries:
           url: https://posit.co/products/enterprise/team/
     apiVersion: v2
     appVersion: 2023.12.0
+    created: "2024-03-12T18:53:07.597542141Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../rstudio-library
+      version: 0.1.28
+    description: Official Helm chart for RStudio Package Manager
+    digest: 296d8a32ed084dd474e19d3802f67f0988ab1a48c9ce27a16024aa22ac295303
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    - posit
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    - https://github.com/rstudio/rstudio-docker-products
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.5.20/rstudio-pm-0.5.20.tgz
+    version: 0.5.20
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-package-manager
+          image: rstudio/rstudio-package-manager:ubuntu2204-2023.12.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2023.12.0
     created: "2024-02-13T19:24:58.89770497Z"
     dependencies:
     - name: rstudio-library
@@ -11012,4 +11059,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2024-03-07T20:22:53.313377026Z"
+generated: "2024-03-12T18:53:07.599416492Z"
