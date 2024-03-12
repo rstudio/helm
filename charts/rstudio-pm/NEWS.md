@@ -1,3 +1,7 @@
+# 0.5.20
+
+- Removed`config.Server.RVersion` from the values.yaml. This does not need to be configured, R version auto-detection will be used ([#473](https://github.com/rstudio/helm/issues/473)).
+
 # 0.5.19
 
 - Add option to set `pod.terminationGracePeriodSeconds`
@@ -23,7 +27,7 @@
 
 - Update default Posit Package Manager version to 2023.08.0-16
 
-# 0.5.13 
+# 0.5.13
 
 - Change default operating system from `bionic` to `ubuntu2204` (`jammy`)
   - This is not a breaking change since it does not affect how Package Manager serves packages
