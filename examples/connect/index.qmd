@@ -8,8 +8,8 @@ listing:
 
 The examples in this directory provide a starting point for deploying Posit Connect in different configurations. 
 
-Each example has a beginning description and a series of `# TODO` comments.
-Before using an example, read through all the comments and ensure you address each `# TODO`.
+Each example has a beginning description and a series of `TODO` comments.
+Before using an example, read through all the comments and ensure you address each `TODO`.
 
 While each example focuses on one or more particular configurations, Posit Connect has some
 standard requirements listed in each example. Each example will need the following to run correctly:
