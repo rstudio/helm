@@ -30,14 +30,14 @@ sharedStorage:
 # which are not needed in the session containers.
 pod:
   volumeMounts:
-  - mountPath: /mnt/data # TODO: Change to your desired mount path
-    name: shared-data
+  - mountPath: /etc/workbench-certs # TODO: Change to your desired mount path
+    name: ldap-certificate-chain # TODO: Change to match the volume name below
   volumes:
-  - name: shared-data
-      # Could be any type of volume... persistentVolumeClaim, configMap, etc.
-      # Could also provision a PVC or PV via `extraObjects` if desired
-    persistentVolumeClaim:
-      claimName: shared-data-pvc # TODO: Change to an available PVC
+  - name: ldap-certificate-chain # TODO: Change to match the volumeMounts name above
+    # Could be any type of volume... persistentVolumeClaim, configMap, etc.
+    # Could also provision a PVC, PV, ConfigMap, etc via `extraObjects` if desired
+    configMap:
+      name: workbench-ldap-certificate-chain # TODO: Change to match your ConfigMap name
 
 # This section is only needed if you need to mount to the session containers
 # which is often the case if you need to mount data for users to access
@@ -45,15 +45,16 @@ pod:
 launcher:
   useTemplates: true # Required to mount the session pods
   templateValues:
-    volumeMounts:
-    - mountPath: /mnt/data # TODO: Change to your desired mount path
-      name: shared-data
-    volumes:
-    - name: shared-data
-      # Could be any type of volume... persistentVolumeClaim, configMap, etc.
-      # Could also provision a PVC or PV via `extraObjects` if desired
-      persistentVolumeClaim:
-        claimName: shared-data-pvc # TODO: Change to an available PVC
+    pod:
+      volumeMounts:
+      - mountPath: /mnt/data # TODO: Change to your desired mount path
+        name: shared-data # TODO: Ensure matches the name specified in volumes below
+      volumes:
+      - name: shared-data # TODO: Ensure matches the name specified in volumeMounts above
+        # Could be any type of volume... persistentVolumeClaim, configMap, etc.
+        # Could also provision a PVC or PV via `extraObjects` if desired
+        persistentVolumeClaim:
+          claimName: shared-data-pvc # TODO: Change to an available PVC name
 
 config:
   secret:

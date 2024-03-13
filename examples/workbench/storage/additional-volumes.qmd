@@ -4,11 +4,11 @@ category: Storage
 
 # Configuring Posit Workbench with additional volumes
 
-This example shows how to mount an additional PVC to the Workbench and  the session pods. 
+This example shows how to mount a `ConfigMap` to the Workbench pod and a `PVC` is mounted to session pods.
 This pattern of specifying the volumes and volumeMounts will work for a variety of volume types: `PVC`, `ConfigMap`, etc.
 
-Depending on the need to add additional volumes, you may only need to mount to Workbench or session pods but not both. 
-For example, if you need to add TLS certificates for Workbench then the session pods do not need the volumes.
+Depending on the need to add additional volumes, you may only need to mount to the Workbench service or session pods but not both. 
+For example, if you need to add TLS certificates for Workbench via a `ConfigMap` then the session pods do not need the `ConfigMap` mounted.
 
 {{< include ../_prereqs.qmd >}}
 
