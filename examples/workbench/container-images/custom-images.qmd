@@ -6,7 +6,13 @@ category: "Container Images"
 
 This example deploys Posit Workbench using custom images instead of the default public Posit provided images.
 
-Both the Workbench and session container images may be customized in the helm chart to pull from your own container registry instead of the public Posit provided images.
+Both the Workbench service and session container images may be customized in the helm chart to pull from your own container registry instead of the public Posit provided images.
+
+The default public images are from dockerhub:
+
+Workbench service: [rstudio/rstudio-workbench](https://hub.docker.com/r/rstudio/rstudio-workbench)
+Workbench sessions: [rstudio/r-session-complete](https://hub.docker.com/r/rstudio/r-session-complete)
+
 
 {{< include ../_prereqs.qmd >}}
 
