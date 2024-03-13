@@ -2,13 +2,12 @@
 category: "Ingress"
 ---
 
-# Configuring Posit Workbench with GKE Ingress
+# Configuring Posit Workbench with a GKE Ingress
 
 This example deploys Posit Workbench with an Ingress using the GKE Ingress Controller to create a GCP Application Load Balancer.
 This example is provided to show how to set annotations to enabled session affinity, redirect HTTP traffic to HTTPS and use GCP Certificate Manager if desired.
-The GKE Ingress Controller has a variety of settings and modes of operation.
-Please visit the GCP documentation for more details specific to your use case:
-https://cloud.google.com/kubernetes-engine/docs/how-to/load-balance-ingress
+
+The GKE Ingress Controller has a variety of settings and modes of operation. Please visit the [GCP documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/load-balance-ingress) for more details specific to your use case.
 
 {{< include ../_prereqs.qmd >}}
 
