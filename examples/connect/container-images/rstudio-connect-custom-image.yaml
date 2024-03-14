@@ -28,7 +28,7 @@ launcher:
   useTemplates: true
   # Define the custom image(s) for the content pod(s)
   # Note these are only used on the initial creation of the Connect cluster
-  # with an empty database. Once Connect is running you should add enviornments
+  # with an empty database. Once Connect is running you should add environments
   # via the UI or Connect API. More information is available in the Admin Guide:
   # https://docs.posit.co/connect/admin/appendix/off-host/execution-environments
   customRuntimeYaml:
