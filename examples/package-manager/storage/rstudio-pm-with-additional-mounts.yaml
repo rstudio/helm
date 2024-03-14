@@ -19,17 +19,17 @@ sharedStorage:
     storage: 100G
 
 # This section is used to mount to the Package Manager container which is
-# often used to add in additional configuration and TLS certificates.
+# often used to add in additional configuration and TLS certificates
 pod:
   volumeMounts:
-  - mountPath: /mnt/data # TODO: Change to your desired mount path
-    name: extra-data
+  - mountPath: /etc/pm-certs # TODO: Change to your desired mount path
+    name: ldap-certificate # TODO: Change to match the volume name below
   volumes:
-  - name: extra-data
-    # Could be any type of volume... persistentVolumeClaim, configMap, etc.
-    # Could also provision a PVC or PV via `extraObjects` if desired
-    persistentVolumeClaim:
-      claimName: extra-data-pvc # TODO: Change to an available PVC
+  - name: ldap-certificate # TODO: Change to match the volumeMounts name above
+    # Can be any type of volume... persistentVolumeClaim, configMap, etc.
+    # Can also provision a PVC, PV, ConfigMap, etc via `extraObjects` if desired
+    configMap:
+      name: pm-ldap-certificate # TODO: Change to match your ConfigMap name
 
 config:
   Database:
