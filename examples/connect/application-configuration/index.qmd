@@ -1,8 +1,8 @@
 ---
-category: "Basic Configuration"
+category: "General Configuration"
 ---
 
-# Application Configuration
+# Configuring Posit Connect with Recommended Settings
 
 This example deploys Posit Connect with the recommended application configuration.
 
