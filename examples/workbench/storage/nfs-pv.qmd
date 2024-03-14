@@ -6,7 +6,7 @@ category: Storage
 
 This example deploys Posit Workbench with a single `PersistentVolume` backed by an NFS server.
 
-The `PersistentVolume` allows setting NFS `mountOptions` and it creates a storage class that Posit Workbench then takes advantage of when it creates its `PersistentVolumeClaim`.
+The `PersistentVolume` allows setting NFS `mountOptions` and it creates a `StorageClass` that Posit Workbench then takes advantage of when it creates its `PersistentVolumeClaim`.
 
 `sharedStorage` is not needed in this example as `config.server.rserver.conf.server-shared-storage-path` is set to put the required shared storage folder in `/home`
 
