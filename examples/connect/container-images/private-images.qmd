@@ -6,11 +6,11 @@ category: "Container Images"
 
 This example deploys Posit Connect using custom images in registries requiring authentication instead of the default public Posit provided images.
 
-There are a minimum of three images that Connect requires to function in Off-Host Execution mode. They are listed below with their cooresponding default public repositories.
+There are a minimum of three images that Connect requires to function in Off-Host Execution mode. They are listed below with their cooresponding default public repositories on ghcr.io
 
-- Connect service container [rstudio/rstudio-connect](https://hub.docker.com/r/rstudio/rstudio-connect)
-- Content container [rstudio/content-base](https://hub.docker.com/r/rstudio/content-base)
-- Content init container [rstudio/rstudio-connect-content-init](https://hub.docker.com/r/rstudio/rstudio-connect-content-init)
+- Connect service container [ghcr.io/rstudio/rstudio-connect](https://github.com/rstudio/rstudio-docker-products/pkgs/container/rstudio-connect)
+- Content container [ghcr.io/rstudio/content-base](https://github.com/rstudio/rstudio-docker-products/pkgs/container/content-base)
+- Content init container [ghcr.io/rstudio/rstudio-connect-content-init](https://github.com/rstudio/rstudio-docker-products/pkgs/container/rstudio-connect-content-init)
   
 There are several content contents listed as execution enviornments by default on initial Connect startup based on the listing in the [default-runtime.yaml](https://github.com/rstudio/helm/blob/main/charts/rstudio-connect/default-runtime.yaml) file. Setting `customRuntimeYaml` will instead use the execution environments defined in that section instead of the default ones. Additional content containers may be added to provide more R, Python and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
 
