@@ -2,13 +2,13 @@
 category: "Ingress"
 ---
 
-# Configuring Posit Connect with Azure Application Gateway Ingress
+# Configuring Posit Connect with an Azure Application Gateway Ingress
 
 This example deploys Posit Connect with an Ingress using the Azure Application Gateway Ingress Controller to create an Azure Application Gateway load balancer.
 This example is provided to show how to set annotations to enabled session affinity and to redirect HTTP traffic to HTTPS.
 
 The Azure Application Gateway Ingress Controller has a variety of settings and modes of operation.
-[Please visit the Azure documentation for more details:](https://azure.github.io/application-gateway-kubernetes-ingress/)
+Please visit the [Azure documentation](https://azure.github.io/application-gateway-kubernetes-ingress/) for more details specific to your use case.
 
 {{< include ../_prereqs.qmd >}}
 

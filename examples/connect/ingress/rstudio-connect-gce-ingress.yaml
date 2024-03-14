@@ -22,7 +22,7 @@ ingress:
     kubernetes.io/ingress.class: gce # TODO: Fill in your desired ingress class for the ingress resource. Note ingress.ingressClassName cannot be used for GKE ingress, it must be supplied as an annotation.
     kubernetes.io/ingress.global-static-ip-name: connect-static-ip # TODO: Change to your static IP name 
     networking.gke.io/managed-certificates: connect-managed-cert # TODO: If you are using GCP Certificate Manager, change this to match your ManagedCertificate name
-    networking.gke.io/v1beta1.FrontendConfig: connect-frontend-config # TODO: Change to match the name of the FrontendConfig defined in extraObjects
+    networking.gke.io/v1beta1.FrontendConfig: connect-frontend-config
     kubernetes.io/ingress.allow-http: "true" # FrontendConfig defined in extraObjects redirects HTTP to HTTPS with a 301
   hosts:
     - host: connect.example.com # TODO: Change to your domain
@@ -35,7 +35,7 @@ ingress:
 
 service:
   annotations:
-    cloud.google.com/backend-config: '{"ports": {"http":"connect-backend-config"}}' # TODO: Change to match the name of the BackendConfig defined in extraObjects
+    cloud.google.com/backend-config: '{"ports": {"http":"connect-backend-config"}}'
 
 extraObjects:
   # GCE uses custom resources to configure the load balancer/service
