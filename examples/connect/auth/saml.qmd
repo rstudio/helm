@@ -6,7 +6,7 @@ category: "Authentication"
 
 This example deploys Posit Connect using SAML SSO for authentication.
 
-Users will be authenticated via SSO (using SAML) and users will be createdin Connect upon first login or creation via the Connect API using certain attributes received from the IdP.
+Users will be authenticated via SSO (using SAML) and then users will be created in Connect upon first login or upon creation via the Connect API. Connect will populate user information based on certain attributes received from the IdP.
 
 {{< include ../_prereqs.qmd >}}
 
