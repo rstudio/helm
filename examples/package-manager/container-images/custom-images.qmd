@@ -6,8 +6,13 @@ category: "Container Images"
 
 This example deploys Posit Package Manager using a custom image instead of the default public Posit provided image.
 
-The focus of this example is on using custom images, however there are a few requirements to run Package manager.
-To use the example you will need a license file or key,a PostgreSQL database and either a `ReadWriteMany` POSIX compliant `StorageClass` for `sharedStorage` or S3.
+The Package Manager image may be customized in the helm chart to pull from your own container registry instead of the public Posit provided images.
+
+The default public images are from dockerhub:
+
+Package Manager: [rstudio/rstudio-package-manager](https://hub.docker.com/r/rstudio/rstudio-package-manager)
+
+{{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-pm-custom-image.yaml" filename="values.yaml"}
 ```
