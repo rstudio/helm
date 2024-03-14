@@ -4,7 +4,7 @@ category: "Storage"
 
 # Configuring Posit Package Manager with S3
 
-This example deploys Posit Package Manager using S3 instead of a PV and PVC for sharedStorage.
+This example deploys Posit Package Manager using S3 instead of using `sharedStorage` with a `PersistentVolume` and `PersistentVolumeClaim`.
 
 {{< include ../_prereqs.qmd >}}
 
