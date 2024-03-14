@@ -1,8 +1,8 @@
 ---
-category: "Basic Configuration"
+category: "General Configuration"
 ---
 
-# Application Configuration
+# Configuring Posit Workbench with Recommended Settings
 
 This example deploys Posit Workbench with the recommended application configuration.
 
