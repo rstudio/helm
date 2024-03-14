@@ -18,34 +18,33 @@ sharedStorage:
 
 # This section is used to mount to the Connect container which is
 # often used to add in additional configuration and TLS certificates
-# which are not needed in the session containers.
+# which are not needed in the content containers.
 pod:
   volumeMounts:
-  - mountPath: /mnt/data # TODO: Change to your desired mount path
-    name: shared-data
+  - mountPath: /etc/connect-certs # TODO: Change to your desired mount path
+    name: ldap-certificate # TODO: Change to match the volume name below
   volumes:
-  - name: shared-data
-    # Could be any type of volume... persistentVolumeClaim, configMap, etc.
-    # Could also provision a PVC or PV via `extraObjects` if desired
-    persistentVolumeClaim:
-      claimName: shared-data-pvc # TODO: Change to an available PVC
+  - name: ldap-certificate # TODO: Change to match the volumeMounts name above
+    # Can be any type of volume... persistentVolumeClaim, configMap, etc.
+    # Can also provision a PVC, PV, ConfigMap, etc via `extraObjects` if desired
+    configMap:
+      name: connect-ldap-certificate # TODO: Change to match your ConfigMap name
 
 # This section is only needed if you need to mount to the content containers
-# which is often the case if you need to mount data for content to access.
+# which is often the case if you need to mount data for content to access
 launcher:
-  enabled: true # Required for Off-Host Execution mode
-  useTemplates: true
+  useTemplates: true # Required to mount the content pods
   templateValues:
     pod:
       volumeMounts:
-        - mountPath: /mnt/data # TODO: Change to match your desired mount path
-          name: shared-data
+      - mountPath: /mnt/data # TODO: Change to your desired mount path
+        name: shared-data # TODO: Ensure matches the name specified in volumes below
       volumes:
-        - name: shared-data
-          # Could be any type of volume... persistentVolumeClaim, configMap, etc.
-          # Could also provision a PVC or PV via `extraObjects` if desired
-          persistentVolumeClaim:
-            claimName: shared-data-pvc # TODO: Change to match your desired PVC
+      - name: shared-data # TODO: Ensure matches the name specified in volumeMounts above
+        # Can be any type of volume... persistentVolumeClaim, configMap, etc.
+        # Can also provision a PVC or PV via `extraObjects` if desired
+        persistentVolumeClaim:
+          claimName: shared-data-pvc # TODO: Change to an available PVC name
 
 # The config section overwrites values in Posit Connect's main
 # .gcfg configuration file.
