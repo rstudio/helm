@@ -10,7 +10,7 @@ The image can be pulled from your own container registry instead of the public P
 This example shows where to provide private registry credentials in the form of a Kubernetes secret of type
 `kubernetes.io/dockercfg`
 
-The default public images are from dockerhub:
+The default public images are on Docker Hub:
 
 Package Manager: [rstudio/rstudio-package-manager](https://hub.docker.com/r/rstudio/rstudio-package-manager)
 
