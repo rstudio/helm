@@ -16,4 +16,4 @@ Each example will need the following to run correctly:
 
 - PostgreSQL database specified in the Package Manager configuration
 - License key or file specified
-- `sharedStorage` or `S3Storage` configured
+- [`sharedStorage`](https://docs.posit.co/rspm/admin/getting-started/installation/installation-kubernetes/#using-shared-storage) or [`S3Storage`](https://docs.posit.co/rspm/admin/getting-started/installation/installation-kubernetes/#using-aws-s3-with-eks) configured
