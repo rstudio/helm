@@ -16,7 +16,7 @@ sharedStorage:
     storage: 100G
 
 # This is evaluated as a template
-# Change the `mountOptions` and `nfs` settings to suite your NFS setup
+# TODO: Change the `mountOptions` and `nfs` settings to suite your NFS setup
 extraObjects:
   - |
     apiVersion: v1

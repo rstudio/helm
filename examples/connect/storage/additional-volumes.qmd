@@ -4,10 +4,11 @@ category: "Storage"
 
 # Configuring Posit Connect with additional volumes
 
-This example shows how to mount an additional PVC to the Connect and  the content pods. 
-This pattern of specifying the volumes and volumeMounts will work for a variety of volume types PVC, ConfigMap, etc.
-Depending on the need to add additional volumes, you may only need to mount to Connect or content pods but not both.
-For example, if you need to add TLS certificates for Connect then the session pods do not need the volumes.
+This example shows how to mount a `ConfigMap` to the Connect pod and a `PVC` is mounted to content pods.
+This pattern of specifying the volumes and volumeMounts will work for a variety of volume types: `PVC`, `ConfigMap`, etc.
+
+Depending on the need to add additional volumes, you may only need to mount to the Connect service or content pods but not both. 
+For example, if you need to add TLS certificates for Connect via a `ConfigMap` then the content pods do not need the `ConfigMap` mounted.
 
 {{< include ../_prereqs.qmd >}}
 
