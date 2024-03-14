@@ -2,12 +2,11 @@
 category: "Ingress"
 ---
 
-# Configuring Posit Package Manager with Traefik Ingress
+# Configuring Posit Package Manager with a Traefik Ingress
 
 This example deploys Posit Package Manager with an Ingress using the Traefik Ingress Controller.
 
-The Traefik Ingress Controller has a variety of settings and modes of operation.
-[Please visit the Traefik documentation for more details specific to your use case:](https://doc.traefik.io/traefik/providers/kubernetes-ingress/)
+The Traefik Ingress Controller has a variety of settings and modes of operation. Please visit the [Traefik documentation](https://doc.traefik.io/traefik/providers/kubernetes-ingress/) for more details specific to your use case.
 
 {{< include ../_prereqs.qmd >}}
 
