@@ -34,9 +34,8 @@ extraObjects:
         trusted-host = packagemanager.posit.co
 
 launcher:
-  enabled: true
-  useTemplates: true
-  # Required to set a custom PyPI repo
+  enabled: true # Required for Off-Host Execution mode
+  useTemplates: true # Required to set a custom PyPI repo
   templateValues:
     pod:
       volumes:
