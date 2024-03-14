@@ -1,0 +1,116 @@
+# WARNING: no shared storage, so no persistence for this system
+sharedStorage:
+  enabled: false
+
+pod:
+  volumes:
+    - name: sssd-emptydir
+      emptyDir: {}
+    - name: sssd-config
+      configMap:
+        name: sssd-config
+        defaultMode: 0600
+    - name: pam-config
+      configMap:
+        name: pam-config
+        defaultMode: 0755
+  volumeMounts:
+    - name: sssd-emptydir
+      mountPath: /var/lib/sss
+    - name: pam-config
+      mountPath: /etc/pam.d/common-account
+      subPath: common-account
+    - name: pam-config
+      mountPath: /etc/pam.d/common-session
+      subPath: common-session
+    - name: pam-config
+      mountPath: /etc/pam.d/common-auth
+      subPath: common-auth
+    - name: pam-config
+      mountPath: /etc/pam.d/common-password
+      subPath: common-password
+  sidecar:
+    - name: sssd
+      image: "some-sssd-image"
+      imagePullPolicy: "IfNotPresent"
+      securityContext: {}
+      volumeMounts:
+        - name: sssd-emptydir
+          mountPath: /var/lib/sss
+        - name: sssd-config
+          mountPath: /etc/sssd/
+
+extraObjects:
+  - |
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: sssd-config
+      namespace: {{ $.Release.Namespace }}
+    data:
+      sssd.conf: |
+        [sssd]
+        config_file_version=2
+        domains=example.com
+        services=nss, pam
+    
+        [domain/example.com]
+        access_provider=ldap
+        auth_provider=ldap
+        cache_credentials=false
+        chpass_provider=none
+        debug_level=6
+        default_shell=/bin/bash
+        enumerate=true
+        id_provider=ldap
+        ldap_access_filter=(objectClass=inetOrgPerson)
+        ldap_access_order=filter
+        ldap_default_authtok=placeholder
+        ldap_default_bind_dn=cn=bind-account,ou=users,dc=example,dc=com
+        ldap_group_name=cn
+        ldap_group_search_base=ou=roles,dc=example,dc=com
+        ldap_id_use_start_tls=true
+        ldap_schema=rfc2307bis
+        ldap_search_base=ou=users,dc=example,dc=com
+        ldap_tls_cacert=/etc/ssl/certs/ca-certificates.crt
+        ldap_tls_reqcert=never
+        ldap_uri=ldaps://ldap.example.com
+        ldap_user_gid_number=gidNumber
+        ldap_user_name=username
+        ldap_user_object_class=inetOrgPerson
+        ldap_user_search_base=ou=users,dc=example,dc=com
+        ldap_user_uid_number=uidNumber
+        override_homedir=/mnt/home/%u
+        sudo_provider=none
+  - |
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: pam-config
+      namespace: {{ $.Release.Namespace }}
+    data:
+      common-auth: |
+        auth	[success=2 default=ignore]	pam_unix.so nullok_secure
+        auth	[success=1 default=ignore]	pam_sss.so use_first_pass
+        auth	requisite			pam_deny.so
+        auth	required			pam_permit.so
+      common-session: |
+        session	[default=1]			pam_permit.so
+        session	requisite			pam_deny.so
+        session	required			pam_permit.so
+        session optional			pam_umask.so
+        session	required	pam_unix.so
+        session	optional			pam_sss.so
+        session required pam_mkhomedir.so skel=/etc/skel umask=0022
+      common-account: |
+        account	[success=1 new_authtok_reqd=done default=ignore]	pam_unix.so
+        account	requisite			pam_deny.so
+        account	required			pam_permit.so
+        account	sufficient			pam_localuser.so
+        account	[default=bad success=ok user_unknown=ignore]	pam_sss.so
+      common-password: |
+        password	requisite			pam_pwquality.so retry=3
+        password	[success=2 default=ignore]	pam_unix.so obscure use_authtok try_first_pass sha512
+        password	sufficient			pam_sss.so use_authtok
+        password	requisite			pam_deny.so
+        password	required			pam_permit.so
