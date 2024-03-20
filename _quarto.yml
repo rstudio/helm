@@ -20,11 +20,14 @@ filters:
   - include-code-files
 
 format: 
-  posit-docs-html: default
+  posit-docs-html:
+    toc: true
 
 website: 
   title: Posit Helm Charts
   bread-crumbs: true
+  repo-url: https://github.com/rstudio/helm
+  repo-actions: [edit, issue]
   page-footer: 
     center: Posit Helm Charts
   sidebar:
