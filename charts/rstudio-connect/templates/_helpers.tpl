@@ -147,3 +147,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
 {{- end -}}
+
+{{/*
+Create the name of the ServiceAccount
+*/}}
+{{- define "rstudio-connect.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (include "rstudio-connect.fullname" .) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}

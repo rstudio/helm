@@ -489,3 +489,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
 {{- end -}}
+
+{{/*
+Create the name of the ServiceAccount
+*/}}
+{{- define "rstudio-workbench.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (include "rstudio-workbench.fullname" .) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
