@@ -1,3 +1,7 @@
+# 0.5.21
+
+- Add documentation on running the Chronicle Agent on version 2024.03.0 as a sidecar container
+
 # 0.5.20
 
 - Removed`config.Server.RVersion` from the values.yaml. This does not need to be configured, R version auto-detection will be used ([#473](https://github.com/rstudio/helm/issues/473)).

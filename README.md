@@ -26,6 +26,7 @@ Individual helm charts have their own documentation
 - [Posit Connect](./charts/rstudio-connect)
 - [Posit Workbench](./charts/rstudio-workbench)
 - [Posit Package Manager](./charts/rstudio-pm)
+- [Posit Chronicle](./charts/posit-chronicle)
 
 Examples:
 
