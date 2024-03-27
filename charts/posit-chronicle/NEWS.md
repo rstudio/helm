@@ -1,6 +1,6 @@
 # 0.2.2
 
-- Update Chronicle to version 2024.03.0
+- Bump Chronicle to version 2024.03.0
 
 # 0.2.1
 

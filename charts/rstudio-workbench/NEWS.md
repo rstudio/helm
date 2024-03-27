@@ -1,3 +1,7 @@
+# 0.7.1
+
+- Bump Chronicle Agent to version 2024.03.0
+
 # 0.7.0
 
 - BREAKING: The generated service will now have type `ClusterIP` set by default.
