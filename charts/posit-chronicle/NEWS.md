@@ -1,3 +1,9 @@
+# 0.3.0
+
+- Bump Chronicle to version 2024.03.0
+- Moves `pod.NodeSelector` value to the top level as `NodeSelector`, in line with other charts
+- Disable local storage by default
+
 # 0.2.1
 
 - Update docs

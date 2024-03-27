@@ -1,6 +1,6 @@
 image:
   repository: "ghcr.io/rstudio/chronicle"
-  tag: "2023.11.3"
+  tag: "2024.03.0"
   imagePullPolicy: "IfNotPresent"
 
 serviceaccount:
@@ -26,6 +26,9 @@ service:
 # -- The number of replica pods to maintain for this service
 replicas: 1
 
+# -- A map used verbatim as the pod's "nodeSelector" definition
+nodeSelector: {}
+
 pod:
   # -- The command and args to run in the chronicle-server container
   command: "/chronicle"
@@ -40,8 +43,6 @@ pod:
   selectorLabels: {}
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
-  # -- A map used verbatim as the pod's "nodeSelector" definition
-  nodeSelector: {}
   # -- An array used verbatim as the pod's "tolerations" definition
   tolerations: []
   # -- The termination grace period seconds allowed for the pod before shutdown
@@ -69,9 +70,9 @@ config:
     ServiceLogLevel: "INFO"
     ServiceLogFormat: "TEXT"
   LocalStorage:
-    # If localStorage.enabled=false, the chronicle stateful-set
+    # By default when localStorage.enabled=false, the chronicle stateful-set
     # won't submit a volume claim or be bound to a persistent volume
-    Enabled: true
+    Enabled: false
     Location: "./chronicle-data"
     RetentionPeriod: "30d"
   S3Storage:
