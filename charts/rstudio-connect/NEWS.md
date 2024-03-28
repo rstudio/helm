@@ -1,3 +1,7 @@
+# 0.6.1
+
+- Bump Connect version to 2024.03.0
+
 # 0.6.0
 
 - BREAKING: The generated service will now have type `ClusterIP` set by default.
