@@ -1,5 +1,5 @@
 ---
-category: "General Configuration"
+category: "Basic Configuration"
 ---
 
 # Configuring Posit Connect with Recommended Settings

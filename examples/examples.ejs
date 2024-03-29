@@ -1,15 +1,30 @@
 <%
 const postsByCategory = {};
+const basicConfigPosts = [];
 items.forEach(item => {
-  if (!postsByCategory[item.category]) {
-    postsByCategory[item.category] = [];
+  if (item.category === "Basic Configuration") {
+    basicConfigPosts.push(item)
+  } else {
+    if (!postsByCategory[item.category]) {
+      postsByCategory[item.category] = [];
+    }
+    postsByCategory[item.category].push(item);
   }
-  postsByCategory[item.category].push(item);
-})
+});
 
-// Loop through each category
-for (const [category, categoryPosts] of Object.entries(postsByCategory)) {
-%>
+// Basic config first
+if (basicConfigPosts.length > 0) { %>
+<h2>Basic Configuration</h2>
+<ul>
+  <% basicConfigPosts.forEach(post => { %>
+    <li>
+    <a href="<%= post.path %>"><%=post.title %></a>
+    </li> 
+  <% }) %> 
+</ul>
+<% } %>
+
+<% for (const [category, categoryPosts] of Object.entries(postsByCategory)) { %>
   <h2><%= category %></h2>
   <ul>
     <% categoryPosts.forEach(post => { %>
