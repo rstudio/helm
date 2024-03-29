@@ -6,7 +6,7 @@ that are published by Data Scientists.
 IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
   {{- else if eq .Name "rstudio-workbench" -}}
-Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench//) to analyze data and create data
+Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
 products using R and Python.
   {{- else if eq .Name "posit-chronicle" -}}
 Chronicle helps data science managers and other stakeholders understand their
@@ -160,14 +160,3 @@ Set a license server directly in your values file (`license.server`) or during `
 {{ toPrettyJson . }}
 # Examples
 {{- end }}
-
-{{- /*
-Interesting example that does not work... but I fought hard for... for some reason:
-
-  {{ $currentScope := . }}
-  {{ range $path, $_ := $.Files.Glob "{{ .ChartDirectory }}/ci/*.yaml" }}
-    {{- with $currentScope }}
-      {{ $.Files.Get $path }}
-    {{- end }}
-  {{ end }}
-*/ -}}
