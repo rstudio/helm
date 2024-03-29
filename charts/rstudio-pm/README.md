@@ -1,10 +1,10 @@
-# RStudio Package Manager
+# Posit Package Manager
 
 ![Version: 0.5.20](https://img.shields.io/badge/Version-0.5.20-informational?style=flat-square) ![AppVersion: 2023.12.0](https://img.shields.io/badge/AppVersion-2023.12.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
-IT Administrators use [RStudio Package Manager](https://www.rstudio.com/products/package-manager/) to control and manage
+IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
 
 ## For Production

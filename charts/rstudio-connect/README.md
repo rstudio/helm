@@ -1,10 +1,10 @@
-# RStudio Connect
+# Posit Connect
 
 ![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![AppVersion: 2024.02.0](https://img.shields.io/badge/AppVersion-2024.02.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
-Business Users and Collaborators use R and Python data products on [RStudio Connect](https://www.rstudio.com/products/connect/)
+Business Users and Collaborators use R and Python data products on [Posit Connect](https://posit.co/products/enterprise/connect/)
 that are published by Data Scientists.
 
 ## Best Practices
@@ -37,18 +37,6 @@ To explore other chart versions, take a look at:
 ```
 helm search repo rstudio/rstudio-connect -l
 ```
-
-### NOTE
-
-> NOTE: Off-Host execution via Kubernetes (a.k.a. running Connect content in
-> their own dedicated pods) is now Generally Available. Please
-> [see the formal documentation
-> here](https://docs.posit.co/connect/admin/getting-started/off-host-install/).
-
-> BREAKING: Current Beta users should be aware that the default OS has changed from
-> bionic to jammy with the `2023.05.0` release. Existing content will be rebuilt
-> the first time it runs. For more information, please see the Beta migration
-> examples <https://github.com/rstudio/helm/tree/main/examples/connect/beta-migration>.
 
 ## Required Configuration
 
