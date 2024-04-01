@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.21
+
+- Updates to support standalone documentation site
+
 ## 0.5.20
 
 - Removed`config.Server.RVersion` from the values.yaml. This does not need to be configured, R version auto-detection will be used ([#473](https://github.com/rstudio/helm/issues/473)).

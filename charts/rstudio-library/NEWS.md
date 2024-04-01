@@ -1,10 +1,12 @@
 # Changelog
 
+## 0.1.29
+
+- Updates to support standalone documentation site
+
 ## 0.1.28
 
 - Tweak docs a bit
-
-## 0.1.27
 
 ## 0.1.27
 

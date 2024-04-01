@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+- Updates to support standalone documentation site
+
 ## 0.6.0
 
 - BREAKING: The generated service will now have type `ClusterIP` set by default.
