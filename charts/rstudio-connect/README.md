@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![AppVersion: 2024.02.0](https://img.shields.io/badge/AppVersion-2024.02.0-informational?style=flat-square)
+![Version: 0.6.1](https://img.shields.io/badge/Version-0.6.1-informational?style=flat-square) ![AppVersion: 2024.02.0](https://img.shields.io/badge/AppVersion-2024.02.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.0:
+To install the chart with the release name `my-release` at version 0.6.1:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.0
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.1
 ```
 
 To explore other chart versions, take a look at:
