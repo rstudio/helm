@@ -1,0 +1,28 @@
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-pm#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-pm#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: packagemanager.lic # TODO: Change to the secret key containing your Package Manager license
+
+serviceAccount:
+  annotations:
+    # Specify your specific IAM role below
+    # https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here # TODO: Change to your IAM role ARN
+
+config:
+  Storage:
+    Default: s3
+  S3Storage:
+    Bucket: bucket-name-here # TODO: Change to your bucket name
+    Region: us-east-1 # TODO: Change to your region
+  Database:
+    Provider: postgres
+  Postgres:
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>" # TODO: Change this URI to reach your Postgres database.
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>
+    UsageDataURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>" # TODO: Change this URI to reach your Postgres database for metrics. This must be either a seperate database or scheam from the main Package Manager database.
+    UsageDataPassword: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>

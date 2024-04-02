@@ -14,7 +14,7 @@ maintainers:
     url: https://github.com/rstudio/helm
 dependencies:
   - name: rstudio-library
-    version: 0.1.28
+    version: 0.1.29
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |

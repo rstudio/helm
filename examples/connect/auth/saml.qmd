@@ -1,0 +1,18 @@
+---
+category: "Authentication"
+---
+
+# Configuring Posit Connect with SAML
+
+This example deploys Posit Connect using SAML SSO for authentication.
+
+Users will be authenticated via SSO (using SAML) and then users will be created in Connect upon first login or upon creation via the Connect API. Connect will populate user information based on certain attributes received from the IdP. `IdPAttributeProfile` may be set to prepopulate attribute mapping for common IdPs, set to `default` for a common generic mapping or left empty to manually map each attribute. See the [Using attribute profiles](https://docs.posit.co/connect/admin/authentication/saml-based/saml/#attribute-profiles) section of the Connect Admin Guide for more details regarding profile mappings.
+
+By default all users get created with the Viewer role which is the default setting in [`Authorization.DefaultUserRole`](https://docs.posit.co/connect/admin/appendix/configuration/#Authorization.DefaultUserRole). Users can be [automatically mapped to different roles](https://docs.posit.co/connect/admin/authentication/saml-based/saml/#user-role-mapping) based on group membership.
+
+See the [Authentication Integration (Using SAML)](https://docs.posit.co/connect/admin/authentication/saml-based/saml/) section of the Connect Admin Guide for more details. The Connect Admin guide also has pages for integrations with specific IdPs such as Okta and Entra ID.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-connect-saml.yaml" filename="values.yaml"}
+```

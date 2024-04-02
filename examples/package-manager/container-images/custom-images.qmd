@@ -1,0 +1,18 @@
+---
+category: "Container Images"
+---
+
+# Configuring Posit Package Manager with Custom Container Images
+
+This example deploys Posit Package Manager using a custom image instead of the default public Posit provided image.
+
+The Package Manager image may be customized in the helm chart to pull from your own container registry instead of the public Posit provided images.
+
+The default public images are on Docker Hub:
+
+Package Manager: [rstudio/rstudio-package-manager](https://hub.docker.com/r/rstudio/rstudio-package-manager)
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-pm-custom-image.yaml" filename="values.yaml"}
+```
