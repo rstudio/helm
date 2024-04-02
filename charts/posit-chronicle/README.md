@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
+![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -22,11 +22,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.1:
+To install the chart with the release name `my-release` at version 0.2.2:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.2.1
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.2.2
 ```
 
 To explore other chart versions, take a look at:
@@ -145,7 +145,9 @@ config:
 ```
 
 ### Needed S3 Policy Permissions
+
 The credentials Chronicle uses for S3 storage must have the following permissions enabled:
+
 - `s3:GetObject`
 - `s3:ListBucket`
 - `s3:PutObject`

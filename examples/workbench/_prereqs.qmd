@@ -1,0 +1,5 @@
+To use the example you will need: 
+
+- a license file or key
+- `ReadWriteMany` POSIX compliant storage class for `homeStorage` and `sharedStorage`
+- a PostgreSQL database.

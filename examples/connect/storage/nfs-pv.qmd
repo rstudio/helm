@@ -1,0 +1,16 @@
+---
+category: "Storage"
+---
+
+# Configuring Posit Connect with an NFS-backed `PersistentVolume`
+
+This example deploys Posit Connect with a single `PersistentVolume` backed by an NFS server.
+
+The `PersistentVolume` allows setting NFS `mountOptions` and it creates a `StorageClass` that Posit Connect then takes advantage of when it creates its `PersistentVolumeClaim`.
+
+Both the PVC and PV will be left around after the helm release is removed (for manual cleanup) due to the `persistentVolumeReclaimPolicy: Retain` setting.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-connect-with-pv.yaml" filename="values.yaml"}
+```

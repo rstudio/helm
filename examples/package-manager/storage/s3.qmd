@@ -1,0 +1,12 @@
+---
+category: "Storage"
+---
+
+# Configuring Posit Package Manager with S3
+
+This example deploys Posit Package Manager using S3 instead of using `sharedStorage` with a `PersistentVolume` and `PersistentVolumeClaim`.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-pm-with-s3.yaml" filename="values.yaml"}
+```

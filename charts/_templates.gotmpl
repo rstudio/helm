@@ -1,12 +1,12 @@
 {{- define "rstudio.blurb" }}
   {{- if eq .Name "rstudio-connect" -}}
-Business Users and Collaborators use R and Python data products on [RStudio Connect](https://www.rstudio.com/products/connect/)
+Business Users and Collaborators use R and Python data products on [Posit Connect](https://posit.co/products/enterprise/connect/)
 that are published by Data Scientists.
   {{- else if eq .Name "rstudio-pm" -}}
-IT Administrators use [RStudio Package Manager](https://www.rstudio.com/products/package-manager/) to control and manage
+IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
   {{- else if eq .Name "rstudio-workbench" -}}
-Data Scientists use [RStudio Workbench](https://www.rstudio.com/products/workbench/) to analyze data and create data
+Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
 products using R and Python.
   {{- else if eq .Name "posit-chronicle" -}}
 Chronicle helps data science managers and other stakeholders understand their
@@ -24,11 +24,11 @@ Workbench.
 
 {{- define "rstudio.header" }}
   {{- if eq .Name "rstudio-connect" -}}
-# RStudio Connect
+# Posit Connect
   {{- else if eq .Name "rstudio-pm" -}}
-# RStudio Package Manager
+# Posit Package Manager
   {{- else if eq .Name "rstudio-workbench" -}}
-# RStudio Workbench
+# Posit Workbench
   {{- else if eq .Name "posit-chronicle" -}}
 # Posit Chronicle
   {{- else -}}
@@ -160,14 +160,3 @@ Set a license server directly in your values file (`license.server`) or during `
 {{ toPrettyJson . }}
 # Examples
 {{- end }}
-
-{{- /*
-Interesting example that does not work... but I fought hard for... for some reason:
-
-  {{ $currentScope := . }}
-  {{ range $path, $_ := $.Files.Glob "{{ .ChartDirectory }}/ci/*.yaml" }}
-    {{- with $currentScope }}
-      {{ $.Files.Get $path }}
-    {{- end }}
-  {{ end }}
-*/ -}}

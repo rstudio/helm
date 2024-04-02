@@ -1,0 +1,26 @@
+---
+category: "Container Images"
+---
+
+# Configuring Posit Connect to Access Image Registries Requiring Authentication
+
+This example deploys Posit Connect using custom images in registries requiring authentication instead of the default public Posit provided images.
+
+There are a minimum of three images that Connect requires to function in Off-Host Execution mode. They are listed below with their cooresponding default public repositories on ghcr.io
+
+- Connect service container [ghcr.io/rstudio/rstudio-connect](https://github.com/rstudio/rstudio-docker-products/pkgs/container/rstudio-connect)
+- Content container [ghcr.io/rstudio/content-base](https://github.com/rstudio/rstudio-docker-products/pkgs/container/content-base)
+- Content init container [ghcr.io/rstudio/rstudio-connect-content-init](https://github.com/rstudio/rstudio-docker-products/pkgs/container/rstudio-connect-content-init)
+  
+There are several content contents listed as execution enviornments by default on initial Connect startup based on the listing in the [default-runtime.yaml](https://github.com/rstudio/helm/blob/main/charts/rstudio-connect/default-runtime.yaml) file. Setting `customRuntimeYaml` will instead use the execution environments defined in that section instead of the default ones. Additional content containers may be added to provide more R, Python and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
+
+These images can be pulled from your own container registry instead of the public Posit provided images. 
+This example also shows where to provide private registry credentials in the form of a Kubernetes secret of type `kubernetes.io/dockercfg`.
+
+The registry credentials secret must be specified in two places in the values to apply to Connect, content and init containers (shown in the example below).
+Also note the `launcher.templateValues.pod.imagePullSecrets` provides the pod-level `imagePullSecret` that provides the secret to pull the `launcher.defaultInitContainer` as well.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-connect-custom-image-private.yaml" filename="values.yaml"}
+```

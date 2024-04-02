@@ -1,0 +1,15 @@
+---
+category: "Ingress"
+---
+
+# Configuring Posit Workbench with an AWS ALB Ingress
+
+This example deploys Posit Workbench with an Ingress using the AWS Load Balancer Controller to create an Application Load Balancer (ALB).
+This example is provided to show how to set annotations to enable session affinity, redirect HTTP traffic to HTTPS and use AWS Certificate Manager if desired.
+
+The AWS Load Balancer Controller has a variety of settings and modes of operation. Please visit the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/) for more details specific to your use case.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-workbench-alb-ingress.yaml" filename="values.yaml"}
+```
