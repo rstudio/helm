@@ -1,0 +1,13 @@
+---
+category: "Storage"
+---
+
+# Configuring Posit Package Manager with additional volumes
+
+This example shows how to mount a `ConfigMap` to the Package Manager pod. 
+This pattern of specifying the volumes and volumeMounts will work for a variety of volume types: `PVC`, `ConfigMap`, etc.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-pm-with-additional-mounts.yaml" filename="values.yaml"}
+```

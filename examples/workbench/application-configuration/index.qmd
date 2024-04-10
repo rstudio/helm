@@ -1,0 +1,23 @@
+---
+category: "Basic Configuration"
+---
+
+# Configuring Posit Workbench with Recommended Settings
+
+This example deploys Posit Workbench with the recommended application configuration.
+
+These settings are recommend for most deployments and are described below:
+
+ - [Set replicas > 1 to deploy Workbench load balanced across multiple pods](https://docs.posit.co/ide/server-pro/load_balancing/configuration.html)
+ - [Set a default Posit Connect URL](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/rstudio_connect_server.html)
+ - [Set a default Posit Package Manager CRAN URL](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories)
+ - [Set a default Posit Package Manager PyPI URL](https://pip.pypa.io/en/stable/topics/configuration/)
+ - [Set RStudio Pro IDE timeout settings](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.htmlsession-timeout)
+ - [Set Jupyter IDE timeout settings](https://docs.posit.co/ide/server-pro/jupyter_sessions/configuration.html)
+ - [Enable the administrator dashboard and set user group(s) to have admin and admin super user permissions](https://docs.posit.co/ide/server-pro/server_management/administrative_dashboard.html)
+ - [Set default and max resource limits for users](https://docs.posit.co/ide/server-pro/job_launcher/kubernetes_plugin.htmlkube-profiles)
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-workbench-recommended-app-config.yaml" filename="values.yaml"}
+```

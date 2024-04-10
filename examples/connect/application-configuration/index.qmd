@@ -1,0 +1,19 @@
+---
+category: "Basic Configuration"
+---
+
+# Configuring Posit Connect with Recommended Settings
+
+This example deploys Posit Connect with the recommended application configuration.
+
+These settings are recommend for most deployments and are described below:
+
+- [Set replicas > 1 to deploy Connect load balanced across multiple pods](https://docs.posit.co/connect/admin/load-balancing/)
+- [Set a default Posit Package Manager CRAN URL](https://docs.posit.co/connect/admin/r/package-management/#configuring-on-posit-connect)
+- [Set a default Posit Package Manager PyPI URL](https://docs.posit.co/connect/admin/python/package-management/#configuring-pip)
+- [Enable Quarto content](https://docs.posit.co/connect/admin/quarto/#enabling-quarto-support)
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-connect-recommended-app-config.yaml" filename="values.yaml"}
+```
