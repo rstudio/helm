@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2
+
+- Bump Connect version to 2024.03.0
+
 ## 0.6.1
 
 - Updates to support standalone documentation site
