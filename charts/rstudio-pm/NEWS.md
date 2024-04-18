@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.22
+
+- Add documentation on running the Chronicle Agent on version 2024.03.0 as a sidecar container
+
 ## 0.5.21
 
 - Updates to support standalone documentation site

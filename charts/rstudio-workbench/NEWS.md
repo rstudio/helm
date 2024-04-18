@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.2
+
+- Bump Chronicle Agent to version 2024.03.0
+
 ## 0.7.1
 
 - Updates to support standalone documentation site
