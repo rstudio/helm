@@ -1,0 +1,75 @@
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: workbench.lic # TODO: Change to the secret key containing your Workbench license
+
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-home-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 1G
+
+config:
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=require" # TODO: Change this URI to reach your Postgres database.
+      password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.secret.database\.conf.password=<your-postgres-password>.
+  server:
+    rserver.conf:
+      auth-saml: 1
+      auth-saml-sp-attribute-username: Username # TODO: Verify this works with your IdP. This attribute must match the Linux account usernames.
+      auth-saml-metadata-url: https://idp.example.com/saml/metadata # TODO: Change to match your IdP
+      # auth-saml-idp-post-binding is set to 0 by default but some IdPs require it be set to 1 (see below):
+      # auth-saml-idp-post-binding: 1
+  # TODO: Fill out the details of sssd.conf for your specific AD/LDAP setup. sssd is already present in the Workbench image.
+  userProvisioning:
+    example.com.conf:
+      sssd:
+        config_file_version: 2
+        services: nss, pam
+        domains: example.com
+      domain/example.com:
+        debug_level: 6
+        id_provider: ldap
+        auth_provider: ldap
+        chpass_provider: none
+        sudo_provider: none
+        access_provider: ldap
+        enumerate: true
+        cache_credentials: false
+        ldap_schema: rfc2307bis
+        ldap_uri: ldaps://ldap.example.com
+        ldap_search_base: ou=users,dc=example,dc=com
+        ldap_user_search_base: ou=users,dc=example,dc=com
+        ldap_user_object_class: inetOrgPerson
+        ldap_user_name: username
+        override_homedir: /mnt/home/%u
+        ldap_group_search_base: ou=roles,dc=example,dc=com
+        ldap_group_name: cn
+        ldap_id_use_start_tls: true
+        ldap_tls_reqcert: never
+        ldap_tls_cacert: /etc/ssl/certs/ca-certificates.crt
+        ldap_default_bind_dn: cn=bind-account,ou=users,dc=example,dc=com
+        ldap_default_authtok: placeholder
+        ldap_access_filter: (objectClass=inetOrgPerson)
+        default_shell: /bin/bash
+        ldap_access_order: filter
+        ldap_user_uid_number: uidNumber
+        ldap_user_gid_number: gidNumber

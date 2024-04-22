@@ -1,0 +1,73 @@
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: connect.lic # TODO: Change to the secret key containing your Connect license
+
+# Configures Connect shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: connect-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+launcher:
+  enabled: true # Required for Off-Host Execution mode
+
+# The config section overwrites values in Posit Connect's main
+# .gcfg configuration file.
+config:
+  Authentication:
+    Provider: oauth2
+  OAuth2:
+    # please see https://docs.posit.co/connect/admin/authentication/oauth2-openid-based/openid-connect/ for more examples of custom OIDC integrations
+    # TODO: change the below to match your OIDC provider
+    ClientId: "0ebfafe9-237f-4e38-a85b-a0e5d6c06782"
+    ClientSecret: "2ab7be07-84fe-4569-b04a-ce8f1ebfc077"
+    OpenIDConnectIssuer: "https://example.com/issuer"
+    #
+    # Enable this for a better user experience, unless
+    # managing a large number of groups is a concern:
+    # GroupsAutoProvision: true
+    #
+    # By default the following claims are mapped to the following values
+    # in Connect. Uncomment and adjust the values below if your claims are
+    # different.
+    # https://docs.posit.co/connect/admin/authentication/oauth2-openid-based/openid-connect/#customizing-openid-connect
+    # UniqueIdClaim: "sub"
+    # EmailClaim: "email"
+    # FirstNameClaim: "given_name"
+    # LastNameClaim: "family_name"
+    # UsernameClaim: "preferred_username"
+    # GroupsClaim: "groups"
+    #
+    # When troubleshooting an OpenID Connect problem, more verbose logging
+    # is produced by uncommenting the following line:
+    # Logging: true
+    #
+  # By default all users get created with the Viewer role which is the default
+  # setting in Authorization.DefaultUserRole, which can be modified.
+  # Users can be automatically mapped to different roles based on group
+  # membership.
+  # https://docs.posit.co/connect/admin/authentication/oauth2-openid-based/openid-connect/#user-role-mapping
+  #
+  # Authorization:
+  #   UserRoleGroupMapping: true
+  #   PublisherRoleMapping: "Developers"
+  #   AdministratorRoleMapping: "Administrators"
+  #
+  # Configures the Postgres connection for Posit Connect.
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    # The URL syntax below is to utilize a PostgreSQL database installed
+    # in the cluster as described in the Kubernetes Cluster Preparation
+    # page of this guide. Change this URL if your PostgreSQL database is
+    # setup externally or in a different location.
+    URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
+    Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.

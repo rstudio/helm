@@ -1,17 +1,11 @@
-# RStudio Workbench
+# Posit Workbench
 
-![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![AppVersion: 2023.12.1](https://img.shields.io/badge/AppVersion-2023.12.1-informational?style=flat-square)
+![Version: 0.7.2](https://img.shields.io/badge/Version-0.7.2-informational?style=flat-square) ![AppVersion: 2023.12.1](https://img.shields.io/badge/AppVersion-2023.12.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
-Data Scientists use [RStudio Workbench](https://www.rstudio.com/products/workbench/) to analyze data and create data
+Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
 products using R and Python.
-
-## IMPORTANT
-
-> Chart version 0.6.0 introduces a change to the default operating system for Workbench and its sessions.
-> The default is now Ubuntu 22.04 / Ubuntu Jammy. See [`NEWS.md`](./NEWS.md) for more guidance on how to protect
-> yourself from this change.
 
 ## For Production
 
@@ -27,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.7.0:
+To install the chart with the release name `my-release` at version 0.7.2:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.2
 ```
 
 To explore other chart versions, take a look at:
@@ -77,18 +71,6 @@ config:
         auth_provider: ldap
 ```
 
-## Recommended Configuration
-
-In addition to the above required configuration, we recommend setting the following to ensure a reliable deployment:
-
-* Set the `launcherPem` value to ensure that it stays the same between releases.
-  This will ensure that users can continue to properly connect to older sessions even after a redeployment of the chart. See the
-  [RSW Admin Guide](https://docs.rstudio.com/ide/server-pro/job-launcher.html#authentication) for details on generating the file.
-* Set the `global.secureCookieKey` so that user authentication continues to work between deployments. A valid value can be obtained
-  by simply running the `uuid` command.
-* Some use-cases may require special PAM profiles to run. By default, no PAM profiles other than the basic `auth` profile will be used to authenticate users.
-  If this is not sufficient then you will need to add your PAM profiles into the container using a volume and volumeMount.
-
 ## Licensing
 
 This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
@@ -132,9 +114,6 @@ Set a license server directly in your values file (`license.server`) or during `
   on the topic in general.
 - The prestart scripts for RStudio Workbench and RStudio Launcher are highly customized to:
   - Get the service account information off of the RStudio Workbench pod for use in launching jobs
-  - Generate `launcher.pub` as needed (if `launcher.pem` is provided). If it is not provided, the Helm chart will
-    generate it automatically but this information can be lost if deleting the chart or moving to a new cluster. This
-    can cause users to be locked out sessions started by a previous deployment.
 - RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 

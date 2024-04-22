@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![AppVersion: 2023.11.3](https://img.shields.io/badge/AppVersion-2023.11.3-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![AppVersion: 2024.03.0](https://img.shields.io/badge/AppVersion-2024.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -22,11 +22,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.2.1:
+To install the chart with the release name `my-release` at version 0.3.0:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.2.1
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.0
 ```
 
 To explore other chart versions, take a look at:
@@ -56,7 +56,7 @@ pod:
       mountPath: "/var/lib/rstudio-server/audit"
   sidecar:
     - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2023.10.4
+      image: ghcr.io/rstudio/chronicle-agent:2024.03.0
       volumeMounts:
       - name: logs
         mountPath: "/var/lib/rstudio-server/audit"
@@ -72,7 +72,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2023.10.4
+      image: ghcr.io/rstudio/chronicle-agent:2024.03.0
       env:
       - name: CHRONICLE_SERVER_ADDRESS
         value: "http://chronicle-server.default"
@@ -145,7 +145,9 @@ config:
 ```
 
 ### Needed S3 Policy Permissions
+
 The credentials Chronicle uses for S3 storage must have the following permissions enabled:
+
 - `s3:GetObject`
 - `s3:ListBucket`
 - `s3:PutObject`
@@ -158,7 +160,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | config.HTTPS.Certificate | string | `""` |  |
 | config.HTTPS.Enabled | bool | `false` |  |
 | config.HTTPS.Key | string | `""` |  |
-| config.LocalStorage.Enabled | bool | `true` |  |
+| config.LocalStorage.Enabled | bool | `false` |  |
 | config.LocalStorage.Location | string | `"./chronicle-data"` |  |
 | config.LocalStorage.RetentionPeriod | string | `"30d"` |  |
 | config.Logging.ServiceLog | string | `"STDOUT"` |  |
@@ -173,7 +175,8 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | config.S3Storage.Region | string | `"us-east-2"` |  |
 | image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
-| image.tag | string | `"2023.11.3"` |  |
+| image.tag | string | `"2024.03.0"` |  |
+| nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
 | pod.args[0] | string | `"start"` |  |
@@ -182,7 +185,6 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | pod.command | string | `"/chronicle"` | The command and args to run in the chronicle-server container |
 | pod.env | list | `[]` | Optional environment variables |
 | pod.labels | object | `{}` | Additional labels to add to the chronicle-server pods |
-| pod.nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.selectorLabels | object | `{}` | Additional selector labels to add to the chronicle-server pods |
 | pod.terminationGracePeriodSeconds | int | `30` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |

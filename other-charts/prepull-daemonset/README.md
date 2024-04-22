@@ -1,16 +1,16 @@
 # prepull-daemonset
 
-![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square)
+![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square)
 
 #### _a daemonset to prepull images so they are cached_
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.0.2:
+To install the chart with the release name `my-release` at version 0.0.3:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm install my-release rstudio/prepull-daemonset --version=0.0.2
+helm install my-release rstudio/prepull-daemonset --version=0.0.3
 ```
 
 ## Use

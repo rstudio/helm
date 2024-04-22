@@ -1,0 +1,16 @@
+---
+category: "Ingress"
+---
+
+# Configuring Posit Workbench with an Azure Application Gateway Ingress
+
+This example deploys Posit Workbench with an Ingress using the Azure Application Gateway Ingress Controller to create an Azure Application Gateway load balancer.
+This example is provided to show how to set annotations to enabled session affinity and to redirect HTTP traffic to HTTPS.
+
+The Azure Application Gateway Ingress Controller has a variety of settings and modes of operation.
+Please visit the [Azure documentation](https://azure.github.io/application-gateway-kubernetes-ingress/) for more details specific to your use case.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-workbench-azure-application-gateway-ingress.yaml" filename="values.yaml"}
+```
