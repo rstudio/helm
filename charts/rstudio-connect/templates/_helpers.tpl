@@ -76,6 +76,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $pythonSettingsDict := dict "Enabled" ("true") }}
     {{- $pythonDict := dict "Python" ( $pythonSettingsDict ) }}
     {{- $defaultConfig = merge $defaultConfig $launcherDict $pythonDict }}
+    {{- $quartoSettingsDict := dict "Enabled" ("true") }}
+    {{- $quartoDict := dict "Quarto" ( $quartoSettingsDict ) }}
+    {{- $defaultConfig = merge $defaultConfig $launcherDict $quartoDict }}
   {{- end }}
   {{- /* default licensing configuration */}}
   {{- if .Values.license.server }}

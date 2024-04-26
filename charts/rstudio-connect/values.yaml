@@ -335,8 +335,6 @@ config:
     DataDir: /var/lib/rstudio-connect
   Scheduler:
     InitTimeout: 5m
-  Quarto:
-    Enabled: true
   Logging:
     ServiceLog: STDOUT
     ServiceLogLevel: INFO    # INFO, WARNING or ERROR
@@ -349,3 +347,5 @@ config:
     GraphiteHost: 127.0.0.1
     GraphitePort: 9109
     GraphiteClientId: rsconnect
+  # Note: Quarto and Python are both enabled automatically when launcher.enabled: true
+  # https://github.com/rstudio/helm/blob/main/charts/rstudio-connect/templates/_helpers.tpl
