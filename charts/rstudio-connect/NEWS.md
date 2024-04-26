@@ -3,7 +3,7 @@
 ## 0.6.4
 
 - Update the default content images in `default-runtime.yaml` and `default-runtime-pro.yaml` to include newer R, Python and Quarto versions.
-- Enable Quarto by default in the `config` section of `values.yaml`
+- Enable Quarto by default when `launcher.enabled: true`
 
 ## 0.6.3
 
