@@ -335,6 +335,8 @@ config:
     DataDir: /var/lib/rstudio-connect
   Scheduler:
     InitTimeout: 5m
+  Quarto:
+    Enabled: true
   Logging:
     ServiceLog: STDOUT
     ServiceLogLevel: INFO    # INFO, WARNING or ERROR
