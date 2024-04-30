@@ -55,6 +55,7 @@ containers:
   - name: RSTUDIO_LAUNCHER_NAMESPACE
     value: "{{ default $.Release.Namespace .Values.launcher.namespace }}"
   {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-workbench") "envVarPrefix" ("RSW") "fullName" (include "rstudio-workbench.fullname" .)) | nindent 2 }}
+  {{- include "rstudio-library.database-env" (dict "database" ( .Values.database ) "envVarPrefix" ("WORKBENCH")) | nindent 2 }}
   - name: RSW_LAUNCHER
     value: "{{ .Values.launcher.enabled }}"
   {{- if .Values.userCreate }}

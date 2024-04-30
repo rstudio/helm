@@ -263,6 +263,14 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
+database:
+  # -- the password section is used for setting the password for PostgreSQL
+  password:
+    # -- secretKey is the key for the secret to use for the database password
+    secretKey: "password"
+    # -- secret is the name of an existing secret with a database password in it
+    secret: ""
+
 # -- replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA
 replicas: 1
 

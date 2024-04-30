@@ -48,6 +48,8 @@ config:
 
 {{ template "rstudio.licensing" . }}
 
+{{ template "rstudio.database" . }}
+
 ## General Principles
 
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
