@@ -333,6 +333,12 @@ config:
   Server:
     Address: http://localhost:3939
     DataDir: /var/lib/rstudio-connect
+  Python:
+    Enabled: true
+    Executable: "/opt/python/3.9.17/bin/python3"
+  Quarto:
+    Enabled: true
+    Executable: "/opt/quarto/1.3.340/bin/quarto"
   Scheduler:
     InitTimeout: 5m
   Logging:
