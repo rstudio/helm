@@ -13,7 +13,7 @@ maintainers:
     url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
-    version: 0.1.29
+    version: 0.1.30
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |

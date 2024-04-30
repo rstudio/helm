@@ -95,6 +95,7 @@ spec:
           value: enabled
         {{- end }}
 {{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-connect") "envVarPrefix" ("RSC") "fullName" (include "rstudio-connect.fullname" .)) | indent 8 }}
+{{ include "rstudio-library.database-env" (dict "database" ( .Values.database ) "envVarPrefix" ("CONNECT")) | indent 8 }}
         {{- if .Values.pod.env }}
 {{ toYaml .Values.pod.env | indent 8 }}
         {{- end }}

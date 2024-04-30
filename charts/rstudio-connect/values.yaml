@@ -154,6 +154,14 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
+database:
+  # -- the password section is used for setting the password for PostgreSQL
+  password:
+    # -- secretKey is the key for the secret to use for the database password
+    secretKey: "password"
+    # -- secret is the name of an existing secret with a database password in it
+    secret: ""
+
 # -- Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
 # launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null`
 securityContext:

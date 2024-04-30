@@ -23,6 +23,8 @@ This chart requires the following in order to function:
 
 {{ template "rstudio.licensing" . }}
 
+{{ template "rstudio.database" . }}
+
 ## General Principles
 
 - In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
