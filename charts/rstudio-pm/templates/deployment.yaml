@@ -77,6 +77,7 @@ spec:
         image: "{{ .Values.image.repository }}:{{ $imageTag }}"
         env:
         {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-pm") "envVarPrefix" ("RSPM") "fullName" (include "rstudio-pm.fullname" .)) | nindent 8 }}
+        {{-- include "rstudio-library.database-env" (dict "database" ( .Values.database ) "envVarPrefix" ("PACKAGEMANAGER")) | nindent 8 }}
         {{- if .Values.pod.env }}
         {{- toYaml .Values.pod.env | nindent 8 }}
         {{- end }}
