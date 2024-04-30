@@ -359,4 +359,3 @@ config:
     GraphiteHost: 127.0.0.1
     GraphitePort: 9109
     GraphiteClientId: rsconnect
-  # Note: Quarto and Python are both enabled automatically when launcher.enabled: true
