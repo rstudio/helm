@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.30
+
+- Add a `_database-env.tpl` helper to set an environment variable from secret to pass a database password
+
 ## 0.1.29
 
 - Updates to support standalone documentation site
