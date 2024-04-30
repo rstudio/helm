@@ -333,6 +333,18 @@ config:
   Server:
     Address: http://localhost:3939
     DataDir: /var/lib/rstudio-connect
+  Python:
+    Enabled: true
+    # Note: The `Executable` listed below are only used for Local Execution. For Off-Host Execution, Python versions are defined by the set of Execution Environments
+    # https://docs.posit.co/connect/admin/python/
+    Executable:
+      - /opt/python/3.9.17/bin/python
+      - /opt/python/3.8.17/bin/python
+  Quarto:
+    Enabled: true
+    # Note: The `Executable` listed below is only used for Local Execution. For Off-Host Execution, Quarto versions are defined by the set of Execution Environments
+    # https://docs.posit.co/connect/admin/quarto/
+    Executable: "/opt/quarto/1.3.340/bin/quarto"
   Scheduler:
     InitTimeout: 5m
   Logging:

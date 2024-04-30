@@ -67,3 +67,34 @@ snapshot-rsw-diff:
         {{ DIFF }} $file $file.lock
     fi
   done
+
+test-connect-interpreter-versions:
+  #!/usr/bin/env bash
+  set -xe
+  cd ./charts/rstudio-connect && helm dependency build && cd -
+
+  # find the default image
+  image=$(
+    helm template ./charts/rstudio-connect \
+    --show-only templates/deployment.yaml | \
+    grep "image\:.*rstudio-connect.*" | \
+    awk -F": " '{print $2}' | \
+    xargs)
+
+  for lang in "Python" "Quarto" "R"
+  do
+    # print the default connect config file for local execution in ini format
+    # print the section and grep for the Executables to find each interpreter
+    executables=$(
+      helm template ./charts/rstudio-connect \
+      --set config.Launcher.Enabled=false \
+      --show-only templates/configmap.yaml | \
+      sed -n -e "/\[$lang\]/,/\[*\]/ p" | \
+      grep Executable | awk -F= '{print $2}' | \
+      xargs)
+
+    for ex in $executables
+    do
+      docker run --rm $image /bin/bash -c "command -v $ex"
+    done
+  done

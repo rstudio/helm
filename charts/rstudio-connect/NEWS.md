@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.4
+
+- Update the default content images in `default-runtime.yaml` and `default-runtime-pro.yaml` to include newer R, Python and Quarto versions.
+- Enable Python and Quarto by default in `values.yaml` when running in local or off-host execution mode.
+
 ## 0.6.3
 
 - Bump Chronicle Agent to version 2024.03.0

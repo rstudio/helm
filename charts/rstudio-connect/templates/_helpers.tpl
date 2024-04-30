@@ -73,9 +73,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $_ := set $launcherSettingsDict "KubernetesUseTemplates" "false" }}
     {{- end }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
-    {{- $pythonSettingsDict := dict "Enabled" ("true") }}
-    {{- $pythonDict := dict "Python" ( $pythonSettingsDict ) }}
-    {{- $defaultConfig = merge $defaultConfig $launcherDict $pythonDict }}
+    {{- $defaultConfig = merge $defaultConfig $launcherDict }}
   {{- end }}
   {{- /* default licensing configuration */}}
   {{- if .Values.license.server }}

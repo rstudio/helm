@@ -84,3 +84,22 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
         continue-on-error: true
+
+  check-versions-connect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.6.3
+
+      - uses: extractions/setup-just@v2
+
+      - name: Run executable verification for default interpreters
+        run: |
+          just test-connect-interpreter-versions

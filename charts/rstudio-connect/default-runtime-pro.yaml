@@ -1,12 +1,12 @@
 name: Kubernetes
 images:
   -
-    name: ghcr.io/rstudio/content-pro:r3.6.3-py3.8.16-ubuntu2204
+    name: ghcr.io/rstudio/content-pro:r3.6.3-py3.8.19-ubuntu2204
     python:
       installations:
         -
-          path: /opt/python/3.8.16/bin/python3
-          version: 3.8.16
+          path: /opt/python/3.8.19/bin/python3
+          version: 3.8.19
     r:
       installations:
         -
@@ -14,15 +14,15 @@ images:
           version: 3.6.3
     quarto:
       installations:
-        - path: /opt/quarto/1.3.340/bin/quarto
-          version: 1.3.340
+        - path: /opt/quarto/1.3.450/bin/quarto
+          version: 1.3.450
   -
-    name: ghcr.io/rstudio/content-pro:r4.0.5-py3.9.16-ubuntu2204
+    name: ghcr.io/rstudio/content-pro:r4.0.5-py3.9.19-ubuntu2204
     python:
       installations:
         -
-          path: /opt/python/3.9.16/bin/python3
-          version: 3.9.16
+          path: /opt/python/3.9.19/bin/python3
+          version: 3.9.19
     r:
       installations:
         -
@@ -30,15 +30,15 @@ images:
           version: 4.0.5
     quarto:
       installations:
-        - path: /opt/quarto/1.3.340/bin/quarto
-          version: 1.3.340
+        - path: /opt/quarto/1.3.450/bin/quarto
+          version: 1.3.450
   -
-    name: ghcr.io/rstudio/content-pro:r4.1.3-py3.10.11-ubuntu2204
+    name: ghcr.io/rstudio/content-pro:r4.1.3-py3.10.14-ubuntu2204
     python:
       installations:
         -
-          path: /opt/python/3.10.11/bin/python3
-          version: 3.10.11
+          path: /opt/python/3.10.14/bin/python3
+          version: 3.10.14
     r:
       installations:
         -
@@ -46,21 +46,53 @@ images:
           version: 4.1.3
     quarto:
       installations:
-        - path: /opt/quarto/1.3.340/bin/quarto
-          version: 1.3.340
+        - path: /opt/quarto/1.3.450/bin/quarto
+          version: 1.3.450
   -
-    name: ghcr.io/rstudio/content-pro:r4.2.2-py3.11.3-ubuntu2204
+    name: ghcr.io/rstudio/content-pro:r4.2.3-py3.11.9-ubuntu2204
     python:
       installations:
         -
-          path: /opt/python/3.11.3/bin/python3
-          version: 3.11.3
+          path: /opt/python/3.11.9/bin/python3
+          version: 3.11.9
     r:
       installations:
         -
-          path: /opt/R/4.2.2/bin/R
-          version: 4.2.2
+          path: /opt/R/4.2.3/bin/R
+          version: 4.2.3
     quarto:
       installations:
-        - path: /opt/quarto/1.3.340/bin/quarto
-          version: 1.3.340
+        - path: /opt/quarto/1.3.450/bin/quarto
+          version: 1.3.450
+  -
+    name: ghcr.io/rstudio/content-pro:r4.3.3-py3.12.3-ubuntu2204
+    python:
+      installations:
+        -
+          path: /opt/python/3.12.3/bin/python3
+          version: 3.12.3
+    r:
+      installations:
+        -
+          path: /opt/R/4.3.3/bin/R
+          version: 4.3.3
+    quarto:
+      installations:
+        - path: /opt/quarto/1.4.553/bin/quarto
+          version: 1.4.553
+  -
+    name: ghcr.io/rstudio/content-pro:r4.4.0-py3.12.3-ubuntu2204
+    python:
+      installations:
+        -
+          path: /opt/python/3.12.3/bin/python3
+          version: 3.12.3
+    r:
+      installations:
+        -
+          path: /opt/R/4.4.0/bin/R
+          version: 4.4.0
+    quarto:
+      installations:
+        - path: /opt/quarto/1.4.553/bin/quarto
+          version: 1.4.553
