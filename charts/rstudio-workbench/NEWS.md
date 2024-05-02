@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.4
+
+- Use the full workbench image tag of ubuntu2204-2024.04.0+735.pro3
+
 ## 0.7.3
 
 - Bump Workbench version to 2024.04.0
