@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.4
+
+- Add a `database` section to the `values.yaml` for setting PostgreSQL password from secrets
+- Bump rstudio-library chart version
+
 ## 0.7.3
 
 - Bump Workbench version to 2024.04.0

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.6
+
+- Add a `database` section to the `values.yaml` for setting PostgreSQL password from secrets
+- Bump rstudio-library chart version
+
 ## 0.6.5
 
 - Bump Connect version to 2024.04.0
