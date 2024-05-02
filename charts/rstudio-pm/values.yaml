@@ -76,6 +76,13 @@ database:
     secretKey: "password"
     # -- secret is the name of an existing secret with a database password in it
     secret: ""
+  # -- the passwordUsage section is used for setting the usage data password for PostgreSQL
+  passwordUsage:
+    # -- secretKey is the key for the secret to use for the database password
+    secretKey: "password"
+    # -- secret is the name of an existing secret with a database password in it
+    secret: ""
+
 
 service:
   # -- The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to
