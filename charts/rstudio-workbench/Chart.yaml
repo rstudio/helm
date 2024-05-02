@@ -18,9 +18,9 @@ dependencies:
 annotations:
   artifacthub.io/images: |
     - name: rstudio-workbench
-      image: rstudio/rstudio-workbench:ubuntu2204-2024.04.0
+      image: rstudio/rstudio-workbench:ubuntu2204-2024.04.0-735.pro3
     - name: r-session-complete
-      image: rstudio/r-session-complete:ubuntu2204-2024.04.0
+      image: rstudio/r-session-complete:ubuntu2204-2024.04.0-735.pro3
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images
