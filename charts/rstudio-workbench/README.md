@@ -119,7 +119,13 @@ database:
   password:
     secret: rstudio-workbench-database
     secretKey: password
-```Alternatively, database passwords can be set during `helm install` with the following argument:`--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
+```
+
+  Alternatively, database passwords can be set during `helm install` with the following argument:
+
+  ```
+--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"
+```
 
 ## General Principles
 

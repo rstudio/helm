@@ -103,15 +103,21 @@ database:
   password:
     secret: rstudio-pm-database
     secretKey: password
-```Package Manager also needs a separate [schema or database for its usage data](https://docs.posit.co/rspm/admin/database/#usage-data_1). To specify the UsageDataPassword, specify the following values:
+```
+
+  Package Manager also needs a separate [schema or database for its usage data](https://docs.posit.co/rspm/admin/database/#usage-data_1). To specify the UsageDataPassword, specify the following values:
 
 ```yaml
 database:
   usageDataPassword:
     secret: rstudio-pm-database
     secretKey: password
-```Alternatively, database passwords can be set during `helm install` with the following argument:`--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
-`--set config.Postgres.UsageDataPassword="<YOUR_PASSWORD_HERE>"`
+```Alternatively, database passwords can be set during `helm install` with the following argument:
+
+  ```
+--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"
+--set config.Postgres.UsageDataPassword="<YOUR_PASSWORD_HERE>"
+```
 
 ## S3 Configuration
 
