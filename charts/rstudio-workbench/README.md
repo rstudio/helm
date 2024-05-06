@@ -106,7 +106,7 @@ Set a license server directly in your values file (`license.server`) or during `
 
 ## Database
 
-When running in Kubernetes, the product requires a PostgreSQL database. The connection URI and password can be specified in the `config` section. However, we recommend putting the database password in a Kubernetes secret, which can be automatically set as an environment variable following the directions below.
+When running in Kubernetes, the product requires a PostgreSQL database. The connection URI and password can be specified in the `config` section. However, we recommend putting the database password in a Kubernetes `Secret`, which can be automatically set as an environment variable following the directions below.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
@@ -119,7 +119,7 @@ database:
   password:
     secret: rstudio-workbench-database
     secretKey: password
-```
+```Alternatively, database passwords can be set during `helm install` with the following argument:`--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
 
 ## General Principles
 
