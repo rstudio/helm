@@ -2,7 +2,7 @@
 
 ## 0.1.30
 
-- Add a `_database-env.tpl` helper to set an environment variable from secret to pass a database password
+- Add a `_database-env.tpl` helper to set an environment variable from a secret to pass a database password to a product
 
 ## 0.1.29
 
