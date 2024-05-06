@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.7.3](https://img.shields.io/badge/Version-0.7.3-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
+![Version: 0.7.4](https://img.shields.io/badge/Version-0.7.4-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.7.3:
+To install the chart with the release name `my-release` at version 0.7.4:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.3
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.4
 ```
 
 To explore other chart versions, take a look at:
@@ -103,6 +103,23 @@ Set a license key directly in your values file (`license.key`) or during `helm i
 ### License Server
 
 Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+
+## Database
+
+When running in Kubernetes, the product requires a PostgreSQL database. The connection URI and password can be specified in the `config` section. However, we recommend putting the database password in a Kubernetes secret, which can be automatically set as an environment variable following the directions below.
+
+First, create the secret declaratively with YAML or imperatively using the following command:
+
+`kubectl create secret generic rstudio-workbench-database --from-literal=password=YOURPASSWORDHERE`
+
+Second, specify the following values:
+
+```yaml
+database:
+  password:
+    secret: rstudio-workbench-database
+    secretKey: password
+```
 
 ## General Principles
 
@@ -426,6 +443,9 @@ Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | config.startupUserProvisioning | object | `{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/ |
 | config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
+| database.password | object | `{"secret":"","secretKey":"password"}` | the password section is used for setting the password for PostgreSQL |
+| database.password.secret | string | `""` | secret is the name of an existing secret with a database password in it |
+| database.password.secretKey | string | `"password"` | secretKey is the key for the secret to use for the database password |
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |

@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.6.5](https://img.shields.io/badge/Version-0.6.5-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
+![Version: 0.6.6](https://img.shields.io/badge/Version-0.6.6-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.5:
+To install the chart with the release name `my-release` at version 0.6.6:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.5
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.6
 ```
 
 To explore other chart versions, take a look at:
@@ -84,6 +84,23 @@ Set a license key directly in your values file (`license.key`) or during `helm i
 
 Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
 
+## Database
+
+When running in Kubernetes, the product requires a PostgreSQL database. The connection URI and password can be specified in the `config` section. However, we recommend putting the database password in a Kubernetes secret, which can be automatically set as an environment variable following the directions below.
+
+First, create the secret declaratively with YAML or imperatively using the following command:
+
+`kubectl create secret generic rstudio-connect-database --from-literal=password=YOURPASSWORDHERE`
+
+Second, specify the following values:
+
+```yaml
+database:
+  password:
+    secret: rstudio-connect-database
+    secretKey: password
+```
+
 ## General Principles
 
 - In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
@@ -110,6 +127,9 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
+| database.password | object | `{"secret":"","secretKey":"password"}` | the password section is used for setting the password for PostgreSQL |
+| database.password.secret | string | `""` | secret is the name of an existing secret with a database password in it |
+| database.password.secretKey | string | `"password"` | secretKey is the key for the secret to use for the database password |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"ubuntu2204-"}` | Defines the Posit Connect image to deploy |
