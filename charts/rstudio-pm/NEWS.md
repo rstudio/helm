@@ -2,7 +2,7 @@
 
 ## 0.5.23
 
-- Update default Posit Package Manager version to 2024.04.0-18
+- Update default Posit Package Manager version to 2024.04.0-20
 
 ## 0.5.22
 
