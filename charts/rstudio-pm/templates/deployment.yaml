@@ -78,12 +78,12 @@ spec:
         env:
         {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-pm") "envVarPrefix" ("RSPM") "fullName" (include "rstudio-pm.fullname" .)) | nindent 8 }}
         {{- include "rstudio-library.database-env" (dict "database" ( .Values.database ) "envVarPrefix" ("PACKAGEMANAGER")) | nindent 8 }}
-        {{- if .Values.database.passwordUsage.secret }}
+        {{- if .Values.database.usageDataPassword.secret }}
         - name: PACKAGEMANAGER_POSTGRES_USAGEDATAPASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.database.passwordUsage.secret }}
-              key: {{ .Values.database.passwordUsage.secretKey }}
+              name: {{ .Values.database.usageDataPassword.secret }}
+              key: {{ .Values.database.usageDataPassword.secretKey }}
         {{- end }}
         {{- if .Values.pod.env }}
         {{- toYaml .Values.pod.env | nindent 8 }}

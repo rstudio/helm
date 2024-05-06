@@ -76,8 +76,8 @@ database:
     secretKey: "password"
     # -- secret is the name of an existing secret with a database password in it
     secret: ""
-  # -- the passwordUsage section is used for setting the usage data password for PostgreSQL
-  passwordUsage:
+  # -- the usageDataPassword section is used for setting the usage data password for PostgreSQL
+  usageDataPassword:
     # -- secretKey is the key for the secret to use for the database password
     secretKey: "password"
     # -- secret is the name of an existing secret with a database password in it
