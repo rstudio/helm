@@ -112,7 +112,9 @@ database:
   usageDataPassword:
     secret: rstudio-pm-database
     secretKey: password
-```Alternatively, database passwords can be set during `helm install` with the following argument:
+```
+
+Alternatively, database passwords can be set during `helm install` with the following argument:
 
   ```
 --set config.Postgres.Password="<YOUR_PASSWORD_HERE>"
