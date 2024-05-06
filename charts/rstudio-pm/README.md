@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.23](https://img.shields.io/badge/Version-0.5.23-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
+![Version: 0.5.24](https://img.shields.io/badge/Version-0.5.24-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.23:
+To install the chart with the release name `my-release` at version 0.5.24:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.23
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.24
 ```
 
 To explore other chart versions, take a look at:
