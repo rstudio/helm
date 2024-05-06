@@ -2,7 +2,7 @@
 
 ## 0.5.24
 
-- Unset the [Server].Address default value as this can cause issues when serving from a domain name.
+- Unset the `[Server].Address` default value as this can cause issues when serving from a domain name.
 
 ## 0.5.23
 
