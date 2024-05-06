@@ -34,15 +34,6 @@ This chart requires the following in order to function:
 
 {{ template "rstudio.database" . }}
 
-Package Manager also needs a separate [schema or database for its usage data](https://docs.posit.co/rspm/admin/database/#usage-data_1). To specify the UsageDataPassword, specify the following values:
-
-```yaml
-database:
-  usageDataPassword:
-    secret: {{ .Name }}-database
-    secretKey: password
-```
-
 ## S3 Configuration
 
 Package Manager [can be configured to store its data in S3
