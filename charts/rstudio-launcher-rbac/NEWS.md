@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.21
+
+- Bump rstudio-library to `0.1.30`
+
 ## 0.2.20
 
 - Updates to support standalone documentation site
