@@ -1,8 +1,0 @@
-primary:
-  initdb:
-    scripts:
-      user_setup.sql: |
-                CREATE DATABASE connect;
-                CREATE DATABASE packagemanager;
-                \connect packagemanager;
-                CREATE SCHEMA metrics;
