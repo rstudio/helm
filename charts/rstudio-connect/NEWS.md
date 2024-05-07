@@ -1,3 +1,7 @@
+# 0.6.6
+
+- Bump Connect version to 2024.04.1
+
 # Changelog
 
 ## 0.6.5
