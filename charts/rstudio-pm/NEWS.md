@@ -2,7 +2,7 @@
 
 ## 0.5.26
 
-- Add a `database` section to the `values.yaml` for setting PostgreSQL passwords from secrets
+- Add a `database` section to the `values.yaml` for setting PostgreSQL passwords from secrets for the main and usage data databases
 - Bump rstudio-library chart version
 
 ## 0.5.25
