@@ -188,6 +188,12 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
 | config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
+| database.password | object | `{"secret":"","secretKey":"password"}` | the password section is used for setting the password for PostgreSQL |
+| database.password.secret | string | `""` | secret is the name of an existing secret with a database password in it |
+| database.password.secretKey | string | `"password"` | secretKey is the key for the secret to use for the database password |
+| database.usageDataPassword | object | `{"secret":"","secretKey":"password"}` | the usageDataPassword section is used for setting the usage data password for PostgreSQL |
+| database.usageDataPassword.secret | string | `""` | secret is the name of an existing secret with a database password in it |
+| database.usageDataPassword.secretKey | string | `"password"` | secretKey is the key for the secret to use for the database password |
 | enableMigration | bool | `true` | Enable migrations for shared storage (if necessary) using Helm hooks. |
 | enableSandboxing | bool | `true` | Enable sandboxing of Git builds, which requires elevated security privileges for the Package Manager container. |
 | extraContainers | list | `[]` | sidecar container list |
