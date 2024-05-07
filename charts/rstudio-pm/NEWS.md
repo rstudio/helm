@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.25
+
+- Update default Posit Package Manager version to 2024.04.0-20
+
 ## 0.5.24
 
 - Unset the `[Server].Address` default value as this can cause issues when serving from a domain name.
