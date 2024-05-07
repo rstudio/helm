@@ -18,6 +18,11 @@ $posit-burgundy-1:#78384F;
 $posit-burgundy-2:#542938;
 
 $primary: $posit-blue;
+
+// Feature preview heading colors
+$preview-header: #EE6331; /* posit orange, contrast: 8.45 */
+$preview-header-border: darken($preview-header, 5%);
+
 // scss-docs-end color-variables
 
 // Typography
@@ -75,6 +80,26 @@ $list-group-color: $primary !default;
     font-weight: 500;
 }
 
+/* Style for the version included in the website title */
+.navbar-title small {
+    font-size: 14px;
+    display: block;
+    padding-left: 1em;
+}
+
+/* Posit logo - navbar or footer */
+#footer-right-posit-logo {
+  width: 70px;
+  min-width: 70px;
+}
+
+#footer-right-logo {
+  width: 20px;
+  min-width: 20px;
+  margin-left: -3px !important;
+  margin-right: -3px !important;
+}
+
 .nav-link {
     font-family: $font-family-monospace;
     text-transform: uppercase;
@@ -98,21 +123,36 @@ $list-group-color: $primary !default;
     font-family: $font-family-sans-serif;
 }
 
-/* Mini TOC */
-.sidebar nav[role=doc-toc]>ul li a {
-    text-transform: none !important;
-    font-family: $font-family-sans-serif;
-    font-size: 16px;
-    font-weight: 300 !important;
-    letter-spacing: .05em !important;
+/* Sidebar and toc */
+
+/* Left nav */
+.sidebar-item-container .active {
+  font-weight: 500;
 }
 
 /* Left nav - letter spacing */
 .sidebar-navigation li a {
-    letter-spacing: .03em;
-    font-size: 16px;
+  letter-spacing: .03em;
+  font-size: 16px;
 }
 
+/* Mini TOC */
+.sidebar nav[role=doc-toc]>ul li a {
+    text-transform: none !important;
+    font-family: $font-family-sans-serif;
+    font-weight: 400 !important;
+    letter-spacing: -0.2px !important;
+}
+
+.sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active {
+    font-weight: 700 !important;
+}
+
+/* Left nav - letter spacing */
+.sidebar-navigation li a {
+    letter-spacing: -0.2px;
+    line-height: normal;
+}
 
 /* Posit logo - footer */
 #footer-logo {
@@ -125,7 +165,74 @@ $list-group-color: $primary !default;
     min-height: min-content;
 }
 
+// Font
+
+/* Body font */
+body {
+  letter-spacing: -0.2px !important;
+ }
+
+// Specialty headers
+
+/* the feature PREVIEW header */
+.preview-header > h1:after,
+.preview-header > h2:after,
+.preview-header > h3:after,
+.preview-header > h4:after,
+header h1 .preview-header {
+  content: "Preview feature";
+  margin-left: 1em;
+  position: relative;
+  border-radius: 50rem !important;
+  top: -0.5em;
+}
+
+.preview-header > h1:after,
+.preview-header > h2:after,
+.preview-header > h3:after,
+.preview-header > h4:after,
+header h1 .preview-header,
+div span.preview-feature {
+  color: $preview-header;
+  border: 1px solid $preview-header-border;
+  font-weight: 400;
+  font-size: 9pt !important;
+  padding: 0rem 0.4rem;
+}
+
+div span.preview-feature {
+  margin-left: 1em;
+  text-transform: uppercase;
+}
+
+// Lists
+
 /* List disc colors */
 li::marker {
-    color: $primary;
+  color: $primary;
+}
+
+/* Callout steps for images with multiple items/steps shown in single image */
+ol.groovyAlpha {
+    list-style: none;
+    counter-reset: list-counter;
+  }
+  
+ol.groovyAlpha li {
+  counter-increment: list-counter;
+}
+
+ol.groovyAlpha li > p:before {
+  content: counter(list-counter, lower-alpha);
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  margin-right: 10px;
+  color: #fff;
+  background-color: #fc403b;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 9px;
+  line-height: 16px;
+  vertical-align: middle;
 }
