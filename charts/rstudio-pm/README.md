@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.24](https://img.shields.io/badge/Version-0.5.24-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
+![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.24:
+To install the chart with the release name `my-release` at version 0.5.25:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.24
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.25
 ```
 
 To explore other chart versions, take a look at:
@@ -187,13 +187,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsAccessKeyId | bool | `false` | awsAccessKeyId is the access key id for s3 access, used also to gate file creation |
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
-| config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true},"Server":{"Address":"http://localhost:4242"}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
-| database.password | object | `{"secret":"","secretKey":"password"}` | the password section is used for setting the password for PostgreSQL |
-| database.password.secret | string | `""` | secret is the name of an existing secret with a database password in it |
-| database.password.secretKey | string | `"password"` | secretKey is the key for the secret to use for the database password |
-| database.usageDataPassword | object | `{"secret":"","secretKey":"password"}` | the usageDataPassword section is used for setting the usage data password for PostgreSQL |
-| database.usageDataPassword.secret | string | `""` | secret is the name of an existing secret with a database password in it |
-| database.usageDataPassword.secretKey | string | `"password"` | secretKey is the key for the secret to use for the database password |
+| config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
 | enableMigration | bool | `true` | Enable migrations for shared storage (if necessary) using Helm hooks. |
 | enableSandboxing | bool | `true` | Enable sandboxing of Git builds, which requires elevated security privileges for the Package Manager container. |
 | extraContainers | list | `[]` | sidecar container list |
