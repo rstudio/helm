@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.26
+
+- Add a `database` section to the `values.yaml` for setting PostgreSQL passwords from secrets
+- Bump rstudio-library chart version
+
 ## 0.5.25
 
 - Update default Posit Package Manager version to 2024.04.0-20
