@@ -93,7 +93,7 @@ required by rstudio-connect.
 
 ## Database
 
-Connect requires a PostgreSQL database when running in Kubernetes. You must configure a valid connection URI and a password for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret,` which can be [automatically set as an environment variable](#database-password).
+Connect requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/connect/admin/database/postgres/) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
 
 ### Database configuration
 
@@ -104,14 +104,16 @@ config:
   Database:
     Provider: "Postgres"
   Postgres:
-    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>"
 ```
 
 ### Database password
 
-First, create a secret declaratively with YAML or imperatively using the following command (replacing with your actual password):
+First, create a `Secret` declaratively with YAML or imperatively using the following command (replacing with your actual password):
 
-`kubectl create secret generic rstudio-connect-database --from-literal=password=YOURPASSWORDHERE`
+```bash
+kubectl create secret generic rstudio-connect-database --from-literal=password=YOURPASSWORDHERE
+```
 
 Second, specify the following in your `values.yaml`:
 

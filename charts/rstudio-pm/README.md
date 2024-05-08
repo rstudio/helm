@@ -90,7 +90,7 @@ Set a license server directly in your values file (`license.server`) or during `
 
 ## Database
 
-Package Manager requires a PostgreSQL database when running in Kubernetes. You must configure a valid connection URI and a password for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret,` which can be [automatically set as an environment variable](#database-password).
+Package Manager requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/rspm/admin/database/#database-postgres) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
 
 By default, Package Manager relies on two databases or schemas. The primary database stores information needed to run the service, including the arrangement of repositories, sources, and packages. The secondary database records usage data, such as the number of times a package was downloaded.
 
@@ -103,15 +103,17 @@ config:
   Database:
     Provider: "Postgres"
   Postgres:
-    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
-    UsageDataURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?options=-csearch_path=<SCHEMA>&sslmode=allow"
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>"
+    UsageDataURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?options=-csearch_path=<SCHEMA>"
 ```
 
 ### Database password
 
-First, create a secret declaratively with YAML or imperatively using the following command (replacing with your actual password):
+First, create a `Secret` declaratively with YAML or imperatively using the following command (replacing with your actual password):
 
-`kubectl create secret generic rstudio-pm-database --from-literal=password=YOURPASSWORDHERE`
+```bash
+kubectl create secret generic rstudio-pm-database --from-literal=password=YOURPASSWORDHERE
+```
 
 Second, specify the following in your `values.yaml`:
 
@@ -130,7 +132,7 @@ pod:
           key: password
 ```
 
-In this example the same database is being used with two schemas so we use the same database password secret.
+In this example the same database is being used with two schemas so we use the same secret.
 
 Alternatively, database passwords may be set during `helm install` with the following argument:
 
