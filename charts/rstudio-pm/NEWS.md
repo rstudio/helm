@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.26
+
+- Add documentation on database configuration and mounting passwords from secrets
+
 ## 0.5.25
 
 - Update default Posit Package Manager version to 2024.04.0-20
