@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.6.6](https://img.shields.io/badge/Version-0.6.6-informational?style=flat-square) ![AppVersion: 2024.04.1](https://img.shields.io/badge/AppVersion-2024.04.1-informational?style=flat-square)
+![Version: 0.6.7](https://img.shields.io/badge/Version-0.6.7-informational?style=flat-square) ![AppVersion: 2024.04.1](https://img.shields.io/badge/AppVersion-2024.04.1-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Connect_
 
@@ -26,11 +26,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.6.6:
+To install the chart with the release name `my-release` at version 0.6.7:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.6
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.7
 ```
 
 To explore other chart versions, take a look at:
@@ -90,6 +90,78 @@ Set a license server directly in your values file (`license.server`) or during `
 required by rstudio-connect.
 - rstudio-connect does not export many prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
+
+## Database
+
+Connect requires a PostgreSQL database when running in Kubernetes. You must configure a valid connection URI and a password for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret,` which can be [automatically set as an environment variable](#database-password).
+
+### Database configuration
+
+Add the following to your `values.yaml`, replacing the `URL` with your database details.
+
+```yaml
+config:
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+```
+
+### Database password
+
+First, create a secret declaratively with YAML or imperatively using the following command (replacing with your actual password):
+
+`kubectl create secret generic rstudio-connect-database --from-literal=password=YOURPASSWORDHERE`
+
+Second, specify the following in your `values.yaml`:
+
+```yaml
+pod:
+  env:
+    - name: CONNECT_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-connect-database
+          key: password
+```
+
+Alternatively, database passwords may be set during `helm install` with the following argument:
+
+```bash
+--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"
+```
+
+### Operational metrics database
+
+Connect by default stores operational metrics in its main database. You may optionally use a seperate [schema or database for your operational metrics storage](https://docs.posit.co/connect/admin/database/postgres/index.html#operational-metrics).
+
+To use a seperate database or schema for these metrics add `InstrumentationURL` in the same section as `URL` in your `values.yaml`.
+
+```yaml
+config:
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+    InstrumentationURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+```
+
+Then specify the `InstrumentationPassword` in the same manner as `Password` by setting the environment variable `CONNECT_POSTGRES_INSTRUMENTATIONPASSWORD` from secret.
+
+```yaml
+pod:
+  env:
+    - name: CONNECT_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-connect-database
+          key: password
+    - name: CONNECT_POSTGRES_INSTRUMENTATIONPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-connect-database
+          key: password
+```
 
 ## Configuration File
 

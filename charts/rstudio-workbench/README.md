@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.7.3](https://img.shields.io/badge/Version-0.7.3-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
+![Version: 0.7.4](https://img.shields.io/badge/Version-0.7.4-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Workbench_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.7.3:
+To install the chart with the release name `my-release` at version 0.7.4:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.3
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.4
 ```
 
 To explore other chart versions, take a look at:
@@ -116,6 +116,46 @@ Set a license server directly in your values file (`license.server`) or during `
   - Get the service account information off of the RStudio Workbench pod for use in launching jobs
 - RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
+
+## Database
+
+Workbench requires a PostgreSQL database when running in Kubernetes. You must configure a valid connection URI and a password for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret,` which can be [automatically set as an environment variable](#database-password).
+
+### Database configuration
+
+Add the following to your `values.yaml`, replacing the `connection-uri` with your database details.
+
+```yaml
+config:
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+```
+
+### Database password
+
+First, create a secret declaratively with YAML or imperatively using the following command (replacing with your actual password):
+
+`kubectl create secret generic rstudio-workbench-database --from-literal=password=YOURPASSWORDHERE`
+
+Second, specify the following in your `values.yaml`:
+
+```yaml
+pod:
+  env:
+    - name: WORKBENCH_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-workbench-database
+          key: password
+```
+
+Alternatively, database passwords may be set during `helm install` with the following argument:
+
+```bash
+--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"
+```
 
 ## Configuration files
 

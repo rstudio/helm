@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
+![Version: 0.5.26](https://img.shields.io/badge/Version-0.5.26-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for RStudio Package Manager_
 
@@ -21,11 +21,11 @@ To ensure a stable production deployment, please:
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release` at version 0.5.25:
+To install the chart with the release name `my-release` at version 0.5.26:
 
 ```bash
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.25
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.26
 ```
 
 To explore other chart versions, take a look at:
@@ -87,6 +87,57 @@ Set a license key directly in your values file (`license.key`) or during `helm i
 ### License Server
 
 Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+
+## Database
+
+Package Manager requires a PostgreSQL database when running in Kubernetes. You must configure a valid connection URI and a password for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret,` which can be [automatically set as an environment variable](#database-password).
+
+By default, Package Manager relies on two databases or schemas. The primary database stores information needed to run the service, including the arrangement of repositories, sources, and packages. The secondary database records usage data, such as the number of times a package was downloaded.
+
+### Database configuration
+
+Add the following to your `values.yaml`, replacing the `URL` and `UsageDataURL` with your database details.
+
+```yaml
+config:
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+    UsageDataURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?options=-csearch_path=<SCHEMA>&sslmode=allow"
+```
+
+### Database password
+
+First, create a secret declaratively with YAML or imperatively using the following command (replacing with your actual password):
+
+`kubectl create secret generic rstudio-pm-database --from-literal=password=YOURPASSWORDHERE`
+
+Second, specify the following in your `values.yaml`:
+
+```yaml
+pod:
+  env:
+    - name: PACKAGEMANAGER_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-pm-database
+          key: password
+    - name: PACKAGEMANAGER_POSTGRES_USAGEDATAPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-pm-database
+          key: password
+```
+
+In this example the same database is being used with two schemas so we use the same database password secret.
+
+Alternatively, database passwords may be set during `helm install` with the following argument:
+
+```bash
+--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"
+--set config.Postgres.UsageDataPassword="<YOUR_PASSWORD_HERE>"
+```
 
 ## S3 Configuration
 
