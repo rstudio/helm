@@ -2,7 +2,7 @@
 
 ## 0.7.4
 
-- Add documentation on database configuration and mounting passwords from secrets
+- Add documentation on PostgreSQL database configuration and mounting passwords from secrets
 
 ## 0.7.3
 
