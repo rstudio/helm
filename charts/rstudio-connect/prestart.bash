@@ -40,8 +40,13 @@ main() {
     /usr/local/share/ca-certificates/Kubernetes/cert-Kubernetes.crt 2>&1 | _indent
 
   _logf 'Updating CA certificates'
-  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  DIST=$(cat /etc/os-release | grep "^ID=" -E -m 1 | cut -c 4-10 | sed 's/"//g')
+  if [[ $DIST == "ubuntu" ]]; then
     update-ca-certificates 2>&1 | _indent
+  elif [[ $DIST == "rhel" || $DIST == "almalinux" ]]; then
+    update-ca-trust 2>&1 | _indent
+  fi
 
   _logf 'Replacing process with %s' "${startup_script}"
   exec "${startup_script}"
