@@ -1,13 +1,16 @@
 DIFF := "diff"
+HELM_DOCS_VERSION := env_var_or_default("HELM_DOCS_VERSION", "1.13.1")
+OS := if os() == "macos" {"Darwin"} else if os() == "linux" {"Linux"} else if os() == "windows" {"Windows"} else {""}
+ARCH := if arch() == "aarch64" {"arm64"} else if arch() == "x86_64" {"x86_64"} else {""}
 
 setup:
   #!/bin/bash
-  # TODO: idempotency
-
-  # TODO: check for macos
-  mkdir -p ./bin/helm-docs-1.5.0/
-  curl -L https://github.com/norwoodj/helm-docs/releases/download/v1.5.0/helm-docs_1.5.0_Darwin_x86_64.tar.gz | tar -xzvf - -C ./bin/helm-docs-1.5.0/
-  ln -s $PWD/bin/helm-docs-1.5.0/helm-docs $PWD/bin/helm-docs
+  set -xe
+  echo "Installing helm-docs version {{HELM_DOCS_VERSION}}"
+  mkdir -p bin
+  curl -L -s https://github.com/norwoodj/helm-docs/releases/download/v{{HELM_DOCS_VERSION}}/helm-docs_{{HELM_DOCS_VERSION}}_{{OS}}_{{ARCH}}.tar.gz -o bin/helm-docs.tar.gz
+  tar -C ./bin -xz -f bin/helm-docs.tar.gz helm-docs
+  rm -rf bin/helm-docs.tar.gz
 
 update-lock:
   #!/bin/bash
