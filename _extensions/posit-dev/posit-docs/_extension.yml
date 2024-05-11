@@ -1,6 +1,6 @@
 title: posit-docs
 author: Ashley Henry, David Aja, Aron Atkins
-version: 3.0.0
+version: 4.0.1
 quarto-required: ">=1.3.340"
 contributes:
   project:
@@ -12,9 +12,10 @@ contributes:
       navbar:
         pinned: true
         logo: "assets/images/posit-icon-fullcolor.svg"
-        logo-alt: "Posit Documentation"  
+        logo-alt: "Posit Documentation"
         right:
          - icon: "list"
+           aria-label: 'Drop-down menu for additional Posit resources'
            menu:
            - text: "docs.posit.co"
              href: "https://docs.posit.co"
@@ -25,7 +26,9 @@ contributes:
         show-item-context: true
     format:
       html:
-        theme: [theme.scss]
+        theme: 
+          light: [theme.scss]
+          dark: [theme-dark.scss]
         link-external-icon: true
         link-external-newwindow: true
         toc: true

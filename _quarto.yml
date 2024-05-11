@@ -32,24 +32,18 @@ website:
     left: |
       Copyright &copy; 2000-{{< env CURRENT_YEAR >}} Posit Software, PBC. All Rights Reserved.
     center: |
-      Posit Helm Charts {{< env PRODUCT_VERSION >}}
+      Posit Helm Charts
     right:
       - icon: question-circle-fill
+        aria-label: 'Link to Posit Support'
         href: "https://support.posit.co/hc/en-us"
       - icon: lightbulb-fill
+        aria-label: 'Link to Posit Solutions'
         href: "https://solutions.posit.co/"
-      - text: "<img src='/images/posit-guide-ltmd.svg' id='footer-right-logo'>"
+      - text: "<img alt='Link to Posit Documentation' src='/images/posit-guide-ltmd.svg' id='footer-right-logo'>"
         href: "https://docs.posit.co/"
-      - text: "<img src='/images/posit-logo-black-TM.svg' id='footer-right-posit-logo'>"
+      - text: "<img alt='Link to main Posit site' src='/images/posit-icon-fullcolor.svg' id='footer-right-posit-logo'>"
         href: "https://posit.co/"
-  navbar:
-    right:
-      - icon: "list"
-        menu:
-          - text: "docs.posit.co"
-            href: "https://docs.posit.co"
-          - text: "Posit Support"
-            href: "https://support.posit.co/hc/en-us/"
   sidebar:
     style: "floating"
     collapse-level: 1
