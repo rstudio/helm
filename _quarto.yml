@@ -19,17 +19,27 @@ project:
 filters:
   - include-code-files
 
-format: 
-  posit-docs-html:
-    toc: true
-
 website: 
   title: Posit Helm Charts
   bread-crumbs: true
   repo-url: https://github.com/rstudio/helm
   repo-actions: [edit, issue]
-  page-footer: 
-    center: Posit Helm Charts
+  page-footer:
+    left: |
+      Copyright &copy; 2000-{{< env CURRENT_YEAR >}} Posit Software, PBC. All Rights Reserved.
+    center: |
+      Posit Helm Charts
+    right:
+      - icon: question-circle-fill
+        aria-label: 'Link to Posit Support'
+        href: "https://support.posit.co/hc/en-us"
+      - icon: lightbulb-fill
+        aria-label: 'Link to Posit Solutions'
+        href: "https://solutions.posit.co/"
+      - text: "<img alt='Link to Posit Documentation' src='/images/posit-guide-ltmd.svg' id='footer-right-logo'>"
+        href: "https://docs.posit.co/"
+      - text: "<img alt='Link to main Posit site' src='/images/posit-icon-fullcolor.svg' id='footer-right-posit-logo'>"
+        href: "https://posit.co/"
   sidebar:
     style: "floating"
     collapse-level: 1
