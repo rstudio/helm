@@ -30,7 +30,7 @@ website:
   repo-actions: [edit, issue]
   page-footer:
     left: |
-      Copyright &copy; 2000-{{< env CURRENT_YEAR >}} Posit Software, PBC. All Rights Reserved.
+      Copyright &copy; 2???-{{< env CURRENT_YEAR >}} Posit Software, PBC. All Rights Reserved.
     center: |
       Posit Helm Charts
     right:
