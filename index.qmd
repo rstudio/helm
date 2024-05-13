@@ -11,12 +11,12 @@ title: Posit Helm Charts
 
 2. Add the Posit Helm repository:
 
-   ```console
+   ```{.bash}
    helm repo add rstudio https://helm.rstudio.com
    ```
 
 3. View charts:
 
-   ```console
+   ```{.bash}
    helm search repo rstudio
    ```
