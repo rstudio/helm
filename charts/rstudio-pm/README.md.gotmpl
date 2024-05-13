@@ -78,11 +78,10 @@ pod:
 
 In this example the same database is being used with two schemas so we use the same secret.
 
-Alternatively, database passwords may be set during `helm install` with the following argument:
+Alternatively, database passwords may be set during `helm install` with the following arguments:
 
-```bash
---set config.Postgres.Password="<YOUR_PASSWORD_HERE>"
---set config.Postgres.UsageDataPassword="<YOUR_PASSWORD_HERE>"
+```
+--set config.Postgres.Password="<YOUR_PASSWORD_HERE>" --set config.Postgres.UsageDataPassword="<YOUR_PASSWORD_HERE>"
 ```
 
 ## S3 Configuration
