@@ -2,7 +2,7 @@
 const postsByCategory = {};
 const basicConfigPosts = [];
 items.forEach(item => {
-  if (item.category === "Basic Configuration") {
+  if (item.category === "Basic configuration") {
     basicConfigPosts.push(item)
   } else {
     if (!postsByCategory[item.category]) {
@@ -14,7 +14,7 @@ items.forEach(item => {
 
 // Basic config first
 if (basicConfigPosts.length > 0) { %>
-<h2>Basic Configuration</h2>
+<h2>Basic configuration</h2>
 <ul>
   <% basicConfigPosts.forEach(post => { %>
     <li>
