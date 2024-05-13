@@ -104,19 +104,6 @@ Set a license key directly in your values file (`license.key`) or during `helm i
 
 Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
 
-## General Principles
-
-- In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
-  valid `.ini` or `.dcf` file formats required by RStudio Workbench. Those config files and their mount locations are
-  below.
-- If you need to modify the jobs launched by RStudio Workbench, you want to use `job-json-overrides`. There is a section on this below
-  and [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
-  on the topic in general.
-- The prestart scripts for RStudio Workbench and RStudio Launcher are highly customized to:
-  - Get the service account information off of the RStudio Workbench pod for use in launching jobs
-- RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
-  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
-
 ## Database
 
 Workbench requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/ide/server-pro/database/configuration.html#postgresql) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
@@ -155,9 +142,20 @@ pod:
 
 Alternatively, database passwords may be set during `helm install` with the following argument:
 
-```bash
---set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"
-```
+`--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
+
+## General Principles
+
+- In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
+  valid `.ini` or `.dcf` file formats required by RStudio Workbench. Those config files and their mount locations are
+  below.
+- If you need to modify the jobs launched by RStudio Workbench, you want to use `job-json-overrides`. There is a section on this below
+  and [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
+  on the topic in general.
+- The prestart scripts for RStudio Workbench and RStudio Launcher are highly customized to:
+  - Get the service account information off of the RStudio Workbench pod for use in launching jobs
+- RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
+  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
 ## Configuration files
 

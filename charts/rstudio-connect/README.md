@@ -84,13 +84,6 @@ Set a license key directly in your values file (`license.key`) or during `helm i
 
 Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
 
-## General Principles
-
-- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
-required by rstudio-connect.
-- rstudio-connect does not export many prometheus metrics on its own. Instead, we run a sidecar graphite exporter
-  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
-
 ## Database
 
 Connect requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/connect/admin/database/postgres/) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
@@ -129,9 +122,7 @@ pod:
 
 Alternatively, database passwords may be set during `helm install` with the following argument:
 
-```bash
---set config.Postgres.Password="<YOUR_PASSWORD_HERE>"
-```
+`--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
 ### Operational metrics database
 
@@ -144,8 +135,8 @@ config:
   Database:
     Provider: "Postgres"
   Postgres:
-    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
-    InstrumentationURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>"
+    InstrumentationURL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?options=-csearch_path=<SCHEMA>"
 ```
 
 Then specify the `InstrumentationPassword` in the same manner as `Password` by setting the environment variable `CONNECT_POSTGRES_INSTRUMENTATIONPASSWORD` from secret.
@@ -164,6 +155,13 @@ pod:
           name: rstudio-connect-database
           key: password
 ```
+
+## General Principles
+
+- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
+required by rstudio-connect.
+- rstudio-connect does not export many prometheus metrics on its own. Instead, we run a sidecar graphite exporter
+  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
 ## Configuration File
 
