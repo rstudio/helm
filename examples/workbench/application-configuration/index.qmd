@@ -1,5 +1,5 @@
 ---
-category: "Basic Configuration"
+category: "Basic configuration"
 ---
 
 # Configuring Posit Workbench with Recommended Settings
