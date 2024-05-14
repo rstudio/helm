@@ -2,7 +2,7 @@
 
 ![Version: 0.7.3](https://img.shields.io/badge/Version-0.7.3-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
-#### _Official Helm chart for RStudio Workbench_
+#### _Official Helm chart for Posit Workbench_
 
 Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
 products using R and Python.

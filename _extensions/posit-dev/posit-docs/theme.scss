@@ -95,6 +95,26 @@ body {
   padding-left: 1em;
 }
 
+/* Style for the version included in the website title */
+.navbar-title small {
+    font-size: 14px;
+    display: block;
+    padding-left: 1em;
+}
+
+/* Posit logo - navbar or footer */
+#footer-right-posit-logo {
+  width: 70px;
+  min-width: 70px;
+}
+
+#footer-right-logo {
+  width: 20px;
+  min-width: 20px;
+  margin-left: -3px !important;
+  margin-right: -3px !important;
+}
+
 .nav-link {
   font-family: $font-family-monospace;
   text-transform: uppercase;
