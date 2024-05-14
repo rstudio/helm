@@ -1,8 +1,6 @@
 project: 
   type: posit-docs
-  pre-render: |
-    ./bin/helm-docs --chart-search-root=charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
-    ./bin/helm-docs --chart-search-root=other-charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
+  pre-render: just docs
   render: 
     - charts/rstudio-workbench/README.md 
     - charts/rstudio-workbench/NEWS.md 
