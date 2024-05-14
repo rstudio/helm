@@ -8,40 +8,43 @@ Chronicle helps data science managers and other stakeholders understand their
 organization's use of other Posit products, primarily Posit Connect and
 Workbench.
 
-## For Production
+## For production
 
-To ensure a stable production deployment, please:
+To ensure a stable production deployment:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-  for breaking changes
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+* "Pin" the version of the Helm chart that you are using. You can do this using the:
+  * `helm dependency` command *and* the associated "Chart.lock" files *or*
+  * the `--version` flag.
+    
+    ::: {.callout-important}
+    This protects you from breaking changes.
+    :::
 
-## Installing the Chart
+* Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
+
+## Installing the chart
 
 To install the chart with the release name `my-release` at version 0.3.0:
 
-```bash
+```{.bash}
 helm repo add rstudio https://helm.rstudio.com
 helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.0
 ```
 
 To explore other chart versions, take a look at:
-```
+
+```{.bash}
 helm search repo rstudio/posit-chronicle -l
 ```
 
 ## Usage
 
 This chart deploys only the Chronicle server and is meant to be used in tandem
-with the Workbench and Connect charts. To actually send data to the server, you
-will need to run the Chronicle agent as a sidecar container on your
-Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files
+with the Workbench and Connect charts. To send data to the server, run the Chronicle agent as a sidecar container on your
+Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files.
 
-Here is an example of Helm values to run the agent sidecar in **Workbench**,
+Here is an example of Helm values to run the agent sidecar in *Workbench*,
 where we set up a shared volume between containers for audit logs:
 
 ```yaml
@@ -65,7 +68,7 @@ pod:
         value: "http://chronicle-server.default"
 ```
 
-And here is an example of Helm values for Connect, where a **Connect**
+Here is an example of Helm values for *Connect*, where a Connect
 API key from a Kubernetes Secret is used to unlock more detailed metrics:
 
 ```yaml
@@ -83,7 +86,7 @@ pod:
             key: apikey
 ```
 
-Note that it is up to the user to provision this Kubernetes Secret for the
+It is up to the user to provision this Kubernetes Secret for the
 Connect API key.
 
 ## Storage Configuration
@@ -102,8 +105,7 @@ config:
 ```
 
 `retentionPeriod` controls how long usage data are kept. For example, `"120m"`
-for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for unbounded retention.
-(Units smaller than seconds or larger than days are not supported.)
+for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for unbounded retention (units smaller than seconds or larger than days are not supported).
 
 You can also persist data to AWS S3 instead of (or in addition to) local
 storage:
@@ -116,7 +118,7 @@ config:
     Region: "us-east-2"
 ```
 
-### Using Iam for S3
+### Using IAM for S3
 
 If you are running on EKS, you can use [IAM Roles for Service
 Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
@@ -131,9 +133,9 @@ serviceaccount:
     eks.amazonaws.com/role-arn:  arn:aws:iam::123456789000:role/iam-role-name-here
 ```
 
-If you are unable to use IAM Roles for Service Accounts, there are any number of
+If you are unable to use IAM Roles for Service Accounts, there are many
 alternatives for injecting AWS credentials into a container. As a fallback,
-the S3 storage config allows specifying a profile:
+the S3 storage `config` allows specifying a profile:
 
 ```yaml
 config:
@@ -144,14 +146,14 @@ config:
     Region: "us-east-2"
 ```
 
-### Needed S3 Policy Permissions
+### Needed S3 policy permissions
 
 The credentials Chronicle uses for S3 storage must have the following permissions enabled:
 
-- `s3:GetObject`
-- `s3:ListBucket`
-- `s3:PutObject`
-- `s3:DeleteObject`
+* `s3:GetObject`
+* `s3:ListBucket`
+* `s3:PutObject`
+* `s3:DeleteObject`
 
 ## Values
 
