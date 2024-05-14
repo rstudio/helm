@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.34">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Posit Helm Charts – readme</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../site_libs/quarto-contrib/quarto-project/posit-dev/posit-docs/assets/images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": true,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<!-- Google Analytics 4 (G-XXXXXXXXXX) -->
+<script>
+ /* Use GA when hosted by our public docs site, not when installed. */
+ if (location.href.indexOf("docs.posit.co") >= 0) {
+     window.dataLayer = window.dataLayer || []
+     function gtag() { dataLayer.push(arguments) }
+     /* Set up integration and send page view */
+     gtag("js", new Date())
+     gtag("config", "GTM-KHBDBW7")
+
+     /* Register virtual event handlers */
+     document.addEventListener("DOMContentLoaded", function () {
+         if (document.forms.search) {
+             var query = document.forms.search.query
+             query.addEventListener("blur", function () {
+                 if (this.value) {
+                     gtag("event", "search", { search_term: this.value })
+                 }
+             })
+         }
+
+         /* Send page view on location change */
+         if (typeof location$ !== "undefined")
+             location$.subscribe(function (url) {
+                 gtag("config", "GTM-KHBDBW7", {
+                     page_path: url.pathname
+                 })
+             })
+     })
+     /* Create script tag */
+     var script = document.createElement("script")
+     script.async = true
+     script.src = "https://www.googletagmanager.com/gtag/js?id=GTM-KHBDBW7"
+
+     /* Inject script tag */
+     var container = document.getElementsByTagName("head")[0]
+     var firstChild = container.firstChild
+     container.insertBefore(script, firstChild)
+ }
+</script>
+
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../site_libs/quarto-contrib/quarto-project/posit-dev/posit-docs/assets/images/posit-icon-fullcolor.svg" alt="Posit Documentation" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Posit Helm Charts</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-list" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-list" role="img" aria-label="Drop-down menu for additional Posit resources">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-list">    
+        <li>
+    <a class="dropdown-item" href="https://docs.posit.co">
+ <span class="dropdown-text">docs.posit.co</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://support.posit.co/hc/en-us/">
+ <span class="dropdown-text">Posit Support</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../charts/rstudio-workbench/README.html">Posit Workbench</a></li><li class="breadcrumb-item"><a href="../../charts/rstudio-workbench/README.html">Overview</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Posit Workbench</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/rstudio-workbench/README.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/rstudio-workbench/NEWS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Changelog</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../examples/workbench/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Examples</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Posit Connect</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/rstudio-connect/README.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/rstudio-connect/NEWS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Changelog</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../examples/connect/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Examples</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Posit Package Manager</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/rstudio-pm/README.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/rstudio-pm/NEWS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Changelog</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../examples/package-manager/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Examples</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Posit Chronicle</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/posit-chronicle/README.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../charts/posit-chronicle/NEWS.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Changelog</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#posit-workbench" id="toc-posit-workbench" class="nav-link active" data-scroll-target="#posit-workbench">Posit Workbench</a>
+  <ul class="collapse">
+  <li><a href="#for-production" id="toc-for-production" class="nav-link" data-scroll-target="#for-production">For production</a></li>
+  <li><a href="#installing-the-chart" id="toc-installing-the-chart" class="nav-link" data-scroll-target="#installing-the-chart">Installing the chart</a></li>
+  <li><a href="#required-configuration" id="toc-required-configuration" class="nav-link" data-scroll-target="#required-configuration">Required configuration</a></li>
+  <li><a href="#licensing" id="toc-licensing" class="nav-link" data-scroll-target="#licensing">Licensing</a></li>
+  <li><a href="#general-principles" id="toc-general-principles" class="nav-link" data-scroll-target="#general-principles">General principles</a></li>
+  <li><a href="#configuration-files" id="toc-configuration-files" class="nav-link" data-scroll-target="#configuration-files">Configuration files</a></li>
+  <li><a href="#user-provisioning" id="toc-user-provisioning" class="nav-link" data-scroll-target="#user-provisioning">User provisioning</a>
+  <ul class="collapse">
+  <li><a href="#pam" id="toc-pam" class="nav-link" data-scroll-target="#pam">PAM</a></li>
+  </ul></li>
+  <li><a href="#rstudio-profiles" id="toc-rstudio-profiles" class="nav-link" data-scroll-target="#rstudio-profiles">RStudio profiles</a>
+  <ul class="collapse">
+  <li><a href="#etcrstudioprofiles" id="toc-etcrstudioprofiles" class="nav-link" data-scroll-target="#etcrstudioprofiles"><code>/etc/rstudio/profiles</code></a></li>
+  <li><a href="#etcrstudiolauncher.kubernetes.profiles.conf" id="toc-etcrstudiolauncher.kubernetes.profiles.conf" class="nav-link" data-scroll-target="#etcrstudiolauncher.kubernetes.profiles.conf"><code>/etc/rstudio/launcher.kubernetes.profiles.conf</code></a></li>
+  <li><a href="#job-json-overrides" id="toc-job-json-overrides" class="nav-link" data-scroll-target="#job-json-overrides">Job Json overrides</a></li>
+  </ul></li>
+  <li><a href="#sealed-secrets" id="toc-sealed-secrets" class="nav-link" data-scroll-target="#sealed-secrets">Sealed secrets</a></li>
+  <li><a href="#values" id="toc-values" class="nav-link" data-scroll-target="#values">Values</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/rstudio/helm/edit/main/charts/rstudio-workbench/README.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/rstudio/helm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="posit-workbench" class="level1">
+<h1>Posit Workbench</h1>
+<p><img src="https://img.shields.io/badge/Version-0.7.4-informational?style=flat-square" class="img-fluid" alt="Version: 0.7.4"> <img src="https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square" class="img-fluid" alt="AppVersion: 2024.04.0"></p>
+<section id="official-helm-chart-for-posit-workbench" class="level4">
+<h4 class="anchored" data-anchor-id="official-helm-chart-for-posit-workbench"><em>Official Helm chart for Posit Workbench</em></h4>
+<p>Data Scientists use <a href="https://posit.co/products/enterprise/workbench/">Posit Workbench</a> to analyze data and create data products using R and Python.</p>
+</section>
+<section id="for-production" class="level2">
+<h2 class="anchored" data-anchor-id="for-production">For production</h2>
+<p>To ensure a stable production deployment:</p>
+<ul>
+<li>“Pin” the version of the Helm chart that you are using. You can do this using the:
+<ul>
+<li><p><code>helm dependency</code> command <em>and</em> the associated “Chart.lock” files <em>or</em></p></li>
+<li><p>the <code>--version</code> flag.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This protects you from breaking changes.</p>
+</div>
+</div></li>
+</ul></li>
+<li>Before upgrading check for breaking changes using <code>helm-diff</code> plugin and <code>helm diff upgrade</code>.</li>
+<li>Read <a href="../../charts/rstudio-workbench/NEWS.html"><code>NEWS.md</code></a> for updates on breaking changes and the documentation below on how to use the chart.</li>
+</ul>
+</section>
+<section id="installing-the-chart" class="level2">
+<h2 class="anchored" data-anchor-id="installing-the-chart">Installing the chart</h2>
+<p>To install the chart with the release name <code>my-release</code> at version 0.7.4:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> repo add rstudio https://helm.rstudio.com</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> upgrade <span class="at">--install</span> my-release rstudio/rstudio-workbench <span class="at">--version</span><span class="op">=</span>0.7.4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To explore other chart versions, look at:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> search repo rstudio/rstudio-workbench <span class="at">-l</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="required-configuration" class="level2">
+<h2 class="anchored" data-anchor-id="required-configuration">Required configuration</h2>
+<p>To function, this chart requires the following:</p>
+<ul>
+<li><p>A license file. See the <a href="#licensing">Licensing</a> section below for more details.</p></li>
+<li><p>A Kubernetes <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">PersistentVolume</a> that contains the home directory for users.</p>
+<ul>
+<li>If <code>homeStorage.create</code> is set, it creates a Persistent Volume Claim (PVC) that relies on the default storage class to generate the PersistentVolume. Most Kubernetes environments do not have a default storage class that you can use with <code>ReadWriteMany</code> access mode out-of-the-box. In this case, we recommend that you:
+<ul>
+<li>Disable <code>homeStorage.create</code> and create your own <code>PersistentVolume</code> and <code>PersistentVolumeClaim</code>, then</li>
+<li>Mount them into the container by specifying the <code>pod.volumes</code> and <code>pod.volumeMounts</code> parameters, or by specifying your <code>PersistentVolumeClaim</code> using <code>homeStorage.name</code> and <code>homeStorage.mount</code>.</li>
+</ul></li>
+<li>If you cannot use a <code>PersistentVolume</code> to properly mount your users’ home directories, mount your data in the container by using a regular <a href="https://kubernetes.io/docs/concepts/storage/volumes/#nfs">Kubernetes Volume</a>, specified in <code>pod.volumes</code> and <code>pod.volumeMounts</code>.</li>
+<li>If you cannot use a <code>Volume</code> to mount the directories, manually mount them during container startup with a mechanism similar to what is described below for joining to auth domains.</li>
+<li>If not using <code>homeStorage.create</code>, configure <code>config.serverDcf.launcher-mounts</code> to ensure that the correct mounts are used when users create new sessions.</li>
+</ul></li>
+<li><p>If using load balancing (by setting <code>replicas &gt; 1</code>), you need similar storage defined for <code>sharedStorage</code> to store shared project configuration. However, you can also configure the product to store its shared data underneath <code>/home</code> by setting <code>config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir</code>.</p></li>
+<li><p>A method to join the deployed <code>rstudio-workbench</code> container to your auth domain. The default <code>rstudio/rstudio-workbench</code> image has <code>sssd</code> installed and started by default. You can include <code>sssd</code> configuration in <code>config.userProvisioning</code> like so:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">userProvisioning</span><span class="kw">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mysssd.conf</span><span class="kw">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">sssd</span><span class="kw">:</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">config_file_version</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">services</span><span class="kw">:</span><span class="at"> nss, pam</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">domains</span><span class="kw">:</span><span class="at"> rstudio.com</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">domain/rstudio.com</span><span class="kw">:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">id_provider</span><span class="kw">:</span><span class="at"> ldap</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">auth_provider</span><span class="kw">:</span><span class="at"> ldap</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</section>
+<section id="licensing" class="level2">
+<h2 class="anchored" data-anchor-id="licensing">Licensing</h2>
+<p>This chart supports activating the product using a <em>license file</em>.</p>
+<p>We recommend storing a license file as a <code>Secret</code> and setting the <code>license.file.secret</code> and <code>license.file.secretKey</code> values accordingly.</p>
+<p>First, create the secret declaratively with YAML or imperatively using the following command:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> create secret generic rstudio-workbench-license <span class="at">--from-file</span><span class="op">=</span>licenses/rstudio-workbench.lic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Second, specify the following values:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">license</span><span class="kw">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">file</span><span class="kw">:</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">secret</span><span class="kw">:</span><span class="at"> rstudio-workbench-license</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">secretKey</span><span class="kw">:</span><span class="at"> rstudio-workbench.lic</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Alternatively, license files can be set during <code>helm install</code> with the following argument:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">--set-file</span> license.file.contents=licenses/rstudio-workbench.lic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="general-principles" class="level2">
+<h2 class="anchored" data-anchor-id="general-principles">General principles</h2>
+<ul>
+<li>In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the valid <code>.ini</code> or <code>.dcf</code> file formats required by Workbench.
+<ul>
+<li>Those configuration files and their mount locations are covered in the <a href="#configuration-files">Configuration files</a> section below.</li>
+</ul></li>
+<li>If you need to modify the jobs launched by Workbench, use <code>job-json-overrides</code>.
+<ul>
+<li>Review the <a href="#job-json-overrides">Job Json overrides</a> section on this below. For general information, see <a href="https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes">a support article</a>.</li>
+</ul></li>
+<li>The prestart scripts for Workbench and Posit Job Launcher are highly customized to get the service account information off of the Workbench pod for use in launching jobs.</li>
+<li>Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter.
+<ul>
+<li>This is described in the <a href="https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite">Monitoring Posit Team Using Prometheus and Graphite</a> support article.</li>
+</ul></li>
+</ul>
+</section>
+<section id="configuration-files" class="level2">
+<h2 class="anchored" data-anchor-id="configuration-files">Configuration files</h2>
+<p>These configuration values all take the form of usual Helm values so you can set the database password with something like:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span> <span class="at">--set</span> config.secret.database<span class="dt">\.</span>conf.password=mypassword ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The files are converted into configuration files in the necessary format via go-templating. If you want to “in-line” a config file or mount it verbatim, you can use a pattern like:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">server</span><span class="kw">:</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">    rserver.conf</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      verbatim-file=format</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The names of files are dynamically used, so you can add new files as needed. Beware that some files have default values, so moving them can have adverse effects. Also, if you use a different mounting paradigm, you need to change the <code>XDG_CONFIG_DIRS</code> environment variable.</p>
+<ul>
+<li>Session Configuration
+<ul>
+<li>These configuration files are mounted into the server and are mounted into the session pods.</li>
+<li><code>repos.conf</code>, <code>rsession.conf</code>, <code>notifications.conf</code></li>
+<li>Located in: <br><code>config.session.&lt;&lt; name of file &gt;&gt;</code> Helm values</li>
+<li>Mounted at:<br> <code>/mnt/session-configmap/rstudio/</code></li>
+</ul></li>
+<li>Session Secret Configuration:
+<ul>
+<li>These configuration files are mounted into the server and session pods.</li>
+<li><code>odbc.ini</code> and other similar shared secrets.</li>
+<li>Located in: <br><code>config.sessionSecret.&lt;&lt; name of file&gt;&gt;</code> Helm values</li>
+<li>Mounted at:<br> <code>/mnt/session-secret/</code></li>
+</ul></li>
+<li>Secret Configuration:
+<ul>
+<li>These configuration files are mounted into the server with more restrictive permissions (0600).</li>
+<li><code>database.conf</code>, <code>openid-client-secret</code>, <code>databricks.conf</code></li>
+<li>Located in: <br><code>config.secret.&lt;&lt; name of file &gt;&gt;</code> Helm values</li>
+<li>Mounted at:<br> <code>/mnt/secret-configmap/rstudio/</code></li>
+</ul></li>
+<li>Server Configuration:
+<ul>
+<li>These configuration files are mounted into the server (.ini file format).</li>
+<li><code>rserver.conf</code>, <code>launcher.conf</code>, <code>jupyter.conf</code>, <code>logging.conf</code></li>
+<li>Located at:<br> <code>config.server.&lt;&lt; name of file &gt;&gt;</code> Helm values</li>
+<li>Mounted at:<br> <code>/mnt/configmap/rstudio/</code></li>
+</ul></li>
+<li>Server DCF Configuration:
+<ul>
+<li>These configuration files are mounted into the server (.dcf file format).</li>
+<li><code>launcher-mounts</code>, <code>launcher-env</code></li>
+<li>Located at:<br> <code>config.serverDcf.&lt;&lt; name of file &gt;&gt;</code> Helm values</li>
+<li>Included at:<br> <code>/mnt/configmap/rstudio/</code></li>
+</ul></li>
+<li>Profiles Configuration:
+<ul>
+<li>These configuration files are mounted into the server (.ini file format).</li>
+<li><code>launcher.kubernetes.profiles.conf</code></li>
+<li>They are located at <code>config.profiles.&lt;&lt; name of file &gt;&gt;</code> Helm values</li>
+<li>Included at:<br> <code>/mnt/configmap/rstudio/</code></li>
+<li>See the <a href="#rstudio-profiles">Profiles</a> section below for more information.</li>
+</ul></li>
+<li>Prestart:
+<ul>
+<li>This is provided by the Helm chart in a configmap.</li>
+<li>It is mounted into the pod at <code>/scripts/</code>.</li>
+<li><code>prestart-workbench.bash</code> is used to start workbench.</li>
+<li><code>prestart-launcher.bash</code> is used to start launcher.</li>
+</ul></li>
+<li>User Provisioning Configuration:
+<ul>
+<li>These configuration files are used for configuring user provisioning (i.e., <code>sssd</code>).</li>
+<li>Located at:<br> <code>config.userProvisioning.&lt;&lt; name of file &gt;&gt;</code> Helm values</li>
+<li>Mounted onto:<br> <code>/etc/sssd/conf.d/</code> with <code>0600</code> permissions by default.</li>
+</ul></li>
+<li>Custom Startup Configuration:
+<ul>
+<li><p><code>supervisord</code> service / unit definition <code>.conf</code> files.</p></li>
+<li><p>Use the <code>.ini</code> file format by default.</p></li>
+<li><p>Mounted at:<br> <code>/startup/custom</code></p></li>
+<li><p>As with all configuration files above, you can override with a verbatim string if desired:</p></li>
+<li><p>Located at:<br> <code>config.startupCustom.&lt;&lt; name of file &gt;&gt;</code> Helm values:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">startupCustom</span><span class="kw">:</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">    myfile.conf</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      file-used-verbatim</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul></li>
+<li>PAM configuration:
+<ul>
+<li><code>pam</code> configuration files.</li>
+<li>Located at:<br> <code>config.pam.&lt;&lt; name of file &gt;&gt;</code> Helm values</li>
+<li>Mounted verbatim as individual files (using <code>subPath</code> mounts) at:<br> <code>/etc/pam.d/&lt;&lt; name of file &gt;&gt;</code></li>
+</ul></li>
+</ul>
+<section id="python-repositories" class="level4">
+<h4 class="anchored" data-anchor-id="python-repositories">Python repositories</h4>
+<p>pip can be configured with <code>config.session.pip.conf</code>. To ensure <code>pip.conf</code> is mounted into the session pods, it is important that:</p>
+<ul>
+<li><p><code>launcher.useTemplates: true</code> is set</p></li>
+<li><p><code>pip.conf</code> settings are listed under <code>config.session</code> as shown in the following example for adding Posit Public Package Manager’s PyPI:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">launcher</span><span class="kw">:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">useTemplates</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">session</span><span class="kw">:</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pip.conf</span><span class="kw">:</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">"global"</span><span class="kw">:</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">index-url</span><span class="kw">:</span><span class="at"> https://packagemanager.posit.co/pypi/latest/simple</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">trusted-host</span><span class="kw">:</span><span class="at"> packagemanager.posit.co</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</section>
+<section id="r-repositories" class="level4">
+<h4 class="anchored" data-anchor-id="r-repositories">R repositories</h4>
+<p>R package repositories can be configured with <code>config.session.repos.conf</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">session</span><span class="kw">:</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">repos.conf</span><span class="kw">:</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">CRAN</span><span class="kw">:</span><span class="at"> https://packagemanager.posit.co/cran/__linux__/jammy/latest</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For more information about configuring CRAN repositories in Workbench, see the <a href="https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories">Posit Workbench Administrator Guide’s - Package Installation &gt; CRAN repositories</a> section.</p>
+</section>
+</section>
+<section id="user-provisioning" class="level2">
+<h2 class="anchored" data-anchor-id="user-provisioning">User provisioning</h2>
+<p>Provisioning users in Workbench containers is challenging. Session images create users automatically (with consistent UIDs / GIDs). However, creating users in the Workbench containers is a responsibility that falls to the administrator.</p>
+<p>The most common way to provision users is via <code>sssd</code>. The <a href="https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning">latest Workbench container</a> has <code>sssd</code> included and running by default (see <code>userProvisioning</code> configuration files above).</p>
+<p>The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever) or a polling service (checks at regular intervals). Either can be written easily in <code>bash</code> or another programming language.</p>
+<p>However, it is important to use caution for the following:</p>
+<ul>
+<li>UID / GID consistency:
+<ul>
+<li>Linux usernames and their matching to UID/GID must be consistent across all nodes and across time.</li>
+<li>Failing can cause security issues and access by some users to access view they should not be allowed to see.</li>
+</ul></li>
+<li>Usernames cannot have <code>@</code>.
+<ul>
+<li>The <code>@</code> sign (often used in emails with SSO) is a problem for Workbench because some operating systems disallow <code>@</code> signs in linux usernames.</li>
+</ul></li>
+<li><code>supervisord</code> is configured by default to exit if any of its child processes exit.
+<ul>
+<li>If you use <code>config.startupCustom</code> to configure a user management service, be careful that it does not exit unnecessarily.</li>
+</ul></li>
+</ul>
+<p>We do not provide such a service out-of-the box because we intend for Workbench to solve this problem in a future release. Please contact your account representative if you have feedback or questions about this workflow.</p>
+<section id="pam" class="level3">
+<h3 class="anchored" data-anchor-id="pam">PAM</h3>
+<p>When starting sessions on Workbench, PAM configuration is often very important, even if PAM is not being used as an authentication mechanism. The Workbench Helm chart allows creating custom PAM files via the <code>config.pam</code> values section.</p>
+<p>Each key under <code>config.pam</code> becomes a PAM configuration file, and is mounted into <code>/etc/pam.d/</code> in the container. For example:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pam</span><span class="kw">:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">    rstudio</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      # the rstudio PAM config file</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      # will be used verbatim</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">    rstudio-session</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>      # the rstudio-session PAM config file</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      # will be used verbatim</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="rstudio-profiles" class="level2">
+<h2 class="anchored" data-anchor-id="rstudio-profiles">RStudio profiles</h2>
+<p>Profiles are used to define product behavior (in <code>.ini</code> file format) based on user and group membership.</p>
+<p>Sections define whether a set of configurations is applied to a user’s jobs based on the following criteria:</p>
+<ul>
+<li>If section header is <code>[*]</code>, it applies to all users.</li>
+<li>If a user’s username is <code>myusername</code>, the section <code>[myusername]</code> applies to them.</li>
+<li>If a user is in the <code>allusers</code> group, then the section <code>[@allusers]</code> applies to them</li>
+</ul>
+<p>The product reads configuration from top to bottom and “last-in-wins” for a given configuration value.</p>
+<section id="etcrstudioprofiles" class="level3">
+<h3 class="anchored" data-anchor-id="etcrstudioprofiles"><code>/etc/rstudio/profiles</code></h3>
+<p>The <code>/etc/rstudio/profiles</code> file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the <a href="https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html">Posit Workbench Administrator Guide - User and Group Profiles</a> page for more information.</p>
+<p>In the <code>values.yaml</code>, define the content of <code>/etc/rstudio/profiles</code> in <code>config.server.profiles</code>. For example:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">server</span><span class="kw">:</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">profiles</span><span class="kw">:</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">"*"</span><span class="kw">:</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">session-limit</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">session-timeout-minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">60</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Becomes:</p>
+<p><em>/etc/rstudio/profiles</em></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[*]</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="dt">session-limit</span><span class="ot">=</span><span class="dv">5</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="dt">session-timeout-minutes</span><span class="ot">=</span><span class="dv">60</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="etcrstudiolauncher.kubernetes.profiles.conf" class="level3">
+<h3 class="anchored" data-anchor-id="etcrstudiolauncher.kubernetes.profiles.conf"><code>/etc/rstudio/launcher.kubernetes.profiles.conf</code></h3>
+<p>The <code>/etc/rstudio/launcher.kubernetes.profiles.conf</code> contains the configuration of resource limits by user and group when using the Kubernetes Launcher Plugin. In the <code>values.yaml</code>, define the content of <code>/etc/rstudio/launcher.kubernetes.profiles.conf</code> in the <code>config.profiles.launcher.kubernetes.profiles.conf</code> file. The <code>config.profiles</code> section has a couple of niceties that are added in by default.</p>
+<ul>
+<li><p>YAML arrays like the following becomes “comma-joined.” For instance, the following becomes: <code>some-key=value1,value2</code></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">some-key</span><span class="kw">:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> value1</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> value2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>The <code>[*]</code> section has arrays “appended” to user and group sections, along with “defaults” defined by the chart.</p></li>
+</ul>
+<p>For example:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">profiles</span><span class="kw">:</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">launcher.kubernetes.profiles.conf</span><span class="kw">:</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">"*"</span><span class="kw">:</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">some-key</span><span class="kw">:</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> value1</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> value2</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">myuser</span><span class="kw">:</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">some-key</span><span class="kw">:</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> value4</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> value5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Becomes:</p>
+<p><em>/etc/rstudio/launcher.kubernetes.profiles.conf</em></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[*]</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="dt">some-key: value1,value2</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[myuser]</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="dt">some-key: value1,value2,value3,value4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This appending/concatenation/array translation behavior only works with the helm chart.</p>
+</div>
+</div>
+</section>
+<section id="job-json-overrides" class="level3">
+<h3 class="anchored" data-anchor-id="job-json-overrides">Job Json overrides</h3>
+<p>If you want to customize the job launch process (i.e., how sessions are defined), edit the following configuration:</p>
+<ul>
+<li><p>Modify:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="at">config.profiles.launcher\.kubernetes\.profiles\.conf.&lt;&lt; some selector &gt;&gt;.job-json-overrides`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Create an array of maps with the following keys:</p>
+<ul>
+<li><code>target</code>: The “target” part of the job spec to replace.</li>
+<li><code>name</code>: A unique identifier (ideally with no spaces) becomes a configuration filename on disk.</li>
+<li><code>json</code>: A YAML value that is translated directly to JSON and injected into the job spec at <code>target</code>.</li>
+</ul></li>
+</ul>
+<p>Explore the docs in the <a href="https://github.com/rstudio/helm/blob/main/docs/customize.md">Helm repository</a> for additional information.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">config</span><span class="kw">:</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">profiles</span><span class="kw">:</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">launcher.kubernetes.profiles.conf</span><span class="kw">:</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">"*"</span><span class="kw">:</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">job-json-overrides</span><span class="kw">:</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fu">target</span><span class="kw">:</span><span class="at"> </span><span class="st">"/spec/template/spec/containers/0/imagePullPolicy"</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">json</span><span class="kw">:</span><span class="at"> </span><span class="st">"Always"</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">name</span><span class="kw">:</span><span class="at"> imagePullPolicy</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fu">target</span><span class="kw">:</span><span class="at"> </span><span class="st">"/spec/template/spec/imagePullSecrets"</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">json</span><span class="kw">:</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> my-pull-secret</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">name</span><span class="kw">:</span><span class="at"> imagePullSecrets</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">container-images</span><span class="kw">:</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="st">"one-image:tag"</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="st">"two-image:tag</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="sealed-secrets" class="level2">
+<h2 class="anchored" data-anchor-id="sealed-secrets">Sealed secrets</h2>
+<p>This chart supports the use of <a href="https://github.com/bitnami-labs/sealed-secrets">Sealed Secrets</a> to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a <code>SealedSecret</code> controller as the controller is responsible for converting a <code>SealedSecret</code> to a <code>Secret</code>.</p>
+<p>To activate the use of <code>SealedSecret</code> templates instead of <code>Secret</code> templates in the chart, set <code>sealedSecret.enabled=true</code> and ensure the following values are all encrypted (the chart does not support mixing encrypted values with unencrypted values):</p>
+<ul>
+<li><code>config.secret</code></li>
+<li><code>config.sessionSecret</code></li>
+<li><code>config.userProvisioning</code></li>
+<li><code>launcherPem</code></li>
+<li><code>secureCookieKey</code> (or <code>global.secureCookieKey</code>)</li>
+</ul>
+<p>Use of <a href="https://github.com/bitnami-labs/sealed-secrets">Sealed secrets</a> disables the chart’s auto-generation and reuse capabilities for <code>launcherPem</code> and <code>secureCookieKey</code>. <code>launcherPem</code> is an RSA private key, which can be generated via an RSA tool such as Helm’s <a href="https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey"><code>genPrivateKey</code></a> function. <code>secureCookieKey</code> is typically a UUID, which can be generated via a UUID generator such as Helm’s <a href="https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions"><code>uuidv4</code></a> function.</p>
+</section>
+<section id="values" class="level2">
+<h2 class="anchored" data-anchor-id="values">Values</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>affinity</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>A map used verbatim as the pod’s “affinity” definition</td>
+</tr>
+<tr class="even">
+<td>args</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>args is the pod container’s run arguments.</td>
+</tr>
+<tr class="odd">
+<td>command</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>command is the pod container’s run command. By default, it uses the container’s default. However, the chart expects a container using <code>supervisord</code> for startup</td>
+</tr>
+<tr class="even">
+<td>config.defaultMode.jobJsonOverrides</td>
+<td>int</td>
+<td>0644</td>
+<td>default mode for jobJsonOverrides config</td>
+</tr>
+<tr class="odd">
+<td>config.defaultMode.pam</td>
+<td>int</td>
+<td>0644</td>
+<td>default mode for pam scripts</td>
+</tr>
+<tr class="even">
+<td>config.defaultMode.prestart</td>
+<td>int</td>
+<td>0755</td>
+<td>default mode for prestart config</td>
+</tr>
+<tr class="odd">
+<td>config.defaultMode.secret</td>
+<td>int</td>
+<td>0600</td>
+<td>default mode for secrets</td>
+</tr>
+<tr class="even">
+<td>config.defaultMode.server</td>
+<td>int</td>
+<td>0644</td>
+<td>default mode for server config</td>
+</tr>
+<tr class="odd">
+<td>config.defaultMode.session</td>
+<td>int</td>
+<td>0644</td>
+<td>default mode for session files</td>
+</tr>
+<tr class="even">
+<td>config.defaultMode.sessionSecret</td>
+<td>int</td>
+<td>0420</td>
+<td>default mode for session secrets</td>
+</tr>
+<tr class="odd">
+<td>config.defaultMode.startup</td>
+<td>int</td>
+<td>0755</td>
+<td>default mode for startup config</td>
+</tr>
+<tr class="even">
+<td>config.defaultMode.userProvisioning</td>
+<td>int</td>
+<td>0600</td>
+<td>default mode for userProvisioning config</td>
+</tr>
+<tr class="odd">
+<td>config.pam</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files</td>
+</tr>
+<tr class="even">
+<td>config.profiles</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>a map of server-scoped config files (akin to <code>config.server</code>), but with specific behavior that supports profiles. See README for more information.</td>
+</tr>
+<tr class="odd">
+<td>config.secret</td>
+<td>string</td>
+<td><code>nil</code></td>
+<td>a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to <code>/mnt/secret-configmap/rstudio/</code> with 0600 permissions</td>
+</tr>
+<tr class="even">
+<td>config.server</td>
+<td>object</td>
+<td><a href="https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html">RStudio Workbench Configuration Reference</a>. See defaults with <code>helm show values</code></td>
+<td>a map of server config files. Mounted to <code>/mnt/configmap/rstudio/</code></td>
+</tr>
+<tr class="odd">
+<td>config.serverDcf</td>
+<td>object</td>
+<td><code>{"launcher-mounts":[]}</code></td>
+<td>a map of server-scoped config files (akin to <code>config.server</code>), but with .dcf file formatting (i.e.&nbsp;<code>launcher-mounts</code>, <code>launcher-env</code>, etc.)</td>
+</tr>
+<tr class="even">
+<td>config.session</td>
+<td>object</td>
+<td><code>{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}</code></td>
+<td>a map of session-scoped config files. Mounted to <code>/mnt/session-configmap/rstudio/</code> on both server and session, by default.</td>
+</tr>
+<tr class="odd">
+<td>config.sessionSecret</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to <code>/mnt/session-secret/</code> on both server and session, by default</td>
+</tr>
+<tr class="even">
+<td>config.startupCustom</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/</td>
+</tr>
+<tr class="odd">
+<td>config.startupUserProvisioning</td>
+<td>object</td>
+<td><code>{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}</code></td>
+<td>a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/</td>
+</tr>
+<tr class="even">
+<td>config.userProvisioning</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>a map of sssd config files, used for user provisioning. Mounted to <code>/etc/sssd/conf.d/</code> with 0600 permissions</td>
+</tr>
+<tr class="odd">
+<td>dangerRegenerateAutomatedValues</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>diagnostics</td>
+<td>object</td>
+<td><code>{"directory":"/var/log/rstudio","enabled":false}</code></td>
+<td>Settings for enabling server diagnostics</td>
+</tr>
+<tr class="odd">
+<td>extraObjects</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>Extra objects to deploy (value evaluated as a template)</td>
+</tr>
+<tr class="even">
+<td>fullnameOverride</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>the full name of the release (can be overridden)</td>
+</tr>
+<tr class="odd">
+<td>global.secureCookieKey</td>
+<td>string</td>
+<td><code>""</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>homeStorage.accessModes</td>
+<td>list</td>
+<td><code>["ReadWriteMany"]</code></td>
+<td>accessModes defined for the storage PVC (represented as YAML)</td>
+</tr>
+<tr class="odd">
+<td>homeStorage.create</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>whether to create the persistentVolumeClaim for homeStorage</td>
+</tr>
+<tr class="even">
+<td>homeStorage.mount</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Whether the persistentVolumeClaim should be mounted (even if not created)</td>
+</tr>
+<tr class="odd">
+<td>homeStorage.name</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>The name of the pvc. By default, computes a value from the release name</td>
+</tr>
+<tr class="even">
+<td>homeStorage.path</td>
+<td>string</td>
+<td><code>"/home"</code></td>
+<td>the path to mount the homeStorage claim within the pod</td>
+</tr>
+<tr class="odd">
+<td>homeStorage.requests.storage</td>
+<td>string</td>
+<td><code>"10Gi"</code></td>
+<td>the volume of storage to request for this persistent volume claim</td>
+</tr>
+<tr class="even">
+<td>homeStorage.selector</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>selector for PVC definition</td>
+</tr>
+<tr class="odd">
+<td>homeStorage.storageClassName</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>storageClassName - the type of storage to use. Must allow ReadWriteMany</td>
+</tr>
+<tr class="even">
+<td>homeStorage.subPath</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>an optional subPath for the volume mount</td>
+</tr>
+<tr class="odd">
+<td>homeStorage.volumeName</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>the volumeName passed along to the persistentVolumeClaim. Optional</td>
+</tr>
+<tr class="even">
+<td>image.imagePullPolicy</td>
+<td>string</td>
+<td><code>"IfNotPresent"</code></td>
+<td>the imagePullPolicy for the main pod image</td>
+</tr>
+<tr class="odd">
+<td>image.imagePullSecrets</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>an array of kubernetes secrets for pulling the main pod image from private registries</td>
+</tr>
+<tr class="even">
+<td>image.repository</td>
+<td>string</td>
+<td><code>"rstudio/rstudio-workbench"</code></td>
+<td>the repository to use for the main pod image</td>
+</tr>
+<tr class="odd">
+<td>image.tag</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>Overrides the image tag whose default is the chart appVersion.</td>
+</tr>
+<tr class="even">
+<td>image.tagPrefix</td>
+<td>string</td>
+<td><code>"ubuntu2204-"</code></td>
+<td>A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined</td>
+</tr>
+<tr class="odd">
+<td>ingress.annotations</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>ingress.enabled</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>ingress.hosts</td>
+<td>string</td>
+<td><code>nil</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>ingress.ingressClassName</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources</td>
+</tr>
+<tr class="odd">
+<td>ingress.tls</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>initContainers</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>the initContainer spec that will be used verbatim</td>
+</tr>
+<tr class="odd">
+<td>jobJsonOverridesFiles</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>jobJsonOverridesFiles is a map of maps. Each item in the map will become a file (named by the key), and the underlying object will be converted to JSON as the file’s contents</td>
+</tr>
+<tr class="even">
+<td>launcher.enabled</td>
+<td>bool</td>
+<td><code>true</code></td>
+<td>determines whether the launcher should be started in the container</td>
+</tr>
+<tr class="odd">
+<td>launcher.extraTemplates</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>extra templates to render in the template directory.</td>
+</tr>
+<tr class="even">
+<td>launcher.includeDefaultTemplates</td>
+<td>bool</td>
+<td><code>true</code></td>
+<td>whether to include the default <code>job.tpl</code> and <code>service.tpl</code> files included with the chart</td>
+</tr>
+<tr class="odd">
+<td>launcher.includeTemplateValues</td>
+<td>bool</td>
+<td><code>true</code></td>
+<td>whether to include the templateValues rendering process</td>
+</tr>
+<tr class="even">
+<td>launcher.kubernetesHealthCheck</td>
+<td>object</td>
+<td><code>{"enabled":true,"extraCurlArgs":["-fsSL"]}</code></td>
+<td>configuration for the “Kubernetes Health Check” that the launcher entrypoint runs at startup</td>
+</tr>
+<tr class="odd">
+<td>launcher.namespace</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today</td>
+</tr>
+<tr class="even">
+<td>launcher.templateValues</td>
+<td>object</td>
+<td><code>{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}</code></td>
+<td>values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates.</td>
+</tr>
+<tr class="odd">
+<td>launcher.templateValues.pod.command</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>command for all pods. This is really not something we should expose and will be removed once we have a better option</td>
+</tr>
+<tr class="even">
+<td>launcher.useTemplates</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>whether to render and use templates in the job launching process</td>
+</tr>
+<tr class="odd">
+<td>launcherPem</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details.</td>
+</tr>
+<tr class="even">
+<td>launcherPub</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>An inline launcher.pub key to pair with launcher.pem. If <code>false</code> (the default), we will try to generate a <code>launcher.pub</code> from the provided <code>launcher.pem</code></td>
+</tr>
+<tr class="odd">
+<td>license.file</td>
+<td>object</td>
+<td><code>{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}</code></td>
+<td>the file section is used for licensing with a license file</td>
+</tr>
+<tr class="even">
+<td>license.file.contents</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>contents is an in-line license file</td>
+</tr>
+<tr class="odd">
+<td>license.file.mountPath</td>
+<td>string</td>
+<td><code>"/etc/rstudio-licensing"</code></td>
+<td>mountPath is the place the license file will be mounted into the container</td>
+</tr>
+<tr class="even">
+<td>license.file.mountSubPath</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>It can be preferable <em>not</em> to enable this, because then updates propagate automatically</td>
+</tr>
+<tr class="odd">
+<td>license.file.secret</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>secret is an existing secret with a license file in it</td>
+</tr>
+<tr class="even">
+<td>license.file.secretKey</td>
+<td>string</td>
+<td><code>"license.lic"</code></td>
+<td>secretKey is the key for the secret to use for the license file</td>
+</tr>
+<tr class="odd">
+<td>license.key</td>
+<td>string</td>
+<td><code>nil</code></td>
+<td>key is the license to use</td>
+</tr>
+<tr class="even">
+<td>license.server</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>server is the <hostname>:<port> for a license server</port></hostname></td>
+</tr>
+<tr class="odd">
+<td>livenessProbe</td>
+<td>object</td>
+<td><code>{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}</code></td>
+<td>livenessProbe is used to configure the container’s livenessProbe</td>
+</tr>
+<tr class="even">
+<td>loadBalancer.forceEnabled</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>whether to force the loadBalancer to be enabled. Otherwise requires replicas &gt; 1. Worth setting if you are HA but may only have one node</td>
+</tr>
+<tr class="odd">
+<td>nameOverride</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>the name of the chart deployment (can be overridden)</td>
+</tr>
+<tr class="even">
+<td>nodeSelector</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>A map used verbatim as the pod’s “nodeSelector” definition</td>
+</tr>
+<tr class="odd">
+<td>pod.annotations</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>Additional annotations to add to the rstudio-workbench pods</td>
+</tr>
+<tr class="even">
+<td>pod.env</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>env is an array of maps that is injected as-is into the “env:” component of the pod.container spec</td>
+</tr>
+<tr class="odd">
+<td>pod.labels</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>Additional labels to add to the rstudio-workbench pods</td>
+</tr>
+<tr class="even">
+<td>pod.lifecycle</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>container lifecycle hooks</td>
+</tr>
+<tr class="odd">
+<td>pod.port</td>
+<td>int</td>
+<td><code>8787</code></td>
+<td>The containerPort used by the main pod container</td>
+</tr>
+<tr class="even">
+<td>pod.securityContext</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>Values to set the <code>securityContext</code> for the service pod</td>
+</tr>
+<tr class="odd">
+<td>pod.sidecar</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>sidecar is an array of containers that will be run alongside the main container</td>
+</tr>
+<tr class="even">
+<td>pod.terminationGracePeriodSeconds</td>
+<td>int</td>
+<td><code>120</code></td>
+<td>The termination grace period seconds allowed for the pod before shutdown</td>
+</tr>
+<tr class="odd">
+<td>pod.volumeMounts</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>volumeMounts is injected as-is into the “volumeMounts:” component of the pod.container spec</td>
+</tr>
+<tr class="even">
+<td>pod.volumes</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>volumes is injected as-is into the “volumes:” component of the pod.container spec</td>
+</tr>
+<tr class="odd">
+<td>podDisruptionBudget</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>Pod disruption budget</td>
+</tr>
+<tr class="even">
+<td>priorityClassName</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>The pod’s priorityClassName</td>
+</tr>
+<tr class="odd">
+<td>prometheusExporter.enabled</td>
+<td>bool</td>
+<td><code>true</code></td>
+<td>whether the prometheus exporter sidecar should be enabled</td>
+</tr>
+<tr class="even">
+<td>prometheusExporter.image.imagePullPolicy</td>
+<td>string</td>
+<td><code>"IfNotPresent"</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>prometheusExporter.image.repository</td>
+<td>string</td>
+<td><code>"prom/graphite-exporter"</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>prometheusExporter.image.tag</td>
+<td>string</td>
+<td><code>"v0.9.0"</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>prometheusExporter.mappingYaml</td>
+<td>string</td>
+<td><code>nil</code></td>
+<td>Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file</td>
+</tr>
+<tr class="even">
+<td>prometheusExporter.resources</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>resource specification for the prometheus exporter sidecar</td>
+</tr>
+<tr class="odd">
+<td>prometheusExporter.securityContext</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>securityContext for the prometheus exporter sidecar</td>
+</tr>
+<tr class="even">
+<td>rbac.clusterRoleCreate</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node’s internal address is sufficient to allow proper functionality.</td>
+</tr>
+<tr class="odd">
+<td>rbac.create</td>
+<td>bool</td>
+<td><code>true</code></td>
+<td>Whether to create rbac. (also depends on launcher.enabled = true)</td>
+</tr>
+<tr class="even">
+<td>rbac.serviceAccount</td>
+<td>object</td>
+<td><code>{"annotations":{},"create":true,"labels":{},"name":""}</code></td>
+<td>The serviceAccount to be associated with rbac (also depends on launcher.enabled = true)</td>
+</tr>
+<tr class="odd">
+<td>readinessProbe</td>
+<td>object</td>
+<td><code>{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}</code></td>
+<td>readinessProbe is used to configure the container’s readinessProbe</td>
+</tr>
+<tr class="even">
+<td>replicas</td>
+<td>int</td>
+<td><code>1</code></td>
+<td>replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA</td>
+</tr>
+<tr class="odd">
+<td>resources</td>
+<td>object</td>
+<td><code>{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}</code></td>
+<td>resources define requests and limits for the rstudio-server pod</td>
+</tr>
+<tr class="even">
+<td>revisionHistoryLimit</td>
+<td>int</td>
+<td><code>10</code></td>
+<td>The revisionHistoryLimit to use for the pod deployment. Do not set to 0</td>
+</tr>
+<tr class="odd">
+<td>sealedSecret.annotations</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>annotations for SealedSecret resources</td>
+</tr>
+<tr class="even">
+<td>sealedSecret.enabled</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>use SealedSecret instead of Secret to deploy secrets</td>
+</tr>
+<tr class="odd">
+<td>secureCookieKey</td>
+<td>string</td>
+<td><code>""</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>securityContext</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>service.annotations</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>Annotations for the service, for example to specify <a href="https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer">an internal load balancer</a></td>
+</tr>
+<tr class="even">
+<td>service.clusterIP</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>The cluster-internal IP to use with <code>service.type</code> ClusterIP</td>
+</tr>
+<tr class="odd">
+<td>service.loadBalancerIP</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>The external IP to use with <code>service.type</code> LoadBalancer, when supported by the cloud provider</td>
+</tr>
+<tr class="even">
+<td>service.nodePort</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>The explicit nodePort to use for <code>service.type</code> NodePort. If not provided, Kubernetes will choose one automatically</td>
+</tr>
+<tr class="odd">
+<td>service.port</td>
+<td>int</td>
+<td><code>80</code></td>
+<td>The Service port. This is the port your service will run under.</td>
+</tr>
+<tr class="even">
+<td>service.type</td>
+<td>string</td>
+<td><code>"ClusterIP"</code></td>
+<td>The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider’s load balancer)</td>
+</tr>
+<tr class="odd">
+<td>serviceMonitor.additionalLabels</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>additionalLabels normally includes the release name of the Prometheus Operator</td>
+</tr>
+<tr class="even">
+<td>serviceMonitor.enabled</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Whether to create a ServiceMonitor CRD for use with a Prometheus Operator</td>
+</tr>
+<tr class="odd">
+<td>serviceMonitor.namespace</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace</td>
+</tr>
+<tr class="even">
+<td>session.defaultConfigMount</td>
+<td>bool</td>
+<td><code>true</code></td>
+<td>Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this</td>
+</tr>
+<tr class="odd">
+<td>session.defaultHomeMount</td>
+<td>bool</td>
+<td><code>true</code></td>
+<td>Whether to automatically add the homeStorage PVC to the session (i.e.&nbsp;via the <code>launcher-mounts</code> file)</td>
+</tr>
+<tr class="even">
+<td>session.defaultSecretMountPath</td>
+<td>string</td>
+<td><code>"/mnt/session-secret/"</code></td>
+<td>The path to mount the sessionSecret (from <code>config.sessionSecret</code>) onto the server and session pods</td>
+</tr>
+<tr class="odd">
+<td>session.image.repository</td>
+<td>string</td>
+<td><code>"rstudio/r-session-complete"</code></td>
+<td>The repository to use for the session image</td>
+</tr>
+<tr class="even">
+<td>session.image.tag</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>A tag override for the session image. Overrides the “tagPrefix” above, if set. Default tag is <code>{ tagPrefix }{{ version }}</code></td>
+</tr>
+<tr class="odd">
+<td>session.image.tagPrefix</td>
+<td>string</td>
+<td><code>"ubuntu2204-"</code></td>
+<td>A tag prefix for session images (common selections: ubuntu2204-, centos7-). Only used if tag is not defined</td>
+</tr>
+<tr class="even">
+<td>shareProcessNamespace</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>whether to provide <code>shareProcessNamespace</code> to the pod.</td>
+</tr>
+<tr class="odd">
+<td>sharedStorage.accessModes</td>
+<td>list</td>
+<td><code>["ReadWriteMany"]</code></td>
+<td>accessModes defined for the storage PVC (represented as YAML)</td>
+</tr>
+<tr class="even">
+<td>sharedStorage.annotations</td>
+<td>object</td>
+<td><code>{"helm.sh/resource-policy":"keep"}</code></td>
+<td>Define the annotations for the Persistent Volume Claim resource</td>
+</tr>
+<tr class="odd">
+<td>sharedStorage.create</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>whether to create the persistentVolumeClaim for shared storage</td>
+</tr>
+<tr class="even">
+<td>sharedStorage.mount</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Whether the persistentVolumeClaim should be mounted (even if not created)</td>
+</tr>
+<tr class="odd">
+<td>sharedStorage.name</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>The name of the pvc. By default, computes a value from the release name</td>
+</tr>
+<tr class="even">
+<td>sharedStorage.path</td>
+<td>string</td>
+<td><code>"/var/lib/rstudio-server"</code></td>
+<td>the path to mount the sharedStorage claim within the pod</td>
+</tr>
+<tr class="odd">
+<td>sharedStorage.requests.storage</td>
+<td>string</td>
+<td><code>"10Gi"</code></td>
+<td>the volume of storage to request for this persistent volume claim</td>
+</tr>
+<tr class="even">
+<td>sharedStorage.selector</td>
+<td>object</td>
+<td><code>{}</code></td>
+<td>selector for PVC definition</td>
+</tr>
+<tr class="odd">
+<td>sharedStorage.storageClassName</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>storageClassName - the type of storage to use. Must allow ReadWriteMany</td>
+</tr>
+<tr class="even">
+<td>sharedStorage.volumeName</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>the volumeName passed along to the persistentVolumeClaim. Optional</td>
+</tr>
+<tr class="odd">
+<td>startupProbe</td>
+<td>object</td>
+<td><code>{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}</code></td>
+<td>startupProbe is used to configure the container’s startupProbe</td>
+</tr>
+<tr class="even">
+<td>startupProbe.failureThreshold</td>
+<td>int</td>
+<td><code>30</code></td>
+<td>failureThreshold * periodSeconds should be strictly &gt; worst case startup time</td>
+</tr>
+<tr class="odd">
+<td>strategy</td>
+<td>object</td>
+<td><code>{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}</code></td>
+<td>How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but will not work well if your license only allows a single activation.</td>
+</tr>
+<tr class="even">
+<td>tolerations</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>An array used verbatim as the pod’s “tolerations” definition</td>
+</tr>
+<tr class="odd">
+<td>topologySpreadConstraints</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>An array used verbatim as the pod’s “topologySpreadConstraints” definition</td>
+</tr>
+<tr class="even">
+<td>userCreate</td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>userCreate determines whether a user should be created at startup (if true)</td>
+</tr>
+<tr class="odd">
+<td>userName</td>
+<td>string</td>
+<td><code>"rstudio"</code></td>
+<td>userName determines the username of the created user</td>
+</tr>
+<tr class="even">
+<td>userPassword</td>
+<td>string</td>
+<td><code>"rstudio"</code></td>
+<td>userPassword determines the password of the created user</td>
+</tr>
+<tr class="odd">
+<td>userUid</td>
+<td>string</td>
+<td><code>"10000"</code></td>
+<td>userUid determines the UID of the created user</td>
+</tr>
+<tr class="even">
+<td>versionOverride</td>
+<td>string</td>
+<td><code>""</code></td>
+<td>A Workbench version to override the “tag” for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194</td>
+</tr>
+<tr class="odd">
+<td>xdgConfigDirs</td>
+<td>string</td>
+<td><code>"/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"</code></td>
+<td>The XDG config dirs (directories where configuration will be read from). Do not change without good reason.</td>
+</tr>
+<tr class="even">
+<td>xdgConfigDirsExtra</td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>A list of additional XDG config dir paths</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Autogenerated from chart metadata using <a href="https://github.com/norwoodj/helm-docs/releases/v1.13.1">helm-docs v1.13.1</a></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/helm\.rstudio\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright © 2???-2024 Posit Software, PBC. All Rights Reserved.</p>
+</div>   
+    <div class="nav-footer-center">
+<p>Posit Helm Charts</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/rstudio/helm/edit/main/charts/rstudio-workbench/README.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/rstudio/helm/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://support.posit.co/hc/en-us">
+      <i class="bi bi-question-circle-fill" role="img" aria-label="Link to Posit Support">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://solutions.posit.co/">
+      <i class="bi bi-lightbulb-fill" role="img" aria-label="Link to Posit Solutions">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="https://docs.posit.co/">
+<p><img alt="Link to Posit Documentation" src="../../images/posit-guide-ltmd.svg" id="footer-right-logo"></p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="https://posit.co/">
+<p><img alt="Link to main Posit site" src="../../images/posit-icon-fullcolor.svg" id="footer-right-posit-logo"></p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
