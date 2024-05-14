@@ -1,7 +1,4 @@
----
-title: Posit Package Manager
-code-overflow: wrap
----
+# Posit Package Manager
 
 ![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
@@ -10,28 +7,35 @@ code-overflow: wrap
 IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
 
-## For Production
+## For production
 
-To ensure a stable production deployment, please:
+To ensure a stable production deployment:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-  for breaking changes
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+## For production
 
-## Installing the Chart
+To ensure a stable production deployment:
+
+* "Pin" the version of the Helm chart that you are using. You can do this using the:
+  * `helm dependency` command *and* the associated "Chart.lock" files *or*
+  * the `--version` flag.
+ 
+    ::: {.callout-important}
+    This protects you from breaking changes.
+    :::
+
+* Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
+
+## Installing the chart
 
 To install the chart with the release name `my-release` at version 0.5.25:
 
-```bash
+```{.bash}
 helm repo add rstudio https://helm.rstudio.com
 helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.25
 ```
 
-To explore other chart versions, take a look at:
+To explore other chart versions, look at:
 ```
 helm search repo rstudio/rstudio-pm -l
 ```
@@ -60,15 +64,15 @@ This chart requires the following in order to function:
 
 ## Licensing
 
-This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
-
-### License File
+This chart supports activating the product using a *license file*.
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-`kubectl create secret generic rstudio-pm-license --from-file=licenses/rstudio-pm.lic`
+```{.bash}
+kubectl create secret generic rstudio-pm-license --from-file=licenses/rstudio-pm.lic
+```
 
 Second, specify the following values:
 
@@ -81,15 +85,9 @@ license:
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-`--set-file license.file.contents=licenses/rstudio-pm.lic`
-
-### License Key
-
-Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
-
-### License Server
-
-Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+```{.bash}
+--set-file license.file.contents=licenses/rstudio-pm.lic
+```
 
 ## S3 Configuration
 
