@@ -1,31 +1,25 @@
----
-title: Posit Workbench
-code-overflow: wrap
----
+# Posit Workbench
 
 ![Version: 0.7.3](https://img.shields.io/badge/Version-0.7.3-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
-#### _Official Helm chart for Posit Workbench_
+#### _Official Helm chart for RStudio Workbench_
 
 Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
 products using R and Python.
 
-## For production
+## For Production
 
-To ensure a stable production deployment:
+To ensure a stable production deployment, please:
 
-* "Pin" the version of the Helm chart that you are using. You can do this using the:
-  * `helm dependency` command *and* the associated "Chart.lock" files *or*
-  * the `--version` flag.
-  
-    ::: {.callout-important}
-    This protects you from breaking changes.
-    :::
+* Ensure you "pin" the version of the Helm chart that you are using. You can do
+  this using the `helm dependency` command and the associated "Chart.lock" files
+  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
+* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
+  for breaking changes
+* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
+  changes, as well as documentation below on how to use the chart
 
-* Before upgrading check for breaking changes using `helm diff upgrade`.
-* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
-
-## Installing the chart
+## Installing the Chart
 
 To install the chart with the release name `my-release` at version 0.7.3:
 
@@ -35,64 +29,59 @@ helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.3
 ```
 
 To explore other chart versions, take a look at:
-
-```bash
+```
 helm search repo rstudio/rstudio-workbench -l
 ```
 
-## Required configuration
+## Required Configuration
 
-To function, this chart requires the following:
+This chart requires the following in order to function:
 
-* A license file. See the [Licensing](#licensing) section below for more details.
+* A license file, license key, or address of a running license server. See the [Licensing](#licensing) section below for more details.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the
   home directory for users.
-  * If `homeStorage.create` is set, it creates a Persistent Volume Claim (PVC) that relies on the default storage class to generate the
+  * If `homeStorage.create` is set, a PVC that relies on the default storage class will be created to generate the
     PersistentVolume. Most Kubernetes environments do not have a default storage class that you can use
-    with `ReadWriteMany` access mode out-of-the-box. In this case, we recommend that you:
-      * Disable `homeStorage.create` and
-    create your own `PersistentVolume` and `PersistentVolumeClaim`, then
-      * Mount them into the container by specifying
+    with `ReadWriteMany` access mode out-of-the-box. In this case, we recommend you disable `homeStorage.create` and
+    create your own `PersistentVolume` and `PersistentVolumeClaim`, then mount them into the container by specifying
     the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim`
     using `homeStorage.name` and `homeStorage.mount`.
-  * If you cannot use a `PersistentVolume` to properly mount your users' home directories, mount your
+  * If you cannot use a `PersistentVolume` to properly mount your users' home directories, you'll need to mount your
     data in the container by using a
     regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes/#nfs), specified in `pod.volumes`
     and `pod.volumeMounts`.
-  * If you cannot use a `Volume` to mount the directories, manually mount them during container startup
+  * If you cannot use a `Volume` to mount the directories, you'll need to manually mount them during container startup
     with a mechanism similar to what is described below for joining to auth domains.
-  * If not using `homeStorage.create`, configure `config.serverDcf.launcher-mounts` to ensure that the correct mounts are used when users create new sessions.
-* If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
+  * If not using `homeStorage.create`, you'll need to configure `config.serverDcf.launcher-mounts` to ensure that the correct mounts are used when users create new sessions.
+* If using load balancing (by setting `replicas > 1`), you will need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
 * A method to join the deployed `rstudio-workbench` container to your auth domain. The default `rstudio/rstudio-workbench` image has `sssd` installed and started by default.
   You can include `sssd` configuration in `config.userProvisioning` like so:
-
-    ```yaml
-    config:
-      userProvisioning:
-        mysssd.conf:
-          sssd:
-            config_file_version: 2
-            services: nss, pam
-            domains: rstudio.com
-          domain/rstudio.com:
-            id_provider: ldap
-            auth_provider: ldap
-    ```
+```yaml
+config:
+  userProvisioning:
+    mysssd.conf:
+      sssd:
+        config_file_version: 2
+        services: nss, pam
+        domains: rstudio.com
+      domain/rstudio.com:
+        id_provider: ldap
+        auth_provider: ldap
+```
 
 ## Licensing
 
-This chart supports activating the product using a *license file*.
+This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
 
-- We recommend *against* directly placing the license file in your values file.
-- We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
+### License File
+
+We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-```{.bash}
-kubectl create secret generic rstudio-workbench-license --from-file=licenses/rstudio-workbench.lic
-```
+`kubectl create secret generic rstudio-workbench-license --from-file=licenses/rstudio-workbench.lic`
 
 Second, specify the following values:
 
@@ -105,32 +94,39 @@ license:
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-```bash
---set-file license.file.contents=licenses/rstudio-workbench.lic
-```
+`--set-file license.file.contents=licenses/rstudio-workbench.lic`
 
-## General principles
+### License Key
+
+Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
+
+### License Server
+
+Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+
+## General Principles
 
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
-  valid `.ini` or `.dcf` file formats required by Workbench.
-  - Those configuration files and their mount locations are covered in the [Configuration files](#configuration-files) section below.
-- If you need to modify the jobs launched by Workbench, use `job-json-overrides`.
-  - Review the [Job Json overrides](#job-json-overrides) section on this below. For general information, see [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes).
-- The prestart scripts for Workbench and Posit Job Launcher are highly customized to get the service account information off of the Workbench pod for use in launching jobs.
-- Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter.
-  - This is described in the
-  [Monitoring Posit Team Using Prometheus and Graphite](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite) support article.
+  valid `.ini` or `.dcf` file formats required by RStudio Workbench. Those config files and their mount locations are
+  below.
+- If you need to modify the jobs launched by RStudio Workbench, you want to use `job-json-overrides`. There is a section on this below
+  and [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
+  on the topic in general.
+- The prestart scripts for RStudio Workbench and RStudio Launcher are highly customized to:
+  - Get the service account information off of the RStudio Workbench pod for use in launching jobs
+- RStudio Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter
+  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
 ## Configuration files
 
-These configuration values all take the form of usual Helm values
-so you can set the database password with similar to:
+These configuration values all take the form of usual helm values
+so you can set the database password with something like:
 
-```bash
+```
 ... --set config.secret.database\.conf.password=mypassword ...
 ```
 
-The files are converted into configuration files, in the required format, via go-templating. If you want to "in-line" a configuration file or mount it verbatim, you can use a pattern like:
+The files are converted into configuration files in the necessary format via go-templating. If you want to "in-line" a config file or mount it verbatim, you can use a pattern like:
 
 ```yaml
 config:
@@ -140,135 +136,130 @@ config:
 ```
 
 The names of files are dynamically used, so you can add new files as needed. Beware that some files have default values,
-so moving them can have adverse effects. Also, if you use a different mounting paradigm, you need to change
-the `XDG_CONFIG_DIRS` environment variable.
+so moving them can have adverse effects. Also, if you use a different mounting paradigm, you will need to change
+the `XDG_CONFIG_DIRS` environment variable
 
 - Session Configuration
   - These configuration files are mounted into the server and
-    are mounted into the session pods.
+    are mounted into the session pods as well.
   - `repos.conf`, `rsession.conf`, `notifications.conf`
-  - Located in: <br>`config.session.<< name of file >>` Helm values
-  - Mounted at:<br> `/mnt/session-configmap/rstudio/`
-- Session Secret Configuration:
-  - These configuration files are mounted into the server and session pods.
-  - `odbc.ini` and other similar shared secrets.
-  - Located in: <br>`config.sessionSecret.<< name of file>>` Helm values
-  - Mounted at:<br> `/mnt/session-secret/`
-- Secret Configuration:
-  - These configuration files are mounted into the server with more restrictive permissions (0600).
+  - located in the `config.session.<< name of file >>` helm values
+  - mounted at `/mnt/session-configmap/rstudio/`
+- Session Secret Configuration
+  - These configuration files are mounted into the server and session pods as well
+  - `odbc.ini` and other similar shared secrets
+  - located in `config.sessionSecret.<< name of file>>` helm values
+  - mounted at `/mnt/session-secret/`
+- Secret Configuration
+  - These configuration files are mounted into the server with more restrictive permissions (0600)
   - `database.conf`, `openid-client-secret`, `databricks.conf`
-  - Located in: <br>`config.secret.<< name of file >>` Helm values
-  - Mounted at:<br> `/mnt/secret-configmap/rstudio/`
-- Server Configuration:
-  - These configuration files are mounted into the server (.ini file format).
+  - They are located in the `config.secret.<< name of file >>` helm values
+  - mounted at `/mnt/secret-configmap/rstudio/`
+- Server Configuration
+  - These configuration files are mounted into the server (.ini file format)
   - `rserver.conf`, `launcher.conf`, `jupyter.conf`, `logging.conf`
-  - Located at:<br> `config.server.<< name of file >>` Helm values
-  - Mounted at:<br> `/mnt/configmap/rstudio/`
-- Server DCF Configuration:
-  - These configuration files are mounted into the server (.dcf file format).
+  - They are located at `config.server.<< name of file >>` helm values
+  - mounted at `/mnt/configmap/rstudio/`
+- Server DCF Configuration
+  - These configuration files are mounted into the server (.dcf file format)
   - `launcher-mounts`, `launcher-env`
-  - Located at:<br> `config.serverDcf.<< name of file >>` Helm values
-  - Included at:<br> `/mnt/configmap/rstudio/`
-- Profiles Configuration:
-  - These configuration files are mounted into the server (.ini file format).
+  - They are located at `config.serverDcf.<< name of file >>` helm values
+  - included at `/mnt/configmap/rstudio/`
+- Profiles Configuration
+  - These configuration files are mounted into the server (.ini file format)
   - `launcher.kubernetes.profiles.conf`
-  - They are located at `config.profiles.<< name of file >>` Helm values
-  - Included at:<br> `/mnt/configmap/rstudio/`
-  - See the [Profiles](#rstudio-profiles) section below for more information.
-- Prestart:
-  - This is provided by the Helm chart in a configmap.
-  - It is mounted into the pod at `/scripts/`.
-  - `prestart-workbench.bash` is used to start workbench.
-  - `prestart-launcher.bash` is used to start launcher.
-- User Provisioning Configuration:
-  - These configuration files are used for configuring user provisioning (i.e., `sssd`).
-  - Located at:<br> `config.userProvisioning.<< name of file >>` Helm values
-  - Mounted onto:<br> `/etc/sssd/conf.d/` with `0600` permissions by default.
-- Custom Startup Configuration:
-  - `supervisord` service / unit definition `.conf` files.
-  - Use the `.ini` file format by default.
-  - Mounted at:<br> `/startup/custom`
-  - As with all configuration files above, you can override with a verbatim string if desired:
-  - Located at:<br> `config.startupCustom.<< name of file >>` Helm values:
-    ```yaml
-    config:
-      startupCustom:
-        myfile.conf: |
-          file-used-verbatim
-    ```
-- PAM configuration:
-  - `pam` configuration files.
-  - Located at:<br> `config.pam.<< name of file >>` Helm values
-  - Mounted verbatim as individual files (using `subPath` mounts) at:<br> `/etc/pam.d/<< name of file >>`
+  - They are located at `config.profiles.<< name of file >>` helm values
+  - included at `/mnt/configmap/rstudio/`
+  - See the `Profiles` section below for more information
+- Prestart
+  - This is provided by the helm chart in a configmap
+  - It is mounted into the pod at `/scripts/`
+  - `prestart-workbench.bash` is used to start workbench
+  - `prestart-launcher.bash` is used to start launcher
+- User Provisioning Configuration
+  - These configuration files are used for configuring user provisioning (i.e. `sssd`)
+  - Located at `config.userProvisioning.<< name of file >>` helm values
+  - Mounted onto `/etc/sssd/conf.d/` with `0600` permissions by default
+- Custom Startup Configuration
+  - `supervisord` service / unit definition `.conf` files
+  - Located at `config.startupCustom.<< name of file >>` helm values
+  - Will use the `.ini` file format, by default
+  - Mounted at `/startup/custom`
+  - As with all config files above, can override with a verbatim string if desired, like so:
+```yaml
+config:
+  startupCustom:
+    myfile.conf: |
+      file-used-verbatim
+```
+- PAM configuration
+  - `pam` configuration files
+  - Located at `config.pam.<< name of file >>` helm values
+  - Will be mounted verbatim as individual files (using `subPath` mounts) at `/etc/pam.d/<< name of file >>`
 
-### Configuring Python and R repositories
-
-#### Python repositories
-
-pip can be configured with `config.session.pip.conf`. To ensure `pip.conf` is mounted into the session pods, it is important that:
-
-- `launcher.useTemplates: true` is set
-- `pip.conf` settings are listed under `config.session` as shown in the following example for adding Posit Public Package Manager's PyPI:
-
-  ```yaml
-  launcher:
-    useTemplates: true
-
-  config:
-    session:
-      pip.conf:
-        "global":
-          index-url: https://packagemanager.posit.co/pypi/latest/simple
-          trusted-host: packagemanager.posit.co
-  ```
+### Configuring R and Python repositories
 
 #### R repositories
 
-R package repositories can be configured with `config.session.repos.conf`:
+R package repositories can be configured with `config.session.repos.conf`.
 
-```yaml
+```
 config:
   session:
     repos.conf:
       CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
 ```
 
-For more information about configuring CRAN repositories in Workbench, see the [Posit Workbench Administrator Guide's - Package Installation > CRAN repositories](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories) section.
+For more information about configuring CRAN repositories in Workbench refer to the [Admin Guide](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories).
 
-## User provisioning
+#### Python repositories
 
-Provisioning users in Workbench containers is challenging. Session images create users automatically (with
-consistent UIDs / GIDs). However, creating users in the Workbench containers is a responsibility that falls to the
-administrator.
+pip can be configured with `config.session.pip.conf`. To ensure `pip.conf` is mounted into the session pods it is important that `launcher.useTemplates: true` is set and `pip.conf` settings are listed under `config.session` like in the example below for adding Posit Public Package Manager's PyPI.
+
+```
+launcher:
+  useTemplates: true
+
+config:
+  session:
+    pip.conf:
+      "global":
+        index-url: https://packagemanager.posit.co/pypi/latest/simple
+        trusted-host: packagemanager.posit.co
+```
+
+## User Provisioning
+
+Provisioning users in RStudio Workbench containers is challenging. Session images have users created automatically (with
+consistent UIDs / GIDs), but creating users in the Workbench containers is a responsibility that falls to the
+administrator today.
 
 The most common way to provision users is via `sssd`.
-The [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
+The [latest RStudio Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
 has `sssd` included and running by default (see `userProvisioning` configuration files above).
 
-The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever)
+The other way that this can be managed is via a lightweight "startup service" (runs once at startup and then sleeps forever)
 or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.
+However, it is important to be careful of a few points:
 
-However, it is important to use caution for the following:
+- UID / GID consistency: linux usernames and their matching to UID/GID must be consistent across all nodes and across
+  time. Failing this can cause security issues and access by some users to files they should not be allowed to see
+- usernames cannot have `@`. The `@` sign (often used in emails with SSO) is a problem for RStudio Workbench because
+  some operating systems disallow `@` signs in linux usernames
+- `supervisord` is configured by default to exit if any of its child processes exit. If you use `config.startupCustom`
+  to configure a user management service, be careful that it does not exit unnecessarily
 
-- UID / GID consistency:
-  - Linux usernames and their matching to UID/GID must be consistent across all nodes and across time.
-  - Failing can cause security issues and access by some users to access view they should not be allowed to see.
-- Usernames cannot have `@`.
-  - The `@` sign (often used in emails with SSO) is a problem for Workbench because some operating systems disallow `@` signs in linux usernames.
-- `supervisord` is configured by default to exit if any of its child processes exit.
-  - If you use `config.startupCustom` to configure a user management service, be careful that it does not exit unnecessarily.
-
-We do not provide such a service out-of-the box because we intend for Workbench to solve this problem in a
-future release. Please contact your account representative if you have feedback or questions about this
+We do not provide such a service out of the box because we intend for RStudio Workbench to solve this problem in a
+future release. Please get in touch with your account representative if you have feedback or questions about this
 workflow.
 
 ### PAM
 
-When starting sessions on Workbench, PAM configuration is often very important, even if PAM is not being used as
-an authentication mechanism. The Workbench Helm chart allows creating custom PAM files via the `config.pam`
+When starting sessions on RStudio Workbench, PAM configuration is often very important, even if PAM is not being used as
+an authentication mechanism. The RStudio Workbench helm chart allows creating custom PAM files via the `config.pam`
 values section.
 
-Each key under `config.pam` becomes a PAM configuration file, and is mounted into `/etc/pam.d/` in the container. For
+Each key under `config.pam` will become a PAM config file, and will be mounted into `/etc/pam.d/` in the container. For
 example:
 
 ```yaml
@@ -288,17 +279,17 @@ Profiles are used to define product behavior (in `.ini` file format) based on us
 
 Sections define whether a set of configurations is applied to a user's jobs based on the following criteria:
 
-- If section header is `[*]`, it applies to all users.
-- If a user's username is `myusername`, the section `[myusername]` applies to them.
-- If a user is in the `allusers` group, then the section `[@allusers]` applies to them
+- if section header is `[*]`, it applies to all users
+- if a user's username is `myusername`, the section `[myusername]` will apply to them
+- if a user is in the `allusers` group, then the section `[@allusers]` will apply to them
 
 The product reads configuration from top to bottom and "last-in-wins" for a given configuration value.
 
 ### `/etc/rstudio/profiles`
 
-The `/etc/rstudio/profiles` file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the [Posit Workbench Administrator Guide - User and Group Profiles](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html) page for more information.
+The `/etc/rstudio/profiles` file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the Workbench Admin Guide [User and Group Profiles](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html) page for more details.
 
-In the `values.yaml`, define the content of `/etc/rstudio/profiles` in `config.server.profiles`. For example:
+In the `values.yaml`, the content of `/etc/rstudio/profiles` should be defined in `config.server.profiles`. For example:
 
 ```yaml
 config:
@@ -321,17 +312,17 @@ session-timeout-minutes=60
 
 ### `/etc/rstudio/launcher.kubernetes.profiles.conf`
 
-The `/etc/rstudio/launcher.kubernetes.profiles.conf` contains the configuration of resource limits by user and group when using the Kubernetes Launcher Plugin. In the `values.yaml`, define the content of `/etc/rstudio/launcher.kubernetes.profiles.conf	` in the `config.profiles.launcher.kubernetes.profiles.conf` file. The `config.profiles` section has a couple of niceties that are added in by default.
+The `/etc/rstudio/launcher.kubernetes.profiles.conf` contains the configuration of resource limits by user and group when using the Kubernetes Launcher Plugin. In the `values.yaml`, the content of `/etc/rstudio/launcher.kubernetes.profiles.conf	` should be defined in `config.profiles.launcher.kubernetes.profiles.conf`. The `config.profiles` section has a couple of niceties that are added in by default.
 
-- YAML arrays like the following becomes "comma-joined." For instance, the following becomes: `some-key=value1,value2`
+- YAML arrays like the following will be "comma-joined." For instance, the following will become: `some-key=value1,value2`
 
-  ```yaml
-  some-key:
-    - value1
-    - value2
-  ```
+```yaml
+some-key:
+  - value1
+  - value2
+```
 
-- The `[*]` section has arrays "appended" to user and group sections, along with "defaults" defined by the chart.
+- The `[*]` section will have arrays "appended" to user and group sections, along with "defaults" defined by the chart.
 
 For example:
 
@@ -348,7 +339,6 @@ config:
           - value4
           - value5
 ```
-
 Becomes:
 
 _/etc/rstudio/launcher.kubernetes.profiles.conf_
@@ -360,24 +350,23 @@ some-key: value1,value2
 some-key: value1,value2,value3,value4
 ```
 
-:::{.callout-note}
-This appending/concatenation/array translation behavior only works with the helm chart.
-:::
+> NOTE: this appending/concatenation/array translation behavior only works with the helm chart
 
-### Job Json overrides
+### Job Json Overrides
 
-If you want to customize the job launch process (i.e., how sessions are defined), edit the following configuration:
+If you want to customize the job launch process (i.e. how sessions are defined), you will need to edit the following
+configuration:
+  - modify `config.profiles.launcher\.kubernetes\.profiles\.conf.<< some selector >>.job-json-overrides`
+  - create an array of maps with the following keys:
+    - `target`: the "target" part of the job spec to replace
+    - `name`: a unique identifier (ideally with no spaces) that will become a config filename on disk
+    - `json`: a YAML value that will be translated directly to JSON and injected into the job spec at `target`
 
-- Modify:
-  ```yaml
-  config.profiles.launcher\.kubernetes\.profiles\.conf.<< some selector >>.job-json-overrides`
-  ```
-- Create an array of maps with the following keys:
-  - `target`: The "target" part of the job spec to replace.
-  - `name`: A unique identifier (ideally with no spaces) becomes a configuration filename on disk.
-  - `json`: A YAML value that is translated directly to JSON and injected into the job spec at `target`.
+Note that several examples are provided
+in [this support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
+(however, examples do not use the helm chart syntax there).
 
-Explore the docs in the [Helm repository](https://github.com/rstudio/helm/blob/main/docs/customize.md) for additional information.
+Alternatively, you can explore the docs in the [helm repository](https://github.com/rstudio/helm/blob/main/docs/customize.md)
 
 ```yaml
 config:
@@ -397,11 +386,10 @@ config:
           - "two-image:tag
 ```
 
-## Sealed secrets
+## Sealed Secrets
+This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
 
-This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
-
-To activate the use of `SealedSecret` templates instead of `Secret` templates in the chart, set `sealedSecret.enabled=true` and ensure the following values are all encrypted (the chart does not support mixing encrypted values with unencrypted values):
+To activate the use of `SealedSecret` templates instead of `Secret` templates in the chart, set `sealedSecret.enabled=true` and ensure the following values are all encrypted. The chart does not support mixing encrypted values with unencrypted values.
 
 - `config.secret`
 - `config.sessionSecret`
@@ -409,7 +397,7 @@ To activate the use of `SealedSecret` templates instead of `Secret` templates in
 - `launcherPem`
 - `secureCookieKey` (or `global.secureCookieKey`)
 
-Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables the chart's auto-generation and reuse capabilities for `launcherPem` and `secureCookieKey`. `launcherPem` is an RSA private key, which can be generated via an RSA tool such as Helm's [`genPrivateKey`](https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey) function. `secureCookieKey` is typically a UUID, which can be generated via a UUID generator such as Helm's [`uuidv4`](https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions) function.
+Use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) disables the chart's auto-generation and reuse capabilities for `launcherPem` and `secureCookieKey`. `launcherPem` is an RSA private key which can be generated via an RSA tool such as helm's [`genPrivateKey`](https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey) function. `secureCookieKey` is typically a UUID which can be generated via a UUID generator such as helm's [`uuidv4`](https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions) function.
 
 ## Values
 
@@ -558,3 +546,4 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.5.0](https://github.com/norwoodj/helm-docs/releases/v1.5.0)
+
