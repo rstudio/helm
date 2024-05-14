@@ -9,7 +9,7 @@ jobs:
     name: helm-docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: r-lib/actions/pr-fetch@v2
         with:
