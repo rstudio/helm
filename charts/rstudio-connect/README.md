@@ -7,7 +7,7 @@
 Business Users and Collaborators use R and Python data products on [Posit Connect](https://posit.co/products/enterprise/connect/)
 that are published by Data Scientists.
 
-## Best Practices
+## Best practices
 
 Helm charts are very useful tools for deploying resources into Kubernetes, however, they do require
 some familiarity with kubernetes and `helm` itself. Please ensure you have adequate training and
