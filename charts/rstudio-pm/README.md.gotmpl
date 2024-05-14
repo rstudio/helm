@@ -8,7 +8,7 @@
 
 {{ template "rstudio.install" . }}
 
-## Upgrade Guidance
+## Upgrade guidance
 
 ### 0.4.0
 
@@ -16,7 +16,7 @@
   the `rstudio-pm` user (with `uid:gid` `999:999`). A `chown` of persistent storage may be required. We will try to
   fix this up automatically. Set `enableMigrations=false` to disable the automatic fixup / hook.
 
-## Required Configuration
+## Required configuration
 
 This chart requires the following in order to function:
 
@@ -32,7 +32,7 @@ This chart requires the following in order to function:
 
 {{ template "rstudio.licensing" . }}
 
-## S3 Configuration
+## S3 configuration
 
 Package Manager [can be configured to store its data in S3
 buckets](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations),
@@ -73,17 +73,17 @@ awsSecretAccessKey: your-secret-access-key
 Bear in mind that static, long-lived credentials are the least secure option and
 should be avoided if at all possible.
 
-## General Principles
+## General principles
 
 - In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
 required by {{ template "chart.name" . }}.
 
-## Configuration File
+## Configuration file
 
 The configuration values all take the form of usual helm values
 so you can set the database password with something like:
 
-```
+```{.bash}
 ... --set config.Postgres.Password=mypassword ...
 ```
 
