@@ -2,46 +2,51 @@
 
 ![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
-#### _Official Helm chart for RStudio Package Manager_
+#### _Official Helm chart for Posit Package Manager_
 
 IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
 
-## For Production
+## For production
 
-To ensure a stable production deployment, please:
+To ensure a stable production deployment:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-  for breaking changes
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+* "Pin" the version of the Helm chart that you are using. You can do this using the:
+  * `helm dependency` command *and* the associated "Chart.lock" files *or*
+  * the `--version` flag.
+  
+    ::: {.callout-important}
+    This protects you from breaking changes.
+    :::
 
-## Installing the Chart
+* Before upgrading check for breaking changes using `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
+
+## Installing the chart
 
 To install the chart with the release name `my-release` at version 0.5.25:
 
-```bash
+```{.bash}
 helm repo add rstudio https://helm.rstudio.com
 helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.25
 ```
 
 To explore other chart versions, take a look at:
-```
+
+```{.bash}
 helm search repo rstudio/rstudio-pm -l
 ```
 
-## Upgrade Guidance
+## Upgrade guidance
 
 ### 0.4.0
 
-- When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
-  the `rstudio-pm` user (with `uid:gid` `999:999`). A `chown` of persistent storage may be required. We will try to
-  fix this up automatically. Set `enableMigrations=false` to disable the automatic fixup / hook.
+* When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
+  the `rstudio-pm` user (with `uid:gid` `999:999`)
+* A `chown` of persistent storage may be required. The issue has been recorded and the team is working to implement an automatic fix.
+  * To disable an automatic fixup / hook, set `enableMigrations=false`.
 
-## Required Configuration
+## Required configuration
 
 This chart requires the following in order to function:
 
