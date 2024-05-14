@@ -94,7 +94,7 @@ required by rstudio-connect.
 
 ## Configuration file
 
-The configuration values all take the form of usual helm values
+The configuration values all take the form of usual Helm values
 so you can set the database password with something like:
 
 ```{.bash}
