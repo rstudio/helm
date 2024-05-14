@@ -22,13 +22,13 @@ filters:
 
 website: 
   title: Posit Helm Charts
-  site-url: https://docs.posit.co/helm
+  site-url: https://helm.rstudio.com
   bread-crumbs: true
   repo-url: https://github.com/rstudio/helm
   repo-actions: [edit, issue]
   page-footer:
     left: |
-      Copyright &copy; 2???-{{< env CURRENT_YEAR >}} Posit Software, PBC. All Rights Reserved.
+      Copyright &copy; {{< env CURRENT_YEAR >}} Posit Software, PBC. All Rights Reserved.
     center: |
       Posit Helm Charts
     right:
