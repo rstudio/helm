@@ -85,8 +85,7 @@ To function, this chart requires the following:
 
 This chart supports activating the product using a *license file*.
 
-- We recommend *against* directly placing the license file in your values file.
-- We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
+We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
@@ -105,7 +104,7 @@ license:
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-```bash
+```{.bash}
 --set-file license.file.contents=licenses/rstudio-workbench.lic
 ```
 
@@ -126,7 +125,7 @@ Alternatively, license files can be set during `helm install` with the following
 These configuration values all take the form of usual Helm values
 so you can set the database password with similar to:
 
-```bash
+```{.bash}
 ... --set config.secret.database\.conf.password=mypassword ...
 ```
 

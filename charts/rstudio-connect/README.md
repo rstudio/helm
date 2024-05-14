@@ -63,7 +63,7 @@ To function, this chart requires the following:
 
 This chart supports activating the product using a *license file*.
 
-- We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
+We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
