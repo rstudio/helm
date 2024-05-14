@@ -1,4 +1,7 @@
-# Posit Connect
+---
+title: Posit Connect
+code-overflow: wrap
+---
 
 ![Version: 0.6.6](https://img.shields.io/badge/Version-0.6.6-informational?style=flat-square) ![AppVersion: 2024.04.1](https://img.shields.io/badge/AppVersion-2024.04.1-informational?style=flat-square)
 
