@@ -50,7 +50,7 @@ helm search repo rstudio/rstudio-pm -l
 
 This chart requires the following in order to function:
 
-* A license file, license key, or address of a running license server. See the [Licensing](#licensing) section below for more details.
+* A license file. See the [Licensing](#licensing) section below for more details.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for RSPM.
   * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
@@ -62,15 +62,16 @@ This chart requires the following in order to function:
 
 ## Licensing
 
-This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
+This chart supports activating the product using a *license file*.
 
-### License File
 
-We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
+- We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-`kubectl create secret generic rstudio-pm-license --from-file=licenses/rstudio-pm.lic`
+```{.bash}
+kubectl create secret generic rstudio-pm-license --from-file=licenses/rstudio-pm.lic
+```
 
 Second, specify the following values:
 
@@ -83,17 +84,11 @@ license:
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-`--set-file license.file.contents=licenses/rstudio-pm.lic`
+```{.bash}
+--set-file license.file.contents=licenses/rstudio-pm.lic
+```
 
-### License Key
-
-Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
-
-### License Server
-
-Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
-
-## S3 Configuration
+## S3 configuration
 
 Package Manager [can be configured to store its data in S3
 buckets](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations),
@@ -131,20 +126,20 @@ awsAccessKeyId: your-access-key-id
 awsSecretAccessKey: your-secret-access-key
 ```
 
-Bear in mind that static, long-lived credentials are the least secure option and
+Consider that static, long-lived credentials are the least secure option and
 should be avoided if at all possible.
 
-## General Principles
+## General principles
 
-- In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
-required by rstudio-pm.
+In most places, we opt to pass Helm values over ConfigMaps. We translate these into the valid `.gcfg` file format
+required by `rstudio-pm`.
 
-## Configuration File
+## Configuration file
 
 The configuration values all take the form of usual Helm values
 so you can set the database password with something like:
 
-```
+```{.bash}
 ... --set config.Postgres.Password=mypassword ...
 ```
 
@@ -159,7 +154,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsAccessKeyId | bool | `false` | awsAccessKeyId is the access key id for s3 access, used also to gate file creation |
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
-| config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
+| config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the `rstudio-pm`.gcfg file |
 | enableMigration | bool | `true` | Enable migrations for shared storage (if necessary) using Helm hooks. |
 | enableSandboxing | bool | `true` | Enable sandboxing of Git builds, which requires elevated security privileges for the Package Manager container. |
 | extraContainers | list | `[]` | sidecar container list |
@@ -190,7 +185,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
 | pod.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"}}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template. |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
-| pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
+| pod.labels | object | `{}` | Additional labels to add to the `rstudio-pm` pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
 | pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
@@ -201,9 +196,9 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | priorityClassName | string | `""` | The pod's priorityClassName |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
-| resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
+| resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the `rstudio-pm` pod |
 | rootCheckIsFatal | bool | `true` | Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new Helm chart version. |
-| rstudioPMKey | bool | `false` | rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service |
+| rstudioPMKey | bool | `false` | rstudioPMKey is the `rstudio-pm` key used for the RStudio Package Manager service |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
