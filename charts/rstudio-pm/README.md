@@ -90,7 +90,7 @@ Alternatively, license files can be set during `helm install` with the following
 ## S3 configuration
 
 Package Manager [can be configured to store its data in S3
-buckets](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations),
+buckets](https://docs.posit.co/rspm/admin/file-storage/file-storage/#data-destinations),
 which eliminates the need to provision shared storage for multiple replicas. A
 `values.yaml` file using S3 might contain something like the following:
 
