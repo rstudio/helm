@@ -38,7 +38,8 @@ helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.6
 ```
 
 To explore other chart versions, look at:
-```
+
+```{.bash}
 helm search repo rstudio/rstudio-connect -l
 ```
 
@@ -48,11 +49,12 @@ To function, this chart requires the following:
 
 * A license file. See the [Licensing](#licensing) section below for more details.
 * A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for Connect.
-  * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
+  * If `sharedStorage.create` is set, it creates a Persistent Volume Claim (PVC) that relies on the default storage class to generate the
+    PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
     In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then
     mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
-  * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
+  * If you cannot use a `PersistentVolume` to properly mount your data directory, mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
 
 ## Licensing
@@ -84,14 +86,14 @@ Alternatively, license files can be set during `helm install` with the following
 
 ## General principles
 
-- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
+- In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
 required by rstudio-connect.
 - rstudio-connect does not export many prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
 ## Configuration file
 
-The configuration values all take the form of usual helm values
+The configuration values all take the form of usual Helm values
 so you can set the database password with something like:
 
 ```{.bash}

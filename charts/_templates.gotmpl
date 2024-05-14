@@ -102,7 +102,8 @@ helm upgrade --install --devel my-release rstudio/{{ template "chart.name" . }} 
 ```
 
 To explore other chart versions, look at:
-```
+
+```{.bash}
 helm search repo {{ if $isDev }}--devel {{ end }}rstudio/{{ template "chart.name" . }} -l
 ```
 

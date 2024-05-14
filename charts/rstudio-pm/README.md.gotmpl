@@ -13,20 +13,21 @@
 ### 0.4.0
 
 - When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
-  the `rstudio-pm` user (with `uid:gid` `999:999`). A `chown` of persistent storage may be required. We will try to
-  fix this up automatically. Set `enableMigrations=false` to disable the automatic fixup / hook.
+  the `rstudio-pm` user (with `uid:gid` `999:999`).
+- A `chown` of persistent storage may be required. The team is working to implement an automatic fix. To disable the automatic fix/hook, set `enableMigrations=false`.
 
 ## Required configuration
 
 This chart requires the following in order to function:
 
-* A license file, license key, or address of a running license server. See the [Licensing](#licensing) section below for more details.
-* A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for RSPM.
-  * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume. 
+* A license file. See the [Licensing](#licensing) section below for more details.
+* A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for Package Manager.
+  * If `sharedStorage.create` is set, it creates a Persistent Volume Claim (PVC) that relies on the default storage class to generate the
+    PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box. 
     In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then 
     mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
-  * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
+  * If you cannot use a `PersistentVolume` to properly mount your data directory, mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
   * Alternatively, S3 storage can be used. See the [S3 Configuration](#s3-configuration) section for details.
 
@@ -75,12 +76,12 @@ should be avoided if at all possible.
 
 ## General principles
 
-- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
+- In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
 required by {{ template "chart.name" . }}.
 
 ## Configuration file
 
-The configuration values all take the form of usual helm values
+The configuration values all take the form of usual Helm values
 so you can set the database password with something like:
 
 ```{.bash}

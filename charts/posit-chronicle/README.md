@@ -33,7 +33,8 @@ helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.0
 ```
 
 To explore other chart versions, look at:
-```
+
+```{.bash}
 helm search repo rstudio/posit-chronicle -l
 ```
 

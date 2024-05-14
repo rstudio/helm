@@ -29,7 +29,8 @@ helm upgrade --install my-release rstudio/rstudio-launcher-rbac --version=0.2.20
 ```
 
 To explore other chart versions, look at:
-```
+
+```{.bash}
 helm search repo rstudio/rstudio-launcher-rbac -l
 ```
 

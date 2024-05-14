@@ -32,7 +32,8 @@ helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.3
 ```
 
 To explore other chart versions, look at:
-```
+
+```{.bash}
 helm search repo rstudio/rstudio-workbench -l
 ```
 
@@ -121,7 +122,7 @@ Alternatively, license files can be set during `helm install` with the following
 These configuration values all take the form of usual Helm values
 so you can set the database password with something like:
 
-```
+```{.bash}
 ... --set config.secret.database\.conf.password=mypassword ...
 ```
 
