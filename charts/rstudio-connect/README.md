@@ -2,7 +2,7 @@
 
 ![Version: 0.6.6](https://img.shields.io/badge/Version-0.6.6-informational?style=flat-square) ![AppVersion: 2024.04.1](https://img.shields.io/badge/AppVersion-2024.04.1-informational?style=flat-square)
 
-#### _Official Helm chart for RStudio Connect_
+#### _Official Helm chart for Posit Connect_
 
 Business Users and Collaborators use R and Python data products on [Posit Connect](https://posit.co/products/enterprise/connect/)
 that are published by Data Scientists.
