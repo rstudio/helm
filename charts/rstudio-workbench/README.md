@@ -22,7 +22,7 @@ To ensure a stable production deployment:
     This protects you from breaking changes.
     :::
 
-* Before upgrading check for breaking changes using `helm diff upgrade`.
+* Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.
 * Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
 
 ## Installing the chart
