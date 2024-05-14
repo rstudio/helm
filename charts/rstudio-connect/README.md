@@ -1,7 +1,4 @@
----
-title: Posit Connect
-code-overflow: wrap
----
+# Posit Connect
 
 ![Version: 0.6.6](https://img.shields.io/badge/Version-0.6.6-informational?style=flat-square) ![AppVersion: 2024.04.1](https://img.shields.io/badge/AppVersion-2024.04.1-informational?style=flat-square)
 
@@ -10,33 +7,37 @@ code-overflow: wrap
 Business Users and Collaborators use R and Python data products on [Posit Connect](https://posit.co/products/enterprise/connect/)
 that are published by Data Scientists.
 
-## Best Practices
+## Best practices
 
 Helm charts are very useful tools for deploying resources into Kubernetes, however, they do require
 some familiarity with kubernetes and `helm` itself. Please ensure you have adequate training and
 IT support before deploying these charts into production environments. Reach out to your account representative
-if you need help deciding whether helm is a good choice for your deployment.
+if you need help deciding whether Helm is a good choice for your deployment.
 
 To ensure reproducibility in your environment and insulate yourself from future changes, please:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use the `helm-diff` plugin and `helm diff upgrade` to check
-  for breaking changes
-* Read [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+* "Pin" the version of the Helm chart that you are using. You can do
+  this using the:
+    * `helm dependency` command and the associated "Chart.lock" files _or_
+    * the `--version` flag.
 
-## Installing the Chart
+      :::{.callout-important}
+      This protects you from breaking changes**
+      :::
+
+* Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
+
+## Installing the chart
 
 To install the chart with the release name `my-release` at version 0.6.6:
 
-```bash
+```{.bash}
 helm repo add rstudio https://helm.rstudio.com
 helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.6
 ```
 
-To explore other chart versions, take a look at:
+To explore other chart versions, look at:
 ```
 helm search repo rstudio/rstudio-connect -l
 ```
@@ -56,15 +57,15 @@ This chart requires the following in order to function:
 
 ## Licensing
 
-This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
-
-### License File
+This chart supports activating the product using a *license file*.
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-`kubectl create secret generic rstudio-connect-license --from-file=licenses/rstudio-connect.lic`
+```{.bash}
+kubectl create secret generic rstudio-connect-license --from-file=licenses/rstudio-connect.lic
+```
 
 Second, specify the following values:
 
@@ -77,15 +78,9 @@ license:
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-`--set-file license.file.contents=licenses/rstudio-connect.lic`
-
-### License Key
-
-Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
-
-### License Server
-
-Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+```{.bash}
+--set-file license.file.contents=licenses/rstudio-connect.lic
+```
 
 ## General Principles
 
