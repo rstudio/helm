@@ -1,4 +1,7 @@
-# Posit Package Manager
+---
+title: Posit Package Manager
+code-overflow: wrap
+---
 
 ![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
