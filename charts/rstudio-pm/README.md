@@ -14,7 +14,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
-  
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
