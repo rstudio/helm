@@ -23,8 +23,7 @@ To ensure a stable production deployment:
     :::
 
 * Before upgrading check for breaking changes using `helm diff upgrade`.
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes and the documentation below on how to use the chart.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
 
 ## Installing the chart
 
@@ -51,9 +50,9 @@ To function, this chart requires the following:
   * If `homeStorage.create` is set, it creates a Persistent Volume Claim (PVC) that relies on the default storage class to generate the
     PersistentVolume. Most Kubernetes environments do not have a default storage class that you can use
     with `ReadWriteMany` access mode out-of-the-box. In this case, we recommend that you:
-    * disable `homeStorage.create` and
+      * Disable `homeStorage.create` and
     create your own `PersistentVolume` and `PersistentVolumeClaim`, then
-    * mount them into the container by specifying
+      * Mount them into the container by specifying
     the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim`
     using `homeStorage.name` and `homeStorage.mount`.
   * If you cannot use a `PersistentVolume` to properly mount your users' home directories, mount your
@@ -84,14 +83,14 @@ To function, this chart requires the following:
 
 ## Licensing
 
-This chart supports activating the product using a *license file*. 
+This chart supports activating the product using a *license file*.
 
 - We recommend *against* directly placing the license file in your values file.
 - We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-```bash
+```{.bash}
 kubectl create secret generic rstudio-workbench-license --from-file=licenses/rstudio-workbench.lic
 ```
 
@@ -259,7 +258,7 @@ However, it is important to use caution for the following:
 - `supervisord` is configured by default to exit if any of its child processes exit.
   - If you use `config.startupCustom` to configure a user management service, be careful that it does not exit unnecessarily.
 
-We do not provide such a service out of the box because we intend for Workbench to solve this problem in a
+We do not provide such a service out-of-the box because we intend for Workbench to solve this problem in a
 future release. Please contact your account representative if you have feedback or questions about this
 workflow.
 
