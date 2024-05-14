@@ -2,46 +2,51 @@
 
 ![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
 
-#### _Official Helm chart for RStudio Package Manager_
+#### _Official Helm chart for Posit Package Manager_
 
 IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
 
-## For Production
+## For production
 
-To ensure a stable production deployment, please:
+To ensure a stable production deployment:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-  for breaking changes
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+* "Pin" the version of the Helm chart that you are using. You can do this using the:
+  * `helm dependency` command *and* the associated "Chart.lock" files *or*
+  * the `--version` flag.
+  
+    ::: {.callout-important}
+    This protects you from breaking changes.
+    :::
 
-## Installing the Chart
+* Before upgrading check for breaking changes using `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
+
+## Installing the chart
 
 To install the chart with the release name `my-release` at version 0.5.25:
 
-```bash
+```{.bash}
 helm repo add rstudio https://helm.rstudio.com
 helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.25
 ```
 
 To explore other chart versions, take a look at:
-```
+
+```{.bash}
 helm search repo rstudio/rstudio-pm -l
 ```
 
-## Upgrade Guidance
+## Upgrade guidance
 
 ### 0.4.0
 
-- When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
-  the `rstudio-pm` user (with `uid:gid` `999:999`). A `chown` of persistent storage may be required. We will try to
-  fix this up automatically. Set `enableMigrations=false` to disable the automatic fixup / hook.
+* When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
+  the `rstudio-pm` user (with `uid:gid` `999:999`)
+* A `chown` of persistent storage may be required. The issue has been recorded and the team is working to implement an automatic fix.
+  * To disable an automatic fixup / hook, set `enableMigrations=false`.
 
-## Required Configuration
+## Required configuration
 
 This chart requires the following in order to function:
 
@@ -131,12 +136,12 @@ should be avoided if at all possible.
 
 ## General Principles
 
-- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
+- In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
 required by rstudio-pm.
 
 ## Configuration File
 
-The configuration values all take the form of usual helm values
+The configuration values all take the form of usual Helm values
 so you can set the database password with something like:
 
 ```
@@ -197,7 +202,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
-| rootCheckIsFatal | bool | `true` | Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new helm chart version. |
+| rootCheckIsFatal | bool | `true` | Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new Helm chart version. |
 | rstudioPMKey | bool | `false` | rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
@@ -227,8 +232,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | The update strategy used by the main service pod. |
 | tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | topologySpreadConstraints | list | `[]` | An array used verbatim as the pod's "topologySpreadConstraints" definition |
-| versionOverride | string | `""` | A Package Manager version to override the "tag" for the RStudio Package Manager image. Necessary until https://github.com/helm/helm/issues/8194 |
+| versionOverride | string | `""` | A Package Manager version to override the "tag" for the Posit Package Manager image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.5.0](https://github.com/norwoodj/helm-docs/releases/v1.5.0)
-
