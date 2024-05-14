@@ -88,8 +88,8 @@ Alternatively, license files can be set during `helm install` with the following
 ## General principles
 
 - In most places, we opt to pass Helm values over ConfigMaps. We translate these into the valid `.gcfg` file format
-required by rstudio-connect.
-- rstudio-connect does not export many prometheus metrics on its own. Instead, we run a sidecar graphite exporter
+required by `rstudio-connect`.
+- `rstudio-connect` does not export many prometheus metrics on its own. Instead, we run a sidecar graphite exporter
   [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
 
 ## Configuration file
