@@ -22,7 +22,7 @@ filters:
 
 website: 
   title: Posit Helm Charts
-  site-url: https://helm.rstudio.com
+  site-url: https://docs.posit.co/helm
   bread-crumbs: true
   repo-url: https://github.com/rstudio/helm
   repo-actions: [edit, issue]
