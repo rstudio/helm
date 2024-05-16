@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![AppVersion: 2024.05.0](https://img.shields.io/badge/AppVersion-2024.05.0-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![AppVersion: 2024.05.0](https://img.shields.io/badge/AppVersion-2024.05.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
