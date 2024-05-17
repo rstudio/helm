@@ -101,3 +101,17 @@ test-connect-interpreter-versions:
       docker run --rm $image /bin/bash -c "command -v $ex"
     done
   done
+
+push-docs:
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    s3_args=(--dryrun)
+    if [[ "${GITHUB_REF:-}" == "refs/heads/main" ]] || [[ "${GITHUB_REF:-}" =~ ^refs/tags/v[0-9]{4}\.[0-9]{2}\.[0-9]+$ ]]; then
+        s3_args=("")
+    fi
+
+    # The s3 bucket is s3://docs.rstudio.com/, which is available as https://docs.posit.co/
+    aws s3 sync ${s3_args[*]:-} \
+        _site \
+        "s3://docs.rstudio.com/helm/"
