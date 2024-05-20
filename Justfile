@@ -6,6 +6,10 @@ ARCH := if arch() == "aarch64" {"arm64"} else if arch() == "x86_64" {"x86_64"} e
 setup:
   #!/bin/bash
   set -xe
+  if [ -f ./bin/helm-docs ]; then
+    echo "Helm-docs is already installed"
+    exit 0
+  fi
   echo "Installing helm-docs version {{HELM_DOCS_VERSION}}"
   mkdir -p bin
   curl -L -s https://github.com/norwoodj/helm-docs/releases/download/v{{HELM_DOCS_VERSION}}/helm-docs_{{HELM_DOCS_VERSION}}_{{OS}}_{{ARCH}}.tar.gz -o bin/helm-docs.tar.gz

@@ -1,6 +1,8 @@
 project: 
   type: posit-docs
-  pre-render: just docs
+  pre-render: 
+    - just setup
+    - just docs
   render: 
     - charts/rstudio-workbench/README.md 
     - charts/rstudio-workbench/NEWS.md 
