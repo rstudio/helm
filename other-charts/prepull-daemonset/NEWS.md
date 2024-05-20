@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4
+
+- Update docs
+
 ## 0.0.3
 
 - Updates to support standalone documentation site

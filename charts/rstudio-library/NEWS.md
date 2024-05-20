@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.30
+
+- Documentation site updates
+
 ## 0.1.29
 
 - Updates to support standalone documentation site

@@ -9,7 +9,7 @@ jobs:
     name: helm-docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: r-lib/actions/pr-fetch@v2
         with:
@@ -20,19 +20,22 @@ jobs:
         with:
           version: v3.6.3
 
+      - name: install Just
+        uses: extractions/setup-just@v2
+
       - name: Install helm-docs
         env:
-          version: 1.5.0
+          HELM_DOCS_VERSION: 1.13.1
         run: |
-          echo "Installing helm-docs version $version"
-          curl -L -o helm-docs.tar.gz https://github.com/norwoodj/helm-docs/releases/download/v${version}/helm-docs_${version}_Linux_x86_64.tar.gz
-          tar -xzvf helm-docs.tar.gz helm-docs
-          rm -rf helm-docs.tar.gz
+          just setup
+      
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: pre-release
 
-      - name: Run helm-docs
-        run: |
-          ./helm-docs --chart-search-root=charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
-          ./helm-docs --chart-search-root=other-charts --template-files=README.md.gotmpl --template-files=./_templates.gotmpl
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
 
       - name: Commit results
         run: |
@@ -62,13 +65,12 @@ jobs:
         with:
           version: v3.6.3
 
+      - name: install Just
+        uses: extractions/setup-just@v2
+
       - name: Compute and update dependent files
         run: |
-          set -xe
-          cd ./charts/rstudio-launcher-rbac && helm dependency build && cd -
-          helm template -n rstudio rstudio-launcher-rbac ./charts/rstudio-launcher-rbac --set removeNamespaceReferences=true > examples/rbac/rstudio-launcher-rbac.yaml
-          CHART_VERSION=$(helm show chart ./charts/rstudio-launcher-rbac | grep '^version' | cut -d ' ' -f 2)
-          cp examples/rbac/rstudio-launcher-rbac.yaml examples/rbac/rstudio-launcher-rbac-${CHART_VERSION}.yaml
+          just rbac
 
       - name: Commit results
         run: |

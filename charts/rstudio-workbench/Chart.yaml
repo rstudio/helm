@@ -1,6 +1,6 @@
 name: rstudio-workbench
-description: Official Helm chart for RStudio Workbench
-version: 0.7.3
+description: Official Helm chart for Posit Workbench
+version: 0.7.4
 apiVersion: v2
 appVersion: 2024.04.0
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
@@ -13,7 +13,7 @@ maintainers:
     url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
-    version: 0.1.29
+    version: 0.1.30
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |
