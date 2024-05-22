@@ -2,7 +2,7 @@
 
 ## 0.7.5
 
-- Add documentation on PostgreSQL database configuration and mounting passwords from secrets as env variables
+- Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
 
 ## 0.7.4
 
