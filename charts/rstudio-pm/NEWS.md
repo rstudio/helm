@@ -2,7 +2,7 @@
 
 ## 0.5.27
 
-- Update `strategy` section of `deployment.yaml` template to be consistent with other products. `RollingUpdate` is still the default strategy.
+- Update `strategy` section of `deployment.yaml` template to be consistent with other Posit products. `RollingUpdate` is still the default strategy.
 
 ## 0.5.26
 
