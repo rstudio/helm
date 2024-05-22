@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.26
+
+- Update `strategy` section of `deployment.yaml` template to be consistent with other products. `RollingUpdate` is still the default strategy.
+
 ## 0.5.25
 
 - Update default Posit Package Manager version to 2024.04.0-20
