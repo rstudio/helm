@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.8
+
+- Add documentation on PostgreSQL database configuration and mounting passwords from secrets as env variables
+
 ## 0.6.7
 
 - Documentation site updates
