@@ -1,5 +1,5 @@
 ---
-category: "Beta Migration"
+category: "Beta migration"
 ---
 
 # Off-Host Execution Beta User Migration

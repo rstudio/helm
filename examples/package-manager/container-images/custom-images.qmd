@@ -1,5 +1,5 @@
 ---
-category: "Container Images"
+category: "Container images"
 ---
 
 # Configuring Posit Package Manager with Custom Container Images
