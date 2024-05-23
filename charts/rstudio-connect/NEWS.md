@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0
+
+- BREAKING: the prometheus endpoint has changed from port `9108` to `3232` by default
+  - We are now using an internal prometheus endpoint with all new metrics
+  - As a result, the `graphiteExporter` sidecar has been removed
+  - Some metrics from the `graphiteExporter` will no longer be present
+  - There is also a new "off-switch" for prometheus at `prometheus.enabled=true`
+  - To revert to old behavior, set `legacyPrometheus=true` (and please reach out to let us know why!)
+
 ## 0.6.7
 
 - Documentation site updates

@@ -159,6 +159,14 @@ license:
 securityContext:
   privileged: true
 
+# -- Whether to enable prometheus metrics in the product
+prometheus:
+  enabled: true
+  port: 3232
+
+# -- Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. Takes precedence over
+#    prometheusExporter.enabled
+legacyPrometheus: false
 prometheusExporter:
   # -- Whether the  prometheus exporter sidecar should be enabled
   enabled: true
@@ -357,7 +365,3 @@ config:
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Metrics:
     Enabled: true
-    GraphiteEnabled: true
-    GraphiteHost: 127.0.0.1
-    GraphitePort: 9109
-    GraphiteClientId: rsconnect

@@ -57,6 +57,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     - set launcher parameters if applicable
 */}}
 {{- define "rstudio-connect.config" -}}
+  {{- $configCopy := deepCopy .Values.config }}
   {{- $defaultConfig := dict }}
   {{- /* default launcher configuration */}}
   {{- if .Values.launcher.enabled }}
@@ -80,7 +81,26 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $licenseDict := dict "Licensing" ( dict "LicenseType" ("Remote") ) }}
     {{- $defaultConfig = merge $defaultConfig $licenseDict }}
   {{- end }}
-  {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig .Values.config ) }}
+  {{- /* default metrics / prometheus configuration */}}
+  {{- if .Values.prometheus.enabled }}
+    {{- if .Values.legacyPrometheus }}
+      {{- /* we set the graphite values as a default, to hide from values.yaml */ -}}
+      {{- $graphiteDict := dict ("Metrics" (dict "Enabled" true "GraphiteClientId" "rsconnect" "GraphiteEnabled" true))}}
+      {{- $graphiteDict = merge $graphiteDict (dict ("Metrics" ("GraphiteHost" "127.0.0.1" "GraphitePort" "9109")))}}
+      {{- $defaultConfig = merge $defaultConfig $graphiteDict }}
+    {{- else }}
+      {{- if hasKey $configCopy "Metrics" }}
+        {{- if hasKey (get $configCopy "Metrics") "GraphiteEnabled" }}
+          {{- /* we explicitly overwrite the graphite endpoint */ -}}
+          {{- mergeOverwrite $configCopy (dict "Metrics" (dict "GraphiteEnabled" false))}}
+        {{- end }}
+      {{- end }}
+
+      {{- /* and set a default for the prometheus listener */ -}}
+      {{- $defaultConfig = merge $defaultConfig (dict "Metrics" ( dict "PrometheusListen" (print ":" .Values.prometheus.port )))}}
+    {{- end }}
+  {{- end }}
+  {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
 
 {{/*
