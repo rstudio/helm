@@ -6,8 +6,8 @@
   - We are now using an internal prometheus endpoint with all new metrics
   - As a result, the `graphiteExporter` sidecar has been removed
   - Some metrics from the `graphiteExporter` will no longer be present
-  - There is also a new "off-switch" for prometheus at `prometheus.enabled=true`
-  - To revert to old behavior, set `legacyPrometheus=true` (and please reach out to let us know why!)
+  - The parent / main "off-switch" for prometheus is at `prometheus.enabled`
+  - To revert to the old exporter, set `prometheus.legacy=true` (and please reach out to let us know why!)
 
 ## 0.6.7
 

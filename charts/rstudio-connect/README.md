@@ -142,7 +142,6 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the Posit Connect session templating process |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
 | launcher.useTemplates | bool | `true` | Whether to use launcher templates when launching sessions. Defaults to true |
-| legacyPrometheus | bool | `false` | Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. Takes precedence over    prometheusExporter.enabled |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |
 | license.file.mountPath | string | `"/etc/rstudio-licensing"` | mountPath is the place the license file will be mounted into the container |
@@ -167,8 +166,10 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.volumes | list | `[]` | An array of maps that is injected as-is into the "volumes:" component of the pod spec |
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
 | priorityClassName | string | `""` | The pod's priorityClassName |
-| prometheus | object | `{"enabled":true,"port":3232}` | Whether to enable prometheus metrics in the product |
-| prometheusExporter.enabled | bool | `true` | Whether the  prometheus exporter sidecar should be enabled |
+| prometheus.enabled | bool | `true` | The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter |
+| prometheus.legacy | bool | `false` | Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. If you change this to `true`, please let us know why! Requires prometheusExporter.enabled=true too |
+| prometheus.port | int | `3232` | The port that prometheus will listen on. If legacy=true, then this will be hard-coded to 9108 |
+| prometheusExporter.enabled | bool | `true` | DEPRECATED. Whether the  prometheus exporter sidecar should be enabled. See prometheus.enabled instead. |
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |

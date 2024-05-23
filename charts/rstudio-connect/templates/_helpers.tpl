@@ -83,7 +83,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- end }}
   {{- /* default metrics / prometheus configuration */}}
   {{- if .Values.prometheus.enabled }}
-    {{- if .Values.legacyPrometheus }}
+    {{- if .Values.prometheus.legacy }}
       {{- /* we set the graphite values as a default, to hide from values.yaml */ -}}
       {{- $graphiteDict := dict ("Metrics" (dict "Enabled" true "GraphiteClientId" "rsconnect" "GraphiteEnabled" true))}}
       {{- $graphiteDict = merge $graphiteDict (dict ("Metrics" ("GraphiteHost" "127.0.0.1" "GraphitePort" "9109")))}}
