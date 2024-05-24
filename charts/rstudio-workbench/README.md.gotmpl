@@ -50,6 +50,46 @@ To function, this chart requires the following:
     ```
 {{ template "rstudio.licensing" . }}
 
+## Database
+
+Workbench requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/ide/server-pro/database/configuration.html#postgresql) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
+
+### Database configuration
+
+Add the following to your `values.yaml`, replacing the `connection-uri` with your database details.
+
+```yaml
+config:
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
+```
+
+### Database password
+
+First, create a `Secret` declaratively with YAML or imperatively using the following command (replacing with your actual password):
+
+```bash
+kubectl create secret generic {{ .Name }}-database --from-literal=password=YOURPASSWORDHERE
+```
+
+Second, specify the following in your `values.yaml`:
+
+```yaml
+pod:
+  env:
+    - name: WORKBENCH_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Name }}-database
+          key: password
+```
+
+Alternatively, database passwords may be set during `helm install` with the following argument:
+
+`--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
+
 ## General principles
 
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the

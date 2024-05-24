@@ -61,3 +61,9 @@ Please consider removing this configuration value.
 {{- fail "\n\n`pod.nodeSelector` is no longer used. Use `nodeSelector` instead!\nThis is more consistent with other charts and the community." }}
 
 {{- end }}
+
+{{- if and (hasKey .Values.config.Metrics "GraphiteEnabled") (not .Values.prometheus.legacy) }}
+
+{{- print "\n\n`config.Metrics.GraphiteEnabled` is overwritten by `prometheus.legacy=false`. Internal Connect Prometheus will be used instead." }}
+
+{{- end }}
