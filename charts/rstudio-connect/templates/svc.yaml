@@ -30,5 +30,11 @@ spec:
     targetPort: {{ .Values.service.targetPort }}
   {{- if .Values.prometheus.enabled }}
   - name: metrics
+    targetPort: metrics
+    {{- if .Values.prometheus.legacy }}
+    port: 9108
+    {{- else }}
+    port: {{ .Values.prometheus.port }}
+    {{- end }}
   {{- end }}
 ---
