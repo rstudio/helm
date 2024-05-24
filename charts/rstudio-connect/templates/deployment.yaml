@@ -20,14 +20,20 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
         checksum/config-graphite: {{ include (print $.Template.BasePath "/configmap-graphite-exporter.yaml") . | sha256sum }}
+        {{- end }}
         {{- if .Values.launcher.enabled }}
         checksum/config-prestart: {{ include (print $.Template.BasePath "/configmap-prestart.yaml") . | sha256sum }}
         {{- end }}
-      {{- if .Values.prometheusExporter.enabled }}
+      {{- if .Values.prometheus }}
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
+        {{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
         prometheus.io/port: "9108"
+        {{- else }}
+        prometheus.io/port: {{ .Values.prometheus.port | quote }}
+        {{- end }}
       {{- end }}
 {{ include "rstudio-connect.pod.annotations" . | indent 8 }}
       labels:
@@ -118,6 +124,11 @@ spec:
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
         ports:
         - containerPort: {{ .Values.pod.port }}
+          name: http
+        {{- if and .Values.prometheus.enabled (not .Values.prometheus.legacy) }}
+        - containerPort: {{ .Values.prometheus.port }}
+          name: metrics
+        {{- end}}
         {{- with .Values.securityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}
@@ -187,7 +198,7 @@ spec:
           {{- toYaml . | nindent 10 }}
           {{- end }}
         {{- end }}
-      {{- if .Values.prometheusExporter.enabled }}
+      {{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
       - name: exporter
         image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
         imagePullPolicy: "{{ .Values.prometheusExporter.image.imagePullPolicy }}"
@@ -220,7 +231,7 @@ spec:
           claimName: {{default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- end }}
       {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-connect.fullname" .)) | indent 6 }}
-      {{- if .Values.prometheusExporter.enabled }}
+      {{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
       - name: graphite-exporter-config
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-graphite

@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.6.7](https://img.shields.io/badge/Version-0.6.7-informational?style=flat-square) ![AppVersion: 2024.04.1](https://img.shields.io/badge/AppVersion-2024.04.1-informational?style=flat-square)
+![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![AppVersion: 2024.04.1](https://img.shields.io/badge/AppVersion-2024.04.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.6.7:
+To install the chart with the release name `my-release` at version 0.7.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.6.7
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.0
 ```
 
 To explore other chart versions, look at:
@@ -166,7 +166,10 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.volumes | list | `[]` | An array of maps that is injected as-is into the "volumes:" component of the pod spec |
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
 | priorityClassName | string | `""` | The pod's priorityClassName |
-| prometheusExporter.enabled | bool | `true` | Whether the  prometheus exporter sidecar should be enabled |
+| prometheus.enabled | bool | `true` | The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter |
+| prometheus.legacy | bool | `false` | Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. If you change this to `true`, please let us know why! Requires prometheusExporter.enabled=true too |
+| prometheus.port | int | `3232` | The port that prometheus will listen on. If legacy=true, then this will be hard-coded to 9108 |
+| prometheusExporter.enabled | bool | `true` | DEPRECATED. Whether the  prometheus exporter sidecar should be enabled. See prometheus.enabled instead. |
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |
