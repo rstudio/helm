@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+- Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
+
 ## 0.7.0
 
 - BREAKING: the prometheus endpoint has changed from port `9108` to `3232` by default
