@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.2
+
+- Enable TensorFlow by default in `values.yaml` when running in local or
+  off-host execution mode.
+
 ## 0.7.1
 
 - Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
