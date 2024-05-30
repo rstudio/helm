@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.2
+
+- Bump Connect version to 2024.05.0
+- BREAKING: local execution only
+  - Default installed R versions upgraded to 4.4.0 and 4.3.3.
+
 ## 0.7.1
 
 - Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
