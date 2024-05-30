@@ -5,6 +5,7 @@
 - Bump Connect version to 2024.05.0
 - BREAKING: local execution only
   - Default installed R versions upgraded to 4.4.0 and 4.3.3.
+  - Default installed Python versions upgraded to 3.12.1 and 3.11.7.
 - Enable TensorFlow by default in `values.yaml` when running in local or
   off-host execution mode.
 
