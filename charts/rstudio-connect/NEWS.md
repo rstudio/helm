@@ -1,3 +1,7 @@
+# 0.7.2
+
+- Bump Connect version to 2024.05.0
+
 # Changelog
 
 ## 0.7.1
