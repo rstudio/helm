@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.2
+
+- Bump Connect version to 2024.05.0
+- BREAKING: local execution only
+  - Default installed R versions upgraded to 4.4.0 and 4.3.3.
+  - Default installed Python versions upgraded to 3.12.1 and 3.11.7.
+- Enable TensorFlow by default in `values.yaml` when running in local or
+  off-host execution mode.
+
 ## 0.7.1
 
 - Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
