@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.6
+
+- Bump Workbench version to 2024.04.2
+
 ## 0.7.5
 
 - Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
