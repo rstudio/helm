@@ -1,6 +1,6 @@
-# Version: 2.3.1
+# Version: 2.4.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v4
+# Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -18,6 +18,9 @@ metadata:
     {{- end }}
   labels:
     app.kubernetes.io/managed-by: "launcher"
+    {{- with .Job.instanceId }}
+    launcher-instance-id: {{ toYaml . }}
+    {{- end }}
     {{- with .Job.metadata.job.labels }}
     {{- range $key, $val := . }}
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
@@ -62,6 +65,9 @@ spec:
         {{- end }}
         {{- end }}
       labels:
+        {{- with .Job.instanceId }}
+        launcher-instance-id: {{ toYaml . }}
+        {{- end }}
         {{- with .Job.metadata.pod.labels }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
