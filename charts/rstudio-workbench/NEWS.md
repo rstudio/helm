@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.7
+
+- Bump version of launcher templates `job.tpl` and `service.tpl`
+
 ## 0.7.6
 
 - Bump Workbench version to 2024.04.2

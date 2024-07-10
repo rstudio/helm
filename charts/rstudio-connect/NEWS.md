@@ -1,3 +1,7 @@
+## 0.7.4
+
+- Bump version of launcher templates `job.tpl` and `service.tpl`
+
 # 0.7.3
 
 - Bump Connect version to 2024.06.0
