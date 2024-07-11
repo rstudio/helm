@@ -3,7 +3,7 @@
 ## 0.8.0
 
 - BREAKING: the prometheus endpoint has changed from port `9108` to `8989` by default
-  - We are now using an internal prometheus endpoint with all new metrics
+  - We are now using an internal prometheus endpoint with new metrics
   - As a result, the `graphiteExporter` sidecar has been removed
   - Some metrics from the `graphiteExporter` will no longer be present
   - The parent / main "off-switch" for prometheus is at `prometheus.enabled`
