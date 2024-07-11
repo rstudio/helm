@@ -52,3 +52,9 @@ Please consider removing this configuration value.
 {{- if .Values.serviceAccountName }}
   {{- fail "\n\n`serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead"}}
 {{- end }}
+
+{{- if and (hasKey (get .Values.config.server "rserver.conf") "monitor-graphite-enabled") (not .Values.prometheus.legacy) }}
+
+{{- print "\n\n`config.server.'rserver/.conf'.monitor-graphite-enabled` is overwritten by `prometheus.legacy=false`. Internal Workbench Prometheus will be used instead." }}
+
+{{- end }}
