@@ -355,7 +355,7 @@ config:
     # Note: The `Executable` listed below is only used for Local Execution.
     # For Off-Host Execution, Quarto versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/quarto/
-    Executable: "/opt/quarto/1.4.552/bin/quarto"
+    Executable: "/opt/quarto/1.4.557/bin/quarto"
   TensorFlow:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.
