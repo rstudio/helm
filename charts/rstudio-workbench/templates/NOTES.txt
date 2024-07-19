@@ -1,10 +1,10 @@
 
 {{ include "rstudio-workbench.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
 
-{{- if eq .Values.launcherPem "" }}
+{{- if eq .Values.launcherPem.value "" }}
 
 NOTE: Using auto-generated value for "launcher.pem"
-  - We recommend making this value persistent by setting `.Values.launcherPem`
+  - We recommend making this value persistent by setting `.Values.launcherPem.value` or `.Values.launcherPem.existingSecret`
   - If the value changes, sessions started before the change will not be accessible
   - You can get the current value with:
 ```

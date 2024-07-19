@@ -376,7 +376,9 @@ extraObjects: []
 jobJsonOverridesFiles: {}
 
 # -- An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details.
-launcherPem: ""
+launcherPem:
+  value: ""
+  existingSecret: ""
 # -- An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem`
 launcherPub: false
 

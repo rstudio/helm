@@ -440,8 +440,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
           - if it is, we warn and leave it alone
 */}}
 {{- define "rstudio-workbench.launcherPem" -}}
-{{- $pemVar := $.Values.launcherPem -}}
-{{- if eq ($.Values.launcherPem) ("") -}}
+{{- $pemVar := $.Values.launcherPem.value -}}
+{{- if and (eq $.Values.launcherPem.value "") (eq $.Values.launcherPem.existingSecret "") -}}
 {{- $secretName := print (include "rstudio-workbench.fullname" .) "-secret" }}
 {{- $currentSecret := lookup "v1" "Secret" $.Release.Namespace $secretName }}
 {{- if and $currentSecret (not .Values.dangerRegenerateAutomatedValues) }}
