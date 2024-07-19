@@ -62,8 +62,17 @@ containers:
     value: "{{ .Values.userName }}"
   - name: RSW_TESTUSER_UID
     value: "{{ .Values.userUid }}"
+  {{- if .Values.userPassword.existingSecret }}
   - name: RSW_TESTUSER_PASSWD
-    value: "{{ .Values.userPassword }}"
+    valueFrom:
+      secretKeyRef:
+        key: password
+        name: {{ .Values.userPassword.existingSecret }}
+  {{- end }}
+  {{- if .Values.userPassword.value }}
+  - name: RSW_TESTUSER_PASSWD
+    value: {{ .Values.userPassword.value }}
+  {{- end }}
   {{- else }}
   - name: RSW_TESTUSER
     value: ""
