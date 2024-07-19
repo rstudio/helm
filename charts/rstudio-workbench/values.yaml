@@ -382,12 +382,16 @@ launcherPem:
 # -- An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem`
 launcherPub: false
 
-secureCookieKey: ""
+secureCookieKey:
+  value: ""
+  existingSecret: ""
 
 dangerRegenerateAutomatedValues: false
 
 global:
-  secureCookieKey: ""
+  secureCookieKey:
+    value: ""
+    existingSecret: ""
 
 config:
   defaultMode:
@@ -418,6 +422,11 @@ config:
     # -- default mode for pam scripts
     # @default -- 0644
     pam: 0644
+
+  database:
+    conf:
+      value: ""
+      existingSecret: ""
 
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:

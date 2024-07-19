@@ -122,8 +122,25 @@ containers:
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}
     {{- end }}
+    {{- if or (not .Values.launcherPem.existingSecret) (not .Values.secureCookieKey.existingSecret) }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
+    {{- end }}
+    {{- if .Values.launcherPem.existingSecret }}
+    - name: launcher-pem-secret
+      mountPath: "/mnt/secret-configmap/rstudio/launcher.pem"
+      subPath: "launcher.pem"
+    {{- end }}
+    {{- if .Values.secureCookieKey.existingSecret }}
+    - name: secure-cookie-key-secret
+      mountPath: "/mnt/secret-configmap/rstudio/secure-cookie-key"
+      subPath: "secure-cookie-key"
+    {{- end }}
+    {{- if .Values.config.database.conf.existingSecret }}
+    - name: database-conf-secret
+      mountPath: "/mnt/secret-configmap/rstudio/database.conf"
+      subPath: "database.conf"
+    {{- end }}
     {{- if .Values.config.userProvisioning }}
     - name: rstudio-user
       mountPath: "/etc/sssd/conf.d/"
@@ -303,10 +320,30 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-pam
     defaultMode: {{ .Values.config.defaultMode.pam }}
 {{- end }}
+{{- if or (not .Values.launcherPem.existingSecret) (not .Values.secureCookieKey.existingSecret) (not .Values.config.database.conf.existingSecret) }}
 - name: rstudio-secret
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-secret
     defaultMode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
+{{- if .Values.launcherPem.existingSecret  }}
+- name: launcher-pem-secret
+  secret:
+    secretName: {{ .Values.launcherPem.existingSecret }}
+    defaultMode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
+{{- if .Values.secureCookieKey.existingSecret  }}
+- name: secure-cookie-key-secret
+  secret:
+    secretName: {{ .Values.secureCookieKey.existingSecret }}
+    defaultMode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
+{{- if .Values.config.database.conf.existingSecret  }}
+- name: database-conf-secret
+  secret:
+    secretName: {{ .Values.config.database.conf.existingSecret }}
+    defaultMode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
 {{- if .Values.config.userProvisioning }}
 - name: rstudio-user
   secret:
@@ -462,7 +499,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
           - if it is, we warn and leave it alone
 */}}
 {{- define "rstudio-workbench.secureCookieKey" -}}
-{{- $cookieVar := default .Values.secureCookieKey .Values.global.secureCookieKey -}}
+{{- $cookieVar := default .Values.secureCookieKey.value .Values.global.secureCookieKey.value -}}
 {{- if eq ($cookieVar) ("") -}}
 {{- $secretName := print (include "rstudio-workbench.fullname" .) "-secret" }}
 {{- $currentSecret := lookup "v1" "Secret" $.Release.Namespace $secretName }}

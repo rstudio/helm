@@ -11,10 +11,10 @@ NOTE: Using auto-generated value for "launcher.pem"
 kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fullname" . }}-secret --template='{{print "{{" }}index .data "launcher.pem" | base64decode {{print "}}" }}'
 ```
 {{- end }}
-{{- if eq (default .Values.secureCookieKey .Values.global.secureCookieKey) "" }}
+{{- if eq (default .Values.secureCookieKey.value .Values.global.secureCookieKey.value) "" }}
 
 NOTE: Using an auto-generated value for "secure-cookie-key"
-  - We recommend making this value persistent by setting `.Values.global.secureCookieKey`
+  - We recommend making this value persistent by setting `.Values.global.secureCookieKey.value`
   - If the value changes, authenticated sessions will be invalidated (all users will be logged out) and some old sessions will not be accessible
   - You can get the current value with:
 ```
