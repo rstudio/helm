@@ -14,7 +14,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
@@ -452,6 +452,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| config.database.conf.value | string | 0644 | Database connection config |
+| config.database.conf.existingSecret | string | `""` | Secret for database connection config |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
 | config.defaultMode.pam | int | 0644 | default mode for pam scripts |
 | config.defaultMode.prestart | int | 0755 | default mode for prestart config |
@@ -475,7 +477,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
-| global.secureCookieKey | string | `""` |  |
+| global.secureCookieKey.value | string | `""` |  |
+| global.secureCookieKey.existingSecret | string | `""` | Secret containing secureCookieKey |
 | homeStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | homeStorage.create | bool | `false` | whether to create the persistentVolumeClaim for homeStorage |
 | homeStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
@@ -507,7 +510,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | launcher.templateValues | object | `{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
 | launcher.useTemplates | bool | `false` | whether to render and use templates in the job launching process |
-| launcherPem | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
+| launcherPem.value | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
+| launcherPem.existingSecret | string | `""` | Existing Secret for launcherPem |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |
@@ -552,7 +556,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | sealedSecret.annotations | object | `{}` | annotations for SealedSecret resources |
 | sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
-| secureCookieKey | string | `""` |  |
+| secureCookieKey.value | string | `""` |  |
+| secureCookieKey.existingSecret | string | `""` | Secret containing secureCookieKey |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
@@ -587,7 +592,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | topologySpreadConstraints | list | `[]` | An array used verbatim as the pod's "topologySpreadConstraints" definition |
 | userCreate | bool | `false` | userCreate determines whether a user should be created at startup (if true) |
 | userName | string | `"rstudio"` | userName determines the username of the created user |
-| userPassword | string | `"rstudio"` | userPassword determines the password of the created user |
+| userPassword.value | string | `"rstudio"` | userPassword determines the password of the created user |
+| userPassword.existingSecret | string | `""` | Existing Secret for userPassword |
 | userUid | string | `"10000"` | userUid determines the UID of the created user |
 | versionOverride | string | `""` | A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194 |
 | xdgConfigDirs | string | `"/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"` | The XDG config dirs (directories where configuration will be read from). Do not change without good reason. |
