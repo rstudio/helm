@@ -1,8 +1,19 @@
-# 0.7.3
+# Changelog
+
+## 0.7.5
+
+- Bump version of launcher templates `job.tpl` and `service.tpl`
+  - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
+    To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`.
+  - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+
+## 0.7.4
+
+- Bump default Quarto version to 1.4.557
+
+## 0.7.3
 
 - Bump Connect version to 2024.06.0
-
-# Changelog
 
 ## 0.7.2
 
