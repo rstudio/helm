@@ -83,6 +83,7 @@ spec:
       {{- if .Job.host }}
       nodeName: {{ toYaml .Job.host }}
       {{- end }}
+      enableServiceLinks: {{ if hasKey $templateData.pod "enableServiceLinks" }}{{ $templateData.pod.enableServiceLinks }}{{ else }}false{{ end }}
       restartPolicy: Never
       {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
       serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
@@ -105,7 +106,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or (ne (len .Job.placementConstraints) 0) (ne (len $templateData.pod.nodeSelector) 0) }}
+      {{- if or (ne (len .Job.placementConstraints) 0) (and $templateData.pod.nodeSelector (ne (len $templateData.pod.nodeSelector) 0)) }}
       nodeSelector:
         {{- range .Job.placementConstraints }}
         {{ .name }}: {{ toYaml .value }}
