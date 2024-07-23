@@ -1,10 +1,14 @@
 # Changelog
 
-## 0.7.4
+## 0.7.5
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`
   - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
     To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`
+
+## 0.7.4
+
+- Bump default Quarto version to 1.4.557
 
 ## 0.7.3
 
