@@ -89,6 +89,10 @@ containers:
   ports:
   - containerPort: 8787
     name: http
+  {{- if and .Values.prometheus.enabled (not .Values.prometheus.legacy) }}
+  - containerPort: {{ .Values.prometheus.port }}
+    name: metrics
+  {{- end}}
   securityContext:
     {{- toYaml .Values.securityContext | nindent 4 }}
   volumeMounts:
@@ -206,7 +210,7 @@ containers:
       {{- toYaml . | nindent 10 }}
     {{- end }}
   {{- end }}
-{{- if .Values.prometheusExporter.enabled }}
+{{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
 - name: exporter
   image: "{{ .Values.prometheusExporter.image.repository }}:{{ .Values.prometheusExporter.image.tag }}"
   imagePullPolicy: "{{ .Values.prometheusExporter.image.imagePullPolicy }}"
@@ -310,7 +314,7 @@ volumes:
     defaultMode: {{ .Values.config.defaultMode.userProvisioning }}
 {{- end }}
 {{ include "rstudio-library.license-volume" (dict "license" ( .Values.license ) "fullName" (include "rstudio-workbench.fullname" .)) }}
-{{- if .Values.prometheusExporter.enabled }}
+{{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
 - name: graphite-exporter-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-graphite

@@ -21,15 +21,21 @@ spec:
     metadata:
       annotations:
         checksum/config-general: {{ include (print $.Template.BasePath "/configmap-general.yaml") . | sha256sum }}
+        {{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
         checksum/config-graphite: {{ include (print $.Template.BasePath "/configmap-graphite-exporter.yaml") . | sha256sum }}
+        {{- end }}
         checksum/config-prestart: {{ include (print $.Template.BasePath "/configmap-prestart.yaml") . | sha256sum }}
         checksum/config-secret: {{ include (print $.Template.BasePath "/configmap-secret.yaml") . | sha256sum }}
         checksum/config-session: {{ include (print $.Template.BasePath "/configmap-session.yaml") . | sha256sum }}
-        {{- if .Values.prometheusExporter.enabled }}
+      {{- if .Values.prometheus }}
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
+        {{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
         prometheus.io/port: "9108"
+        {{- else }}
+        prometheus.io/port: {{ .Values.prometheus.port | quote }}
         {{- end }}
+      {{- end }}
         {{- include "rstudio-workbench.pod.annotations" . | nindent 8 }}
       labels:
         {{- include "rstudio-workbench.selectorLabels" . | nindent 8 }}

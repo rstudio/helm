@@ -70,6 +70,24 @@ data:
   {{- $overrideDict = mergeOverwrite $licenseServerConf $overrideDict }}
 {{- end }}
 {{- $overrideDict = mergeOverwrite $defaultRServerConfig $overrideDict }}
+{{- /* default metrics / prometheus configuration */}}
+  {{- if .Values.prometheus.enabled }}
+    {{- if .Values.prometheus.legacy }}
+      {{- /* we set the graphite values as a default, to hide from values.yaml */ -}}
+      {{- $graphiteDict := dict "rserver.conf" (dict "monitor-graphite-enabled" 1 "monitor-graphite-host" "127.0.0.1" "monitor-graphite-port" 9109 "monitor-graphite-client-id" "rstudio") }}
+      {{- $overrideDict = mergeOverwrite $graphiteDict $overrideDict }}
+    {{- else }}
+      {{- if hasKey $overrideDict "rserver.conf" }}
+        {{- if hasKey (get $overrideDict "rserver.conf") "monitor-graphite-enabled" }}
+          {{- /* we explicitly overwrite the graphite endpoint */ -}}
+          {{- $overrideDict = mergeOverwrite $overrideDict (dict "rserver.conf" (dict "monitor-graphite-enabled" "0")) }}
+        {{- end }}
+      {{- end }}
+
+      {{- /* and set a default for the prometheus listener */ -}}
+      {{- $overrideDict = merge $overrideDict (dict "rserver.conf" ( dict "metrics-enabled" 1 "metrics-port" .Values.prometheus.port))}}
+    {{- end }}
+  {{- end }}
 {{- $overrideDict = mergeOverwrite $defaultLauncherK8sConfig $overrideDict }}
 {{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
