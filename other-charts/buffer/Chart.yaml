@@ -1,0 +1,14 @@
+apiVersion: v2
+name: buffer
+description: A deployment buffer to enable auto-scaling more proactively
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+home: https://www.rstudio.com
+sources:
+  - https://github.com/rstudio/helm
+maintainers:
+  - name: sol-eng
+    email: docker@rstudio.com
+    url: https://github.com/sol-eng
