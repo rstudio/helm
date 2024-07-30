@@ -1,8 +1,13 @@
-# 0.7.3
+# Changelog
+
+## 0.7.4
+
+- BREAKING: local execution only
+  - Default installed Quarto version upgraded to 1.4.557
+
+## 0.7.3
 
 - Bump Connect version to 2024.06.0
-
-# Changelog
 
 ## 0.7.2
 
