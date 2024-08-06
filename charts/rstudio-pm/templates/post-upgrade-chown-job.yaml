@@ -22,7 +22,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: chown-shared-storage
-        image: "busybox"
+        image: "{{ .Values.postUpgradeJob.image.repository }}:{{ .Values.postUpgradeJob.image.tag }}"
         command:
         - /bin/sh
         - -c
