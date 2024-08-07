@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.6
+
+- Bump Connect version to 2024.08.0
+
 ## 0.7.4
 
 - BREAKING: local execution only
