@@ -250,3 +250,11 @@ tolerations: []
 priorityClassName: ""
 # -- Pod disruption budget
 podDisruptionBudget: {}
+
+# -- post upgrade job config
+postUpgradeJob:
+  image:
+    # -- the repository to use for the post upgrade job image
+    repository: busybox
+    # -- the tag to use for the post upgrade job image
+    tag: latest
