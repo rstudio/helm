@@ -79,7 +79,7 @@ priorityClassName: someval
 # Testing with the chronicle-agent sidecar container
 extraContainers:
   - name: chronicle-agent
-    image: ghcr.io/rstudio/chronicle-agent:2024.03.0
+    image: ghcr.io/rstudio/chronicle-agent:2024.09.0
     imagePullPolicy: Always
     env:
     - name: CHRONICLE_SERVER_ADDRESS
