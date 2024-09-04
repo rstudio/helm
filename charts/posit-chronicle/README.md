@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![AppVersion: 2024.03.0](https://img.shields.io/badge/AppVersion-2024.03.0-informational?style=flat-square)
+![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![AppVersion: 2024.09.0](https://img.shields.io/badge/AppVersion-2024.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -25,11 +25,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.3.1:
+To install the chart with the release name `my-release` at version 0.3.2:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.1
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.2
 ```
 
 To explore other chart versions, look at:
@@ -60,7 +60,7 @@ pod:
       mountPath: "/var/lib/rstudio-server/audit"
   sidecar:
     - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2024.03.0
+      image: ghcr.io/rstudio/chronicle-agent:2024.09.0
       volumeMounts:
       - name: logs
         mountPath: "/var/lib/rstudio-server/audit"
@@ -76,7 +76,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2024.03.0
+      image: ghcr.io/rstudio/chronicle-agent:2024.09.0
       env:
       - name: CHRONICLE_SERVER_ADDRESS
         value: "http://chronicle-server.default"

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.31
+- Bump Chronicle Agent to version 2024.09.0
+
 ## 0.5.30
 
 - Update default Posit Package Manager version to 2024.08.0-6
