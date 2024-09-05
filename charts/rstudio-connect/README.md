@@ -179,7 +179,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.launcherKubernetesProfilesConf | object | `{}` | User definition of launcher.kubernetes.profiles.conf for job customization |
 | launcher.namespace | string | `""` | The namespace to launch sessions into. Uses the Release namespace by default |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the Posit Connect session templating process |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the Posit Connect session templating process |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
 | launcher.useTemplates | bool | `true` | Whether to use launcher templates when launching sessions. Defaults to true |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
@@ -197,6 +197,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-connect pods |
 | pod.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.haste | bool | `true` | A helper that defines the RSTUDIO_CONNECT_HASTE environment variable |
+| pod.hostAliases | list | `[]` | Array of hostnames to supply to the main pod |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
 | pod.port | int | `3939` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
