@@ -219,19 +219,19 @@ entries:
     version: 0.0.2
   rstudio-connect:
   - annotations:
-    artifacthub.io/images: |
-      - name: rstudio-connect
-        image: rstudio/rstudio-connect:ubuntu2204-2024.08.0
-    artifacthub.io/license: MIT
-    artifacthub.io/links: |
-      - name: Docker Images
-        url: https://github.com/rstudio/rstudio-docker-products
-      - name: RStudio Community
-        url: https://community.rstudio.com/c/r-admin/5
-      - name: About Connect
-        url: https://www.rstudio.com/products/connect/
-      - name: About RStudio Team
-        url: https://www.rstudio.com/products/team/
+      artifacthub.io/images: |
+        - name: rstudio-connect
+          image: rstudio/rstudio-connect:ubuntu2204-2024.08.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Connect
+          url: https://www.rstudio.com/products/connect/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
     apiVersion: v2
     appVersion: 2024.08.0
     created: "2024-09-06T16:15:18.04294209Z"
