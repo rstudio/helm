@@ -328,6 +328,14 @@ launcher:
     tag: ""
     # -- The imagePullPolicy for the default initContainer
     imagePullPolicy: ""
+  # -- Optional resources for the default initContainer
+    resources: {}
+      # requests:
+      #   cpu: "128m"
+      #   memory: "128Mi"
+      # limits:
+      #   cpu: "512m"
+      #   memory: "512Mi"
     # -- The securityContext for the default initContainer
     securityContext: {}
 
