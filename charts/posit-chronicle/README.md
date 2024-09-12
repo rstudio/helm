@@ -179,7 +179,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | config.S3Storage.Region | string | `"us-east-2"` |  |
 | image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
-| image.tag | string | `"2024.03.0"` |  |
+| image.tag | string | `"2024.09.0"` |  |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
