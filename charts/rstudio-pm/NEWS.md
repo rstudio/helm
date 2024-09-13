@@ -1,4 +1,7 @@
 # Changelog
+## 0.5.32
+
+- Bump Chronicle Agent to version 2024.09.0
 
 ## 0.5.31
 
