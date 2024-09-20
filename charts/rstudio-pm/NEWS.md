@@ -1,4 +1,8 @@
 # Changelog
+## 0.5.33
+
+- Update default Post Package Manager version to 2024.08.2-9
+
 ## 0.5.32
 
 - Bump Chronicle Agent to version 2024.09.0
