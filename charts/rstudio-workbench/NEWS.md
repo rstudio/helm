@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+
+- Bump Chronicle Agent to version 2024.09.0
+
 ## 0.8.0
 
 - BREAKING: the prometheus endpoint has changed from port `9108` to `8989` by default

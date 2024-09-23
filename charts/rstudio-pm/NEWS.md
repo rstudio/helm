@@ -1,4 +1,15 @@
 # Changelog
+## 0.5.33
+
+- Update default Post Package Manager version to 2024.08.2-9
+
+## 0.5.32
+
+- Bump Chronicle Agent to version 2024.09.0
+
+## 0.5.31
+
+- Add documentation about PostgreSQL database configuration and mounting passwords from secrets as an env variable
 
 ## 0.5.30
 

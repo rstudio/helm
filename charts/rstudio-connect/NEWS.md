@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.8
+
+- Bump Chronicle Agent to version 2024.09.0
+
+## 0.7.7
+
+- Add helm values for `pod.hostAliases` and `launcher.templateValues.pod.hostAliases`
+- Add helm values for `launcher.defaultInitContainer.resources`
+
 ## 0.7.6
 
 - Bump Connect version to 2024.08.0

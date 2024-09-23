@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.7.6](https://img.shields.io/badge/Version-0.7.6-informational?style=flat-square) ![AppVersion: 2024.08.0](https://img.shields.io/badge/AppVersion-2024.08.0-informational?style=flat-square)
+![Version: 0.7.8](https://img.shields.io/badge/Version-0.7.8-informational?style=flat-square) ![AppVersion: 2024.08.0](https://img.shields.io/badge/AppVersion-2024.08.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.7.6:
+To install the chart with the release name `my-release` at version 0.7.8:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.6
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.8
 ```
 
 To explore other chart versions, look at:
@@ -170,10 +170,11 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
 | launcher.additionalRuntimeImages | list | `[]` | Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key). If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list". |
 | launcher.customRuntimeYaml | string | `"base"` | Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default runtime.yaml file. If changing this value, be careful to include the images that you have already used. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments the first time the server starts. If any execution environments already exist in the database, these values are ignored; execution environments are not created or modified during subsequent restarts. |
-| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","securityContext":{},"tag":"","tagPrefix":"ubuntu2204-"}` | Image definition for the default Posit Connect Content InitContainer |
+| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","resources":{},"securityContext":{},"tag":"","tagPrefix":"ubuntu2204-"}` | Image definition for the default Posit Connect Content InitContainer |
 | launcher.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. |
 | launcher.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
 | launcher.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
+| launcher.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
 | launcher.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | launcher.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
@@ -183,7 +184,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.launcherKubernetesProfilesConf | object | `{}` | User definition of launcher.kubernetes.profiles.conf for job customization |
 | launcher.namespace | string | `""` | The namespace to launch sessions into. Uses the Release namespace by default |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the Posit Connect session templating process |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the Posit Connect session templating process |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
 | launcher.useTemplates | bool | `true` | Whether to use launcher templates when launching sessions. Defaults to true |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
@@ -201,6 +202,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-connect pods |
 | pod.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.haste | bool | `true` | A helper that defines the RSTUDIO_CONNECT_HASTE environment variable |
+| pod.hostAliases | list | `[]` | Array of hostnames to supply to the main pod |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-connect pods |
 | pod.port | int | `3939` | The containerPort used by the main pod container |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the connect pod |
