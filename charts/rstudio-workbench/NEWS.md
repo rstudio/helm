@@ -1,11 +1,24 @@
 # Changelog
 
-## 0.7.7
+## Unversioned
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`
-  - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
-    To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`
-  - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+    - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
+      To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`
+    - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+
+## 0.8.1
+
+- Bump Chronicle Agent to version 2024.09.0
+
+## 0.8.0
+
+- BREAKING: the prometheus endpoint has changed from port `9108` to `8989` by default
+  - We are now using an internal prometheus endpoint with new metrics
+  - As a result, the `graphiteExporter` sidecar has been removed
+  - Some metrics from the `graphiteExporter` will no longer be present
+  - The parent / main "off-switch" for prometheus is at `prometheus.enabled`
+  - To revert to the old exporter, set `prometheus.legacy=true` (and please reach out to let us know why!)
 
 ## 0.7.6
 

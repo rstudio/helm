@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.7.7](https://img.shields.io/badge/Version-0.7.7-informational?style=flat-square) ![AppVersion: 2024.04.2](https://img.shields.io/badge/AppVersion-2024.04.2-informational?style=flat-square)
+![Version: 0.8.1](https://img.shields.io/badge/Version-0.8.1-informational?style=flat-square) ![AppVersion: 2024.04.2](https://img.shields.io/badge/AppVersion-2024.04.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.7.7:
+To install the chart with the release name `my-release` at version 0.8.1:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.7.7
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.8.1
 ```
 
 To explore other chart versions, look at:
@@ -533,7 +533,10 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | pod.volumes | list | `[]` | volumes is injected as-is into the "volumes:" component of the pod.container spec |
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
 | priorityClassName | string | `""` | The pod's priorityClassName |
-| prometheusExporter.enabled | bool | `true` | whether the  prometheus exporter sidecar should be enabled |
+| prometheus.enabled | bool | `true` | The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter |
+| prometheus.legacy | bool | `false` | Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. If you change this to `true`, please let us know why! Requires prometheusExporter.enabled=true too |
+| prometheus.port | int | `8989` | The port that prometheus will listen on. If legacy=true, then this will be hard-coded to 9108 |
+| prometheusExporter.enabled | bool | `true` | DEPRECATED. Whether the prometheus exporter sidecar should be enabled. See prometheus.enabled instead. |
 | prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
 | prometheusExporter.image.tag | string | `"v0.9.0"` |  |

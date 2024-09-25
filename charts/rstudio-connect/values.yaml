@@ -127,6 +127,8 @@ pod:
   port: 3939
   # -- The termination grace period seconds allowed for the pod before shutdown
   terminationGracePeriodSeconds: 120
+  # -- Array of hostnames to supply to the main pod
+  hostAliases: []
 
 # -- The pod's run command. By default, it uses the container's default
 command: []
@@ -307,6 +309,7 @@ launcher:
       tolerations: []
       affinity: {}
       nodeSelector: {}
+      hostAliases: []
       priorityClassName: ""
       # -- command for all pods. This is really not something we should expose and will be removed once we have a better option
       command: []
@@ -325,6 +328,14 @@ launcher:
     tag: ""
     # -- The imagePullPolicy for the default initContainer
     imagePullPolicy: ""
+  # -- Optional resources for the default initContainer
+    resources: {}
+      # requests:
+      #   cpu: "128m"
+      #   memory: "128Mi"
+      # limits:
+      #   cpu: "512m"
+      #   memory: "512Mi"
     # -- The securityContext for the default initContainer
     securityContext: {}
 

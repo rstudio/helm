@@ -20,6 +20,8 @@ jobs:
       - name: Rebuild index.yaml
         env:
           version: v1.2.1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [[ ! -d "$RUNNER_TOOL_CACHE" ]]; then
               echo "Cache directory '$RUNNER_TOOL_CACHE' does not exist" >&2

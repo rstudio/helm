@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2
+
+- Bump Chronicle to version 2024.09.0
+
 ## 0.3.1
 
 - Documentation site updates

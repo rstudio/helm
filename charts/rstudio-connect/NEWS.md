@@ -1,15 +1,29 @@
 # Changelog
 
-## 0.7.5
+## Unversioned
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`
   - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
     To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`.
   - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
 
+## 0.7.8
+
+- Bump Chronicle Agent to version 2024.09.0
+
+## 0.7.7
+
+- Add helm values for `pod.hostAliases` and `launcher.templateValues.pod.hostAliases`
+- Add helm values for `launcher.defaultInitContainer.resources`
+
+## 0.7.6
+
+- Bump Connect version to 2024.08.0
+
 ## 0.7.4
 
-- Bump default Quarto version to 1.4.557
+- BREAKING: local execution only
+  - Default installed Quarto version upgraded to 1.4.557
 
 ## 0.7.3
 
