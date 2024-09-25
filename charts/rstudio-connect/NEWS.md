@@ -6,6 +6,8 @@
   - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
     To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`.
   - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+- Removed a protection against `.resources.enabled = false` which was a [bad attempt at backwards compatibility two
+  years ago](https://github.com/rstudio/helm/pull/224) (v0.2.34)
 
 ## 0.7.8
 
