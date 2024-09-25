@@ -1,6 +1,5 @@
 # Changelog
-
-## Unversioned
+## 0.5.33
 
 - Update default Post Package Manager version to 2024.08.2-9
 

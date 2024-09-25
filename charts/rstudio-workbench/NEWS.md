@@ -1,6 +1,6 @@
 # Changelog
 
-## Unversioned
+## 0.8.2
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`
     - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
