@@ -1,11 +1,15 @@
 # Changelog
 
-## 0.8.2
+## Unversioned
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`
     - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
       To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`
     - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+
+## 0.8.2
+
+- Bump Workbench version to 2024.09.0
 
 ## 0.8.1
 
