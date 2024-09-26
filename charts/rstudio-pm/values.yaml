@@ -129,6 +129,7 @@ pod:
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template.
   containerSecurityContext:
     runAsUser: 999
+    fsGroup: 999
     runAsNonRoot: true
     allowPrivilegeEscalation: false
     capabilities:
