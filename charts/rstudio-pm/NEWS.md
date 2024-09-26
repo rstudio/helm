@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.35
+
+- Update PostgreSQL configuration documentation to temporarily work around bug with `Postgres.UsageDataPassword` in Package Manager 2024.08.2.
+
 ## 0.5.34
 
 - Add `pod.securityContext.fsGroup = 999` value to set file permissions correctly when using shared storage.
