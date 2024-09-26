@@ -1,5 +1,5 @@
 # format per https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#about-code-owners
-* @atheriel @rstudio/infraops @rstudio/ptd-dev
+* @rstudio/infraops @rstudio/ptd-dev
 
 # package-manager resources
 /charts/rstudio-pm/* @rstudio/ppm
