@@ -1,4 +1,9 @@
 # Changelog
+
+## 0.5.34
+
+- Add `pod.securityContext.fsGroup = 999` value to set file permissions correctly when using shared storage.
+
 ## 0.5.33
 
 - Update default Post Package Manager version to 2024.08.2-9
