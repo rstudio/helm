@@ -67,6 +67,14 @@ pod:
         secretKeyRef:
           name: {{ .Name }}-database
           key: password
+
+    # Temporarily work around bug in Package Manager 2024.08.2 where Postgres.UsageDataPassword
+    # does not default to Postgres.Password. This will be fixed in the next release of Package Manager.
+    - name: PACKAGEMANAGER_POSTGRES_USAGEDATAPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Name }}-database
+          key: password
 ```
 
 Alternatively, database passwords may be set during `helm install` with the following argument:
