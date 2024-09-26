@@ -98,7 +98,7 @@ Add the following to your `values.yaml`, replacing the `URL` with your database 
 ```yaml
 config:
   Database:
-    Provider: "postgres"
+    Provider: "Postgres"
   Postgres:
     URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>"
 ```
