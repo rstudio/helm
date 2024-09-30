@@ -1,8 +1,13 @@
 # Changelog
 
+## 0.5.35
+
+- Move `pod.containerSecurityContext.fsGroup = 999` to `pod.securityContext.fsGroup` to resolve
+  helm warning `unknown field "spec.template.spec.containers[0].securityContext.fsGroup"`.
+
 ## 0.5.34
 
-- Add `pod.securityContext.fsGroup = 999` value to set file permissions correctly when using shared storage.
+- Add `pod.containerSecurityContext.fsGroup = 999` value to set file permissions correctly when using shared storage.
 
 ## 0.5.33
 
