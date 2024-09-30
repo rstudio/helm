@@ -3,7 +3,7 @@
 ## 0.5.35
 
 - Move `pod.containerSecurityContext.fsGroup = 999` to `pod.securityContext.fsGroup` to resolve
-  helm warning `unknown field "spec.template.spec.containers[0].securityContext.fsGroup"`.
+  the helm warning `unknown field "spec.template.spec.containers[0].securityContext.fsGroup"`.
 
 ## 0.5.34
 
