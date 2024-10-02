@@ -2,7 +2,7 @@
 
 ## 0.5.36
 
-- Update PostgreSQL configuration documentation to temporarily work around bug with `Postgres.UsageDataPassword` in Package Manager 2024.08.2.
+- Update the PostgreSQL configuration documentation to temporarily work around bug with `Postgres.UsageDataPassword` in Package Manager 2024.08.2.
 
 ## 0.5.35
 
