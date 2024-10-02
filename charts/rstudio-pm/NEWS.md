@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.36
+
+- Update the PostgreSQL configuration documentation to temporarily work around bug with `Postgres.UsageDataPassword` in Package Manager 2024.08.2.
+
 ## 0.5.35
 
 - Move `pod.containerSecurityContext.fsGroup = 999` to `pod.securityContext.fsGroup` to resolve
