@@ -175,11 +175,11 @@ spec:
           {{- end }}
           {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
       {{- if .Values.pod.volumeMounts }}
-{{ toYaml .Values.pod.volumeMounts | indent 10 }}
+          {{- toYaml .Values.pod.volumeMounts | nindent 10 }}
       {{- end }}
         {{- with .Values.resources }}
         resources:
-          {{ toYaml (omit . "enabled") | nindent 10 }}
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- if .Values.livenessProbe.enabled }}
           {{- $liveness := omit .Values.livenessProbe "enabled" }}

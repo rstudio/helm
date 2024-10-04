@@ -1,17 +1,9 @@
 # Version: 2.4.0
-# DO NOT MODIFY the "Version: " key
-# Helm Version: v1
-{{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
 metadata:
   annotations:
     {{- with .Job.metadata.job.annotations }}
-    {{- range $key, $val := . }}
-    {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
-    {{- end }}
-    {{- end }}
-    {{- with $templateData.job.annotations }}
     {{- range $key, $val := . }}
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
     {{- end }}
@@ -26,16 +18,8 @@ metadata:
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
     {{- end }}
     {{- end }}
-    {{- with $templateData.job.labels }}
-    {{- range $key, $val := . }}
-    {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
-    {{- end }}
-    {{- end }}
   generateName: {{ toYaml .Job.generateName }}
 spec:
-  {{- if $templateData.job.ttlSecondsAfterFinished }}
-  ttlSecondsAfterFinished: {{ $templateData.job.ttlSecondsAfterFinished }}
-  {{- end }}
   backoffLimit: 0
   template:
     metadata:
@@ -59,11 +43,6 @@ spec:
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- end }}
         {{- end }}
-        {{- with $templateData.pod.annotations }}
-        {{- range $key, $val := . }}
-        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
-        {{- end }}
-        {{- end }}
       labels:
         {{- with .Job.instanceId }}
         launcher-instance-id: {{ toYaml . }}
@@ -73,57 +52,26 @@ spec:
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- end }}
         {{- end }}
-        {{- with $templateData.pod.labels }}
-        {{- range $key, $val := . }}
-        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
-        {{- end }}
-        {{- end }}
       generateName: {{ toYaml .Job.generateName }}
     spec:
       {{- if .Job.host }}
       nodeName: {{ toYaml .Job.host }}
       {{- end }}
-      enableServiceLinks: {{ if hasKey $templateData.pod "enableServiceLinks" }}{{ $templateData.pod.enableServiceLinks }}{{ else }}false{{ end }}
       restartPolicy: Never
-      {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
-      serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
-      {{- end }}
-      {{- with $templateData.pod.hostAliases }}
-      hostAliases:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
-      {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
+      {{- if ne (len .Job.volumes) 0 }}
       volumes:
         {{- range .Job.volumes }}
         - {{ nindent 10 (toYaml .) | trim -}}
         {{- end }}
-        {{- range $templateData.pod.volumes }}
-        - {{ nindent 10 (toYaml .) | trim -}}
-        {{- end }}
       {{- end }}
-      {{- with $templateData.pod.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with $templateData.pod.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if or (ne (len .Job.placementConstraints) 0) (and $templateData.pod.nodeSelector (ne (len $templateData.pod.nodeSelector) 0)) }}
+      {{- if ne (len .Job.placementConstraints) 0 }}
       nodeSelector:
         {{- range .Job.placementConstraints }}
         {{ .name }}: {{ toYaml .value }}
         {{- end }}
-        {{- range $key,$val := $templateData.pod.nodeSelector }}
-        {{ $key }}: {{- toYaml $val | nindent 10 }}
-        {{- end }}
       {{- end }}
-      {{- with $templateData.pod.priorityClassName }}
-      priorityClassName:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- $securityContext := $templateData.pod.defaultSecurityContext }}
+      {{- $securityContext := dict }}
       {{- if .Job.container.runAsUserId }}
         {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
       {{- end }}
@@ -136,7 +84,6 @@ spec:
           {{- $groupIds = append $groupIds . }}
         {{- end }}
         {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
-        {{- $securityContext := mergeOverwrite $securityContext $templateData.pod.securityContext }}
       {{- end }}
       {{- if $securityContext }}
       securityContext:
@@ -144,8 +91,8 @@ spec:
         {{ $key }}: {{ $val }}
         {{- end }}
       {{- end }}
-      {{- with $templateData.pod.imagePullSecrets }}
-      imagePullSecrets: {{ toYaml . | nindent 12 }}
+      {{- if .Job.serviceAccountName }}
+      serviceAccountName: {{ .Job.serviceAccountName | quote }}
       {{- end }}
       initContainers:
         {{- with .Job.metadata.pod.initContainers }}
@@ -153,22 +100,11 @@ spec:
         - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
         {{- end }}
         {{- end }}
-        {{- with $templateData.pod.initContainers }}
-          {{- range . }}
-        - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
-          {{- end }}
-        {{- end }}
       containers:
         - name: rs-launcher-container
           image: {{ toYaml .Job.container.image }}
-          {{- with $templateData.pod.imagePullPolicy }}
-          imagePullPolicy: {{- . | nindent 12 }}
-          {{- end }}
           {{- $isShell := false }}
-          {{- if $templateData.pod.command }}
-          command: {{- toYaml $templateData.pod.command | nindent 12 }}
-            {{- if .Job.command }}{{- $isShell = true }}{{- end }}
-          {{- else if .Job.command }}
+          {{- if .Job.command }}
           command: ['/bin/sh']
           {{- $isShell = true }}
           {{- else }}
@@ -210,7 +146,7 @@ spec:
               {{- $secrets = append $secrets $secret }}
             {{- end }}
           {{- end }}
-          {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) (ne (len $templateData.pod.env) 0) }}
+          {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) }}
           env:
             {{- range .Job.environment }}
             - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
@@ -223,13 +159,6 @@ spec:
                   name: {{ get . "secret" }}
                   key: {{ get . "key" }}
             {{- end }}
-            {{- if $templateData.pod.env }}
-              {{- toYaml $templateData.pod.env | nindent 12 }}
-            {{- end }}
-          {{- end }}
-          {{- with $templateData.pod.containerSecurityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- $exposedPorts := list }}
           {{- range .Job.exposedPorts }}
@@ -282,15 +211,9 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
+          {{- if ne (len .Job.volumes) 0 }}
           volumeMounts:
             {{- range .Job.volumeMounts }}
             - {{ nindent 14 (toYaml .) | trim -}}
             {{- end }}
-            {{- range $templateData.pod.volumeMounts }}
-            - {{ nindent 14 (toYaml .) | trim -}}
-            {{- end }}
           {{- end }}
-        {{- with $templateData.pod.extraContainers }}
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
