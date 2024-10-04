@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.33](https://img.shields.io/badge/Version-0.5.33-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
+![Version: 0.5.36](https://img.shields.io/badge/Version-0.5.36-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.33:
+To install the chart with the release name `my-release` at version 0.5.36:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.33
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.36
 ```
 
 To explore other chart versions, look at:
@@ -117,6 +117,14 @@ Second, specify the following in your `values.yaml`:
 pod:
   env:
     - name: PACKAGEMANAGER_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-pm-database
+          key: password
+
+    # Temporarily work around bug in Package Manager 2024.08.2 where Postgres.UsageDataPassword
+    # does not default to Postgres.Password. This will be fixed in the next release of Package Manager.
+    - name: PACKAGEMANAGER_POSTGRES_USAGEDATAPASSWORD
       valueFrom:
         secretKeyRef:
           name: rstudio-pm-database
@@ -226,7 +234,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
-| pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
+| pod.securityContext | object | `{"fsGroup":999}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
 | pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
