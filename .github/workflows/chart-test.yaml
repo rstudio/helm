@@ -32,14 +32,46 @@ jobs:
         run: |
           changed=$(ct list-changed --target-branch main --chart-dirs charts --chart-dirs other-charts)
           if [[ -n "$changed" ]]; then
-            echo "::set-output name=changed::true"
+            echo 'changed=true' >> $GITHUB_OUTPUT
           fi
 
       - name: Run chart-testing (lint changed)
-        run: ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
+        id: ct-lint
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
+          if [[ $? -ne 0 ]]; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Run chart-testing (lint all)
-        run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+        id: ct-lint-all
+        run: |
+          ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+          if [[ $? -ne 0 ]]; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notify Slack of chart linting failure
+        if: steps.ct-lint.outputs.failed == 'true' || steps.ct-lint-all.outputs.failed == 'true'
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload-delimiter: "_"
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Linting failed for ${{ steps.ct-lint.outputs.failed == true && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   install:
     runs-on: ubuntu-latest
@@ -66,7 +98,7 @@ jobs:
         run: |
           changed=$(ct list-changed --target-branch main --chart-dirs charts --chart-dirs other-charts)
           if [[ -n "$changed" ]]; then
-            echo "::set-output name=changed::true"
+            echo 'changed=true' >> $GITHUB_OUTPUT
           fi
 
       - name: Create kind cluster
@@ -75,15 +107,46 @@ jobs:
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install changed)
+        id: ct-install
         if: ${{ github.ref != 'refs/heads/main' }}
-        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
+        run: |
+          ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
+          if [[ $? -ne 0 ]]; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
         continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
+        id: ct-install-all
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+        run: |
+          ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+          if [[ $? -ne 0 ]]; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
         continue-on-error: true
+
+      - name: Notify Slack of chart install failure
+        if: steps.ct-install.outputs.failed == 'true' || steps.ct-install-all.outputs.failed == 'true'
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload-delimiter: "_"
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Failure during installation of ${{ steps.ct-install.outputs.failed == true && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   check-versions-connect:
     runs-on: ubuntu-latest
