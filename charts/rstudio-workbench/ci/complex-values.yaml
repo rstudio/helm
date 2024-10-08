@@ -10,6 +10,7 @@ service:
   type: NodePort
   annotations:
     key: value
+  - 7
 replicas: 2
 
 sealedSecret:
