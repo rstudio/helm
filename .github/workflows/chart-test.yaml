@@ -38,22 +38,16 @@ jobs:
       - name: Run chart-testing (lint changed)
         id: ct-lint
         if: steps.list-changed.outputs.changed == 'true'
-        run: |
-          ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
-          if [[ $? -ne 0 ]]; then
-            echo "failed=true" >> $GITHUB_OUTPUT
-          fi
+        run: ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       - name: Run chart-testing (lint all)
         id: ct-lint-all
-        run: |
-          ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
-          if [[ $? -ne 0 ]]; then
-            echo "failed=true" >> $GITHUB_OUTPUT
-          fi
+        run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       - name: Notify Slack of chart linting failure
-        if: steps.ct-lint.outputs.failed == 'true' || steps.ct-lint-all.outputs.failed == 'true'
+        if: steps.ct-lint.outcome != 'success' || steps.ct-lint-all.outcome != 'success'
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
@@ -64,14 +58,18 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Linting failed for ${{ steps.ct-lint.outputs.failed == true && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    "text": "Linting failed for ${{ steps.ct-lint.outcome != 'success' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }
                 }
               ]
             }
         env:
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-            SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Fail the workflow if failed linting
+        if: steps.ct-lint.outcome != 'success' || steps.ct-lint-all.outcome != 'success'
+        run: exit 1
 
   install:
     runs-on: ubuntu-latest
@@ -109,24 +107,18 @@ jobs:
       - name: Run chart-testing (install changed)
         id: ct-install
         if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
-        run: |
-          ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
-          if [[ $? -ne 0 ]]; then
-            echo "failed=true" >> $GITHUB_OUTPUT
-          fi
+        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         id: ct-install-all
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
-          if [[ $? -ne 0 ]]; then
-            echo "failed=true" >> $GITHUB_OUTPUT
-          fi
+        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       - name: Notify Slack of chart install failure
-        if: steps.ct-install.outputs.failed == 'true' || steps.ct-install-all.outputs.failed == 'true'
+        if: steps.ct-install.outcome != 'success' || steps.ct-install-all.outcome != 'success'
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
@@ -137,7 +129,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Failure during installation of ${{ steps.ct-install.outputs.failed == true && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    "text": "Failure during test installation of ${{ steps.ct-install.outcome != 'success' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }
                 }
               ]
@@ -145,6 +137,10 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Fail the workflow if failed installs
+        if: steps.ct-install.outcome != 'success' || steps.ct-install-all.outcome != 'success'
+        run: exit 1
 
   check-versions-connect:
     runs-on: ubuntu-latest
