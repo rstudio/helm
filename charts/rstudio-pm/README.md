@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.36:
+To install the chart with the release name `my-release` at version 0.5.37:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.36
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.37
 ```
 
 To explore other chart versions, look at:
