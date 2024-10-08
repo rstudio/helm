@@ -38,24 +38,14 @@ jobs:
       - name: Run chart-testing (lint changed)
         id: ct-lint
         if: steps.list-changed.outputs.changed == 'true'
-        run: |
-          ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
-          if [[ $? -ne 0 ]]; then
-            echo 'failed=true' >> $GITHUB_OUTPUT
-          fi
-          echo $?
+        run: ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
 
       - name: Run chart-testing (lint all)
         id: ct-lint-all
-        run: |
-          ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
-          if [[ $? -ne 0 ]]; then
-            echo 'failed=true' >> $GITHUB_OUTPUT
-          fi
-          echo $?
+        run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
 
       - name: Notify Slack of chart linting failure
-        if: steps.ct-lint.outputs.failed == 'true' || steps.ct-lint-all.outputs.failed == 'true'
+        if: steps.ct-lint.outcome != 'success' || steps.ct-lint-all.outcome != 'success'
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
@@ -66,7 +56,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Linting failed for ${{ steps.ct-lint.outputs.failed == true && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    "text": "Linting failed for ${{ steps.ct-lint.outcome != 'success' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }
                 }
               ]
@@ -111,26 +101,16 @@ jobs:
       - name: Run chart-testing (install changed)
         id: ct-install
         if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
-        run: |
-          ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
-          echo $?
-          if [[ $? -ne 0 ]]; then
-            echo 'failed=true' >> $GITHUB_OUTPUT
-          fi
-          echo $?
+        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         id: ct-install-all
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
-          if [[ $? -ne 0 ]]; then
-            echo 'failed=true' >> $GITHUB_OUTPUT
-          fi
+        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
 
       - name: Notify Slack of chart install failure
-        if: failure()
+        if: steps.ct-install.outcome != 'success' || steps.ct-install-all.outcome != 'success'
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
@@ -141,7 +121,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Failure during installation of ${{ steps.ct-install.outputs.failed == true && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    "text": "Failure during installation of ${{ steps.ct-install.outcome != 'success' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }
                 }
               ]
