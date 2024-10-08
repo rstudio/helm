@@ -102,12 +102,14 @@ jobs:
         id: ct-install
         if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
         run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         id: ct-install-all
         if: ${{ github.ref == 'refs/heads/main' }}
         run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       - name: Notify Slack of chart install failure
         if: steps.ct-install.outcome != 'success' || steps.ct-install-all.outcome != 'success'
