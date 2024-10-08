@@ -71,7 +71,7 @@ rbac:
       one-two: three
 
 sharedStorage:
-  create: true
+  create: 5
   path: "/var/lib/awesome"
   storageClassName: nfs
   requests:
