@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.37
+
+- Update documentation with lowercase `Database.Provider = "postgres"`.
+
 ## 0.5.36
 
 - Update the PostgreSQL configuration documentation to temporarily work around bug with `Postgres.UsageDataPassword` in Package Manager 2024.08.2.
