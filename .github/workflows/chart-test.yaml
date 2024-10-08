@@ -43,6 +43,7 @@ jobs:
           if [[ $? -ne 0 ]]; then
             echo "failed=true" >> $GITHUB_OUTPUT
           fi
+          echo $?
 
       - name: Run chart-testing (lint all)
         id: ct-lint-all
@@ -51,6 +52,7 @@ jobs:
           if [[ $? -ne 0 ]]; then
             echo "failed=true" >> $GITHUB_OUTPUT
           fi
+          echo $?
 
       - name: Notify Slack of chart linting failure
         if: steps.ct-lint.outputs.failed == 'true' || steps.ct-lint-all.outputs.failed == 'true'
