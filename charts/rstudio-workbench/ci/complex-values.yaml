@@ -48,7 +48,7 @@ pod:
       imagePullPolicy: "IfNotPresent"
 
 ingress:
-  enabled: true
+  enabled: []
   annotations:
     kubernetes.io/ingress.class: traefik
 
@@ -78,7 +78,7 @@ sharedStorage:
     storage: "200Gi"
 
 homeStorage:
-  create: true
+  create: 'fancy'
   path: "/mnt/home"
   storageClassName: nfs
   requests:
