@@ -1,6 +1,6 @@
 name: rstudio-pm
 description: Official Helm chart for Posit Package Manager
-version: 0.5.36
+version: 0.5.37
 apiVersion: v2
 appVersion: 2024.08.2
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png

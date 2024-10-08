@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.36](https://img.shields.io/badge/Version-0.5.36-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
+![Version: 0.5.37](https://img.shields.io/badge/Version-0.5.37-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
