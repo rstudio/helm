@@ -2,7 +2,7 @@
 
 ## 0.5.37
 
-- Update documentation with lowercase `postgres`.
+- Update documentation with lowercase `Database.Provider = "postgres"`.
 
 ## 0.5.36
 
