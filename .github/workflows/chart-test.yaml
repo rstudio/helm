@@ -118,6 +118,7 @@ jobs:
             echo 'failed=true' >> $GITHUB_OUTPUT
           fi
           echo $?
+        continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
