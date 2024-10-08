@@ -132,6 +132,10 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+      - name: Fail the workflow if failed installs
+        if: steps.ct-install.outcome != 'success' || steps.ct-install-all.outcome != 'success'
+        run: exit 1
+
   check-versions-connect:
     runs-on: ubuntu-latest
     steps:
