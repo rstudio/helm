@@ -116,6 +116,7 @@ jobs:
           if [[ $? -ne 0 ]]; then
             echo "failed=true" >> $GITHUB_OUTPUT
           fi
+          echo $?
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
