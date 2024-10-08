@@ -1,0 +1,140 @@
+image:
+  repository: rstudio/rstudio-server-pro
+  tag: daily
+license:
+  key: test
+service:
+  nodePort: 31878
+  type: NodePort
+  annotations:
+    key: value
+replicas: 2
+
+pod:
+  env:
+    - name: TEST_ENV_WORKS
+      value: "true"
+  volumeMounts:
+    - name: key
+      mountPath: /tmp/somepath
+  volumes:
+    - name: key
+      emptyDir: {}
+  annotations:
+    testannotation2: three
+  sidecar:
+    - name: test
+      image: "busybox"
+      imagePullPolicy: "IfNotPresent"
+
+xdgConfigDirs: '/tmp/base/'
+xdgConfigDirsExtra:
+  - '/tmp/one/'
+  - '/tmp/two/'
+
+rbac:
+  create: true
+  serviceAccount:
+    name: rstudio-server-job-launcher
+
+sharedStorage:
+  create: true
+  path: "/var/lib/awesome"
+  storageClassName: nfs
+  requests:
+    storage: "20Mi"
+  volumeName: test2-volume
+
+homeStorage:
+  create: true
+  path: "/mnt/home"
+  storageClassName: nfs
+  requests:
+    storage: "50Mi"
+  volumeName: test-volume
+
+prometheusExporter:
+  mappingYaml: |
+    mappings:
+      - match: "rstudio\\.([\\w-]+)\\.system\\.load\\.(.*)"
+        match_type: regex
+        name: "rstudio_system_load_other_test"
+        labels:
+          host: "$1"
+          duration: "$2"
+
+jobJsonOverridesFiles:
+  test:
+    one: two
+    three: four
+    array:
+      - one
+      - two:
+          - three
+          - 4
+          - false
+  two:
+    three: four
+
+loadBalancer:
+  env:
+    - name: FAIL_ON_ERROR
+      value: "false"
+
+config:
+  session:
+    repos.conf:
+      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+      CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+    rsession.conf: {}
+    notifications.conf: {}
+    r-versions:
+      - Label: test
+        Path: /opt/R/3.6.3
+      - Label: other
+        Path: /opt/R/4.0.2
+  secret:
+    "database.conf": {}
+  server:
+    rserver.conf:
+      server-health-check-enabled: 1
+      admin-enabled: 1
+      www-port: 8787
+      server-project-sharing: 1
+      launcher-address: 127.0.0.1
+      launcher-port: 5559
+      launcher-sessions-enabled: 1
+      launcher-default-cluster: Kubernetes
+      launcher-sessions-callback-address: http://127.0.0.1:8787
+    launcher.conf:
+      server:
+        address: 127.0.0.1
+        port: fivethousandfivehundredninetynine
+        server-user: rstudio-server
+        admin-group: rstudio-server
+        authorization-enabled: 1
+        thread-pool-size: 4
+        enable-debug-logging: 1
+      cluster:
+        name: Kubernetes
+        type: Kubernetes
+    "jupyter.conf":
+      jupyter-exe: /opt/python/3.6.5/bin/jupyter
+      notebooks-enabled: 1
+      labs-enabled: 1
+      default-session-cluster: Kubernetes
+    logging.conf: {}
+  serverDcf:
+    launcher-mounts:
+      - MountType: KubernetesPersistentVolumeClaim
+        MountPath: /home
+        ClaimName: rstudio-server-home-storage
+    launcher-env:
+      - JobType: session
+        Environment:
+          TEST: 1
+          TEST2: 2
+      - JobType: adhoc
+        Environment:
+          TESTA: A
+          TESTB: B
