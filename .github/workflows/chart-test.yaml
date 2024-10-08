@@ -39,10 +39,12 @@ jobs:
         id: ct-lint
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       - name: Run chart-testing (lint all)
         id: ct-lint-all
         run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+        continue-on-error: true
 
       - name: Notify Slack of chart linting failure
         if: steps.ct-lint.outcome != 'success' || steps.ct-lint-all.outcome != 'success'
@@ -64,6 +66,10 @@ jobs:
         env:
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
             SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Fail the workflow if failed linting
+        if: steps.ct-lint.outcome != 'success' || steps.ct-lint-all.outcome != 'success'
+        run: exit 1
 
   install:
     runs-on: ubuntu-latest
@@ -123,7 +129,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Failure during installation of ${{ steps.ct-install.outcome != 'success' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    "text": "Failure during test installation of ${{ steps.ct-install.outcome != 'success' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }
                 }
               ]
