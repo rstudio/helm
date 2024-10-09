@@ -36,3 +36,23 @@ jobs:
       
       - run: just push-docs
 
+      - name: Notify Slack of publishing chart documentation failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload-delimiter: "_"
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Publishing Chart Documentation failed, please check the logs.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
