@@ -50,7 +50,7 @@ pod:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: traefik
+    spec.ingressClassName: traefik
 
   # Defines network routing in the traefik configuration.
   hosts:
