@@ -39,7 +39,7 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Notify Slack of chart releaser failure
+      - name: Notify Slack of chart release failure
         if: failure()
         uses: slackapi/slack-github-action@v1.27.0
         with:
