@@ -83,7 +83,7 @@ homeStorage:
   storageClassName: nfs
   requests:
     storage: "500Gi"
-  subPath: "/another"
+  subPath: "another"
 
 prometheusExporter:
   securityContext:
