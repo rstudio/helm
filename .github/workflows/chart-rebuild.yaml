@@ -57,3 +57,24 @@ jobs:
         run: |
           echo "Created Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
+      - name: Notify Slack of index.yaml rebuild failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload-delimiter: "_"
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Rebuild of index.yaml failed, please check the logs.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
