@@ -121,6 +121,14 @@ jobs:
           volumeBindingMode: WaitForFirstConsumer
           EOF
 
+      - name: Get debugging information about the cluster
+        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
+        run: |
+          echo ${{ kubectl get nodes -o wide }}
+          echo ${{ kubectl get nodes -o yaml }}
+          echo ${{ kubectl get sc -o yaml }}
+          echo ${{ kubectl get pods -A }}
+
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install changed)
         id: ct-install
