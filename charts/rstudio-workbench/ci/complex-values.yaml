@@ -75,6 +75,8 @@ sharedStorage:
   create: true
   path: "/var/lib/awesome"
   storageClassName: local-storage
+  accessModes:
+    - "ReadWriteOnce"
   requests:
     storage: "200Gi"
 
@@ -84,6 +86,8 @@ homeStorage:
   storageClassName: local-storage
   requests:
     storage: "500Gi"
+  accessModes:
+    - "ReadWriteOnce"
   subPath: "another"
 
 prometheusExporter:
