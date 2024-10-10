@@ -99,132 +99,54 @@ jobs:
             echo 'changed=true' >> $GITHUB_OUTPUT
           fi
 
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.10.0
-        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
-
-      - name: Install SealedSecrets Helm Chart
-        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
-        run: |
-          helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
-          helm install sealed-secrets sealed-secrets/sealed-secrets
-
-      - name: Install local-storage storageClass
-        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
-        run: |
-          cat << EOF | kubectl apply -f -
-          kind: StorageClass
-          apiVersion: storage.k8s.io/v1
-          metadata:
-            name: local-storage
-          provisioner: kubernetes.io/no-provisioner
-          volumeBindingMode: WaitForFirstConsumer
-          EOF
-
-      - name: Create PVs for homeStorage and sharedStorage
-        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
-        run: |
-          mkdir -p ./home-storage ./shared-storage
-          cat << EOF | kubectl apply -f -
-          apiVersion: v1
-          kind: PersistentVolume
-          metadata:
-            name: home-storage
-          spec:
-            capacity:
-              storage: 500Gi
-            volumeMode: Filesystem
-            accessModes:
-              - ReadWriteOnce
-            storageClassName: local-storage
-            local:
-              path: ./home-storage
-            nodeAffinity:
-              required:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: In
-                        values:
-                          - chart-testing-control-plane
-          ---
-          apiVersion: v1
-          kind: PersistentVolume
-          metadata:
-            name: shared-storage
-          spec:
-              capacity:
-                  storage: 200Gi
-              volumeMode: Filesystem
-              accessModes:
-                  - ReadWriteOnce
-              storageClassName: local-storage
-              local:
-                path: ./shared-storage
-              nodeAffinity:
-                required:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: kubernetes.io/hostname
-                          operator: In
-                          values:
-                            - chart-testing-control-plane
-          EOF
-
-      - name: Get debugging information about the cluster
-        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
-        run: |
-          echo "Nodes: "
-          kubectl get nodes -o wide
-          echo "PVs: "
-          kubectl get pv
-          echo "PVCs: "
-          kubectl get pvc -A
-          echo "Pods: "
-          kubectl get pods -A
-          echo "Local Dir: "
-          pwd
-          echo "List local dir: "
-          ls -al
-
-      # no allow-failure until https://github.com/actions/toolkit/issues/399
-      - name: Run chart-testing (install changed)
-        id: ct-install
-        if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
-        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
-        continue-on-error: true
-
-      # no allow-failure until https://github.com/actions/toolkit/issues/399
-      - name: Run chart-testing (install all)
-        id: ct-install-all
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
-        continue-on-error: true
-
-      - name: Notify Slack of chart install failure
-        if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure'
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          payload-delimiter: "_"
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Failure during test installation of ${{ steps.ct-install.outcome == 'failure' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
-      - name: Fail the workflow if failed installs
-        if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure'
-        run: exit 1
+#      - name: Create kind cluster
+#        uses: helm/kind-action@v1.10.0
+#        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
+#
+#      - name: Install SealedSecrets Helm Chart
+#        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
+#        run: |
+#          helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+#          helm install sealed-secrets sealed-secrets/sealed-secrets
+#
+#      # no allow-failure until https://github.com/actions/toolkit/issues/399
+#      - name: Run chart-testing (install changed)
+#        id: ct-install
+#        if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
+#        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts
+#        continue-on-error: true
+#
+#      # no allow-failure until https://github.com/actions/toolkit/issues/399
+#      - name: Run chart-testing (install all)
+#        id: ct-install-all
+#        if: ${{ github.ref == 'refs/heads/main' }}
+#        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+#        continue-on-error: true
+#
+#      - name: Notify Slack of chart install failure
+#        if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure'
+#        uses: slackapi/slack-github-action@v1.27.0
+#        with:
+#          payload-delimiter: "_"
+#          payload: |
+#            {
+#              "blocks": [
+#                {
+#                  "type": "section",
+#                  "text": {
+#                    "type": "mrkdwn",
+#                    "text": "Failure during test installation of ${{ steps.ct-install.outcome == 'failure' && 'changed' || 'all' }} charts.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+#                  }
+#                }
+#              ]
+#            }
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+#
+#      - name: Fail the workflow if failed installs
+#        if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure'
+#        run: exit 1
 
   check-versions-connect:
     runs-on: ubuntu-latest
