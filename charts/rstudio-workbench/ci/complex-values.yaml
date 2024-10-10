@@ -13,7 +13,8 @@ service:
 replicas: 2
 
 sealedSecret:
-  enabled: true
+  # TODO: enable testing of the sealedSecrets after we determine how to test it reliably in GHA
+  enabled: false
   annotations:
     is-a-sealed-secret: "yes"
 
@@ -155,7 +156,10 @@ config:
         Path: /opt/R/3.6.3
       - Label: other
         Path: /opt/R/4.0.2
-  sessionSecret: {}
+  sessionSecret:
+    odbc.ini: |
+      [hello]
+      uid=someval
   secret:
     "database.conf": {}
   server:
