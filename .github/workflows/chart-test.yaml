@@ -174,10 +174,18 @@ jobs:
       - name: Get debugging information about the cluster
         if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
         run: |
+          echo "Nodes: "
           kubectl get nodes -o wide
-          kubectl get nodes -o yaml
-          kubectl get sc -o yaml
+          echo "PVs: "
+          kubectl get pv
+          echo "PVCs: "
+          kubectl get pvc -A
+          echo "Pods: "
           kubectl get pods -A
+          echo "Local Dir: "
+          pwd
+          echo "List local dir: "
+          ls -al
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install changed)
