@@ -74,14 +74,14 @@ rbac:
 sharedStorage:
   create: true
   path: "/var/lib/awesome"
-  storageClassName: nfs
+  storageClassName: local-storage
   requests:
     storage: "200Gi"
 
 homeStorage:
   create: true
   path: "/mnt/home"
-  storageClassName: nfs
+  storageClassName: local-storage
   requests:
     storage: "500Gi"
   subPath: "another"
