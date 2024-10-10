@@ -155,10 +155,7 @@ config:
         Path: /opt/R/3.6.3
       - Label: other
         Path: /opt/R/4.0.2
-  sessionSecret:
-    "odbc.ini":
-      hello:
-        uid: someval
+  sessionSecret: {}
   secret:
     "database.conf": {}
   server:
