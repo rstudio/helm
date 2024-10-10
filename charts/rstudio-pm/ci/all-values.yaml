@@ -84,3 +84,8 @@ extraContainers:
     env:
     - name: CHRONICLE_SERVER_ADDRESS
       value: "http://chronicle-server.default"
+
+postUpgradeJob:
+  image:
+    repository: busybox
+    tag: latest
