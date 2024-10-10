@@ -121,6 +121,56 @@ jobs:
           volumeBindingMode: WaitForFirstConsumer
           EOF
 
+      - name: Create PVs for homeStorage and sharedStorage
+        if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
+        run: |
+          mkdir -p ./home-storage ./shared-storage
+          cat << EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: PersistentVolume
+          metadata:
+            name: home-storage
+          spec:
+            capacity:
+              storage: 500Gi
+            volumeMode: Filesystem
+            accessModes:
+              - ReadWriteOnce
+            storageClassName: local-storage
+            local:
+              path: ./home-storage
+            nodeAffinity:
+              required:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                          - chart-testing-control-plane
+          ---
+          apiVersion: v1
+          kind: PersistentVolume
+          metadata:
+            name: shared-storage
+          spec:
+              capacity:
+                  storage: 200Gi
+              volumeMode: Filesystem
+              accessModes:
+                  - ReadWriteOnce
+              storageClassName: local-storage
+              local:
+                path: ./shared-storage
+              nodeAffinity:
+                required:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: kubernetes.io/hostname
+                          operator: In
+                          values:
+                            - chart-testing-control-plane
+          EOF
+
       - name: Get debugging information about the cluster
         if: ${{ steps.list-changed.outputs.changed == 'true' || github.ref == 'refs/heads/main' }}
         run: |
