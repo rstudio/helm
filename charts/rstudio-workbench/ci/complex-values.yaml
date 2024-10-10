@@ -156,9 +156,11 @@ config:
       - Label: other
         Path: /opt/R/4.0.2
   sessionSecret:
-    odbc.ini: encryptedstringhere
+    odbc.ini: |
+      [hello]
+      uid=someval
   secret:
-    "database.conf": anotherencryptedstringhere
+    "database.conf": {}
   server:
     rserver.conf:
       server-health-check-enabled: 1
