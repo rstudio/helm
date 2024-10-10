@@ -1,8 +1,6 @@
 image:
-  repository: rstudio/rstudio-server-pro
-  tag: daily
-  imagePullSecrets:
-    - name: "some-secret"
+  repository: rstudio/rstudio-workbench
+  tag: ubuntu2204-2024.09.0
 license:
   key: test
 service:
@@ -77,6 +75,7 @@ sharedStorage:
   storageClassName: local-storage
   accessModes:
     - "ReadWriteOnce"
+  volumeName: "shared-storage"
   requests:
     storage: "200Gi"
 
@@ -88,6 +87,7 @@ homeStorage:
     storage: "500Gi"
   accessModes:
     - "ReadWriteOnce"
+  volumeName: "home-storage"
   subPath: "another"
 
 prometheusExporter:
