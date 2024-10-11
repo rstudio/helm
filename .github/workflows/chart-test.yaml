@@ -98,7 +98,7 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --target-branch main --chart-dirs charts --chart-dirs other-charts --charts rstudio-launcher-rbac)
+          changed=$(ct list-changed --target-branch main --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-workbench,rstudio-library,rstudio-connect,rstudio-pm,posit-chronicle)
           if [[ -n "$changed" ]]; then
             echo 'changed=true' >> $GITHUB_OUTPUT
           fi
