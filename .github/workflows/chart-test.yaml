@@ -31,7 +31,7 @@ jobs:
         run: |
           for dir in charts/*/; do
             if [[ -d $dir/ci-lint ]]; then
-              ln -s ./ci-lint charts/$dir/ci
+              ln -s ./ci-lint $dir/ci
             fi
           done
 
@@ -103,7 +103,7 @@ jobs:
         run: |
           for dir in charts/*/; do
             if [[ -d $dir/ci-install ]]; then
-              ln -s ./ci-install charts/$dir/ci
+              ln -s ./ci-install $dir/ci
             fi
           done
 
