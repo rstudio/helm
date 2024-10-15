@@ -49,9 +49,6 @@ jobs:
         run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
         continue-on-error: true
 
-      - name: Remove ci symlink
-        run: rm charts/rstudio-workbench/ci
-
       - name: Notify Slack of chart linting failure
         if: steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure'
         uses: slackapi/slack-github-action@v1.27.0
@@ -131,9 +128,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts
         continue-on-error: true
-
-      - name: Remove ci symlink
-        run: rm charts/rstudio-workbench/ci
 
       - name: Notify Slack of chart install failure
         if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure'
