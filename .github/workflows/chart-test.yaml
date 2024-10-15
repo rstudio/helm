@@ -28,7 +28,12 @@ jobs:
         uses: helm/chart-testing-action@v2.6.1
 
       - name: Symlink ci-lint -> ci
-        run: ln -s ./ci-lint charts/rstudio-workbench/ci
+        run: |
+          for dir in charts/*/; do
+            if [[ -d $dir/ci-lint ]]; then
+              ln -s ./ci-lint charts/$dir/ci
+            fi
+          done
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -95,7 +100,12 @@ jobs:
         uses: helm/chart-testing-action@v2.6.1
 
       - name: Symlink ci-install -> ci
-        run: ln -s ./ci-install charts/rstudio-workbench/ci
+        run: |
+          for dir in charts/*/; do
+            if [[ -d $dir/ci-install ]]; then
+              ln -s ./ci-install charts/$dir/ci
+            fi
+          done
 
       - name: Run chart-testing (list-changed)
         id: list-changed
