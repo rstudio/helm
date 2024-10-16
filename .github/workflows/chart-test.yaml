@@ -29,12 +29,10 @@ jobs:
 
       - name: Symlink ci-lint -> ci
         run: |
-          for dir in charts/*/; do
-            dir=${dir%*/}
-            dir=${dir##*/}
-            if [[ -d ci/${dir}/lint ]]; then
-              ln -s ../../ci/${dir}/lint charts/${dir}/ci
-            fi
+          for dir in ci/*/lint; do
+            dir=${dir#ci/}
+            dir=${dir%/lint}
+            ln -s ../../ci/${dir}/lint charts/${dir}/ci
           done
 
       - name: Run chart-testing (list-changed)
@@ -103,12 +101,10 @@ jobs:
 
       - name: Symlink ci-install -> ci
         run: |
-          for dir in charts/*/; do
-            dir=${dir%*/}
-            dir=${dir##*/}
-            if [[ -d ci/${dir}/install ]]; then
-              ln -s ../../ci/${dir}/install charts/${dir}/ci
-            fi
+          for dir in ci/*/install; do
+            dir=${dir#ci/}
+            dir=${dir%/install}
+            ln -s ../../ci/${dir}/install charts/${dir}/ci
           done
 
       - name: Run chart-testing (list-changed)
