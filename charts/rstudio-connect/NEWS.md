@@ -2,7 +2,7 @@
 
 ## 0.7.11
 
-- Move the values files for linting and installation testing outside the chart directory
+- Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
 
 ## 0.7.10
 
