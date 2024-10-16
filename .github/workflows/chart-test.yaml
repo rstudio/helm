@@ -107,7 +107,7 @@ jobs:
             dir=${dir%*/}
             dir=${dir##*/}
             if [[ -d ci/${dir}/install ]]; then
-              ln -s ../../ci/${dir}/install charts/${dir}/cig
+              ln -s ../../ci/${dir}/install charts/${dir}/ci
             fi
           done
 
