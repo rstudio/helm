@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.38
+
+- Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
+
 ## 0.5.37
 
 - Update documentation with lowercase `Database.Provider = "postgres"`.

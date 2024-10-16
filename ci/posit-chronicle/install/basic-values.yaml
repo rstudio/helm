@@ -1,0 +1,5 @@
+config:
+  LocalStorage:
+    Enabled: true
+    Location: "/chronicle-data"
+    RetentionPeriod: "30d"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.22
+
+- Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
+
 ## 0.2.21
 
 - Documentation site updates
