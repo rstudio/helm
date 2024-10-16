@@ -30,8 +30,10 @@ jobs:
       - name: Symlink ci-lint -> ci
         run: |
           for dir in charts/*/; do
-            if [[ -d $dir/ci-lint ]]; then
-              ln -s ./ci-lint $dir/ci
+            dir=${dir%*/}
+            dir=${dir##*/}
+            if [[ -d ci/${dir}/lint ]]; then
+              ln -s ../../ci/${dir}/lint charts/${dir}/ci
             fi
           done
 
@@ -102,8 +104,10 @@ jobs:
       - name: Symlink ci-install -> ci
         run: |
           for dir in charts/*/; do
-            if [[ -d $dir/ci-install ]]; then
-              ln -s ./ci-install $dir/ci
+            dir=${dir%*/}
+            dir=${dir##*/}
+            if [[ -d ci/${dir}/install ]]; then
+              ln -s ../../ci/${dir}/install charts/${dir}/cig
             fi
           done
 
