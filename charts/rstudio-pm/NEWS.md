@@ -2,7 +2,7 @@
 
 ## 0.5.38
 
-- Changes to the values files for linting and installation testing
+- Move the values files for linting and installation testing outside the chart directory
 
 ## 0.5.37
 

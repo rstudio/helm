@@ -2,7 +2,7 @@
 
 ## 0.7.11
 
-- Changes to the values files for linting and installation testing
+- Move the values files for linting and installation testing outside the chart directory
 
 ## 0.7.10
 
