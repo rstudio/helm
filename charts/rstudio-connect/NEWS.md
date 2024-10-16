@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.11
+
+- Changes to the values files for linting and installation testing
+
 ## 0.7.10
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.22
+
+- Changes to the values files for linting and installation testing
+
 ## 0.2.21
 
 - Documentation site updates

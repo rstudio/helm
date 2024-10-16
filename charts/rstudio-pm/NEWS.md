@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.38
+
+- Changes to the values files for linting and installation testing
+
 ## 0.5.37
 
 - Update documentation with lowercase `Database.Provider = "postgres"`.

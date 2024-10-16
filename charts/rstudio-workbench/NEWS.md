@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.4
+
+- Changes to the values files for linting and installation testing
+
 ## 0.8.3
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`

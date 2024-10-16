@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+- Changes to the values files for linting and installation testing
+
 ## 0.3.2
 
 - Bump Chronicle to version 2024.09.0
