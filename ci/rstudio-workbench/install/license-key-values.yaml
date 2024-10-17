@@ -1,0 +1,5 @@
+license:
+  key: test-license
+
+readinessProbe:
+  enabled: false
