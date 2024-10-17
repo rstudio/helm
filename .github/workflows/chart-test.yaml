@@ -75,6 +75,19 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+      - name: Add linting results for changed charts to PR
+        if: github.event_name == 'pull_request' && steps.list-changed.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${{steps.ct-lint.outputs.result}}`
+            })
+
       - name: Fail the workflow if failed linting
         if: steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure'
         run: exit 1
