@@ -148,7 +148,7 @@ jobs:
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         id: ct-install-all
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' || steps.list-changed.outputs.changed != 'true' }}
         run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library
         continue-on-error: true
 
