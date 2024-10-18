@@ -148,7 +148,7 @@ jobs:
           kubectl create secret generic rsc-license --from-file=rsc.lic --namespace posit-test
           rm rsc.lic
           echo "${{ secrets.PPM_LICENSE_FILE }}" > ppm.lic
-          kubeclt create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
+          kubectl create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
           rm ppm.lic
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
