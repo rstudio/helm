@@ -1,2 +1,4 @@
-readinessProbe:
-  enabled: false
+license:
+  file:
+    secret: pwb-license
+    secretKey: pwb.lic

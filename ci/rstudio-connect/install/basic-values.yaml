@@ -1,2 +1,4 @@
-readinessProbe:
-  enabled: false
+license:
+  file:
+    secret: pct-license
+    secretKey: pct.lic
