@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.39
+
+- Add the `fsGroupChangePolicy: "OnRootMismatch"` default option to the pod's `securityContext`. This will only ensure
+  permissions and ownership change only if the permission and the ownership of root directory does not match with
+  expected permissions of the volume.
+
 ## 0.5.38
 
 - Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
