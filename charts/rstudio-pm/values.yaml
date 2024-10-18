@@ -127,6 +127,7 @@ pod:
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
   securityContext:
     fsGroup: 999
+    fsGroupChangePolicy: "OnRootMismatch"
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template.
   containerSecurityContext:
     runAsUser: 999

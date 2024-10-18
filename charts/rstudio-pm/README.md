@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.38](https://img.shields.io/badge/Version-0.5.38-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
+![Version: 0.5.39](https://img.shields.io/badge/Version-0.5.39-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -14,7 +14,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.38:
+To install the chart with the release name `my-release` at version 0.5.39:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.38
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.39
 ```
 
 To explore other chart versions, look at:
