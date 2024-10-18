@@ -144,9 +144,9 @@ jobs:
           echo "${{ secrets.PWB_LICENSE_FILE }}" > pwb.lic
           kubectl create secret generic pwb-license --from-file=pwb.lic --namespace posit-test
           rm pwb.lic
-          echo "${{ secrets.RSC_LICENSE_FILE }}" > rsc.lic
-          kubectl create secret generic rsc-license --from-file=rsc.lic --namespace posit-test
-          rm rsc.lic
+          echo "${{ secrets.PCT_LICENSE_FILE }}" > pct.lic
+          kubectl create secret generic pct-license --from-file-pct.lic --namespace posit-test
+          rm pct.lic
           echo "${{ secrets.PPM_LICENSE_FILE }}" > ppm.lic
           kubectl create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
           rm ppm.lic

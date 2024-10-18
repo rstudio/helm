@@ -1,4 +1,4 @@
 license:
   file:
-    secret: rsc-license
-    secretKey: rsc.lic
+    secret: pct-license
+    secretKey: pct.lic
