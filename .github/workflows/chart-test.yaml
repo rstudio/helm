@@ -136,17 +136,32 @@ jobs:
           helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
           helm install sealed-secrets sealed-secrets/sealed-secrets
 
+      - name: Create posit-test namespace
+        run: kubectl create namespace posit-test
+
+      - name: Create License File Secrets
+        run: |
+          echo "${{ secrets.PWB_LICENSE_FILE }}" > pwb.lic
+          kubectl create secret generic pwb-license --from-file=pwb.lic --namespace posit-test
+          rm pwb.lic
+          echo "${{ secrets.RSC_LICENSE_FILE }}" > rsc.lic
+          kubectl create secret generic rsc-license --from-file=rsc.lic --namespace posit-test
+          rm rsc.lic
+          echo "${{ secrets.PPM_LICENSE_FILE }}" > ppm.lic
+          kubeclt create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
+          rm ppm.lic
+
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install changed)
         id: ct-install
         if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
-        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library
+        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library --namespace posit-test
         continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         id: ct-install-all
-        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library
+        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library --namespace posit-test
         continue-on-error: true
 
       - name: Notify Slack of chart install failure
