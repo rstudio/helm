@@ -1,7 +1,7 @@
 {{- if and (.Values.rbac.create) (.Values.launcher.enabled) }}
 {{ $namespace := $.Release.Namespace }}
 {{ $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
-{{ $serviceAccountName := default .Values.rbac.serviceAccount.name (include "rstudio-connect.fullname" .) }}
+{{ $serviceAccountName := default (include "rstudio-connect.fullname" .) .Values.rbac.serviceAccount.name }}
 {{ $serviceAccountCreate := .Values.rbac.serviceAccount.create }}
 {{ $serviceAccountAnnotations := .Values.rbac.serviceAccount.annotations }}
 {{ $serviceAccountLabels := .Values.rbac.serviceAccount.labels }}

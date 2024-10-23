@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.12
+
+- Fix a bug where `rbac.serviceAccount.name` was not applied when the job launcher is enabled.
+
 ## 0.7.11
 
 - Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
