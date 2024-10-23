@@ -2,6 +2,7 @@ rbac:
   create: true
   serviceAccount:
     create: true
+    name: "connect-service-account"
 securityContext: null
 sharedStorage:
   create: true
