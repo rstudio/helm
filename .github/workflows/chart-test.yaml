@@ -90,7 +90,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `${{steps.ct-lint.outputs.result}}`
+              body: '${{steps.ct-lint.outputs.result}}'
             })
 
       - name: Fail the workflow if failed linting
