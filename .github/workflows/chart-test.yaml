@@ -49,8 +49,8 @@ jobs:
         run: |
           {
             echo 'RESULT<<EOF'
-            ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
-            echo EOF
+            ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts || true
+            echo 'EOF'
           } >> "$GITHUB_OUTPUT"
         continue-on-error: true
 
