@@ -151,6 +151,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
+| fake | bool | `true` |  |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"ubuntu2204-"}` | Defines the Posit Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |
