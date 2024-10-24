@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.7.11](https://img.shields.io/badge/Version-0.7.11-informational?style=flat-square) ![AppVersion: 2024.09.0](https://img.shields.io/badge/AppVersion-2024.09.0-informational?style=flat-square)
+![Version: 0.7.12](https://img.shields.io/badge/Version-0.7.12-informational?style=flat-square) ![AppVersion: 2024.09.0](https://img.shields.io/badge/AppVersion-2024.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.7.11:
+To install the chart with the release name `my-release` at version 0.7.12:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.11
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.12
 ```
 
 To explore other chart versions, look at:
@@ -151,6 +151,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
+| fake | bool | `true` |  |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"ubuntu2204-"}` | Defines the Posit Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |
