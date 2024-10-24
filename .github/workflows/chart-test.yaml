@@ -50,8 +50,8 @@ jobs:
           {
             echo 'result<<EOF'
             ct lint --target-branch main --chart-dirs charts --chart-dirs other-charts
-            echo 'EOF'
-          } >> $GITHUB_OUTPUT
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
         continue-on-error: true
 
       - name: Run chart-testing (lint all)
