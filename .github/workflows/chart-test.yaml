@@ -45,8 +45,8 @@ jobs:
           fi
 
       - name: Run chart-testing (lint changed)
-        id: ct-lint
         if: steps.list-changed.outputs.changed == 'true'
+        id: ct-lint
         run: |
           {
             echo 'result<<EOF'
