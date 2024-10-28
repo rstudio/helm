@@ -88,12 +88,14 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            local s=$(echo "${{ env.BODY }}" | sed -r 's/`//g')
+            let body = ${{ env.BODY }}
+            let re = /`/g;
+            let sanitized = body.replace(re, '');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: $s
+              body: sanitized
             })
 
       - name: Fail the workflow if failed linting
