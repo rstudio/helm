@@ -21,6 +21,3 @@
 .idea/
 *.tmproj
 .vscode/
-
-# chart tests
-tests/

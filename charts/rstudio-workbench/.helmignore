@@ -1,6 +1,3 @@
 snapshot/
 Makefile
 *.gotmpl
-
-# chart tests
-tests/
