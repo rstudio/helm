@@ -96,11 +96,38 @@ jobs:
         run: helm plugin install --version v0.6.3  https://github.com/helm-unittest/helm-unittest.git
 
       - name: Run chart unit tests
+        id: unittest
         run: |
           for dir in $(ls -d charts/*/); do
             pushd $dir; helm dependencies update; popd
             helm unittest $dir
           done
+        continue-on-error: true
+
+      - name: Notify Slack of chart unittest failure
+        if: steps.unittest.outcome == 'failure'
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload-delimiter: "_"
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Chart unit tests failed.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Fail the workflow if failed unittest
+        if: steps.unittest.outcome == 'failure'
+        run: exit 1
 
   install:
     runs-on: ubuntu-latest
