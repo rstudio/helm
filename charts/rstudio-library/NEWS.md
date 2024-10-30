@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.31
+
+- Add helm unit test scaffold.
+
 ## 0.1.30
 
 - Documentation site updates
