@@ -34,6 +34,19 @@ We'll try to be as responsive as possible in reviewing and accepting pull reques
 - If `index.yaml` gets out of date on the repository, see
   [`./scripts/`](./scripts) for a workflow to fix
 
+## Testing
+
+Running the [helm chart unit tests](https://github.com/helm-unittest/helm-unittest):
+
+```
+# install the unittest plugin
+helm plugin install https://github.com/helm-unittest/helm-unittest.git
+
+# run the rstudio-connect chart unittests
+# unit tests are defined in `charts/$CHART_NAME/tests`
+helm unittest --color ./charts/rstudio-connect
+```
+
 ## Templates
 
 The `rstudio-workbench` and `rstudio-connect` charts both make heavy use of the "templating" feature of the Posit Job

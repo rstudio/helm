@@ -79,6 +79,28 @@ jobs:
         if: steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure'
         run: exit 1
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: v3.6.3
+
+      - name: Install helm unittest plugin
+        run: helm plugin install --version v0.6.3  https://github.com/helm-unittest/helm-unittest.git
+
+      - name: Run chart unit tests
+        run: |
+          for dir in $(ls -d charts/*/); do
+            helm unittest $dir
+          done
+
   install:
     runs-on: ubuntu-latest
     steps:
