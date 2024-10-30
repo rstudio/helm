@@ -11,9 +11,9 @@ spec:
     - name: nc-wb
       image: busybox
       command: ['nc', '-zv', '-w30']
-      args: ['{{ include "rstudio-workbench.fullname" . }}:{{ .Values.pod.port }}']
+      args: ['{{ include "rstudio-workbench.fullname" . }}:80']
     - name: nc-launcher
       image: busybox
       command: [ 'nc', '-zv', '-w30' ]
-      args: [ '{{ include "rstudio-workbench.fullname" . }}:5559' ]
+      args: [ '{{ include "rstudio-workbench.fullname" . }}:8989' ]
   restartPolicy: Never
