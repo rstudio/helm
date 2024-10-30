@@ -1,9 +1,5 @@
 # Changelog
 
-## 0.7.13
-
-- Add initial set of chart unit tests
-
 ## 0.7.12
 
 - Fix a bug where `rbac.serviceAccount.name` was not applied when the job launcher is enabled.
