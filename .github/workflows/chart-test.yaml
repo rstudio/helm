@@ -98,6 +98,7 @@ jobs:
       - name: Run chart unit tests
         run: |
           for dir in $(ls -d charts/*/); do
+            pushd $dir; helm dependencies update; popd
             helm unittest $dir
           done
 
