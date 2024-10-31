@@ -42,9 +42,13 @@ Running the [helm chart unit tests](https://github.com/helm-unittest/helm-unitte
 # install the unittest plugin
 helm plugin install https://github.com/helm-unittest/helm-unittest.git
 
-# run the rstudio-connect chart unittests
 # unit tests are defined in `charts/$CHART_NAME/tests`
-helm unittest --color ./charts/rstudio-connect
+
+# test all charts
+just test
+
+# run unit tests for a single chart
+just test rstudio-connect
 ```
 
 ## Templates
