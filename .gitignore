@@ -2,6 +2,10 @@ helm-docs
 charts/**/charts/
 /*.values
 /.cr-release-packages
+
+# helm unittest plugin
+__snapshot__
+
 bin/**
 !bin/README.md
 
@@ -10,3 +14,4 @@ _site/
 _publish.yml
 
 /.quarto/
+

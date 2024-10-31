@@ -75,6 +75,17 @@ snapshot-rsw-diff:
     fi
   done
 
+test chart='all':
+  #!/usr/bin/env bash
+  set -xe
+  if [[ "{{ chart }}" == 'all' ]]; then
+    for dir in $(ls -d {{ justfile_directory() }}/charts/*/); do
+      helm unittest $dir
+    done
+  else
+    helm unittest "charts/{{ chart }}"
+  fi
+
 test-connect-interpreter-versions:
   #!/usr/bin/env bash
   set -xe

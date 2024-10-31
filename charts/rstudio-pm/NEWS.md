@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.40
+
+- Add helm unit test scaffold.
+
 ## 0.5.39
 
 - Add the `fsGroupChangePolicy: "OnRootMismatch"` default option to the pod's `securityContext`. This will only ensure
