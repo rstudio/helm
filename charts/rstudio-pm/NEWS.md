@@ -2,7 +2,7 @@
 
 ## 0.5.41
 
-- Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
+- Update the default `pod.startupProbe` to use the `/__api__/status` route instead of `/__ping__` for a more reliable startup.
 
 ## 0.5.40
 
