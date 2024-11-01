@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.40](https://img.shields.io/badge/Version-0.5.40-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
+![Version: 0.5.41](https://img.shields.io/badge/Version-0.5.41-informational?style=flat-square) ![AppVersion: 2024.08.2](https://img.shields.io/badge/AppVersion-2024.08.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.40:
+To install the chart with the release name `my-release` at version 0.5.41:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.40
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.41
 ```
 
 To explore other chart versions, look at:
@@ -269,7 +269,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
 | sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
-| startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
+| startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__api__/status","port":4242},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | The update strategy used by the main service pod. |
 | tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
