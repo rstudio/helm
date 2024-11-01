@@ -11,8 +11,8 @@
 /examples/connect/* @aronatkins @dbkegley @christierney @zackverham
 
 # posit-chronicle resources
-/charts/posit-chronicle/* @matt-urbina @AshleyHenry15 @markrtucker @t-margheim 
-/ci/posit-chronicle/* @matt-urbina @AshleyHenry15 @markrtucker @t-margheim
+/charts/posit-chronicle/* @matt-urbina @markrtucker @t-margheim
+/ci/posit-chronicle/* @matt-urbina @markrtucker @t-margheim
 
 # rstudio-workbench resources
 /charts/rstudio-workbench/* @GCrev @zachhannum
