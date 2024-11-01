@@ -170,7 +170,7 @@ livenessProbe:
 startupProbe:
   enabled: false
   httpGet:
-    path: /__ping__
+    path: /__api__/status
     port: 4242
   initialDelaySeconds: 10
   periodSeconds: 10
