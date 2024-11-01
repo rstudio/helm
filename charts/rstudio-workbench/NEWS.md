@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.6
+
+- Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
+
 ## 0.8.5
 
 - Add helm unit test scaffold.
