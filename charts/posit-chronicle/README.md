@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.3.4](https://img.shields.io/badge/Version-0.3.4-informational?style=flat-square) ![AppVersion: 2024.09.0](https://img.shields.io/badge/AppVersion-2024.09.0-informational?style=flat-square)
+![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square) ![AppVersion: 2024.09.0](https://img.shields.io/badge/AppVersion-2024.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -25,11 +25,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.3.4:
+To install the chart with the release name `my-release` at version 0.3.5:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.4
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.5
 ```
 
 To explore other chart versions, look at:
@@ -164,7 +164,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | config.HTTPS.Certificate | string | `""` |  |
 | config.HTTPS.Enabled | bool | `false` |  |
 | config.HTTPS.Key | string | `""` |  |
-| config.LocalStorage.Enabled | bool | `false` |  |
+| config.LocalStorage.Enabled | bool | `true` |  |
 | config.LocalStorage.Location | string | `"./chronicle-data"` |  |
 | config.LocalStorage.RetentionPeriod | string | `"30d"` |  |
 | config.Logging.ServiceLog | string | `"STDOUT"` |  |
