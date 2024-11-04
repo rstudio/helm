@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5
+
+- Change the default value for LocalStorage.Enabled to `true` in order for installations with the default values to work out of the box.
+
 ## 0.3.4
 
 - Add helm unit test scaffold.
