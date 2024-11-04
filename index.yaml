@@ -12,6 +12,36 @@ entries:
           url: https://posit.co/products/enterprise/team/
     apiVersion: v2
     appVersion: 2024.09.0
+    created: "2024-11-04T18:50:35.488707489Z"
+    description: Official Helm chart for Posit Chronicle Server
+    digest: 6f36a9005f7d705d5d01c53cda9a3c6dce1664ee61a858a66522ee986a73e87f
+    home: https://www.posit.co
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - rstudio
+    - posit
+    - chronicle
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: posit-chronicle
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/posit-chronicle-0.3.5/posit-chronicle-0.3.5.tgz
+    version: 0.3.5
+  - annotations:
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: Posit Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
+    appVersion: 2024.09.0
     created: "2024-10-31T20:31:07.306721056Z"
     description: Official Helm chart for Posit Chronicle Server
     digest: 937e320e44b99de0be082a2b4785d2d2481bab2fb97347d49b1ab5fcf937d995
@@ -14092,4 +14122,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2024-11-01T16:05:23.307554996Z"
+generated: "2024-11-04T18:50:35.49085508Z"
