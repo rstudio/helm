@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.7
+
+- Bump Workbench version to 2024.09.1
+
 ## 0.8.6
 
 - Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
