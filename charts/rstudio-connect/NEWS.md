@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.15
+
+- Bump Connect version to 2024.11.0
+
 ## 0.7.14
 
 - Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
