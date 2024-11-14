@@ -3,4 +3,4 @@ Makefile
 *.gotmpl
 
 # chart tests
-tests/
+tests/*
