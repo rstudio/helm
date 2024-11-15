@@ -98,6 +98,14 @@ jobs:
       - name: Install helm unittest plugin
         run: helm plugin install --version v0.6.3  https://github.com/helm-unittest/helm-unittest.git
 
+      - name: Symlink ci-tests -> tests
+        run: |
+          for dir in ci/*/tests; do
+            dir=${dir#ci/}
+            dir=${dir%/tests}
+            ln -s ../../ci/${dir}/tests charts/${dir}/tests
+          done
+
       - name: Run chart unit tests
         id: unittest
         run: |

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.16
+
+- Change location of helm unittests to `ci/rstudio-connect/tests` so changes to unittest files do not require a chart version bump
+
 ## 0.7.15
 
 - Bump Connect version to 2024.11.0
