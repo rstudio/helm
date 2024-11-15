@@ -1,0 +1,68 @@
+suite: Workbench prometheus configuration
+templates:
+  - configmap-general.yaml
+  - configmap-graphite-exporter.yaml
+  - configmap-prestart.yaml
+  - configmap-secret.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+  - svc.yaml
+tests:
+  - it: should ensure the specified metrics port is used in the service
+    template: svc.yaml
+    set:
+      prometheus:
+        enabled: true
+        port: 8989
+    asserts:
+      - equal:
+          path: "spec.ports[1].name"
+          value: "metrics"
+      - equal:
+          path: "spec.ports[1].port"
+          value: 8989
+  - it: should ensure the legacy metrics port is used in the service
+    template: svc.yaml
+    set:
+      prometheus:
+        enabled: true
+        legacy: true
+        port: 8989
+    asserts:
+      - equal:
+          path: "spec.ports[1].name"
+          value: "metrics"
+      - equal:
+          path: "spec.ports[1].port"
+          value: 9108
+  - it: should ensure the prometheus annotations are defined in the service, and that the graphite exporter checksum is non-existent
+    template: deployment.yaml
+    set:
+      prometheus:
+        enabled: true
+        port: 8989
+    asserts:
+      - isSubset:
+          path: spec.template.metadata.annotations
+          content:
+            prometheus.io/scrape: "true"
+            prometheus.io/path: "/metrics"
+            prometheus.io/port: "8989"
+      - notExists:
+          path: "spec.template.metadata.annotations.checksum/config-graphite"
+  - it: should ensure the legacy prometheus annotations are defined in the service, and that the graphite exporter checksum exists
+    template: deployment.yaml
+    set:
+      prometheus:
+        enabled: true
+        legacy: true
+        port: 8989
+    asserts:
+      - isSubset:
+          path: spec.template.metadata.annotations
+          content:
+            prometheus.io/scrape: "true"
+            prometheus.io/path: "/metrics"
+            prometheus.io/port: "9108"
+      - exists:
+          path: "spec.template.metadata.annotations.checksum/config-graphite"
