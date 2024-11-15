@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.6
+
+- Bump Chronicle to version 2024.11.0
+
 ## 0.3.5
 
 - Change the default value for LocalStorage.Enabled to `true` in order for installations with the default values to work out of the box.

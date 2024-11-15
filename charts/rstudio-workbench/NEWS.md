@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.8
+
+- Bump Chronicle Agent to version 2024.11.0
+
 ## 0.8.7
 
 - Bump Workbench version to 2024.09.1

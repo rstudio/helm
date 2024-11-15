@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.16
+
+- Bump Chronicle Agent to version 2024.11.0
+
 ## 0.7.15
 
 - Bump Connect version to 2024.11.0
