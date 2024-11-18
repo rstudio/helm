@@ -66,3 +66,22 @@ tests:
             prometheus.io/port: "9108"
       - exists:
           path: "spec.template.metadata.annotations.checksum/config-graphite"
+  - it: should ensure the legacy metrics port is used and that the graphite exporter container exists
+    template: deployment.yaml
+    set:
+      prometheus:
+        enabled: true
+        legacy: true
+        port: 8989
+      prometheusExporter:
+        enabled: true
+    asserts:
+      - equal:
+          path: "spec.template.spec.containers[1].name"
+          value: "exporter"
+      - equal:
+          path: "spec.template.spec.containers[1].ports[0].name"
+          value: "metrics"
+      - equal:
+          path: "spec.template.spec.containers[1].ports[0].containerPort"
+          value: 9108
