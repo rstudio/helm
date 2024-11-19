@@ -1,0 +1,34 @@
+suite: Workbench Deployment
+templates:
+  - configmap-general.yaml
+  - configmap-prestart.yaml
+  - configmap-secret.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+tests:
+  - it: should not specify the RollingUpdate configuration if the strategy type is not RollingUpdate
+    template: deployment.yaml
+    set:
+      strategy:
+        type: "Recreate"
+    asserts:
+      - notExists:
+          path: "spec.strategy.rollingUpdate"
+  - it: should specify the RollingUpdate configuration if the strategy type is RollingUpdate
+    template: deployment.yaml
+    set:
+      strategy:
+        type: "RollingUpdate"
+        rollingUpdate:
+          maxUnavailable: 1
+          maxSurge: "50%"
+    asserts:
+      - equal:
+          path: "spec.strategy.type"
+          value: "RollingUpdate"
+      - equal:
+          path: "spec.strategy.rollingUpdate.maxUnavailable"
+          value: 1
+      - equal:
+          path: "spec.strategy.rollingUpdate.maxSurge"
+          value: "50%"
