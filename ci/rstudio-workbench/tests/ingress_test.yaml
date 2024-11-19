@@ -26,6 +26,18 @@ tests:
     asserts:
       - notExists:
           path: "spec.tls"
+  - it: should include the tls path if tls has values specified and ingress is enabled
+    template: ingress.yaml
+    set:
+      ingress:
+        enabled: true
+        tls:
+          - secretName: chart-example-tls
+            hosts:
+              - chart-example.local
+    asserts:
+      - exists:
+          path: "spec.tls"
   - it: should include the ingressClassName if defined and ingress is enabled
     template: ingress.yaml
     set:
@@ -36,3 +48,11 @@ tests:
       - equal:
           path: "spec.ingressClassName"
           value: "alb"
+  - it: should not include the ingressClassName if it is not defined and ingress is enabled
+    template: ingress.yaml
+    set:
+      ingress:
+        enabled: true
+    asserts:
+      - notExists:
+          path: "spec.ingressClassName"

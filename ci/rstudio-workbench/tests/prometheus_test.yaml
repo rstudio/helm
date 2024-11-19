@@ -8,7 +8,7 @@ templates:
   - deployment.yaml
   - svc.yaml
 tests:
-  - it: should ensure the specified metrics port is used in the service
+  - it: should ensure the specified metrics port is used in the service if prometheus is enabled and legacy is not true
     template: svc.yaml
     set:
       prometheus:
@@ -21,7 +21,7 @@ tests:
       - equal:
           path: "spec.ports[1].port"
           value: 8989
-  - it: should ensure the legacy metrics port is used in the service
+  - it: should ensure the legacy metrics port is used in the service if prometheus is enabled and legacy is true
     template: svc.yaml
     set:
       prometheus:
