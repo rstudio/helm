@@ -116,3 +116,28 @@ tests:
           path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_PASSWD")]'
       - notExists:
           path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_UID")]'
+  - it: should set the RSW_LOAD_BALANCING env var to true if replicas > 1
+    template: deployment.yaml
+    set:
+      replicas: 2
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
+          value: "true"
+  - it: should not set the RSW_LOAD_BALANCING env var replicas = 1
+    template: deployment.yaml
+    set:
+      replicas: 1
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")]'
+  - it: should set the RSW_LOAD_BALANCING env var to true if loadBalancer.forceEnabled is true even if replicas = 1
+    template: deployment.yaml
+    set:
+      replicas: 1
+      loadBalancer:
+        forceEnabled: true
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
+          value: "true"
