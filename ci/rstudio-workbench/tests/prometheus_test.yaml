@@ -85,3 +85,20 @@ tests:
       - equal:
           path: "spec.template.spec.containers[1].ports[0].containerPort"
           value: 9108
+  - it: should ensure the metrics port is used in the rstudio container if prometheus is enabled and legacy is not true
+    template: deployment.yaml
+    set:
+      prometheus:
+        enabled: true
+        legacy: false
+        port: 8989
+    asserts:
+      - equal:
+          path: "spec.template.spec.containers[0].name"
+          value: "rstudio"
+      - equal:
+          path: "spec.template.spec.containers[0].ports[1].name"
+          value: "metrics"
+      - equal:
+          path: "spec.template.spec.containers[0].ports[1].containerPort"
+          value: 8989
