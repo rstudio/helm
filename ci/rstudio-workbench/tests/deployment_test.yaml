@@ -84,3 +84,35 @@ tests:
       - equal:
           path: 'spec.template.spec.containers[0].env[?(@.name=="RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK")].value'
           value: "disabled"
+  - it: should set the ENV vars for user creation if userCreate is true
+    template: deployment.yaml
+    set:
+      userCreate: true
+      userName: "testuser"
+      userPassword: "testpassword"
+      userUid: 1000
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER")].value'
+          value: "testuser"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_PASSWD")].value'
+          value: "testpassword"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_UID")].value'
+          value: "1000"
+  - it: should set the RSW_TESTUSER ENV var to an empty string if userCreate is false
+    template: deployment.yaml
+    set:
+      userCreate: false
+      userName: "testuser"
+      userPassword: "testpassword"
+      userUid: 1000
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER")].value'
+          value: ""
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_PASSWD")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_UID")]'
