@@ -61,3 +61,26 @@ tests:
           path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ENABLE")]'
       - notExists:
           path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ONLY")]'
+  - it: should set the RSTUDIO_LAUNCHER_STARTUP_HEALTHCHECK_ARGS env var if launcher.kubernetesHealthCheck.enabled is true
+    template: deployment.yaml
+    set:
+      launcher:
+        kubernetesHealthCheck:
+          enabled: true
+          extraCurlArgs: ["-fsSL", "-k"]
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS")].value'
+          value: "-fsSL -k"
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK")]'
+  - it: should set the RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK to disabled if launcher.kubernetesHealthCheck.enabled is false
+    template: deployment.yaml
+    set:
+      launcher:
+        kubernetesHealthCheck:
+          enabled: false
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK")].value'
+          value: "disabled"
