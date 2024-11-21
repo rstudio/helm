@@ -32,3 +32,32 @@ tests:
       - equal:
           path: "spec.strategy.rollingUpdate.maxSurge"
           value: "50%"
+  - it: should specify the diagnostic env vars if diagnostics is enabled
+    template: deployment.yaml
+    set:
+      diagnostics:
+        enabled: true
+        directory: "/var/log/rstudio-workbench"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_DIR")].value'
+          value: "/var/log/rstudio-workbench"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ENABLE")].value'
+          value: "true"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ONLY")].value'
+          value: "true"
+  - it: should not specify the diagnostic env vars if diagnostics is not enabled
+    template: deployment.yaml
+    set:
+      diagnostics:
+        enabled: false
+        directory: "/var/log/rstudio-workbench"
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_DIR")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ENABLE")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ONLY")]'
