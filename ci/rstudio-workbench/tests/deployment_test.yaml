@@ -141,3 +141,29 @@ tests:
       - equal:
           path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
           value: "true"
+  - it: should specify a volumeMount and a volume for sharedStorage if sharedStorage.create is true
+    template: deployment.yaml
+    set:
+      sharedStorage:
+        create: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-shared-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-shared-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-shared-storage"
+  - it: should specify a volumeMount and a volume for sharedStorage if sharedStorage.mount is true
+    template: deployment.yaml
+    set:
+      sharedStorage:
+        mount: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-shared-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-shared-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-shared-storage"
