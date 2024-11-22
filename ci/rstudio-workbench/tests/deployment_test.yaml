@@ -266,3 +266,74 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")]'
+  - it: should specify a volumeMount and a volume for userProvisioning if config.userProvisioning is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          userProvisioning: 0600
+        userProvisioning:
+          sssd.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].mountPath'
+          value: "/etc/sssd/conf.d/"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].name'
+          value: "rstudio-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")].name'
+          value: "rstudio-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")].secret.secretName'
+          value: "RELEASE-NAME-rstudio-workbench-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")].secret.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for userProvisioning if config.userProvisioning is not defined
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")]'
+  - it: should specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupUserProvisioning:
+          sssd.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
+          value: "/startup/user-provisioning"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].name'
+          value: "rstudio-user-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].name'
+          value: "rstudio-user-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-start-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].configMap.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupUserProvisioning: null
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")]'
