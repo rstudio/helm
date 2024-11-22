@@ -375,3 +375,44 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-custom-startup")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")]'
+  - it: should specify a volumeMount and a volume for pam if config.pam is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          pam: 0600
+        pam:
+          thing.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")].mountPath'
+          value: "/etc/pam.d/thing.conf"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")].name'
+          value: "rstudio-pam"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")].subPath'
+          value: "thing.conf"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")].name'
+          value: "rstudio-pam"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-pam"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")].configMap.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for pam if config.pam is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          pam: 0600
+        pam: null
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")]'
