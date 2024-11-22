@@ -337,3 +337,41 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")]'
+  - it: should specify a volumeMount and a volume for startupCustom if config.startupCustom is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupCustom:
+          sssd.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-custom-startup")].mountPath'
+          value: "/startup/custom"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-custom-startup")].name'
+          value: "rstudio-custom-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")].name'
+          value: "rstudio-custom-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-start-custom"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")].configMap.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for startupCustom if config.startupCustom is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupCustom: null
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-custom-startup")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")]'
