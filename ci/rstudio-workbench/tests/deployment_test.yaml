@@ -231,3 +231,38 @@ tests:
       - equal:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
           value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for the session secret if config.sessionSecret is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          sessionSecret: 0420
+        sessionSecret:
+          odbc.ini:
+            dsn: "test"
+            driver: "test"
+      session:
+        defaultSecretMountPath: "/mnt/session-secret"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")].mountPath'
+          value: "/mnt/session-secret"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")].name'
+          value: "rstudio-session-secret"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")].name'
+          value: "rstudio-session-secret"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")].secret.secretName'
+          value: "RELEASE-NAME-rstudio-workbench-session-secret"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")].secret.defaultMode'
+          value: 0420
+  - it: should not specify a volumeMount and a volume for the session secret if config.sessionSecret is not defined
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")]'
