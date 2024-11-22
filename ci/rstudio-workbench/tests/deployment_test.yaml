@@ -167,3 +167,67 @@ tests:
       - equal:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-shared-storage")].persistentVolumeClaim.claimName'
           value: "RELEASE-NAME-rstudio-workbench-shared-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.create is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        create: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.mount is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        mount: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.create is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        create: true
+        path: "/mnt/shared"
+        subPath: "subpath"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+          value: "subpath"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.mount is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        mount: true
+        path: "/mnt/shared"
+        subPath: "subpath"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+          value: "subpath"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
