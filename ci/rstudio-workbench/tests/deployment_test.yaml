@@ -690,3 +690,13 @@ tests:
     asserts:
       - notExists:
           path: 'spec.template.spec.containers[0].readinessProbe'
+  - it: should create a sidecar container if pod.sidecar is defined
+    template: deployment.yaml
+    set:
+      pod:
+        sidecar:
+          - name: "sidecarTest"
+            image: "test"
+    asserts:
+      - exists:
+          path: 'spec.template.spec.containers[?(@.name=="sidecarTest")]'
