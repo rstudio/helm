@@ -299,6 +299,34 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")]'
+  - it: should specify a volumeMount and a volume for launcher if launcher.enabled is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          launcher: 0755
+      launcher:
+        enabled: true
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")].mountPath'
+          value: "/startup/launcher"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-start-launcher"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.defaultMode'
+          value: 0755
+  - it: should not specify a volumeMount and a volume for launcher if launcher.enabled is false
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")]'
   - it: should specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is defined and not empty
     template: deployment.yaml
     set:
