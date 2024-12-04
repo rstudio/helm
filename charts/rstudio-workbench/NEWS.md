@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.9
+
+- Fix a logic bug where the resource limit key was set even if `resources.limits.enabled` is false
+
 ## 0.8.8
 
 - Bump Chronicle Agent to version 2024.11.0

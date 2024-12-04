@@ -183,8 +183,8 @@ containers:
       cpu: "{{ .Values.resources.requests.cpu }}"
       ephemeral-storage: "{{ .Values.resources.requests.ephemeralStorage }}"
     {{- end }}
-    limits:
     {{- if .Values.resources.limits.enabled }}
+    limits:
       memory: "{{ .Values.resources.limits.memory }}"
       cpu: "{{ .Values.resources.limits.cpu }}"
       ephemeral-storage: "{{ .Values.resources.limits.ephemeralStorage }}"

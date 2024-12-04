@@ -584,3 +584,37 @@ tests:
             name: "secondTest"
             mountPath: "/mnt/secondTest"
           any: true
+  - it: should set the resource requests if enabled
+    template: deployment.yaml
+    set:
+      resources:
+        requests:
+          enabled: true
+          cpu: "100m"
+          memory: "128Mi"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.cpu'
+          value: "100m"
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.memory'
+          value: "128Mi"
+      - notExists:
+          path: 'spec.template.spec.containers[0].resources.limits'
+  - it: should set the resource limits if enabled
+    template: deployment.yaml
+    set:
+      resources:
+        limits:
+          enabled: true
+          cpu: "1000m"
+          memory: "1024Mi"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.cpu'
+          value: "1000m"
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.memory'
+          value: "1024Mi"
+      - notExists:
+          path: 'spec.template.spec.containers[0].resources.requests'
