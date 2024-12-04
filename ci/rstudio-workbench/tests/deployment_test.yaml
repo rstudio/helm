@@ -416,3 +416,79 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")]'
+  - it: should specify a volumeMount and a volume for the old style jobJsonOverridesFiles if jobJsonOverridesFiles is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      jobJsonOverridesFiles:
+        - name: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")].mountPath'
+          value: "/mnt/job-json-overrides"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")].name'
+          value: "rstudio-job-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].name'
+          value: "rstudio-job-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify a volumeMount and a volume for the old style jobJsonOverridesFiles if jobJsonOverridesFiles is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      jobJsonOverridesFiles: {}
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")]'
+
+# $useNewOverrides is defined as {- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
+  - it: should specify a volumeMount and a volume for the new style jobJsonOverridesFiles if $useNewerOverrides is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      launcher:
+        useTemplates: false
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")].mountPath'
+          value: "/mnt/job-json-overrides-new"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")].name'
+          value: "rstudio-job-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].name'
+          value: "rstudio-job-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify a volumeMount and a volume for the new style jobJsonOverridesFiles if $useNewerOverrides is false
+    template: deployment.yaml
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            thing: "test"
+      launcher:
+        useTemplates: true
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")]'
