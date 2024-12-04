@@ -562,3 +562,25 @@ tests:
           path: 'spec.template.spec.volumes[?(@.name=="session-templates")]'
       - notExists:
           path: 'spec.template.spec.volumeMounts[?(@.name=="session-templates")]'
+  - it: should have the pod volumemounts defined by the user
+    template: deployment.yaml
+    set:
+      pod:
+        volumeMounts:
+          - name: "test"
+            mountPath: "/mnt/test"
+          - name: "secondTest"
+            mountPath: "/mnt/secondTest"
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "test"
+            mountPath: "/mnt/test"
+          any: true
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "secondTest"
+            mountPath: "/mnt/secondTest"
+          any: true
