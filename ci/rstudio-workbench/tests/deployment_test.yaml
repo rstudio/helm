@@ -618,3 +618,75 @@ tests:
           value: "1024Mi"
       - notExists:
           path: 'spec.template.spec.containers[0].resources.requests'
+  - it: should configure the livenessProbe if values.livenessProbe.enabled is true
+    template: deployment.yaml
+    set:
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].livenessProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].livenessProbe.periodSeconds'
+          value: 20
+  - it: should not configure the livenessProbe if values.livenessProbe.enabled is false
+    template: deployment.yaml
+    set:
+      livenessProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].livenessProbe'
+  - it: should configure the startupProbe if values.startupsProbe.enabled is true
+    template: deployment.yaml
+    set:
+      startupProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].startupProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].startupProbe.periodSeconds'
+          value: 20
+  - it: should not configure the startupProbe if values.startupProbe.enabled is false
+    template: deployment.yaml
+    set:
+      startupProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].startupProbe'
+  - it: should configure the readinessProbe if values.readinessProbe.enabled is true
+    template: deployment.yaml
+    set:
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].readinessProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].readinessProbe.periodSeconds'
+          value: 20
+  - it: should not configure the readinessProbe if values.readinessProbe.enabled is false
+    template: deployment.yaml
+    set:
+      readinessProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].readinessProbe'
