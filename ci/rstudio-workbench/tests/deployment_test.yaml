@@ -299,6 +299,34 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")]'
+  - it: should specify a volumeMount and a volume for launcher if launcher.enabled is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          launcher: 0755
+      launcher:
+        enabled: true
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")].mountPath'
+          value: "/startup/launcher"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-start-launcher"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.defaultMode'
+          value: 0755
+  - it: should not specify a volumeMount and a volume for launcher if launcher.enabled is false
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")]'
   - it: should specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is defined and not empty
     template: deployment.yaml
     set:
@@ -416,3 +444,287 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")]'
+  - it: should specify a volumeMount and a volume for the old style jobJsonOverridesFiles if jobJsonOverridesFiles is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      jobJsonOverridesFiles:
+        - name: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")].mountPath'
+          value: "/mnt/job-json-overrides"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")].name'
+          value: "rstudio-job-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].name'
+          value: "rstudio-job-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify a volumeMount and a volume for the old style jobJsonOverridesFiles if jobJsonOverridesFiles is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      jobJsonOverridesFiles: {}
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")]'
+
+# $useNewOverrides is defined as {- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
+  - it: should specify a volumeMount and a volume for the new style jobJsonOverridesFiles if $useNewerOverrides is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      launcher:
+        useTemplates: false
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")].mountPath'
+          value: "/mnt/job-json-overrides-new"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")].name'
+          value: "rstudio-job-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].name'
+          value: "rstudio-job-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify a volumeMount and a volume for the new style jobJsonOverridesFiles if $useNewerOverrides is false
+    template: deployment.yaml
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            thing: "test"
+      launcher:
+        useTemplates: true
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")]'
+  - it: should specify 3 volumeMounts and a volume if Values.launcher.useTemplates is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          server: 0644
+      launcher:
+        useTemplates: true
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            subPath: "rstudio-library-templates-data.tpl"
+          any: true
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+            subPath: "job.tpl"
+          any: true
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+            subPath: "service.tpl"
+          any: true
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")].name'
+          value: "session-templates"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-templates"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify any volumeMounts or a volume if Values.launcher.useTemplates is false
+    template: deployment.yaml
+    set:
+      launcher:
+        useTemplates: false
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            subPath: "rstudio-library-templates-data.tpl"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+            subPath: "job.tpl"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+            subPath: "service.tpl"
+          any: true
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")]'
+      - notExists:
+          path: 'spec.template.spec.volumeMounts[?(@.name=="session-templates")]'
+  - it: should have the pod volumemounts defined by the user
+    template: deployment.yaml
+    set:
+      pod:
+        volumeMounts:
+          - name: "test"
+            mountPath: "/mnt/test"
+          - name: "secondTest"
+            mountPath: "/mnt/secondTest"
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "test"
+            mountPath: "/mnt/test"
+          any: true
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "secondTest"
+            mountPath: "/mnt/secondTest"
+          any: true
+  - it: should set the resource requests if enabled
+    template: deployment.yaml
+    set:
+      resources:
+        requests:
+          enabled: true
+          cpu: "100m"
+          memory: "128Mi"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.cpu'
+          value: "100m"
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.memory'
+          value: "128Mi"
+      - notExists:
+          path: 'spec.template.spec.containers[0].resources.limits'
+  - it: should set the resource limits if enabled
+    template: deployment.yaml
+    set:
+      resources:
+        limits:
+          enabled: true
+          cpu: "1000m"
+          memory: "1024Mi"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.cpu'
+          value: "1000m"
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.memory'
+          value: "1024Mi"
+      - notExists:
+          path: 'spec.template.spec.containers[0].resources.requests'
+  - it: should configure the livenessProbe if values.livenessProbe.enabled is true
+    template: deployment.yaml
+    set:
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].livenessProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].livenessProbe.periodSeconds'
+          value: 20
+  - it: should not configure the livenessProbe if values.livenessProbe.enabled is false
+    template: deployment.yaml
+    set:
+      livenessProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].livenessProbe'
+  - it: should configure the startupProbe if values.startupsProbe.enabled is true
+    template: deployment.yaml
+    set:
+      startupProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].startupProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].startupProbe.periodSeconds'
+          value: 20
+  - it: should not configure the startupProbe if values.startupProbe.enabled is false
+    template: deployment.yaml
+    set:
+      startupProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].startupProbe'
+  - it: should configure the readinessProbe if values.readinessProbe.enabled is true
+    template: deployment.yaml
+    set:
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].readinessProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].readinessProbe.periodSeconds'
+          value: 20
+  - it: should not configure the readinessProbe if values.readinessProbe.enabled is false
+    template: deployment.yaml
+    set:
+      readinessProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].readinessProbe'
+  - it: should create a sidecar container if pod.sidecar is defined
+    template: deployment.yaml
+    set:
+      pod:
+        sidecar:
+          - name: "sidecarTest"
+            image: "test"
+    asserts:
+      - exists:
+          path: 'spec.template.spec.containers[?(@.name=="sidecarTest")]'
