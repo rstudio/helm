@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.43
+
+- Update default Posit Package Manager version to 2024.11.0-7
+
 ## 0.5.41
 
 - Update the default `pod.startupProbe` to use the `/__api__/status` route instead of `/__ping__` for a more reliable startup.
