@@ -281,6 +281,14 @@ spec:
               {{ $key }}: {{ toYaml $val }}
               {{- end }}
             {{- end }}
+          {{- else }}
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 500m
+              memory: 1Gi
           {{- end }}
           {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
           volumeMounts:
