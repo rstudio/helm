@@ -463,14 +463,28 @@ config:
       default-session-cluster: Kubernetes
     vscode.conf:
       enabled: 1
-      exe: /opt/code-server/bin/code-server
-      args: --host=0.0.0.0
+      session-timeout-kill-hours: 12
+    vscode.extensions.conf: |
+      quarto.quarto
+      posit.shiny
+      posit.publisher
     vscode-user-settings.json: |
       {
             "terminal.integrated.shell.linux": "/bin/bash",
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
       }
+    #  positron.conf:
+    #    enabled: 1
+    #  positron.extensions.conf: |
+    #    posit.shiny
+    #    posit.publisher
+    #  positron-user-settings.json: |
+    #    {
+    #          "terminal.integrated.shell.linux": "/bin/bash",
+    #          "extensions.autoUpdate": false,
+    #          "extensions.autoCheckUpdates": false
+    #    }
     logging.conf:
       "*":
         log-level: info
