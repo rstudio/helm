@@ -36,8 +36,11 @@ service:
 
 launcher:
   enabled: true
-  namespace: "soleng-team"
-
+  useTemplates: true
+  templateValues:
+    pod:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 rbac:
   create: true
 
@@ -73,10 +76,6 @@ config:
         max-mem-mb: "8192"
         allow-unknown-images: "1"
         cpu-request-ratio: "1"
-        job-json-overrides:
-          - target: "/spec/template/metadata/annotations/cluster-autoscaler.kubernetes.io~1safe-to-evict"
-            json: "false"
-            name: evict-annotation
   server:
     rserver.conf:
       admin-enabled: 1
