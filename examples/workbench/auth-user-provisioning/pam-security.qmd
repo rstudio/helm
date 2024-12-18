@@ -1,0 +1,12 @@
+---
+category: Authentication
+---
+
+# Configuring Posit Workbench with Secure Home Directories
+
+This example deploys Posit Workbench using pam to create user home directories with more secure permissions, in this example 700
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-workbench-pam-homedirectory-permissions.yaml" filename="values.yaml"}
+```
