@@ -1,8 +1,8 @@
 name: rstudio-connect
 description: Official Helm chart for Posit Connect
-version: 0.7.17
+version: 0.7.18
 apiVersion: v2
-appVersion: 2024.11.0
+appVersion: 2024.12.0
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
 sources:
@@ -18,7 +18,7 @@ dependencies:
 annotations:
   artifacthub.io/images: |
     - name: rstudio-connect
-      image: rstudio/rstudio-connect:ubuntu2204-2024.11.0
+      image: rstudio/rstudio-connect:ubuntu2204-2024.12.0
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images
