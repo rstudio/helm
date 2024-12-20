@@ -2,7 +2,7 @@
 
 ## 0.7.18
 
-- Bump Connect version to 2024.12.0
+- Bumps Connect version to 2024.12.0
 
 ## 0.7.17
 
