@@ -267,18 +267,32 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if any (ne (len $requests) 0) (ne (len $limits) 0) }}
+          {{- if or (ne (len $requests) 0) (ne (len $limits) 0) }}
           resources:
             {{- if ne (len $requests) 0 }}
             requests:
-              {{- range $key, $val := $requests }}
-              {{ $key }}: {{ toYaml $val }}
+              {{- if $requests.cpu }}
+              cpu: {{ $requests.cpu }}
+              {{- else }}
+              cpu: 500m
+              {{- end }}
+              {{- if $requests.memory }}
+              memory: {{ $requests.memory }}
+              {{- else }}
+              memory: 1Gi
               {{- end }}
             {{- end }}
             {{- if ne (len $limits) 0 }}
             limits:
-              {{- range $key, $val := $limits }}
-              {{ $key }}: {{ toYaml $val }}
+              {{- if $limits.cpu }}
+              cpu: {{ $limits.cpu }}
+              {{- else }}
+              cpu: 500m
+              {{- end }}
+              {{- if $limits.memory }}
+              memory: {{ $limits.memory }}
+              {{- else }}
+              memory: 1Gi
               {{- end }}
             {{- end }}
           {{- else }}
