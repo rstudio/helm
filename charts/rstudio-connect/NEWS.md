@@ -1,6 +1,99 @@
 # Changelog
 
-# 0.6.6
+## 0.7.18
+
+- Bumps Connect version to 2024.12.0
+
+## 0.7.17
+
+- Bump Chronicle Agent to version 2024.11.0
+
+## 0.7.16
+
+- Change location of helm unittests to `ci/rstudio-connect/tests` so changes to unittest files do not require a chart version bump
+
+## 0.7.15
+
+- Bump Connect version to 2024.11.0
+
+## 0.7.14
+
+- Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
+
+## 0.7.13
+
+- Add initial set of helm unit tests.
+
+## 0.7.12
+
+- Fix a bug where `rbac.serviceAccount.name` was not applied when the job launcher is enabled.
+
+## 0.7.11
+
+- Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
+
+## 0.7.10
+
+- Bump version of launcher templates `job.tpl` and `service.tpl`
+  - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
+    To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`.
+  - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+- Removed a protection against `.resources.enabled = false` which was a [bad attempt at backwards compatibility two
+  years ago](https://github.com/rstudio/helm/pull/224) (v0.2.34)
+
+## 0.7.9
+
+- Bump Connect version to 2024.09.0
+
+## 0.7.8
+
+- Bump Chronicle Agent to version 2024.09.0
+
+## 0.7.7
+
+- Add helm values for `pod.hostAliases` and `launcher.templateValues.pod.hostAliases`
+- Add helm values for `launcher.defaultInitContainer.resources`
+
+## 0.7.6
+
+- Bump Connect version to 2024.08.0
+
+## 0.7.4
+
+- BREAKING: local execution only
+  - Default installed Quarto version upgraded to 1.4.557
+
+## 0.7.3
+
+- Bump Connect version to 2024.06.0
+
+## 0.7.2
+
+- Bump Connect version to 2024.05.0
+- BREAKING: local execution only
+  - Default installed R versions upgraded to 4.4.0 and 4.3.3.
+  - Default installed Python versions upgraded to 3.12.1 and 3.11.7.
+- Enable TensorFlow by default in `values.yaml` when running in local or
+  off-host execution mode.
+
+## 0.7.1
+
+- Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
+
+## 0.7.0
+
+- BREAKING: the prometheus endpoint has changed from port `9108` to `3232` by default
+  - We are now using an internal prometheus endpoint with all new metrics
+  - As a result, the `graphiteExporter` sidecar has been removed
+  - Some metrics from the `graphiteExporter` will no longer be present
+  - The parent / main "off-switch" for prometheus is at `prometheus.enabled`
+  - To revert to the old exporter, set `prometheus.legacy=true` (and please reach out to let us know why!)
+
+## 0.6.7
+
+- Documentation site updates
+
+## 0.6.6
 
 - Bump Connect version to 2024.04.1
 

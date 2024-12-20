@@ -1,9 +1,19 @@
 # format per https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#about-code-owners
-* @colearendt @atheriel
+* @rstudio/infraops @rstudio/platform-cloud
 
 # package-manager resources
-/charts/rstudio-pm/* @rstudio/ppm
+/charts/rstudio-pm/** @rstudio/ppm
+/ci/rstudio-pm/** @rstudio/ppm
 
 # connect resources
-/charts/rstudio-connect/* @aronatkins @dbkegley @christierney @zackverham
-/examples/connect/* @aronatkins @dbkegley @christierney @zackverham
+/charts/rstudio-connect/** @aronatkins @dbkegley @christierney @zackverham
+/ci/rstudio-connect/** @aronatkins @dbkegley @christierney @zackverham
+/examples/connect/** @aronatkins @dbkegley @christierney @zackverham
+
+# posit-chronicle resources
+/charts/posit-chronicle/** @matt-urbina @markrtucker @t-margheim
+/ci/posit-chronicle/** @matt-urbina @markrtucker @t-margheim
+
+# rstudio-workbench resources
+/charts/rstudio-workbench/** @GCrev @zachhannum
+/ci/rstudio-workbench/** @GCrev @zachhannum

@@ -1,6 +1,6 @@
-# Version: 2.3.1
+# Version: 2.4.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v3
+# Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -18,6 +18,9 @@ metadata:
     {{- end }}
   labels:
     app.kubernetes.io/managed-by: "launcher"
+    {{- with .Job.instanceId }}
+    launcher-instance-id: {{ toYaml . }}
+    {{- end }}
     {{- with .Job.metadata.job.labels }}
     {{- range $key, $val := . }}
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
@@ -30,6 +33,9 @@ metadata:
     {{- end }}
   generateName: {{ toYaml .Job.generateName }}
 spec:
+  {{- if $templateData.job.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ $templateData.job.ttlSecondsAfterFinished }}
+  {{- end }}
   backoffLimit: 0
   template:
     metadata:
@@ -59,6 +65,9 @@ spec:
         {{- end }}
         {{- end }}
       labels:
+        {{- with .Job.instanceId }}
+        launcher-instance-id: {{ toYaml . }}
+        {{- end }}
         {{- with .Job.metadata.pod.labels }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
@@ -74,9 +83,14 @@ spec:
       {{- if .Job.host }}
       nodeName: {{ toYaml .Job.host }}
       {{- end }}
+      enableServiceLinks: {{ if hasKey $templateData.pod "enableServiceLinks" }}{{ $templateData.pod.enableServiceLinks }}{{ else }}false{{ end }}
       restartPolicy: Never
       {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
       serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
+      {{- end }}
+      {{- with $templateData.pod.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
@@ -96,7 +110,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or (ne (len .Job.placementConstraints) 0) (ne (len $templateData.pod.nodeSelector) 0) }}
+      {{- if or (ne (len .Job.placementConstraints) 0) (and $templateData.pod.nodeSelector (ne (len $templateData.pod.nodeSelector) 0)) }}
       nodeSelector:
         {{- range .Job.placementConstraints }}
         {{ .name }}: {{ toYaml .value }}

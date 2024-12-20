@@ -40,49 +40,55 @@ Workbench.
 
 {{- define "rstudio.disclaimer" }}
 
-## For Production
+## For production
 
-To ensure a stable production deployment, please:
+To ensure a stable production deployment:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-  for breaking changes
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+* "Pin" the version of the Helm chart that you are using. You can do this using the:
+  * `helm dependency` command *and* the associated "Chart.lock" files *or*
+  * the `--version` flag.
+  
+    ::: {.callout-important}
+    This protects you from breaking changes.
+    :::
 
+* Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
 {{- end }}
 
 {{- define "rstudio.best-practices" }}
 
-## Best Practices
+## Best practices
 
 Helm charts are very useful tools for deploying resources into Kubernetes, however, they do require
 some familiarity with kubernetes and `helm` itself. Please ensure you have adequate training and
 IT support before deploying these charts into production environments. Reach out to your account representative
-if you need help deciding whether helm is a good choice for your deployment.
+if you need help deciding whether Helm is a good choice for your deployment.
 
 To ensure reproducibility in your environment and insulate yourself from future changes, please:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use the `helm-diff` plugin and `helm diff upgrade` to check
-  for breaking changes
-* Read [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+* "Pin" the version of the Helm chart that you are using. You can do
+  this using the:
+    * `helm dependency` command and the associated "Chart.lock" files _or_
+    * the `--version` flag.
+
+      :::{.callout-important}
+      This protects you from breaking changes**
+      :::
+
+* Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
 
 {{- end }}
 
 {{- define "rstudio.install" }}
 {{- $isDev := (regexMatch "[0-9]+\\.[0-9]+\\.[0-9]+-[a-zA-Z\\.0-9]+" .Version) }}
 
-## Installing the Chart
+## Installing the chart
 
 To install the chart with the release name `my-release` at version {{ template "chart.version" . }}:
 
-```bash
+```{.bash}
 helm repo add rstudio https://helm.rstudio.com
 {{- if not $isDev }}
 helm upgrade --install my-release rstudio/{{ template "chart.name" . }} --version={{ template "chart.version" . }}
@@ -95,8 +101,9 @@ helm upgrade --install --devel my-release rstudio/{{ template "chart.name" . }} 
 {{- end }}
 ```
 
-To explore other chart versions, take a look at:
-```
+To explore other chart versions, look at:
+
+```{.bash}
 helm search repo {{ if $isDev }}--devel {{ end }}rstudio/{{ template "chart.name" . }} -l
 ```
 
@@ -106,15 +113,15 @@ helm search repo {{ if $isDev }}--devel {{ end }}rstudio/{{ template "chart.name
 
 ## Licensing
 
-This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
-
-### License File
+This chart supports activating the product using a *license file*.
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-`kubectl create secret generic {{ .Name }}-license --from-file=licenses/{{ .Name }}.lic`
+```{.bash}
+kubectl create secret generic {{ .Name }}-license --from-file=licenses/{{ .Name }}.lic
+```
 
 Second, specify the following values:
 
@@ -127,15 +134,9 @@ license:
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-`--set-file license.file.contents=licenses/{{ .Name }}.lic`
-
-### License Key
-
-Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
-
-### License Server
-
-Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+```{.bash}
+--set-file license.file.contents=licenses/{{ .Name }}.lic
+```
 
 {{- end }}
 

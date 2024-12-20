@@ -28,7 +28,12 @@ spec:
     nodePort: {{ .Values.service.nodePort }}
 {{- end }}
     targetPort: 8787
-  {{- if .Values.prometheusExporter.enabled }}
+  {{- if .Values.prometheus.enabled }}
   - name: metrics
+    targetPort: metrics
+    {{- if .Values.prometheus.legacy }}
     port: 9108
+    {{- else }}
+    port: {{ .Values.prometheus.port }}
+    {{- end }}
   {{- end }}

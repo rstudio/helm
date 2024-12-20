@@ -1,5 +1,71 @@
 # Changelog
 
+## 0.8.10
+
+- Bump Workbench version to 2024.12.0
+- Bump version of launcher templates `job.tpl` and `service.tpl`
+  - Populate pod `initContainers` from `.Job.initContainers`
+ 
+## 0.8.9
+
+- Fix a logic bug where the resource limit key was set even if `resources.limits.enabled` is false
+
+## 0.8.8
+
+- Bump Chronicle Agent to version 2024.11.0
+
+## 0.8.7
+
+- Bump Workbench version to 2024.09.1
+
+## 0.8.6
+
+- Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
+
+## 0.8.5
+
+- Add helm unit test scaffold.
+
+## 0.8.4
+
+- Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
+
+## 0.8.3
+
+- Bump version of launcher templates `job.tpl` and `service.tpl`
+    - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
+      To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`
+    - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+
+## 0.8.2
+
+- Bump Workbench version to 2024.09.0
+
+## 0.8.1
+
+- Bump Chronicle Agent to version 2024.09.0
+
+## 0.8.0
+
+- BREAKING: the prometheus endpoint has changed from port `9108` to `8989` by default
+  - We are now using an internal prometheus endpoint with new metrics
+  - As a result, the `graphiteExporter` sidecar has been removed
+  - Some metrics from the `graphiteExporter` will no longer be present
+  - The parent / main "off-switch" for prometheus is at `prometheus.enabled`
+  - To revert to the old exporter, set `prometheus.legacy=true` (and please reach out to let us know why!)
+
+## 0.7.6
+
+- Bump Workbench version to 2024.04.2
+
+## 0.7.5
+
+- Add documentation about PostgreSQL database configuration and mounting passwords from secrets as env variables
+
+## 0.7.4
+
+- Documentation site updates
+
 ## 0.7.3
 
 - Bump Workbench version to 2024.04.0

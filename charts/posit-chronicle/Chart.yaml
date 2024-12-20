@@ -1,8 +1,8 @@
 apiVersion: v2
 name: posit-chronicle
 description: Official Helm chart for Posit Chronicle Server
-version: 0.3.0
-appVersion: 2024.03.0
+version: 0.3.6
+appVersion: 2024.11.0
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.posit.co
 sources:

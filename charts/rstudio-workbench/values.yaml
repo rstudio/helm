@@ -321,8 +321,17 @@ pod:
   # -- The termination grace period seconds allowed for the pod before shutdown
   terminationGracePeriodSeconds: 120
 
+prometheus:
+  # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
+  enabled: true
+  # -- The port that prometheus will listen on. If legacy=true, then this will be hard-coded to 9108
+  port: 8989
+  # -- Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. If you change this to
+  # `true`, please let us know why! Requires prometheusExporter.enabled=true too
+  legacy: false
+
 prometheusExporter:
-  # -- whether the  prometheus exporter sidecar should be enabled
+  # -- DEPRECATED. Whether the prometheus exporter sidecar should be enabled. See prometheus.enabled instead.
   enabled: true
   # -- Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
   mappingYaml: null
@@ -435,10 +444,6 @@ config:
       launcher-port: 5559
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
-      monitor-graphite-enabled: 1
-      monitor-graphite-host: 127.0.0.1
-      monitor-graphite-port: 9109
-      monitor-graphite-client-id: rstudio
     launcher.conf:
       server:
         address: 127.0.0.1
@@ -458,14 +463,28 @@ config:
       default-session-cluster: Kubernetes
     vscode.conf:
       enabled: 1
-      exe: /opt/code-server/bin/code-server
-      args: --host=0.0.0.0
+      session-timeout-kill-hours: 12
+    vscode.extensions.conf: |
+      quarto.quarto
+      posit.shiny
+      posit.publisher
     vscode-user-settings.json: |
       {
             "terminal.integrated.shell.linux": "/bin/bash",
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
       }
+    #  positron.conf:
+    #    enabled: 1
+    #  positron.extensions.conf: |
+    #    posit.shiny
+    #    posit.publisher
+    #  positron-user-settings.json: |
+    #    {
+    #          "terminal.integrated.shell.linux": "/bin/bash",
+    #          "extensions.autoUpdate": false,
+    #          "extensions.autoCheckUpdates": false
+    #    }
     logging.conf:
       "*":
         log-level: info

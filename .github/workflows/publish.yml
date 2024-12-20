@@ -1,0 +1,58 @@
+name: Quarto Publish to docs.posit.co
+
+on:
+  workflow_dispatch:
+  push:
+    branches: main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: install Just
+        uses: extractions/setup-just@v2
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: pre-release
+          
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
+      
+      - run: just push-docs
+
+      - name: Notify Slack of publishing chart documentation failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload-delimiter: "_"
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Publishing Chart Documentation failed, please check the logs.  ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

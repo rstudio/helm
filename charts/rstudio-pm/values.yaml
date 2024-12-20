@@ -125,7 +125,9 @@ pod:
   # -- Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
   lifecycle: {}
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod
-  securityContext: {}
+  securityContext:
+    fsGroup: 999
+    fsGroupChangePolicy: "OnRootMismatch"
   # -- the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template.
   containerSecurityContext:
     runAsUser: 999
@@ -168,7 +170,7 @@ livenessProbe:
 startupProbe:
   enabled: false
   httpGet:
-    path: /__ping__
+    path: /__api__/status
     port: 4242
   initialDelaySeconds: 10
   periodSeconds: 10

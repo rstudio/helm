@@ -1,71 +1,76 @@
 # Posit Package Manager
 
-![Version: 0.5.25](https://img.shields.io/badge/Version-0.5.25-informational?style=flat-square) ![AppVersion: 2024.04.0](https://img.shields.io/badge/AppVersion-2024.04.0-informational?style=flat-square)
+![Version: 0.5.43](https://img.shields.io/badge/Version-0.5.43-informational?style=flat-square) ![AppVersion: 2024.11.0](https://img.shields.io/badge/AppVersion-2024.11.0-informational?style=flat-square)
 
-#### _Official Helm chart for RStudio Package Manager_
+#### _Official Helm chart for Posit Package Manager_
 
 IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
 
-## For Production
+## For production
 
-To ensure a stable production deployment, please:
+To ensure a stable production deployment:
 
-* Ensure you "pin" the version of the Helm chart that you are using. You can do
-  this using the `helm dependency` command and the associated "Chart.lock" files
-  or the `--version` flag. **IMPORTANT: This protects you from breaking changes**
-* Before upgrading, to avoid breaking changes, use `helm diff upgrade` to check
-  for breaking changes
-* Pay close attention to [`NEWS.md`](./NEWS.md) for updates on breaking
-  changes, as well as documentation below on how to use the chart
+* "Pin" the version of the Helm chart that you are using. You can do this using the:
+  * `helm dependency` command *and* the associated "Chart.lock" files *or*
+  * the `--version` flag.
+ 
+    ::: {.callout-important}
+    This protects you from breaking changes.
+    :::
 
-## Installing the Chart
+* Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.
+* Read [`NEWS.md`](./NEWS.md) for updates on breaking changes and the documentation below on how to use the chart.
 
-To install the chart with the release name `my-release` at version 0.5.25:
+## Installing the chart
 
-```bash
+To install the chart with the release name `my-release` at version 0.5.43:
+
+```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.25
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.43
 ```
 
-To explore other chart versions, take a look at:
-```
+To explore other chart versions, look at:
+
+```{.bash}
 helm search repo rstudio/rstudio-pm -l
 ```
 
-## Upgrade Guidance
+## Upgrade guidance
 
 ### 0.4.0
 
 - When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as
-  the `rstudio-pm` user (with `uid:gid` `999:999`). A `chown` of persistent storage may be required. We will try to
-  fix this up automatically. Set `enableMigrations=false` to disable the automatic fixup / hook.
+  the `rstudio-pm` user (with `uid:gid` `999:999`).
+- A `chown` of persistent storage may be required. The team is working to implement an automatic fix. To disable the automatic fix/hook, set `enableMigrations=false`.
 
-## Required Configuration
+## Required configuration
 
 This chart requires the following in order to function:
 
-* A license file, license key, or address of a running license server. See the [Licensing](#licensing) section below for more details.
-* A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for RSPM.
-  * If `sharedStorage.create` is set, a PVC that relies on the default storage class will be created to generate the PersistentVolume.
+* A license file. See the [Licensing](#licensing) section below for more details.
+* A Kubernetes [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) that contains the data directory for Package Manager.
+  * If `sharedStorage.create` is set, it creates a Persistent Volume Claim (PVC) that relies on the default storage class to generate the
+    PersistentVolume.
     Most Kubernetes environments do not have a default storage class that you can use with `ReadWriteMany` access mode out-of-the-box.
     In this case, we recommend you disable `sharedStorage.create` and create your own `PersistentVolume` and `PersistentVolumeClaim`, then
     mount them into the container by specifying the `pod.volumes` and `pod.volumeMounts` parameters, or by specifying your `PersistentVolumeClaim` using `sharedStorage.name` and `sharedStorage.mount`.
-  * If you cannot use a `PersistentVolume` to properly mount your data directory, you'll need to mount your data in the container
+  * If you cannot use a `PersistentVolume` to properly mount your data directory, mount your data in the container
     by using a regular [Kubernetes Volume](https://kubernetes.io/docs/concepts/storage/volumes), specified in `pod.volumes` and `pod.volumeMounts`.
   * Alternatively, S3 storage can be used. See the [S3 Configuration](#s3-configuration) section for details.
 
 ## Licensing
 
-This chart supports activating the product using a license file, license key, or license server. In the case of a license file or key, we recommend against placing it in your values file directly.
-
-### License File
+This chart supports activating the product using a *license file*.
 
 We recommend storing a license file as a `Secret` and setting the `license.file.secret` and `license.file.secretKey` values accordingly.
 
 First, create the secret declaratively with YAML or imperatively using the following command:
 
-`kubectl create secret generic rstudio-pm-license --from-file=licenses/rstudio-pm.lic`
+```{.bash}
+kubectl create secret generic rstudio-pm-license --from-file=licenses/rstudio-pm.lic
+```
 
 Second, specify the following values:
 
@@ -78,20 +83,62 @@ license:
 
 Alternatively, license files can be set during `helm install` with the following argument:
 
-`--set-file license.file.contents=licenses/rstudio-pm.lic`
+```{.bash}
+--set-file license.file.contents=licenses/rstudio-pm.lic
+```
 
-### License Key
+## Database
 
-Set a license key directly in your values file (`license.key`) or during `helm install` with the argument `--set license.key=XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX`.
+Package Manager requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/rspm/admin/database/#database-postgres) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
 
-### License Server
+### Database configuration
 
-Set a license server directly in your values file (`license.server`) or during `helm install` with the argument `--set license.server=<LICENSE_SERVER_HOST_ADDRESS>`.
+Add the following to your `values.yaml`, replacing the `URL` with your database details.
 
-## S3 Configuration
+```yaml
+config:
+  Database:
+    Provider: "postgres"
+  Postgres:
+    URL: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>"
+```
+
+### Database password
+
+First, create a `Secret` declaratively with YAML or imperatively using the following command (replacing with your actual password):
+
+```bash
+kubectl create secret generic rstudio-pm-database --from-literal=password=YOURPASSWORDHERE
+```
+
+Second, specify the following in your `values.yaml`:
+
+```yaml
+pod:
+  env:
+    - name: PACKAGEMANAGER_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-pm-database
+          key: password
+
+    # Temporarily work around bug in Package Manager 2024.08.2 where Postgres.UsageDataPassword
+    # does not default to Postgres.Password. This will be fixed in the next release of Package Manager.
+    - name: PACKAGEMANAGER_POSTGRES_USAGEDATAPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rstudio-pm-database
+          key: password
+```
+
+Alternatively, database passwords may be set during `helm install` with the following argument:
+
+`--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
+
+## S3 configuration
 
 Package Manager [can be configured to store its data in S3
-buckets](https://docs.rstudio.com/rspm/admin/files-directories/#data-destinations),
+buckets](https://docs.posit.co/rspm/admin/file-storage/file-storage/#data-destinations),
 which eliminates the need to provision shared storage for multiple replicas. A
 `values.yaml` file using S3 might contain something like the following:
 
@@ -129,17 +176,17 @@ awsSecretAccessKey: your-secret-access-key
 Bear in mind that static, long-lived credentials are the least secure option and
 should be avoided if at all possible.
 
-## General Principles
+## General principles
 
-- In most places, we opt to pass helm values over configmaps. We translate these into the valid `.gcfg` file format
+- In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
 required by rstudio-pm.
 
-## Configuration File
+## Configuration file
 
-The configuration values all take the form of usual helm values
+The configuration values all take the form of usual Helm values
 so you can set the database password with something like:
 
-```
+```{.bash}
 ... --set config.Postgres.Password=mypassword ...
 ```
 
@@ -174,7 +221,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |
 | license.file.mountPath | string | `"/etc/rstudio-licensing"` | mountPath is the place the license file will be mounted into the container |
-| license.file.mountSubPath | bool | `false` | mountSubPath is whether to mount the subPath for the file secret. -- It can be preferable _not_ to enable this, because then updates propagate automatically |
+| license.file.mountSubPath | bool | `false` | It can be preferable _not_ to enable this, because then updates propagate automatically |
 | license.file.secret | bool | `false` | secret is an existing secret with a license file in it |
 | license.file.secretKey | string | `"license.lic"` | secretKey is the key for the secret to use for the license file |
 | license.key | string | `nil` | key is the license to use |
@@ -187,7 +234,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
-| pod.securityContext | object | `{}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
+| pod.securityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch"}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
 | pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
@@ -207,7 +254,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, if any |
 | serviceAccount.create | bool | `true` | Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) |
-| serviceAccount.labels | object | `{}` |  |
+| serviceAccount.labels | object | `{}` | Labels for the ServiceAccount, if any |
 | serviceAccount.name | string | When `serviceAccount.create` is `true` this defaults to the full name of the release | ServiceAccount to use, if any, or an explicit name for the one we create |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
@@ -222,7 +269,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
 | sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
-| startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
+| startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__api__/status","port":4242},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
 | strategy | object | `{"rollingUpdate":{"maxSurge":"100%","maxUnavailable":0},"type":"RollingUpdate"}` | The update strategy used by the main service pod. |
 | tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
@@ -230,5 +277,5 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | versionOverride | string | `""` | A Package Manager version to override the "tag" for the RStudio Package Manager image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.5.0](https://github.com/norwoodj/helm-docs/releases/v1.5.0)
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
 

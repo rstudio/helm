@@ -17,7 +17,7 @@ spec:
 {{- end }}
 {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
-{{- end }}  
+{{- end }}
   selector:
     {{- include "rstudio-connect.selectorLabels" . | nindent 4 }}
   ports:
@@ -28,8 +28,13 @@ spec:
     nodePort: {{ .Values.service.nodePort }}
 {{- end }}
     targetPort: {{ .Values.service.targetPort }}
-  {{- if .Values.prometheusExporter.enabled }}
+  {{- if .Values.prometheus.enabled }}
   - name: metrics
+    targetPort: metrics
+    {{- if .Values.prometheus.legacy }}
     port: 9108
+    {{- else }}
+    port: {{ .Values.prometheus.port }}
+    {{- end }}
   {{- end }}
 ---

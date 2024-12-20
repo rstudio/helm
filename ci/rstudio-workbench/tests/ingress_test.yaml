@@ -1,0 +1,58 @@
+suite: Workbench Ingress
+templates:
+  - ingress.yaml
+tests:
+  - it: should include the tls path if tls has values specified and ingress is enabled
+    template: ingress.yaml
+    set:
+      ingress:
+        enabled: true
+        tls:
+          - hosts:
+              - "example.com"
+            secretName: "example-tls"
+    asserts:
+      - exists:
+          path: "spec.tls"
+      - equal:
+          path: "spec.tls[0].hosts[0]"
+          value: "example.com"
+  - it: should not include the tls path if tls has no values specified and ingress is enabled
+    template: ingress.yaml
+    set:
+      ingress:
+        enabled: true
+        tls: []
+    asserts:
+      - notExists:
+          path: "spec.tls"
+  - it: should include the tls path if tls has values specified and ingress is enabled
+    template: ingress.yaml
+    set:
+      ingress:
+        enabled: true
+        tls:
+          - secretName: chart-example-tls
+            hosts:
+              - chart-example.local
+    asserts:
+      - exists:
+          path: "spec.tls"
+  - it: should include the ingressClassName if defined and ingress is enabled
+    template: ingress.yaml
+    set:
+      ingress:
+        enabled: true
+        ingressClassName: "alb"
+    asserts:
+      - equal:
+          path: "spec.ingressClassName"
+          value: "alb"
+  - it: should not include the ingressClassName if it is not defined and ingress is enabled
+    template: ingress.yaml
+    set:
+      ingress:
+        enabled: true
+    asserts:
+      - notExists:
+          path: "spec.ingressClassName"

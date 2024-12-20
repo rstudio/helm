@@ -1,0 +1,8 @@
+license:
+  file:
+    secret: pwb-license
+    secretKey: pwb.lic
+
+userCreate: true
+userName: jforest-test
+userPassword: djhkjhij870jjbJye

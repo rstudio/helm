@@ -1,5 +1,5 @@
 ---
-category: "Container Images"
+category: "Container images"
 ---
 
 # Configuring Posit Workbench with Custom Container Images

@@ -1,6 +1,6 @@
 image:
   repository: "ghcr.io/rstudio/chronicle"
-  tag: "2024.03.0"
+  tag: "2024.11.0"
   imagePullPolicy: "IfNotPresent"
 
 serviceaccount:
@@ -70,9 +70,8 @@ config:
     ServiceLogLevel: "INFO"
     ServiceLogFormat: "TEXT"
   LocalStorage:
-    # By default when localStorage.enabled=false, the chronicle stateful-set
-    # won't submit a volume claim or be bound to a persistent volume
-    Enabled: false
+    # By default LocalStorage.Enabled=true, so that installs work with the default values
+    Enabled: true
     Location: "./chronicle-data"
     RetentionPeriod: "30d"
   S3Storage:

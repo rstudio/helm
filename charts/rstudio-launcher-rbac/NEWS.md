@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.24
+
+- Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
+
+## 0.2.23
+
+- Add helm unit test scaffold.
+
+## 0.2.22
+
+- Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
+
+## 0.2.21
+
+- Documentation site updates
+
 ## 0.2.20
 
 - Updates to support standalone documentation site

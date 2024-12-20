@@ -12,7 +12,7 @@ Before using an example, read through all the comments and ensure you address ea
 
 While each example focuses on one or more particular configurations, RStudio Workbench has some standard requirements listed in each example. 
 
-Each example will need the following to run correctly:
+Each example needs the following to run correctly:
 
 - PostgreSQL database specified in the Workbench configuration
 - License key or file specified

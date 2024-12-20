@@ -127,6 +127,8 @@ pod:
   port: 3939
   # -- The termination grace period seconds allowed for the pod before shutdown
   terminationGracePeriodSeconds: 120
+  # -- Array of hostnames to supply to the main pod
+  hostAliases: []
 
 # -- The pod's run command. By default, it uses the container's default
 command: []
@@ -159,8 +161,17 @@ license:
 securityContext:
   privileged: true
 
+prometheus:
+  # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
+  enabled: true
+  # -- The port that prometheus will listen on. If legacy=true, then this will be hard-coded to 9108
+  port: 3232
+  # -- Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. If you change this to
+  # `true`, please let us know why! Requires prometheusExporter.enabled=true too
+  legacy: false
+
 prometheusExporter:
-  # -- Whether the  prometheus exporter sidecar should be enabled
+  # -- DEPRECATED. Whether the  prometheus exporter sidecar should be enabled. See prometheus.enabled instead.
   enabled: true
   # -- Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
   mappingYaml: null
@@ -298,6 +309,7 @@ launcher:
       tolerations: []
       affinity: {}
       nodeSelector: {}
+      hostAliases: []
       priorityClassName: ""
       # -- command for all pods. This is really not something we should expose and will be removed once we have a better option
       command: []
@@ -316,6 +328,14 @@ launcher:
     tag: ""
     # -- The imagePullPolicy for the default initContainer
     imagePullPolicy: ""
+  # -- Optional resources for the default initContainer
+    resources: {}
+      # requests:
+      #   cpu: "128m"
+      #   memory: "128Mi"
+      # limits:
+      #   cpu: "512m"
+      #   memory: "512Mi"
     # -- The securityContext for the default initContainer
     securityContext: {}
 
@@ -339,14 +359,20 @@ config:
     # For Off-Host Execution, Python versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/python/
     Executable:
-      - /opt/python/3.9.17/bin/python
-      - /opt/python/3.8.17/bin/python
+      - /opt/python/3.12.1/bin/python
+      - /opt/python/3.11.7/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.
     # For Off-Host Execution, Quarto versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/quarto/
-    Executable: "/opt/quarto/1.4.552/bin/quarto"
+    Executable: "/opt/quarto/1.4.557/bin/quarto"
+  TensorFlow:
+    Enabled: true
+    # Note: The `Executable` listed below is only used for Local Execution.
+    # For Off-Host Execution, TensorFlow versions are defined by the set of Execution Environments
+    # https://docs.posit.co/connect/admin/tensorflow/
+    Executable: "/usr/bin/tensorflow_model_server"
   Scheduler:
     InitTimeout: 5m
   Logging:
@@ -357,7 +383,3 @@ config:
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Metrics:
     Enabled: true
-    GraphiteEnabled: true
-    GraphiteHost: 127.0.0.1
-    GraphitePort: 9109
-    GraphiteClientId: rsconnect

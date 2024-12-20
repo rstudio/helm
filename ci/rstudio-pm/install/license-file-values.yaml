@@ -1,0 +1,4 @@
+license:
+  file:
+    secret: ppm-license
+    secretKey: ppm.lic

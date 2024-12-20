@@ -1,5 +1,76 @@
 # Changelog
 
+## 0.5.43
+
+- Update default Posit Package Manager version to 2024.11.0-7
+
+## 0.5.41
+
+- Update the default `pod.startupProbe` to use the `/__api__/status` route instead of `/__ping__` for a more reliable startup.
+
+## 0.5.40
+
+- Add helm unit test scaffold.
+
+## 0.5.39
+
+- Add the `fsGroupChangePolicy: "OnRootMismatch"` default option to the pod's `securityContext`. This will only ensure
+  permissions and ownership change only if the permission and the ownership of root directory does not match with
+  expected permissions of the volume.
+
+## 0.5.38
+
+- Move the values files for linting and installation testing outside the chart directory so that we can iterate on them without releasing a new version of the chart
+
+## 0.5.37
+
+- Update documentation with lowercase `Database.Provider = "postgres"`.
+
+## 0.5.36
+
+- Update the PostgreSQL configuration documentation to temporarily work around bug with `Postgres.UsageDataPassword` in Package Manager 2024.08.2.
+
+## 0.5.35
+
+- Move `pod.containerSecurityContext.fsGroup = 999` to `pod.securityContext.fsGroup` to resolve
+  the helm warning `unknown field "spec.template.spec.containers[0].securityContext.fsGroup"`.
+
+## 0.5.34
+
+- Add `pod.containerSecurityContext.fsGroup = 999` value to set file permissions correctly when using shared storage.
+
+## 0.5.33
+
+- Update default Post Package Manager version to 2024.08.2-9
+
+## 0.5.32
+
+- Bump Chronicle Agent to version 2024.09.0
+
+## 0.5.31
+
+- Add documentation about PostgreSQL database configuration and mounting passwords from secrets as an env variable
+
+## 0.5.30
+
+- Update default Posit Package Manager version to 2024.08.0-6
+
+## 0.5.29
+
+- Update default Posit Package Manager version to 2024.04.4-35
+
+## 0.5.28
+
+- Update default Posit Package Manager version to 2024.04.2-29
+
+## 0.5.27
+
+- Update `strategy` section of `deployment.yaml` template to be consistent with other Posit products. `RollingUpdate` is still the default strategy.
+
+## 0.5.26
+
+- Documentation site updates
+
 ## 0.5.25
 
 - Update default Posit Package Manager version to 2024.04.0-20

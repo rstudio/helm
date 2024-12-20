@@ -1,6 +1,6 @@
-# Version: 2.3.1
+# Version: 2.5.0
 # DO NOT MODIFY the "Version: " key
-# Helm Version: v4
+# Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
 apiVersion: batch/v1
 kind: Job
@@ -18,6 +18,9 @@ metadata:
     {{- end }}
   labels:
     app.kubernetes.io/managed-by: "launcher"
+    {{- with .Job.instanceId }}
+    launcher-instance-id: {{ toYaml . }}
+    {{- end }}
     {{- with .Job.metadata.job.labels }}
     {{- range $key, $val := . }}
     {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
@@ -62,6 +65,9 @@ spec:
         {{- end }}
         {{- end }}
       labels:
+        {{- with .Job.instanceId }}
+        launcher-instance-id: {{ toYaml . }}
+        {{- end }}
         {{- with .Job.metadata.pod.labels }}
         {{- range $key, $val := . }}
         {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
@@ -77,6 +83,7 @@ spec:
       {{- if .Job.host }}
       nodeName: {{ toYaml .Job.host }}
       {{- end }}
+      enableServiceLinks: {{ if hasKey $templateData.pod "enableServiceLinks" }}{{ $templateData.pod.enableServiceLinks }}{{ else }}false{{ end }}
       restartPolicy: Never
       {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
       serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
@@ -99,7 +106,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or (ne (len .Job.placementConstraints) 0) (ne (len $templateData.pod.nodeSelector) 0) }}
+      {{- if or (ne (len .Job.placementConstraints) 0) (and $templateData.pod.nodeSelector (ne (len $templateData.pod.nodeSelector) 0)) }}
       nodeSelector:
         {{- range .Job.placementConstraints }}
         {{ .name }}: {{ toYaml .value }}
@@ -137,6 +144,48 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 12 }}
       {{- end }}
       initContainers:
+        {{- with .Job.initContainers }}
+        {{- range . }}
+        - name: {{ toYaml .name }}
+          image: {{ toYaml .image }}
+          {{- $isShell := false }}
+          {{- if .command }}
+          command: ['/bin/sh']
+          {{- $isShell = true }}
+          {{- else if .exe }}
+          command: [{{ toYaml .exe }}]
+          {{- $isShell = false }}
+          {{- end }}
+          {{- if or .args $isShell }}
+          args:
+            {{- if $isShell }}
+            - '-c'
+            {{- if .args }}
+            - {{ .args | join " " | cat .command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+            {{- else }}
+            - {{ .command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+            {{- end }}
+            {{- else }}
+            {{- range .args }}
+            - {{ toYaml . | indent 12 | trimPrefix (repeat 12 " ") }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .environment }}
+          env:
+            {{- range .environment }}
+            - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
+              value: {{ toYaml .value | indent 14 | trimPrefix (repeat 14 " ") }}
+            {{- end }}
+          {{- end }}
+          {{- if .mounts }}
+          volumeMounts:
+            {{- range .mounts }}
+            - {{ nindent 14 (toYaml .) | trim -}}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
         {{- with .Job.metadata.pod.initContainers }}
         {{- range . }}
         - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}

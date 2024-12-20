@@ -1,6 +1,6 @@
 name: prepull-daemonset
 description: a daemonset to prepull images so they are cached
-version: 0.0.3
+version: 0.0.4
 apiVersion: v2
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
