@@ -301,6 +301,17 @@ launcher:
       env: []
       imagePullPolicy: ""
       imagePullSecrets: []
+      # -- sets the default resource requests and limits for Jobs launched by Connect
+      # -- to be used when none are provided in the content runtime settings
+      resources:
+        requests: {}
+        #   memory: "1Gi"
+        #   cpu: "500m"
+        #   ephemeral-storage: "100Mi"
+        limits: {}
+        #   memory: "1Gi"
+        #   cpu: "500m"
+        #   ephemeral-storage: "100Mi"
       initContainers: []
       extraContainers: []
       containerSecurityContext: {}
