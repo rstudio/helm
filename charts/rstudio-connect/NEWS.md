@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.19
+
+- Allow overriding the default content Job resource requests/limits settings via the values file
+  using the `launcher.templateValues.pod.resources` key. Note that these settings are applied
+  globally for _all_ jobs including environment restores, document renders, and interactive
+  applications.
+
 ## 0.7.18
 
 - Bumps Connect version to 2024.12.0
