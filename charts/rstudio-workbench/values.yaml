@@ -418,7 +418,7 @@ config:
     pam: 0644
 
   annotations:
-    # annotations for ConfigMap created for sessions
+    # -- annotations for ConfigMap created for sessions
     session: {}
 
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
