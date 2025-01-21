@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.20
+
+- `prestart.bash` startup scripts now support RHEL
+
 ## 0.7.19
 
 - Allow overriding the default content Job resource requests/limits settings via the values file
