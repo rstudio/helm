@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.21
+
+- Bump Connect version to 2025.01.0
+
 ## 0.7.20
 
 - `prestart.bash` startup scripts now support RHEL
