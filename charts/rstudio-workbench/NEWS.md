@@ -1,11 +1,15 @@
 # Changelog
 
+## 0.8.11
+
+- Bump Workbench version to 2024.12.1
+
 ## 0.8.10
 
 - Bump Workbench version to 2024.12.0
 - Bump version of launcher templates `job.tpl` and `service.tpl`
   - Populate pod `initContainers` from `.Job.initContainers`
- 
+
 ## 0.8.9
 
 - Fix a logic bug where the resource limit key was set even if `resources.limits.enabled` is false
