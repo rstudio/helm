@@ -452,6 +452,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| config.annotations.session | object | `{}` | annotations for ConfigMap created for sessions |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
 | config.defaultMode.pam | int | 0644 | default mode for pam scripts |
 | config.defaultMode.prestart | int | 0755 | default mode for prestart config |
