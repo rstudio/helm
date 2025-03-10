@@ -1,4 +1,4 @@
-# RStudio Helm charts
+# Posit Helm charts
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/rstudio)](https://artifacthub.io/packages/search?repo=rstudio)
 [![GitHub license](https://img.shields.io/github/license/rstudio/helm.svg)](https://github.com/rstudio/helm/blob/main/LICENSE)
@@ -55,7 +55,7 @@ Bugs or feature requests should be opened in an [issue](https://github.com/rstud
 
 ## Contributing
 
-RStudio values your contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+Posit values your contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
 
 ## License
 
