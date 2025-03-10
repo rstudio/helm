@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.3.6](https://img.shields.io/badge/Version-0.3.6-informational?style=flat-square) ![AppVersion: 2024.11.0](https://img.shields.io/badge/AppVersion-2024.11.0-informational?style=flat-square)
+![Version: 0.3.7](https://img.shields.io/badge/Version-0.3.7-informational?style=flat-square) ![AppVersion: 2024.11.0](https://img.shields.io/badge/AppVersion-2025.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -15,7 +15,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
@@ -25,11 +25,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.3.6:
+To install the chart with the release name `my-release` at version 0.3.7:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.6
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.7
 ```
 
 To explore other chart versions, look at:
@@ -45,25 +45,13 @@ with the Workbench and Connect charts. To actually send data to the server, you
 will need to run the Chronicle agent as a sidecar container on your
 Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files
 
-Here is an example of Helm values to run the agent sidecar in **Workbench**,
-where we set up a shared volume between containers for audit logs:
+Here is an example of Helm values to run the agent sidecar in **Workbench**:
 
 ```yaml
 pod:
-  # We will need to create a new volume to share audit logs between
-  # the rstudio (workbench) and chronicle-agent containers
-  volumes:
-    - name: logs
-      emptyDir: {}
-  volumeMounts:
-    - name: logs
-      mountPath: "/var/lib/rstudio-server/audit"
   sidecar:
     - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2024.11.0
-      volumeMounts:
-      - name: logs
-        mountPath: "/var/lib/rstudio-server/audit"
+      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
       env:
       - name: CHRONICLE_SERVER_ADDRESS
         value: "http://chronicle-server.default"
@@ -179,7 +167,7 @@ The credentials Chronicle uses for S3 storage must have the following permission
 | config.S3Storage.Region | string | `"us-east-2"` |  |
 | image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
-| image.tag | string | `"2024.11.0"` |  |
+| image.tag | string | `"2025.03.0"` |  |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
