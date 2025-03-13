@@ -30,7 +30,7 @@ pod:
       mountPath: "/var/lib/rstudio-server/audit"
   sidecar:
     - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2024.11.0
+      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
       volumeMounts:
       - name: logs
         mountPath: "/var/lib/rstudio-server/audit"
@@ -46,7 +46,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 pod:
   sidecar:
     - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2024.11.0
+      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
       env:
       - name: CHRONICLE_SERVER_ADDRESS
         value: "http://chronicle-server.default"
