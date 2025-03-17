@@ -2,7 +2,7 @@
 
 ## 0.5.44
 
-- Set `enableMigration: false` to disable the migration job by default because it is not needed for new installations and is only needed if you update from a Package Manager version that is 3+ years old. If you are upgrading from a Package Manager version that does run as root, you can enable the migration job by setting `enableMigration: true`.
+- Set `enableMigration: false` to by default disable the migration job because it is not needed for new installations and is only needed if you update from a Package Manager version that is 3+ years old. If you are upgrading from a Package Manager version that does run as root, you can enable the migration job by setting `enableMigration: true`.
 
 ## 0.5.43
 
