@@ -104,7 +104,7 @@ args: false
 enableSandboxing: true
 
 # -- Enable migrations for shared storage (if necessary) using Helm hooks.
-enableMigration: true
+enableMigration: false
 
 # -- Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new helm chart version.
 rootCheckIsFatal: true

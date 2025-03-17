@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.44
+
+- Disable the migration job of root to non-root by default. This is because the migration job is not needed for new installations and is only needed if you run a version of Package Manager several years old. If you are upgrading from Package Manager version that does run as root, you can enable the migration job by setting `enableMigration: true`.
+
 ## 0.5.43
 
 - Update default Posit Package Manager version to 2024.11.0-7
