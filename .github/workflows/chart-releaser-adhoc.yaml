@@ -1,0 +1,47 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+name: Release Charts (adhoc)
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  release:
+    # from https://docs.github.com/en/graphql/reference/enums#commentauthorassociation
+    if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/release-adhoc') }}
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: r-lib/actions/pr-fetch@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.6.3
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.2.0
+        with:
+          charts_repo_url: https://helm.rstudio.com
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Run chart-releaser (other)
+        uses: helm/chart-releaser-action@v1.2.0
+        with:
+          charts_dir: other-charts
+          charts_repo_url: https://helm.rstudio.com
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
