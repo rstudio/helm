@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.44](https://img.shields.io/badge/Version-0.5.44-informational?style=flat-square) ![AppVersion: 2024.11.0](https://img.shields.io/badge/AppVersion-2024.11.0-informational?style=flat-square)
+![Version: 0.5.45](https://img.shields.io/badge/Version-0.5.45-informational?style=flat-square) ![AppVersion: 2024.11.0](https://img.shields.io/badge/AppVersion-2024.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.44:
+To install the chart with the release name `my-release` at version 0.5.45:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.44
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.45
 ```
 
 To explore other chart versions, look at:
@@ -251,6 +251,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
 | service.nodePort | bool | `false` | The explicit nodePort to use for `service.type` NodePort. If not provided, Kubernetes will choose one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
+| service.targetPort | int | `4242` | The port to forward to on the Package Manager pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, if any |
 | serviceAccount.create | bool | `true` | Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) |

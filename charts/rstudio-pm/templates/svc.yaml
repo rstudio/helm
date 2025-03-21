@@ -27,7 +27,7 @@ spec:
 {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
 {{- end }}
-    targetPort: 4242
+    targetPort: {{ .Values.service.targetPort }}
 {{- if .Values.config.Metrics.Enabled }}
   - name: metrics
     port: 2112

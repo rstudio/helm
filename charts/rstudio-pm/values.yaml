@@ -85,6 +85,8 @@ service:
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80
+  # -- The port to forward to on the Package Manager pod. Also see pod.port
+  targetPort: 4242
 
 # -- replicas is the number of replica pods to maintain for this service
 replicas: 1
