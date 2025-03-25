@@ -140,7 +140,9 @@ pod:
     seccompProfile:
       type: "{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"
   # -- The termination grace period seconds allowed for the pod before shutdown
+  port: 4242
   terminationGracePeriodSeconds: 120
+  hostAliases: []
 
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
