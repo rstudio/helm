@@ -1,8 +1,8 @@
 # Changelog
-
+ 
 ## 0.5.45
 
-- Allow values for `service.targetPort`, `pod.port`, and `pod.hostAliases`
+- Allow values for `service.targetPort`, `pod.port`, and `pod.hostAliases`.
 
 ## 0.5.44
 
