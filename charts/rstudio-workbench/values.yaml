@@ -101,6 +101,7 @@ launcher:
       tolerations: []
       affinity: {}
       nodeSelector: {}
+      hostAliases: []
       # -- command for all pods. This is really not something we should expose and will be removed once we have a better option
       command: []
     job:
@@ -188,6 +189,9 @@ service:
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80
+  # -- The port to forward to on the Workbench pod. Also see pod.port
+  targetPort: 8787
+
 
 # -- resources define requests and limits for the rstudio-server pod
 resources:
@@ -320,6 +324,9 @@ pod:
   lifecycle: {}
   # -- The termination grace period seconds allowed for the pod before shutdown
   terminationGracePeriodSeconds: 120
+  # -- Array of hostnames to supply to the main pod
+  hostAliases: []
+
 
 prometheus:
   # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
