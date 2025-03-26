@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.24
+
+- Bump Connect version to 2025.03.0
+
 ## 0.7.23
 
 - Bump Chronicle Agent to version 2025.03.0
