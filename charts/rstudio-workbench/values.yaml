@@ -52,6 +52,8 @@ sharedStorage:
   # -- Define the annotations for the Persistent Volume Claim resource
   annotations:
     helm.sh/resource-policy: keep
+  # -- an optional subPath for the volume mount
+  subPath: ""
 
 # -- How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but
 # will not work well if your license only allows a single activation.
@@ -251,7 +253,7 @@ license:
   server: false
   # -- the file section is used for licensing with a license file
   file:
-    # -- contents is an in-line license file
+    # -- contents is an in-line license file, generally requiring the use of multi-line yaml notation such as |
     contents: false
     # -- mountPath is the place the license file will be mounted into the container
     mountPath: "/etc/rstudio-licensing"
