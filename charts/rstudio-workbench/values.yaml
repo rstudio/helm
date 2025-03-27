@@ -253,7 +253,7 @@ license:
   server: false
   # -- the file section is used for licensing with a license file
   file:
-    # -- contents is an in-line license file, generally requiring the use of multi-line yaml notation such as |
+    # -- contents is an in-line license file, generally requiring the use of multi-line yaml notation
     contents: false
     # -- mountPath is the place the license file will be mounted into the container
     mountPath: "/etc/rstudio-licensing"
