@@ -1,6 +1,6 @@
 image:
   repository: "ghcr.io/rstudio/chronicle"
-  tag: "2024.11.0"
+  tag: "2025.03.0"
   imagePullPolicy: "IfNotPresent"
 
 serviceaccount:

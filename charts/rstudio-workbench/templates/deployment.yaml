@@ -72,6 +72,10 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.pod.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

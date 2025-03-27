@@ -87,7 +87,7 @@ containers:
   {{- end }}
   imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
   ports:
-  - containerPort: 8787
+  - containerPort: {{ .Values.pod.port }}
     name: http
   {{- if and .Values.prometheus.enabled (not .Values.prometheus.legacy) }}
   - containerPort: {{ .Values.prometheus.port }}

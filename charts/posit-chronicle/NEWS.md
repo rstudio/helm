@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.7
+
+- Bump Chronicle to version 2025.03.0
+
 ## 0.3.6
 
 - Bump Chronicle to version 2024.11.0

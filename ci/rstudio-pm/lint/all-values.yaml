@@ -75,12 +75,3 @@ pod:
   labels:
     onelabel.com: value
 priorityClassName: someval
-
-# Testing with the chronicle-agent sidecar container
-extraContainers:
-  - name: chronicle-agent
-    image: ghcr.io/rstudio/chronicle-agent:2024.11.0
-    imagePullPolicy: Always
-    env:
-    - name: CHRONICLE_SERVER_ADDRESS
-      value: "http://chronicle-server.default"

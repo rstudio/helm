@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.7.24
+
+- Bump Connect version to 2025.03.0
+
+## 0.7.23
+
+- Bump Chronicle Agent to version 2025.03.0
+
+## 0.7.22
+
+- Bump Connect version to 2025.02.0
+
+## 0.7.21
+
+- Bump Connect version to 2025.01.0
+
+## 0.7.20
+
+- `prestart.bash` startup scripts now support RHEL
+
+## 0.7.19
+
+- Allow overriding the default content Job resource requests/limits settings via the values file
+  using the `launcher.templateValues.pod.resources` key. Note that these settings are applied
+  globally for _all_ jobs including environment restores, document renders, and interactive
+  applications.
+
+## 0.7.18
+
+- Bumps Connect version to 2024.12.0
+
 ## 0.7.17
 
 - Bump Chronicle Agent to version 2024.11.0

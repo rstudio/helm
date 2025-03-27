@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.43](https://img.shields.io/badge/Version-0.5.43-informational?style=flat-square) ![AppVersion: 2024.11.0](https://img.shields.io/badge/AppVersion-2024.11.0-informational?style=flat-square)
+![Version: 0.5.45](https://img.shields.io/badge/Version-0.5.45-informational?style=flat-square) ![AppVersion: 2024.11.0](https://img.shields.io/badge/AppVersion-2024.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.43:
+To install the chart with the release name `my-release` at version 0.5.45:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.43
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.45
 ```
 
 To explore other chart versions, look at:
@@ -202,7 +202,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
 | config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
-| enableMigration | bool | `true` | Enable migrations for shared storage (if necessary) using Helm hooks. |
+| enableMigration | bool | `false` | Enable migrations for shared storage (if necessary) using Helm hooks. |
 | enableSandboxing | bool | `true` | Enable sandboxing of Git builds, which requires elevated security privileges for the Package Manager container. |
 | extraContainers | list | `[]` | sidecar container list |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
@@ -232,8 +232,10 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.annotations | object | `{}` | annotations is a map of keys / values that will be added as annotations to the pods |
 | pod.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"{{ if .Values.enableSandboxing }}Unconfined{{ else }}RuntimeDefault{{ end }}"}}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the main Package Manager container. Evaluated as a template. |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
+| pod.hostAliases | list | `[]` |  |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
+| pod.port | int | `4242` |  |
 | pod.securityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch"}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
 | pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
@@ -251,6 +253,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
 | service.nodePort | bool | `false` | The explicit nodePort to use for `service.type` NodePort. If not provided, Kubernetes will choose one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
+| service.targetPort | int | `4242` | The port to forward to on the Package Manager pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, if any |
 | serviceAccount.create | bool | `true` | Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) |
