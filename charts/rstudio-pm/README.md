@@ -235,10 +235,10 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.hostAliases | list | `[]` |  |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-pm pods |
 | pod.lifecycle | object | `{}` | Container [lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
-| pod.port | int | `4242` | The termination grace period seconds allowed for the pod before shutdown |
+| pod.port | int | `4242` |  |
 | pod.securityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch"}` | the [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for the pod |
 | pod.serviceAccountName | string | `""` | Deprecated, use `serviceAccount.name` instead |
-| pod.terminationGracePeriodSeconds | int | `120` |  |
+| pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is an array of maps that is injected as-is into the "volumeMounts" component of the pod spec |
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
