@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.13
+
+- Add `service.targetPort`
+- Add `pod.hostAliases` and `launcher.templateValues.pod.hostAliases`
+- Fix `pod.port`: now mapped correctly in `_helpers.tpl`
+
 ## 0.8.12
 
 - Bump Chronicle Agent to version 2025.03.0
