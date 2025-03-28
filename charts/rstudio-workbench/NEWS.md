@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.14
+
+- Add `sharedStorage.subPath` for parity
+
 ## 0.8.13
 
 - Add `service.targetPort`

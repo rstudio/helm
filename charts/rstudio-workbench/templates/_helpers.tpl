@@ -99,6 +99,9 @@ containers:
     {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
     - name: rstudio-shared-storage
       mountPath: "{{ .Values.sharedStorage.path }}"
+      {{- if .Values.sharedStorage.subPath }}
+      subPath: "{{ .Values.sharedStorage.subPath }}"
+      {{- end }}
     {{- end }}
     {{- if or .Values.homeStorage.create .Values.homeStorage.mount }}
     - name: rstudio-home-storage
