@@ -10336,6 +10336,54 @@ entries:
           url: https://www.rstudio.com/products/team/
     apiVersion: v2
     appVersion: 2024.12.1
+    created: "2025-03-28T13:36:37.852366454Z"
+    dependencies:
+    - name: rstudio-library
+      repository: https://helm.rstudio.com
+      version: 0.1.31
+    description: Official Helm chart for Posit Workbench
+    digest: f0ceb6e37759d0ded78367c2bc51f9846a6cf475e5130bae098bd4c48721d187
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - ide
+    - editor
+    - jupyter
+    - vscode
+    - rstudio
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.8.14/rstudio-workbench-0.8.14.tgz
+    version: 0.8.14
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-workbench
+          image: rstudio/rstudio-workbench:ubuntu2204-2024.12.1
+        - name: r-session-complete
+          image: rstudio/r-session-complete:ubuntu2204-2024.12.1
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Workbench
+          url: https://www.rstudio.com/products/workbench/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 2024.12.1
     created: "2025-03-27T17:25:50.909294639Z"
     dependencies:
     - name: rstudio-library
@@ -15099,4 +15147,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2025-03-27T19:40:37.909747951Z"
+generated: "2025-03-28T13:36:37.85471571Z"
