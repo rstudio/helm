@@ -2,7 +2,7 @@
 
 ## 0.8.14
 
-- Add `sharedStorage.subPath`
+- Add `sharedStorage.subPath` for parity
 
 ## 0.8.13
 
