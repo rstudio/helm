@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.8.14](https://img.shields.io/badge/Version-0.8.14-informational?style=flat-square) ![AppVersion: 2024.12.1](https://img.shields.io/badge/AppVersion-2024.12.1-informational?style=flat-square)
+![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![AppVersion: 2024.12.1](https://img.shields.io/badge/AppVersion-2024.12.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.14:
+To install the chart with the release name `my-release` at version 0.9.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.8.14
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.0
 ```
 
 To explore other chart versions, look at:
@@ -150,12 +150,8 @@ Alternatively, database passwords may be set during `helm install` with the foll
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
   valid `.ini` or `.dcf` file formats required by Workbench.
   - Those configuration files and their mount locations are covered in the [Configuration files](#configuration-files) section below.
-- If you need to modify the jobs launched by Workbench, use `job-json-overrides`.
-  - Review the [Job Json overrides](#job-json-overrides) section on this below. For general information, see [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes).
+- If you need to modify the jobs (sessions) launched by Workbench, use `launcher.templateValues` as described in the [Launcher Templates](#launcher-templates) section below.
 - The prestart scripts for Workbench and Posit Job Launcher are highly customized to get the service account information off of the Workbench pod for use in launching jobs.
-- Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter.
-  - This is described in the
-  [Monitoring Posit Team Using Prometheus and Graphite](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite) support article.
 
 ## Configuration files
 
@@ -239,15 +235,9 @@ the `XDG_CONFIG_DIRS` environment variable.
 
 #### Python repositories
 
-pip can be configured with `config.session.pip.conf`. To ensure `pip.conf` is mounted into the session pods, it is important that:
-
-- `launcher.useTemplates: true` is set
-- `pip.conf` settings are listed under `config.session` as shown in the following example for adding Posit Public Package Manager's PyPI:
+pip can be configured with `config.session.pip.conf`:
 
   ```yaml
-  launcher:
-    useTemplates: true
-
   config:
     session:
       pip.conf:
@@ -398,37 +388,29 @@ some-key: value1,value2,value3,value4
 This appending/concatenation/array translation behavior only works with the helm chart.
 :::
 
-### Job Json overrides
+## Launcher Templates
 
-If you want to customize the job launch process (i.e., how sessions are defined), edit the following configuration:
+If you want to customize the launcher job templates, use the `launcher.templateValues` section of the `values.yaml` file. These values are then used within session templates.
 
-- Modify:
-  ```yaml
-  config.profiles.launcher\.kubernetes\.profiles\.conf.<< some selector >>.job-json-overrides`
-  ```
-- Create an array of maps with the following keys:
-  - `target`: The "target" part of the job spec to replace.
-  - `name`: A unique identifier (ideally with no spaces) becomes a configuration filename on disk.
-  - `json`: A YAML value that is translated directly to JSON and injected into the job spec at `target`.
-
-Explore the docs in the [Helm repository](https://github.com/rstudio/helm/blob/main/docs/customize.md) for additional information.
+For example, if you want to add a container image registry credentials secret to allow session images to authenticate to a container registry, you can do so with the following:
 
 ```yaml
-config:
-  profiles:
-    launcher.kubernetes.profiles.conf:
-      "*":
-        job-json-overrides:
-          - target: "/spec/template/spec/containers/0/imagePullPolicy"
-            json: "Always"
-            name: imagePullPolicy
-          - target: "/spec/template/spec/imagePullSecrets"
-            json:
-              - name: my-pull-secret
-            name: imagePullSecrets
-        container-images:
-          - "one-image:tag"
-          - "two-image:tag
+launcher:
+  templateValues:
+    imagePullSecrets:
+    - name: private-registry-creds
+```
+
+For example, if you want to add a toleration to each session, you can do so with the following:
+
+```yaml
+launcher:
+  templateValues:
+    pod:
+      tolerations:
+        - key: "posit-sessions"
+          operator: "Exists"
+          effect: "NoSchedule"
 ```
 
 ## Sealed secrets
@@ -506,7 +488,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
 | launcher.templateValues | object | `{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
-| launcher.useTemplates | bool | `false` | whether to render and use templates in the job launching process |
+| launcher.useTemplates | bool | `true` | whether to render and use templates in the job launching process |
 | launcherPem | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |

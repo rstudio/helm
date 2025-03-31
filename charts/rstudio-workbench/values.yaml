@@ -73,7 +73,7 @@ launcher:
     enabled: true
     extraCurlArgs: ["-fsSL"]
   # -- whether to render and use templates in the job launching process
-  useTemplates: false
+  useTemplates: true
   # -- extra templates to render in the template directory.
   extraTemplates: {}
   # -- whether to include the default `job.tpl` and `service.tpl` files included with the chart
