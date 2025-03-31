@@ -184,15 +184,9 @@ the `XDG_CONFIG_DIRS` environment variable.
 
 #### Python repositories
 
-pip can be configured with `config.session.pip.conf`. To ensure `pip.conf` is mounted into the session pods, it is important that:
-
-- `launcher.useTemplates: true` is set
-- `pip.conf` settings are listed under `config.session` as shown in the following example for adding Posit Public Package Manager's PyPI:
+pip can be configured with `config.session.pip.conf`:
 
   ```yaml
-  launcher:
-    useTemplates: true
-
   config:
     session:
       pip.conf:
