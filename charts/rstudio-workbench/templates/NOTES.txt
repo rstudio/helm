@@ -43,7 +43,7 @@ Please consider removing this configuration value.
   {{- if hasKey .Values.config.profiles "launcher.kubernetes.profiles.conf" }}
     {{- range $k,$v :=  (get .Values.config.profiles "launcher.kubernetes.profiles.conf") }}
       {{- if hasKey $v "job-json-overrides" }}
-        {{- fail "\n\n`profiles` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`. Note: `launcher.useTemplates=true` was made the default in chart version 0.9.0" }}
+        {{- fail "\n\n`profiles` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`.\n\nNote: `launcher.useTemplates=true` was made the default in chart version 0.9.0" }}
       {{- end }}
     {{- end }}
   {{- end }}
