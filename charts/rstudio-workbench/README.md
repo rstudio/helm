@@ -150,7 +150,7 @@ Alternatively, database passwords may be set during `helm install` with the foll
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
   valid `.ini` or `.dcf` file formats required by Workbench.
   - Those configuration files and their mount locations are covered in the [Configuration files](#configuration-files) section below.
-- If you need to modify the jobs (sessions) launched by Workbench, use the `launcher.templates` as described in the [Launcher Templates](#launcher-templates) section below.
+- If you need to modify the jobs (sessions) launched by Workbench, use `launcher.templateValues` as described in the [Launcher Templates](#launcher-templates) section below.
 - The prestart scripts for Workbench and Posit Job Launcher are highly customized to get the service account information off of the Workbench pod for use in launching jobs.
 
 ## Configuration files
@@ -390,7 +390,7 @@ This appending/concatenation/array translation behavior only works with the helm
 
 ## Launcher Templates
 
-If you want to customize the launcher job templates, use the `launcher.templates` section of the `values.yaml` file. These values are then used within session templates.
+If you want to customize the launcher job templates, use the `launcher.templateValues` section of the `values.yaml` file. These values are then used within session templates.
 
 For example, if you want to add a container image registry credentials secret to allow session images to authenticate to a container registry, you can do so with the following:
 
