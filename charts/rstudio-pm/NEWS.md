@@ -1,5 +1,9 @@
 # Changelog
  
+## 0.5.46
+
+- Update default Posit Package Manager version to 2025.04.0-4
+
 ## 0.5.45
 
 - Allow values for `service.targetPort`, `pod.port`, and `pod.hostAliases`
