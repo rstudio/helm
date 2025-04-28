@@ -8,8 +8,7 @@ This is relevant for both Posit Workbench and Posit Connect when the job launche
 The original mechanism for modifying kubernetes jobs using the Job Launcher is to use 
 [`job-json-overrides`](https://docs.posit.co/ide/server-pro/job_launcher/job_launcher.html).
 
-[There is a support article discussing the topic and examples in a legacy context 
-here](https://docs.posit.co/ide/server-pro/job_launcher/kubernetes_plugin.html#kube-json)
+[The documentation discussing this topic in more detail can be found here.](https://docs.posit.co/ide/server-pro/job_launcher/kubernetes_plugin.html#kube-json)
 
 In helm, there is a helper that simplifies some of this configuration. As a result, we will include several snippets
 below to simplify use cases.
