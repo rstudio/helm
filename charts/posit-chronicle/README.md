@@ -4,7 +4,7 @@
 
 #### _Official Helm chart for Posit Chronicle Server_
 
-Chronicle helps data science managers and other stakeholders understand their
+[Posit Chronicle](https://docs.posit.co/chronicle/) helps data science managers and other stakeholders understand their
 organization's use of other Posit products, primarily Posit Connect and
 Workbench.
 
