@@ -9,18 +9,25 @@ sources:
   - https://github.com/rstudio/helm
 maintainers:
   - name: sol-eng
-    email: docker@rstudio.com
+    email: docker@posit.co
     url: https://github.com/rstudio/helm
 annotations:
   artifacthub.io/license: MIT
   artifacthub.io/links: |
+    - name: Chronicle Documentation
+      url: https://docs.posit.co/chronicle
     - name: Docker Images
       url: https://github.com/rstudio/rstudio-docker-products
     - name: Posit Community
-      url: https://community.rstudio.com/c/r-admin/5
+      url: https://forum.posit.co/c/posit-professional-hosted/5
     - name: About Posit Team
       url: https://posit.co/products/enterprise/team/
 keywords:
   - "rstudio"
   - "posit"
   - "chronicle"
+  - "metrics"
+  - "monitoring"
+  - "observability"
+  - "analytics"
+  - "data science"
