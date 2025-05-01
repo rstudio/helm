@@ -462,6 +462,7 @@ config:
         admin-group: rstudio-server
         authorization-enabled: 1
         thread-pool-size: 4
+        enable-debug-logging: 0
       cluster:
         name: Kubernetes
         type: Kubernetes
@@ -472,6 +473,7 @@ config:
       default-session-cluster: Kubernetes
     vscode.conf:
       enabled: 1
+      session-timeout-kill-hours: 12
     vscode.extensions.conf: |
       quarto.quarto
       posit.shiny
