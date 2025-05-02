@@ -16,7 +16,7 @@ spec:
   - port: {{ .Values.service.port }}
     targetPort: 443
     name: https
-  {{- else}}
+  {{- else }}
   - port: {{ .Values.service.port }}
     targetPort: 5252
     name: http
