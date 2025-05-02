@@ -12,6 +12,11 @@ maintainers:
     email: docker@posit.co
     url: https://github.com/rstudio/helm
 annotations:
+  artifacthub.io/images: |
+    - name: chronicle
+      image: ghcr.io/rstudio/chronicle:2025.03.0
+      platforms:
+        - linux/amd64
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Chronicle Documentation
