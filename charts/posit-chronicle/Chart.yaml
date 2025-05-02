@@ -27,6 +27,9 @@ annotations:
       url: https://forum.posit.co/c/posit-professional-hosted/5
     - name: About Posit Team
       url: https://posit.co/products/enterprise/team/
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
 keywords:
   - "rstudio"
   - "posit"
