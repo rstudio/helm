@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.8
+
+- Update documentation and support links.
+
 ## 0.3.7
 
 - Bump Chronicle to version 2025.03.0
