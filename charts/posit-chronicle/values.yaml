@@ -1,9 +1,28 @@
-image:
-  repository: "ghcr.io/rstudio/chronicle"
-  tag: "2025.03.0"
-  imagePullPolicy: "IfNotPresent"
+# -- Override for the name of the chart deployment
+nameOverride: ""
+# -- Override for the full name of the release
+fullnameOverride: ""
+# -- Override for the namespace of the chart deployment
+namespaceOverride: ""
+# -- Common labels to add to all resources
+commonLabels: {}
+# -- Common annotations to add to all resources
+commonAnnotations: {}
 
-serviceaccount:
+image:
+  # -- The image registry
+  registry: "ghcr.io"
+  # -- The image repository
+  repository: "rstudio/chronicle"
+  # -- Overrides the image tag whose default is the chart appVersion
+  tag: ""
+  # -- (Optional) The image digest
+  sha: ""
+  # -- The image pull policy
+  pullPolicy: "IfNotPresent"
+
+serviceAccount:
+  # --
   create: false
   # -- Additional annotations to add to the chronicle-server serviceaccount
   annotations: {
@@ -26,7 +45,9 @@ service:
 # -- The number of replica pods to maintain for this service
 replicas: 1
 
-# -- A map used verbatim as the pod's "nodeSelector" definition
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+#
 nodeSelector: {}
 
 pod:
@@ -51,33 +72,71 @@ pod:
 # If config.LocalStorage.Enabled is set to true,
 # the chart will provision a pvc of size storage.persistentVolumeSize for
 # the chronicle server stateful-set
-storage:
-  persistentVolumeSize: 1Gi
 
-config:
-  HTTPS:
+
+## Enable persistence using Persistent Volume Claims
+## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  # -- Enable persistence using Persistent Volume Claims
+  enabled: true
+  # -- Persistent Volume Storage Class
+  #    (Leave empty if using the default storage class)
+  storageClass: ""
+  # -- Size of the data volume
+  size: 1Gi
+  # -- Persistent Volume Access Modes
+  accessModes:
+    - ReadWriteOnce
+  # -- Name of an existing PVC to use
+  existingClaim: ""
+  # -- Selector to match an existing Persistent Volume for the data PVC
+  selector: {}
+
+# Configurations for the underlying Chronicle server instance
+# ref: https://docs.posit.co/chronicle/appendix/library/advanced-server.html
+#
+server:
+  https:
     # If https.enabled=true, ignore any http
     # values and enable https in the config instead
-    Enabled: false
-    Key: ""
-    Certificate: ""
-  Metrics:
-    Enabled: true
-  Profiling:
-    Enabled: false
-  Logging:
-    ServiceLog: "STDOUT"
-    ServiceLogLevel: "INFO"
-    ServiceLogFormat: "TEXT"
-  LocalStorage:
-    # By default LocalStorage.Enabled=true, so that installs work with the default values
-    Enabled: true
-    Location: "./chronicle-data"
-    RetentionPeriod: "30d"
-  S3Storage:
-    Enabled: false
-    Bucket: "posit-chronicle"
-    Prefix: ""
-    Profile: ""
-    # An AWS region must be set if S3 Storage is enabled
-    Region: "us-east-2"
+    # -- If set to true, Chronicle will use HTTPS instead of HTTP
+    enabled: false
+    # -- Path to a PEM encoded TLS certificate file
+    certificate: ""
+    # -- Path to a PEM encoded private key file corresponding to the specified certificate
+    key: ""
+  metrics:
+    # -- If set to true, Chronicle will expose a metrics endpoint for Prometheus
+    enabled: true
+  profiling:
+    # -- If set to true, Chronicle will expose a pprof profiling server
+    enabled: false
+  logging:
+    # -- Specified the output for log messages, can be one of "STDOUT", "STDERR", or a file path
+    serviceLog: "STDOUT"
+    # -- The log level for the service, can be one of "TRACE", "DEBUG", "INFO", "WARN", or "ERROR"
+    serviceLogLevel: "INFO"
+    # -- The log format for the service, can be one of "TEXT" or "JSON"
+    serviceLogFormat: "TEXT"
+  storage:
+    # -- Configuration for local data storage with Chronicle, for configuring persistence of this data see the persistence section
+    local:
+      # -- If set to true, Chronicle will use a local path for data storage
+      enabled: true
+      # -- The path to the local storage location
+      path: "./chronicle-data"
+      # -- The retention period for data before it is purged
+      retentionPeriod: "30d"
+    # -- Configuration for S3 data storage with Chronicle
+    s3:
+      # -- If set to true, Chronicle will use S3 for data storage
+      enabled: false
+      # -- The S3 bucket to use for storage
+      bucket: ""
+      # -- (Optional) the prefix to use when writing to the S3 bucket, defaults to the bucket root
+      prefix: ""
+      # -- (Optional) the profile to use when writing to the S3 bucket, defaults is to use the `AWS_PROFILE` env var
+      profile: ""
+      # -- (Optional) the region to use when writing to the S3 bucket, defaults is to use the `AWS_REGION` env var
+      region: ""
