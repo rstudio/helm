@@ -26,13 +26,13 @@ jobs:
           project-url: https://github.com/orgs/posit-dev/projects/23
           github-token: ${{ steps.generate-token.outputs.token }}
           labeled: "team: connect"
-      # - name: Workbench issue
-      #   id: workbench-issue
-      #   uses: actions/add-to-project@v1.0.2
-      #   with:
-      #     project-url: https://github.com/orgs/posit-dev/projects/23
-      #     github-token: ${{ steps.generate-token.outputs.token }}
-      #     labeled: "team: workbench"
+      - name: Workbench issue
+        id: workbench-issue
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/rstudio/projects/92
+          github-token: ${{ steps.generate-token.outputs.token }}
+          labeled: "team: workbench"
       - name: Package Manager issue
         id: ppm-issue
         uses: actions/add-to-project@v1.0.2
