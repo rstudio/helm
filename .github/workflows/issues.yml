@@ -18,7 +18,7 @@ jobs:
         uses: actions/create-github-app-token@v2
         with:
           app-id: 1064714
-          private-key: ${{ secrets.POSIT_CONNECT_PROJECTS_PEM }}
+          private-key: ${{ secrets.POSIT_PLATFORM_PROJECTS_PEM }}
       - name: Connect issue
         id: connect-issue
         uses: actions/add-to-project@v1.0.2
