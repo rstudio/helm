@@ -1,0 +1,35 @@
+{{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "posit-chronicle.fullname" . }}
+  namespace: {{ include "posit-chronicle.namespace" . }}
+  labels:
+    {{ include "posit-chronicle.labels" . | nindent 4 }}
+    {{- with .Values.persistence.labels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.persistence.annotations .Values.commonAnnotations }}
+  {{- $annotations := merge .Values.persistence.annotations .Values.commonAnnotations }}
+  annotations:
+    {{- with $annotations }}
+      {{ toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- range .Values.persistence.accessModes }}
+    - {{ . | quote | nindent 4 }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size | quote }}
+  {{- with .Values.persistence.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.persistence.selectorLabels }}
+  selector:
+    matchLabels:
+      {{ toYaml . | nindent 6 }}
+  {{- end }}
+{{- end }}

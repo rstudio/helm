@@ -22,8 +22,9 @@ image:
   pullPolicy: "IfNotPresent"
 
 serviceAccount:
-  # --
   create: false
+  # -- The name of the service account to use
+  name: ""
   # -- Additional annotations to add to the chronicle-server serviceaccount
   annotations: {
     # EKS role arn example
@@ -45,11 +46,6 @@ service:
 # -- The number of replica pods to maintain for this service
 replicas: 1
 
-## Node labels for pod assignment
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-#
-nodeSelector: {}
-
 pod:
   # -- The command and args to run in the chronicle-server container
   command: "/chronicle"
@@ -64,6 +60,8 @@ pod:
   selectorLabels: {}
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
+  # -- A map used verbatim as the pod's "nodeSelector" definition
+  nodeSelector: {}
   # -- An array used verbatim as the pod's "tolerations" definition
   tolerations: []
   # -- The termination grace period seconds allowed for the pod before shutdown
@@ -74,15 +72,15 @@ pod:
 # the chronicle server stateful-set
 
 
-## Enable persistence using Persistent Volume Claims
-## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
-##
+# Enable persistence using Persistent Volume Claims
+# ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+#
 persistence:
   # -- Enable persistence using Persistent Volume Claims
   enabled: true
   # -- Persistent Volume Storage Class
   #    (Leave empty if using the default storage class)
-  storageClass: ""
+  storageClassName: ""
   # -- Size of the data volume
   size: 1Gi
   # -- Persistent Volume Access Modes
@@ -91,7 +89,14 @@ persistence:
   # -- Name of an existing PVC to use
   existingClaim: ""
   # -- Selector to match an existing Persistent Volume for the data PVC
-  selector: {}
+  selectorLabels: {}
+  # -- Additional annotations to add to the PVC
+  annotations: {}
+  # -- Additional labels to add to the PVC
+  labels: {}
+  # -- Finalizers added verbatim to the PVC
+  finalizers:
+    - kubernetes.io/pvc-protection
 
 # Configurations for the underlying Chronicle server instance
 # ref: https://docs.posit.co/chronicle/appendix/library/advanced-server.html
@@ -112,6 +117,7 @@ server:
   profiling:
     # -- If set to true, Chronicle will expose a pprof profiling server
     enabled: false
+    port: 3030
   logging:
     # -- Specified the output for log messages, can be one of "STDOUT", "STDERR", or a file path
     serviceLog: "STDOUT"
