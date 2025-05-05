@@ -23,7 +23,6 @@ jobs:
       - name: Generate token for GitHub App in the posit-dev org
         id: generate-token-posit-dev
         uses: actions/create-github-app-token@v2
-        if:
         with:
           app-id: 1064714
           private-key: ${{ secrets.POSIT_PLATFORM_PROJECTS_PEM }}
