@@ -2,17 +2,25 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: chronicle-server
+  name: {{ include "posit-chronicle.fullname" . }}
+  namespace: {{ include "posit-chronicle.namespace" . }}
   labels:
-    {{- include "posit-chronicle.service.labels" . | trim | nindent 4 }}
-    {{- include "posit-chronicle.service.selectorLabels" . | trim | nindent 4 }}
+    {{ include "posit-chronicle.labels" . | nindent 4 }}
+    {{- with .Values.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := merge .Values.service.annotations .Values.commonAnnotations }}
   annotations:
-    {{- include "posit-chronicle.service.annotations" . | trim | nindent 4 }}
+    {{- with $annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   selector:
-    {{- include "posit-chronicle.service.selectorLabels" . | trim | nindent 4 }}
+    {{ include "posit-chronicle.service.selectorLabels" . | trim | nindent 4 }}
   ports:
-  {{- if .Values.config.HTTPS.Enabled }}
+  {{- if .Values.server.https.enabled }}
   - port: {{ .Values.service.port }}
     targetPort: 443
     name: https

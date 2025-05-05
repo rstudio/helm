@@ -1,0 +1,86 @@
+---
+{{- $root := . -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "posit-chronicle.fullname" . }}
+  namespace: {{ include "posit-chronicle.namespace" . }}
+  labels:
+    {{- include "posit-chronicle.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicas }}
+  serviceName: {{ include "posit-chronicle.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "posit-chronicle.pod.selectorLabels" . | trim | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "posit-chronicle.labels" . | trim |  nindent 8 }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- include "posit-chronicle.pod.annotations" . | trim |  nindent 8 }}
+    spec:
+      {{- with .Values.pod.affinity }}
+      affinity:
+        {{- tpl (toYaml .) $root | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "posit-chronicle.serviceAccountName" . }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - {{ .Values.pod.command }}
+        {{- if .Values.pod.args }}
+        args:
+        {{- toYaml .Values.pod.args | nindent 8 }}
+        {{- end }}
+        ports:
+        {{- if .Values.server.https.enabled }}
+        - containerPort: 443
+          name: https
+        {{- else}}
+        - containerPort: 5252
+          name: http
+        {{- end }}
+        volumeMounts:
+        {{- if .Values.server.storage.local.enabled }}
+        - name: data
+          mountPath: {{ .Values.server.storage.local.path }}
+        {{- end }}
+        - name: config
+          mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
+          subPath: posit-chronicle.gcfg
+        {{- if .Values.pod.env }}
+        env:
+        {{- toYaml .Values.pod.env | nindent 8 }}
+        {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
+      volumes:
+      {{- if .Values.persistence.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ tpl (.Values.persistence.existingClaim | default (include "posit-chronicle.fullname" .)) . }}
+      {{- end }}
+      - name: config
+        configMap:
+          name: {{ include "posit-chronicle.fullname" . }}
+          items:
+            - key: posit-chronicle.gcfg
+              path: "posit-chronicle.gcfg"
+---
