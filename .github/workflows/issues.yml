@@ -13,37 +13,46 @@ jobs:
   issues:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate token for GitHub App
-        id: generate-token
+      - name: Generate token for GitHub App in the rstudio org
+        id: generate-token-rstudio
         uses: actions/create-github-app-token@v2
         with:
           app-id: 1064714
           private-key: ${{ secrets.POSIT_PLATFORM_PROJECTS_PEM }}
+          owner: rstudio
+      - name: Generate token for GitHub App in the posit-dev org
+        id: generate-token-posit-dev
+        uses: actions/create-github-app-token@v2
+        if:
+        with:
+          app-id: 1064714
+          private-key: ${{ secrets.POSIT_PLATFORM_PROJECTS_PEM }}
+          owner: posit-dev
       - name: Connect issue
         id: connect-issue
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/orgs/posit-dev/projects/23
-          github-token: ${{ steps.generate-token.outputs.token }}
+          github-token: ${{ steps.generate-token-posit-dev.outputs.token }}
           labeled: "team: connect"
       - name: Workbench issue
         id: workbench-issue
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/orgs/rstudio/projects/92
-          github-token: ${{ steps.generate-token.outputs.token }}
+          github-token: ${{ steps.generate-token-rstudio.outputs.token }}
           labeled: "team: workbench"
       - name: Package Manager issue
         id: ppm-issue
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/orgs/rstudio/projects/48
-          github-token: ${{ steps.generate-token.outputs.token }}
+          github-token: ${{ steps.generate-token-rstudio.outputs.token }}
           labeled: "team: package manager"
       - name: Chronicle issue
         id: chronicle-issue
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/orgs/rstudio/projects/134
-          github-token: ${{ steps.generate-token.outputs.token }}
+          github-token: ${{ steps.generate-token-rstudio.outputs.token }}
           labeled: "team: chronicle"
