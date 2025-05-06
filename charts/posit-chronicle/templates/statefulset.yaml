@@ -16,7 +16,7 @@ spec:
   serviceName: {{ include "posit-chronicle.fullname" . }}
   selector:
     matchLabels:
-      {{- include "posit-chronicle.pod.selectorLabels" . | trim | nindent 6 }}
+      {{- include "posit-chronicle.selectorLabels" . | trim | nindent 6 }}
   template:
     metadata:
       labels:

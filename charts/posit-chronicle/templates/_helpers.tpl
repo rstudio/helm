@@ -93,20 +93,3 @@ Generate annotations for various resources
 {{ $key }}: {{ $value | quote }}
 {{- end }}
 {{- end }}
-
-{{/*
-Generate selector labels for  various resources
-*/}}
-{{- define "posit-chronicle.pod.selectorLabels" }}
-{{- $podSelectorLabels := merge .Values.pod.selectorLabels (include "posit-chronicle.selectorLabels" .) }}
-{{- range $key,$value := $podSelectorLabels }}
-{{ $key }}: {{ $value | quote }}
-{{- end }}
-{{- end }}
-
-{{- define "posit-chronicle.service.selectorLabels" }}
-{{- $svcSelectorLabels := merge .Values.service.selectorLabels (include "posit-chronicle.selectorLabels" .) }}
-{{- range $key,$value := $svcSelectorLabels }}
-{{ $key }}: {{ $value | quote }}
-{{- end }}
-{{- end }}
