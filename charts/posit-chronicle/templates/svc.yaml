@@ -18,7 +18,7 @@ metadata:
   {{- end }}
 spec:
   selector:
-    {{ include "posit-chronicle.service.selectorLabels" . | trim | nindent 4 }}
+    {{ include "posit-chronicle.selectorLabels" . | trim | nindent 4 }}
   ports:
   {{- if .Values.server.https.enabled }}
   - port: {{ .Values.service.port }}

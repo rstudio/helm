@@ -56,8 +56,6 @@ pod:
   annotations: {}
   # -- Additional labels to add to the chronicle-server pods
   labels: {}
-  # -- Additional selector labels to add to the chronicle-server pods
-  selectorLabels: {}
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
   # -- A map used verbatim as the pod's "nodeSelector" definition
