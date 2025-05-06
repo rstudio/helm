@@ -1,0 +1,407 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "properties": {
+    "nameOverride": {
+      "description": "Overrides the name of the chart",
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "description": "Overrides the full name of the release",
+      "type": "string"
+    },
+    "namespaceOverride": {
+      "description": "Overrides the namespace used for the release",
+      "type": "string"
+    },
+    "commonLabels": {
+      "description": "Labels to be added to all resources",
+      "type": "object",
+      "additionalProperties": {
+          "type": "string"
+      }
+    },
+    "commonAnnotations": {
+      "description": "Annotations to be added to all resources",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "image": {
+      "description": "Container image specification",
+      "type": "object",
+      "properties": {
+        "registry": {
+          "description": "Container image registry",
+          "type": "string"
+        },
+        "repository": {
+          "description": "Container image repository",
+          "type": "string"
+        },
+        "tag": {
+          "description": "Container image tag",
+          "type": "string"
+        },
+        "sha": {
+          "description": "Container image digest",
+          "type": "string"
+        },
+        "pullPolicy": {
+          "description": "Container image pull policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "registry",
+        "tag",
+        "pullPolicy"
+      ]
+    },
+    "serviceAccount": {
+      "description": "Service account configuration",
+      "type": "object",
+      "properties": {
+        "create": {
+          "description": "Boolean flag to create a service account for the chart",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "Name of the service account to use, defaults to fullname if blank",
+          "type": "string"
+        },
+        "annotations": {
+          "description": "Annotations to add to the service account",
+          "type": "object",
+          "additionalProperties": {
+              "type": "string"
+          }
+        },
+        "labels": {
+          "description": "Labels to add to the service account",
+          "type": "object",
+          "additionalProperties": {
+              "type": "string"
+          }
+        }
+      }
+    },
+    "service": {
+      "description": "Service configuration",
+      "type": "object",
+      "properties": {
+        "port": {
+          "description": "Port to expose the service on",
+          "type": "integer",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "annotations": {
+          "description": "Annotations to add to the service",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "description": "Labels to add to the service",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "replicas": {
+      "description": "Number of replicas for the deployment",
+      "type": "integer",
+      "default": 1,
+      "minimum": 1
+    },
+    "pod": {
+      "description": "Pod configuration",
+      "type": "object",
+      "properties": {
+        "command": {
+          "description": "Command to run in the container",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "args": {
+          "description": "Arguments to pass to the command",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "env": {
+          "description": "Environment variables to set in the container",
+          "type": "array"
+        },
+        "annotations": {
+          "description": "Annotations to add to the pod",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "description": "Labels to add to the pod",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "affinity": {
+          "description": "Affinity rules for the pod",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "description": "Node selector for the pod",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "tolerations": {
+          "description": "Tolerations for the pod",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "terminationGracePeriodSeconds": {
+            "description": "Termination grace period for the pod",
+            "type": "integer",
+            "default": 30,
+            "minimum": 0
+        }
+      }
+    },
+    "persistence": {
+      "description": "Persistence configuration",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enable persistent storage",
+          "type": "boolean"
+        },
+        "size": {
+          "description": "Size of the persistent volume claim",
+          "type": "string"
+        },
+        "storageClass": {
+          "description": "Storage class for the persistent volume claim",
+          "type": "string"
+        },
+        "accessModes": {
+          "description": "Access modes for the persistent volume claim",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selectorLabels": {
+          "description": "Labels to select the persistent volume",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "annotations": {
+          "description": "Annotations to add to the persistent volume claim",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "description": "Labels to add to the persistent volume claim",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "finalizers": {
+          "description": "Finalizers to add to the persistent volume claim",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "extraSecretMounts": {
+      "description": "Additional secret mounts for the pod",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the secret",
+            "type": "string"
+          },
+          "mountPath": {
+            "description": "Path to mount the secret at",
+            "type": "string"
+          },
+          "readOnly": {
+            "description": "Boolean flag to make the mount read-only",
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "name",
+          "mountPath"
+        ]
+      }
+    },
+    "server": {
+      "description": "Chronicle server configuration",
+      "type": "object",
+      "properties": {
+        "https": {
+          "description": "Configuration for using HTTPS",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enable HTTPS",
+              "type": "boolean"
+            },
+            "certificate": {
+              "description": "Path to the certificate file",
+              "type": "string"
+            },
+            "key": {
+              "description": "Path to the key file",
+              "type": "string"
+            }
+          }
+        },
+        "metrics": {
+          "description": "Configuration for Prometheus metrics",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enable metrics",
+              "type": "boolean"
+            }
+          }
+        },
+        "profiling": {
+          "description": "Configuration for profiling server",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enable profiling",
+              "type": "boolean"
+            },
+            "port": {
+              "description": "Port for profiling server",
+              "type": "integer",
+              "default": 3030,
+              "minimum": 1,
+              "maximum": 65535
+            }
+          }
+        },
+        "logging": {
+          "description": "Configuration for logging",
+          "type": "object",
+          "properties": {
+            "serviceLog": {
+              "description": "Logging output destination",
+              "type": "string"
+            },
+            "serviceLogLevel": {
+              "description": "Logging level",
+              "type": "string",
+              "pattern": "(?i)^(trace|debug|info|warn|error)$"
+            },
+            "format": {
+              "description": "Logging format",
+              "type": "string",
+              "pattern": "(?i)^(json|text)$"
+            }
+          }
+        },
+        "storage": {
+          "description": "Configuration for storage",
+          "type": "object",
+          "properties": {
+            "local": {
+              "description": "Configuration for local storage",
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "description": "Enable local storage",
+                  "type": "boolean",
+                  "default": true
+                },
+                "path": {
+                  "description": "Path to the local storage directory",
+                  "type": "string",
+                  "default": "/opt/chronicle-data"
+                },
+                "retentionPeriod": {
+                  "description": "Retention period for local storage",
+                  "type": "string",
+                  "default": "30d"
+                }
+              }
+            },
+            "s3": {
+              "description": "Configuration for S3 storage",
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "description": "Enable S3 storage",
+                  "type": "boolean",
+                  "default": false
+                },
+                "bucket": {
+                  "description": "S3 bucket name",
+                  "type": "string"
+                },
+                "region": {
+                  "description": "S3 region",
+                  "type": "string"
+                },
+                "accessKeyId": {
+                  "description": "S3 access key ID",
+                  "type": "string"
+                },
+                "secretAccessKey": {
+                  "description": "S3 secret access key",
+                  "type": "string"
+                }
+              },
+              "if": {
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "bucket": {
+                    "minLength": 3
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "title": "Values",
+  "type": "object"
+}

@@ -44,8 +44,10 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if .Values.pod.command }}
         command:
-        - {{ .Values.pod.command }}
+        {{- toYaml .Values.pod.command | nindent 8 }}
+        {{- end }}
         {{- if .Values.pod.args }}
         args:
         {{- toYaml .Values.pod.args | nindent 8 }}
