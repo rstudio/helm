@@ -80,7 +80,7 @@ persistence:
   #    (Leave empty if using the default storage class)
   storageClassName: ""
   # -- Size of the data volume
-  size: 1Gi
+  size: 10Gi
   # -- Persistent Volume Access Modes
   accessModes:
     - ReadWriteOnce
