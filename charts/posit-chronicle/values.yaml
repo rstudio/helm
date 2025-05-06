@@ -40,15 +40,13 @@ service:
   annotations: {}
   # -- Additional labels to add to the chronicle-server service
   labels: {}
-  # -- Additional selector labels to add to the chronicle-server service
-  selectorLabels: {}
 
 # -- The number of replica pods to maintain for this service
 replicas: 1
 
 pod:
   # -- The command and args to run in the chronicle-server container
-  command: "/chronicle"
+  command: ["/chronicle"]
   args: ["start", "-c", "/etc/posit-chronicle/posit-chronicle.gcfg"]
   # -- Optional environment variables
   env: []
@@ -84,8 +82,6 @@ persistence:
   # -- Persistent Volume Access Modes
   accessModes:
     - ReadWriteOnce
-  # -- Name of an existing PVC to use
-  existingClaim: ""
   # -- Selector to match an existing Persistent Volume for the data PVC
   selectorLabels: {}
   # -- Additional annotations to add to the PVC
@@ -95,6 +91,9 @@ persistence:
   # -- Finalizers added verbatim to the PVC
   finalizers:
     - kubernetes.io/pvc-protection
+
+# Additional secrets to mount to the Chronicle server pod
+extraSecretMounts: []
 
 # Configurations for the underlying Chronicle server instance
 # ref: https://docs.posit.co/chronicle/appendix/library/advanced-server.html
@@ -130,7 +129,7 @@ server:
       # -- If set to true, Chronicle will use a local path for data storage
       enabled: true
       # -- The path to the local storage location
-      path: "./chronicle-data"
+      path: "/opt/chronicle-data"
       # -- The retention period for data before it is purged
       retentionPeriod: "30d"
     # -- Configuration for S3 data storage with Chronicle
