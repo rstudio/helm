@@ -59,7 +59,7 @@ spec:
           name: http
         {{- end }}
         volumeMounts:
-        {{- if .Values.server.storage.local.enabled }}
+        {{- if .Values.persistence.enabled }}
         - name: data
           mountPath: {{ .Values.server.storage.local.path }}
         {{- end }}
@@ -72,15 +72,31 @@ spec:
         {{- end }}
       terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
       volumes:
-      {{- if .Values.persistence.enabled }}
-      - name: data
-        persistentVolumeClaim:
-          claimName: {{ tpl (.Values.persistence.existingClaim | default (include "posit-chronicle.fullname" .)) . }}
-      {{- end }}
       - name: config
         configMap:
           name: {{ include "posit-chronicle.fullname" . }}
           items:
             - key: posit-chronicle.gcfg
               path: "posit-chronicle.gcfg"
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: {{ include "posit-chronicle.fullname" . }}
+    spec:
+      accessModes:
+        {{- range .Values.persistence.accessModes }}
+        - {{ . | quote | nindent 4 }}
+        {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+      {{- with .Values.persistence.storageClassName }}
+      storageClassName: {{ . }}
+      {{- end }}
+      {{- with .Values.persistence.selectorLabels }}
+      selector:
+        matchLabels:
+          {{ toYaml . | nindent 6 }}
+      {{- end }}
 ---
