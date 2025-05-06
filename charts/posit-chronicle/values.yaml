@@ -111,10 +111,11 @@ server:
     key: ""
   metrics:
     # -- If set to true, Chronicle will expose a metrics endpoint for Prometheus
-    enabled: true
+    enabled: false
   profiling:
     # -- If set to true, Chronicle will expose a pprof profiling server
     enabled: false
+    # -- The port to use for the profiling server
     port: 3030
   logging:
     # -- Specified the output for log messages, can be one of "STDOUT", "STDERR", or a file path
