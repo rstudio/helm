@@ -32,20 +32,21 @@ data:
 
     [Profiling]
     Enabled = {{ .Values.server.profiling.enabled }}
+    {{- if .Values.server.profiling.enabled }}
     Listen = :{{ .Values.server.profiling.port }}
+    {{- end }}
 
     [LocalStorage]
     Enabled = {{ .Values.server.storage.local.enabled }}
+    {{- if .Values.server.storage.local.enabled }}
     Location = {{ .Values.server.storage.local.path }}
     RetentionPeriod = {{ .Values.server.storage.local.retentionPeriod }}
+    {{- end }}
 
     [S3Storage]
     Enabled = {{ .Values.server.storage.s3.enabled }}
-    {{- if eq .Values.server.storage.s3.enabled true }}
+    {{- if .Values.server.storage.s3.enabled }}
     Bucket = {{ required "A .Values.server.storage.s3.bucket must be specified when S3 storage is enabled." .Values.server.storage.s3.bucket }}
-    {{- else if ne .Values.server.storage.s3.bucket "" }}
-    Bucket = {{ .Values.server.storage.s3.bucket }}
-    {{- end }}
     {{- if ne .Values.server.storage.s3.prefix "" }}
     Prefix = {{ .Values.server.storage.s3.prefix }}
     {{- end }}
@@ -54,5 +55,6 @@ data:
     {{- end }}
     {{- if ne .Values.server.storage.s3.region "" }}
     Region = {{ .Values.server.storage.s3.region }}
+    {{- end }}
     {{- end }}
 ---

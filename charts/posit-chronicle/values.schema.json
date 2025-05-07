@@ -397,7 +397,31 @@
                 }
               }
             }
-          }
+          },
+          "anyOf": [
+            {
+              "properties": {
+                "local": {
+                  "properties": {
+                    "enabled": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "s3": {
+                  "properties": {
+                    "enabled": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       }
     }
