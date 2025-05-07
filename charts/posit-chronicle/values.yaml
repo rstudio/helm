@@ -94,6 +94,12 @@ persistence:
 
 # Additional secrets to mount to the Chronicle server pod
 extraSecretMounts: []
+# this option can be used to mount secrets such as an SSL certificate and key into the pod
+#  - name: "ssl"
+#    secretName: "chronicle-ssl"
+#    mountPath: "/etc/ssl"
+#    readOnly: true
+#    optional: false
 
 # Configurations for the underlying Chronicle server instance
 # ref: https://docs.posit.co/chronicle/appendix/library/advanced-server.html
