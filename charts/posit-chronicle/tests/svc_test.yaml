@@ -1,0 +1,109 @@
+suite: Service tests
+templates:
+  - templates/svc.yaml
+tests:
+  - it: should create a service targeting http by default
+    release:
+      name: test-release
+      namespace: test-namespace
+    asserts:
+    - isKind:
+        of: Service
+    - equal:
+        path: metadata.name
+        value: test-release-posit-chronicle
+    - equal:
+        path: metadata.namespace
+        value: test-namespace
+    - isSubset:
+        path: spec.selector
+        content:
+          app.kubernetes.io/name: posit-chronicle
+          app.kubernetes.io/instance: test-release
+    - contains:
+        path: spec.ports
+        content:
+          name: http
+          port: 80
+          targetPort: 5252
+    - notContains:
+        path: spec.ports
+        content:
+          name: https
+          port: 80
+          targetPort: 443
+  - it: should create a service targeting https when enabled
+    release:
+      name: test-release
+      namespace: test-namespace
+    set:
+      server:
+        https:
+          enabled: true
+          certificate: test-cert
+          key: test-key
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-release-posit-chronicle
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: posit-chronicle
+            app.kubernetes.io/instance: test-release
+      - contains:
+          path: spec.ports
+          content:
+            name: https
+            port: 80
+            targetPort: 443
+      - notContains:
+          path: spec.ports
+          content:
+            name: http
+            port: 80
+            targetPort: 5252
+  - it: should use an alternate port when specified by user
+    release:
+      name: test-release
+      namespace: test-namespace
+    set:
+      service:
+        port: 8787
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-release-posit-chronicle
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: posit-chronicle
+            app.kubernetes.io/instance: test-release
+      - contains:
+          path: spec.ports
+          content:
+            name: http
+            port: 8787
+            targetPort: 5252
+      - notContains:
+          path: spec.ports
+          content:
+            name: http
+            port: 80
+            targetPort: 5252
+      - notContains:
+          path: spec.ports
+          content:
+            name: https
+            port: 80
+            targetPort: 443
