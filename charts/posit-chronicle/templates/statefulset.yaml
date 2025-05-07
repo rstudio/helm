@@ -68,6 +68,11 @@ spec:
         - name: config
           mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
           subPath: posit-chronicle.gcfg
+        {{- range .Values.extraSecretMounts }}
+        - name: {{ .name }}
+          mountPath: {{ .mountPath }}
+          readOnly: {{ .readOnly }}
+        {{- end }}
         {{- if .Values.pod.env }}
         env:
         {{- toYaml .Values.pod.env | nindent 8 }}
@@ -80,6 +85,29 @@ spec:
           items:
             - key: posit-chronicle.gcfg
               path: "posit-chronicle.gcfg"
+      {{- range .Values.extraSecretMounts }}
+      {{- if .secretName }}
+      - name: {{ .name }}
+        secret:
+          secretName: {{ .secretName }}
+          defaultMode: {{ .defaultMode }}
+          {{- with .optional }}
+          optional: {{ . }}
+          {{- end }}
+          {{- with .items }}
+          items:
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+      {{- else if .projected }}
+      - name: {{ .name }}
+        projected:
+        {{- toYaml .projected | nindent 8 }}
+      {{- else if .csi }}
+      - name: {{ .name }}
+        csi:
+        {{- toYaml .csi | nindent 8 }}
+      {{- end }}
+      {{- end }}
   volumeClaimTemplates:
   - apiVersion: v1
     kind: PersistentVolumeClaim
