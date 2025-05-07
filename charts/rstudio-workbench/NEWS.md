@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1
+
+- Bump Workbench version to 2025.05.0
+- Enable `audited-jobs`
+
 ## 0.9.0
 
 - BREAKING: `launcher.useTemplates: true` is now the default. `launcher.templateValues` settings are the recommended way to pass values to the launcher jobs. If you must use the older `job-json-overrides` method, set `launcher.useTemplates: false`, the two methods cannot be used concurrently and will error if detected.
