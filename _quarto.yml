@@ -40,8 +40,6 @@ website:
       - icon: lightbulb-fill
         aria-label: 'Link to Posit Solutions'
         href: "https://solutions.posit.co/"
-      - text: "<img alt='Link to Posit Documentation' src='/images/posit-guide-ltmd.svg' id='footer-right-logo'>"
-        href: "https://docs.posit.co/"
       - text: "<img alt='Link to main Posit site' src='/images/posit-icon-fullcolor.svg' id='footer-right-posit-logo'>"
         href: "https://posit.co/"
   sidebar:
