@@ -453,6 +453,7 @@ config:
       launcher-port: 5559
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
+      audited-jobs: 1
     launcher.conf:
       server:
         address: 127.0.0.1
