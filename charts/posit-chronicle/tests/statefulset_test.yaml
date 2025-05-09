@@ -51,6 +51,54 @@ tests:
           app.kubernetes.io/instance: test-release
           app.kubernetes.io/version: 9999.9.9
           another: label
+  - it: should apply custom pod labels if specified
+    set:
+      pod:
+        labels:
+          another: label
+    asserts:
+    - isSubset:
+        path: spec.template.metadata.labels
+        content:
+          helm.sh/chart: posit-chronicle-9.9.9_test
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/part-of: posit-chronicle
+          app.kubernetes.io/component: server
+          app.kubernetes.io/name: posit-chronicle
+          app.kubernetes.io/instance: test-release
+          app.kubernetes.io/version: 9999.9.9
+          another: label
+  - it: should not set pod annotations by default
+    asserts:
+    - notExists:
+        path: spec.template.metadata.annotations
+  - it: should set the annotations if specified with pod annotations favored during merge
+    set:
+      commonAnnotations:
+        test-merge: value1
+        test-common: value
+      pod:
+        annotations:
+          test-merge: value2
+          test-pod: value
+    asserts:
+    - isSubset:
+        path: spec.template.metadata.annotations
+        content:
+          test-merge: value2
+          test-common: value
+          test-pod: value
+  - it: should set prometheus pod annotations when metrics are enabled
+    set:
+      server:
+        metrics:
+          enabled: true
+    asserts:
+    - isSubset:
+        path: spec.template.metadata.annotations
+        content:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "5252"
   - it: should set the pod affinity when specified
     set:
       pod:
@@ -261,7 +309,7 @@ tests:
     - equal:
         path: spec.volumeClaimTemplates[0].spec.storageClassName
         value: my-storage-class
-  - it: should set selector labels if specified
+  - it: should set volume claim template selector labels if specified
     set:
       persistence:
         selectorLabels:

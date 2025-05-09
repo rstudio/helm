@@ -1,0 +1,77 @@
+suite: Generic metadata tests
+set:
+  serviceAccount:
+    create: true
+# Unittest cannot use templating for chart values so we need this to be set to a fixed value for testing
+chart:
+  version: 9.9.9+test
+  appVersion: 9999.9.9
+release:
+  name: test-release
+  namespace: test-namespace
+tests:
+  - it: should always set the default resource name to the posit-chronicle.fullname
+    asserts:
+      - equal:
+          path: metadata.name
+          value: test-release-posit-chronicle
+  - it: should use an override for the resource name if specified
+    set:
+      fullnameOverride: custom-name
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-name
+  - it: should set the default resource namespace to the release namespace
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+  - it: should use an override for the resource namespace if specified
+    set:
+      namespaceOverride: custom-namespace
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+  - it: should set the default resource labels
+    asserts:
+      - isSubset:
+          path: metadata.labels
+          content:
+            helm.sh/chart: posit-chronicle-9.9.9_test
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/part-of: posit-chronicle
+            app.kubernetes.io/component: server
+            app.kubernetes.io/name: posit-chronicle
+            app.kubernetes.io/instance: test-release
+            app.kubernetes.io/version: 9999.9.9
+  - it: should apply custom labels if specified
+    set:
+      commonLabels:
+        another: label
+    asserts:
+      - isSubset:
+          path: metadata.labels
+          content:
+            helm.sh/chart: posit-chronicle-9.9.9_test
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/part-of: posit-chronicle
+            app.kubernetes.io/component: server
+            app.kubernetes.io/name: posit-chronicle
+            app.kubernetes.io/instance: test-release
+            app.kubernetes.io/version: 9999.9.9
+            another: label
+  - it: should skip annotations by default
+    asserts:
+      - notExists:
+          path: metadata.annotations
+  - it: should apply custom annotations if specified
+    set:
+      commonAnnotations:
+        another: annotation
+    asserts:
+      - isSubset:
+          path: metadata.annotations
+          content:
+              another: annotation
