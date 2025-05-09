@@ -8,7 +8,7 @@ home: https://www.posit.co
 sources:
   - https://github.com/rstudio/helm
 maintainers:
-  - name: Posit Helm Team
+  - name: rstudio
     email: docker@posit.co
     url: https://github.com/rstudio/helm
 annotations:
