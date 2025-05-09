@@ -33,14 +33,16 @@
       "properties": {
         "registry": {
           "description": "Container image registry",
-          "type": "string"
+          "type": "string",
+          "default": "ghcr.io"
         },
         "repository": {
           "description": "Container image repository",
-          "type": "string"
+          "type": "string",
+          "default": "rstudio/chronicle"
         },
         "tag": {
-          "description": "Container image tag",
+          "description": "Container image tag (defaults to .Chart.AppVersion)",
           "type": "string"
         },
         "sha": {
