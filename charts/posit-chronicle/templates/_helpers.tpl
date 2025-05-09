@@ -67,6 +67,9 @@ Common labels
 */}}
 {{- define "posit-chronicle.labels" }}
 helm.sh/chart: {{ include "posit-chronicle.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+app.kubernetes.io/part-of: {{ .Chart.Name | quote }}
+app.kubernetes.io/component: server
 {{ include "posit-chronicle.selectorLabels" . }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
 app.kubernetes.io/version: {{ mustRegexReplaceAllLiteral "@sha.*" .Values.image.tag "" | default .Chart.AppVersion | trunc 63 | trimSuffix "-" | quote }}
