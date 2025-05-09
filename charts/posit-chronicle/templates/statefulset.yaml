@@ -44,8 +44,7 @@ spec:
       serviceAccountName: {{ include "posit-chronicle.serviceAccountName" . }}
       containers:
       - name: {{ .Chart.Name }}
-        # FIXME: Make these required in schema or here?
-        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+        image: "{{ required "An image registry must be specified" .Values.image.registry }}/{{ required "An image repository must be specified" .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- with .Values.pod.command }}
         command:
