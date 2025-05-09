@@ -27,3 +27,6 @@
 ci/
 lint/
 tests/
+
+# helm unittest debug files
+.debug/

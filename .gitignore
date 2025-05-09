@@ -5,6 +5,7 @@ charts/**/charts/
 
 # helm unittest plugin
 __snapshot__
+.debug/
 
 bin/**
 !bin/README.md
