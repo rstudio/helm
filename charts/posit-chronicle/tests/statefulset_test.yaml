@@ -183,7 +183,7 @@ tests:
           - containerPort: 5252
             name: http
           volumeMounts:
-          - name: data
+          - name: test-release-posit-chronicle
             mountPath: /opt/chronicle-data
           - name: config
             mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
@@ -246,7 +246,7 @@ tests:
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
-          name: data
+          name: test-release-posit-chronicle
           mountPath: /opt/chronicle-data
   - it: should mount extra secrets to container if specified
     set:
@@ -288,6 +288,15 @@ tests:
           kind: PersistentVolumeClaim
           metadata:
             name: test-release-posit-chronicle
+            namespace: test-namespace
+            labels:
+              app.kubernetes.io/component: server
+              app.kubernetes.io/instance: test-release
+              app.kubernetes.io/managed-by: Helm
+              app.kubernetes.io/name: posit-chronicle
+              app.kubernetes.io/part-of: posit-chronicle
+              app.kubernetes.io/version: 9999.9.9
+              helm.sh/chart: posit-chronicle-9.9.9_test
           spec:
             accessModes:
             - ReadWriteOnce
