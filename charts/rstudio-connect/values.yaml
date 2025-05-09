@@ -261,6 +261,14 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+chronicleAgent:
+  enabled: false
+  image:
+    registry: ghcr.io
+    repository: rstudio/chronicle-agent
+    tag: ""
+    imagePullPolicy: IfNotPresent
+
 launcher:
   # -- Whether to enable the launcher
   enabled: false
