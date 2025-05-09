@@ -2,6 +2,42 @@ suite: Service tests
 templates:
   - templates/svc.yaml
 tests:
+  - it: should always create a service
+    asserts:
+    - hasDocuments:
+        count: 1
+    - isKind:
+        of: Service
+  - it: should apply service labels if given
+    set:
+      service:
+        labels:
+          test: label
+    asserts:
+    - isSubset:
+        path: metadata.labels
+        content:
+          test: label
+  - it: should have no annotations by default
+    asserts:
+    - notExists:
+        path: metadata.annotations
+  - it: should set annotations if specified with service annotations favored during merge
+    set:
+      service:
+        annotations:
+          test-merge: value2
+          test-svc: value
+      commonAnnotations:
+        test-merge: value1
+        test-common: value
+    asserts:
+    - isSubset:
+        path: metadata.annotations
+        content:
+          test-merge: value2
+          test-common: value
+          test-svc: value
   - it: should create a service targeting http by default
     release:
       name: test-release
