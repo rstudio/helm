@@ -90,8 +90,23 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.initContainers }}
+      {{- if or .Values.initContainers .Values.chronicleAgent.enabled }}
       initContainers:
+      {{- if .Values.chronicleAgent.enabled }}
+      - name: chronicle-agent
+        image: "{{ .Values.chronicleAgent.image.registry }}{{ .Values.chronicleAgent.image.repository }}:{{ .Values.chronicleAgent.image.tag }}"
+        imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
+        restartPolicy: Always
+        env:
+          - name: CHRONICLE_SERVER_ADDRESS
+            value: {{ include "chronicle-agent.serverAddress" . | quote }}
+          {{- if .Values.chronicleAgent.connectApiKey.secretKeyRef }}
+          - name: CONNECT_API_KEY
+            valueFrom:
+              secretKeyRef:
+                {{ toYaml .Values.chronicleAgent.connectApiKey.secretKeyRef | indent 16 }}
+          {{- end }}
+      {{- end }}
 {{ toYaml .Values.initContainers | indent 8 }}
       {{- end }}
       containers:
