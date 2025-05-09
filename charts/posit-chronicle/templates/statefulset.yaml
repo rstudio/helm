@@ -64,7 +64,7 @@ spec:
         {{- end }}
         volumeMounts:
         {{- if .Values.persistence.enabled }}
-        - name: data
+        - name: {{ include "posit-chronicle.fullname" . }}
           mountPath: {{ .Values.server.storage.local.path }}
         {{- end }}
         - name: config
@@ -118,6 +118,13 @@ spec:
     kind: PersistentVolumeClaim
     metadata:
       name: {{ include "posit-chronicle.fullname" . }}
+      namespace: {{ include "posit-chronicle.namespace" . }}
+      labels:
+        {{- include "posit-chronicle.labels" . | nindent 8 }}
+      {{- with .Values.commonAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       {{- range .Values.persistence.accessModes }}
