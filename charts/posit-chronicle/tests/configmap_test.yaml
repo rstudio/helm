@@ -2,6 +2,12 @@ suite: Configmap tests
 templates:
   - templates/configmap.yaml
 tests:
+  - it: should always create a config map
+    asserts:
+    - hasDocuments:
+        count: 1
+    - isKind:
+        of: ConfigMap
   - it: should use http by default
     asserts:
     - matchRegex:
