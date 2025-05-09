@@ -261,13 +261,26 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+# -- Settings for the Chronicle Agent sidecar container
 chronicleAgent:
+  # -- Whether to enable the Chronicle Agent sidecar container
   enabled: false
+  # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
+  autoDiscovery: true
   image:
+    # -- The registry to use for the Chronicle Agent image
     registry: ghcr.io
+    # -- The repository to use for the Chronicle Agent image
     repository: rstudio/chronicle-agent
+    # -- A tag to use for the Chronicle Agent image. If not set, the chart will attempt to look up the version of the deployed Chronicle server in the current namespace.
     tag: ""
+    # -- The pull policy for the Chronicle Agent image
     imagePullPolicy: IfNotPresent
+  # -- The address for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the current namespace.
+  serverAddress: ""
+  # -- An API key generated in Connect that can be used for the Chronicle Agent to authenticate with the Connect server for metrics. This generally must be set after the initial deployment of the Connect pod.
+  connectApiKey:
+    secretKeyRef: {}
 
 launcher:
   # -- Whether to enable the launcher
