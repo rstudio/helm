@@ -1,4 +1,6 @@
 suite: Configmap tests
+excludeTemplates:
+  - templates/extra-manifests.yaml
 set:
   serviceAccount:
     create: true
