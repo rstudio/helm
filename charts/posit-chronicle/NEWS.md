@@ -18,6 +18,7 @@
   - `extraSecretMounts` can now be specified to mount additional secrets, such as certificates, into the pod.
   - Storage class can now be overridden on the pod's volume claim template.
   - Selector labels definitions between pod and service are now merged into a single definition. Removed the ability to override these values.
+  - Add support for additional custom manifest input via `extraObjects` value.
 - Add unittests for chart templates.
 - Various Chart.yaml metadata changes.
   - Fix logo URL.

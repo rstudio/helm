@@ -9,6 +9,9 @@ commonLabels: {}
 # -- Common annotations to add to all resources
 commonAnnotations: {}
 
+# -- Additional manifests to deploy with the chart
+extraObjects: []
+
 image:
   # -- The image registry
   registry: "ghcr.io"

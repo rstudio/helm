@@ -27,6 +27,13 @@
         "type": "string"
       }
     },
+    "extraObjects": {
+      "description": "Additional Kubernetes objects to be created",
+      "type": "array",
+      "items": {
+          "type": "object"
+      }
+    },
     "image": {
       "description": "Container image specification",
       "type": "object",
