@@ -1,0 +1,274 @@
+suite: Stateful set tests
+templates:
+  - templates/statefulset.yaml
+# Unittest cannot use templating for chart values so we need this to be set to a fixed value for testing
+chart:
+  version: 9.9.9+test
+  appVersion: 9999.9.9
+release:
+  name: test-release
+  namespace: test-namespace
+tests:
+  - it: should create a statefulset with the correct name and namespace
+    release:
+      name: test-release
+      namespace: test-namespace
+    asserts:
+    - isKind:
+        of: StatefulSet
+    - equal:
+        path: metadata.name
+        value: test-release-posit-chronicle
+    - equal:
+        path: metadata.namespace
+        value: test-namespace
+    - equal:
+        path: spec.serviceName
+        value: test-release-posit-chronicle
+    - equal:
+        path: spec.replicas
+        value: 1
+  - it: should apply common selector labels
+    asserts:
+    - isSubset:
+        path: spec.selector.matchLabels
+        content:
+          app.kubernetes.io/name: posit-chronicle
+          app.kubernetes.io/instance: test-release
+  - it: should apply common pod labels
+    set:
+      commonLabels:
+        another: label
+    asserts:
+    - isSubset:
+        path: spec.template.metadata.labels
+        content:
+          helm.sh/chart: posit-chronicle-9.9.9_test
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/part-of: posit-chronicle
+          app.kubernetes.io/component: server
+          app.kubernetes.io/name: posit-chronicle
+          app.kubernetes.io/instance: test-release
+          app.kubernetes.io/version: 9999.9.9
+          another: label
+  - it: should set the pod affinity when specified
+    set:
+      pod:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                  - key: disktype
+                    operator: In
+                    values:
+                      - ssd
+    asserts:
+    - isSubset:
+        path: spec.template.spec.affinity
+        content:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                  - key: disktype
+                    operator: In
+                    values:
+                      - ssd
+  - it: should set the pod nodeSelector when specified
+    set:
+      pod:
+        nodeSelector:
+          disktype: ssd
+    asserts:
+    - isSubset:
+        path: spec.template.spec.nodeSelector
+        content:
+          disktype: ssd
+  - it: should set the pod tolerations when specified
+    set:
+      pod:
+        tolerations:
+          - key: "key"
+            operator: "Equal"
+            value: "value"
+            effect: "NoSchedule"
+    asserts:
+    - contains:
+        path: spec.template.spec.tolerations
+        content:
+          key: "key"
+          operator: "Equal"
+          value: "value"
+          effect: "NoSchedule"
+  - it: should set the pod serviceAccountName to default when the service account creation is disabled
+    set:
+      serviceAccount:
+        create: false
+    asserts:
+    - equal:
+        path: spec.template.spec.serviceAccountName
+        value: default
+  - it: should set the pod serviceAccountName to the service account if service account creation is enabled
+    set:
+      serviceAccount:
+        create: true
+    asserts:
+    - equal:
+        path: spec.template.spec.serviceAccountName
+        value: test-release-posit-chronicle
+  - it: should generate a default chronicle server container
+    asserts:
+    - contains:
+        path: spec.template.spec.containers
+        content:
+          name: posit-chronicle
+          command:
+          - /chronicle
+          args:
+          - start
+          - -c
+          - /etc/posit-chronicle/posit-chronicle.gcfg
+          image: "ghcr.io/rstudio/chronicle:9999.9.9"
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 5252
+            name: http
+          volumeMounts:
+          - name: data
+            mountPath: /opt/chronicle-data
+          - name: config
+            mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
+            subPath: posit-chronicle.gcfg
+  - it: should set an overridden image if given
+    set:
+      image:
+        registry: docker.io
+        repository: rstudio/posit-chronicle
+        tag: 2025.03.0
+    asserts:
+    - equal:
+        path: spec.template.spec.containers[0].image
+        value: "docker.io/rstudio/posit-chronicle:2025.03.0"
+  - it: should set the image pull policy to Always if given
+    set:
+      image:
+        pullPolicy: Always
+    asserts:
+    - equal:
+        path: spec.template.spec.containers[0].imagePullPolicy
+        value: Always
+  - it: should set an alternate command and args if given
+    set:
+      pod:
+        command:
+          - /bin/bash
+        args:
+          - -c
+          - echo "Hello world"
+    asserts:
+    - equal:
+        path: spec.template.spec.containers[0].command
+        value: ["/bin/bash"]
+    - equal:
+        path: spec.template.spec.containers[0].args
+        value: ["-c", "echo \"Hello world\""]
+  - it: should open https port on container if enabled
+    set:
+      server:
+        https:
+          enabled: true
+    asserts:
+    - equal:
+        path: spec.template.spec.containers[0].ports
+        value:
+          - containerPort: 443
+            name: https
+  - it: should not mount a data volume if persistence is disabled
+    set:
+      persistence:
+        enabled: false
+    asserts:
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: config
+          mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
+          subPath: posit-chronicle.gcfg
+    - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: data
+          mountPath: /opt/chronicle-data
+  - it: should mount extra secrets to container if specified
+    set:
+      extraSecretMounts:
+        - name: test-ssl-secret
+          secretName: chronicle-ssl
+          mountPath: /etc/ssl
+          readOnly: true
+    asserts:
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: test-ssl-secret
+          mountPath: /etc/ssl
+          readOnly: true
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: test-ssl-secret
+          secret:
+            secretName: chronicle-ssl
+  - it: should define a volume for the config map
+    asserts:
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: config
+          configMap:
+            name: test-release-posit-chronicle
+            items:
+              - key: posit-chronicle.gcfg
+                path: "posit-chronicle.gcfg"
+  - it: should define a volume claim template when persistence is enabled
+    asserts:
+    - contains:
+        path: spec.volumeClaimTemplates
+        content:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: test-release-posit-chronicle
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
+  - it: should define no volume claim templates if persistence is disabled
+    set:
+      persistence:
+        enabled: false
+    asserts:
+    - notExists:
+        path: spec.volumeClaimTemplates
+  - it: should set a storage class if specified
+    set:
+      persistence:
+        storageClassName: my-storage-class
+    asserts:
+    - equal:
+        path: spec.volumeClaimTemplates[0].spec.storageClassName
+        value: my-storage-class
+  - it: should set selector labels if specified
+    set:
+      persistence:
+        selectorLabels:
+          app: chronicle
+    asserts:
+    - equal:
+        path: spec.volumeClaimTemplates[0].spec.selector.matchLabels
+        value:
+          app: chronicle
+
