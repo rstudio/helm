@@ -37,11 +37,11 @@ website:
       - icon: question-circle-fill
         aria-label: 'Link to Posit Support'
         href: "https://support.posit.co/hc/en-us"
+      - text: '<a href="#" id="open_preferences_center" title="Manage your cookie preferences"><i class="bi bi-cookie"></i></i></a>'
+        aria-label: 'Cookie Prefs'
       - icon: lightbulb-fill
         aria-label: 'Link to Posit Solutions'
         href: "https://solutions.posit.co/"
-      - text: "<img alt='Link to Posit Documentation' src='/images/posit-guide-ltmd.svg' id='footer-right-logo'>"
-        href: "https://docs.posit.co/"
       - text: "<img alt='Link to main Posit site' src='/images/posit-icon-fullcolor.svg' id='footer-right-posit-logo'>"
         href: "https://posit.co/"
   sidebar:
