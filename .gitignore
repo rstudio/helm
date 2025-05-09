@@ -5,6 +5,7 @@ charts/**/charts/
 
 # helm unittest plugin
 __snapshot__
+.debug/
 
 bin/**
 !bin/README.md
@@ -13,5 +14,5 @@ bin/**
 _site/
 _publish.yml
 
-/.quarto/
-
+# helm packages
+*.tgz
