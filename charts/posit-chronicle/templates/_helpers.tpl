@@ -86,13 +86,13 @@ Generate annotations for various resources
 {{- $podAnnotations := merge .Values.pod.annotations .Values.commonAnnotations }}
 {{- if .Values.server.metrics.enabled }}
 {{- $_ := set $podAnnotations "prometheus.io/scrape" "true" }}
-{{- if .Values.server.metrics.enabled }}
+{{- if .Values.server.https.enabled }}
 {{- $_ := set $podAnnotations "prometheus.io/port" "443" }}
 {{- else }}
 {{- $_ := set $podAnnotations "prometheus.io/port" "5252" }}
 {{- end }}
 {{- end }}
-{{- range $key,$value := $.Values.pod.annotations }}
-{{ $key }}: {{ $value | quote }}
+{{- with $podAnnotations }}
+{{- toYaml . }}
 {{- end }}
 {{- end }}

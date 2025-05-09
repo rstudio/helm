@@ -24,10 +24,9 @@ spec:
         {{- with .Values.pod.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      # FIXME: Add common annotations?
-      {{- with (include "posit-chronicle.pod.annotations" .) }}
+      {{- if (include "posit-chronicle.pod.annotations" .) }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+        {{- include "posit-chronicle.pod.annotations" . | nindent 8 }}
       {{- end }}
     spec:
       {{- with .Values.pod.affinity }}
