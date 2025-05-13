@@ -24,7 +24,7 @@
 {{- $name := get $service.metadata.labels "app.kubernetes.io/name "}}
 {{- $component := get $service.metadata.labels "app.kubernetes.io/component "}}
 {{- if and (contains "posit-chronicle" $name) (eq $component "server") }}
-{{ $name }}.{{ $service.metadata.namespace }}.svc.cluster.local
+{{ $name }}.{{ $service.metadata.namespace }}
 {{- end }}
 {{- end }}
 {{- end }}
