@@ -54,7 +54,8 @@
         },
         "sha": {
           "description": "Container image digest",
-          "type": "string"
+          "type": "string",
+          "pattern": "^$|^[a-fA-F0-9]{64}$"
         },
         "pullPolicy": {
           "description": "Container image pull policy",
