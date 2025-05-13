@@ -44,7 +44,11 @@ spec:
       serviceAccountName: {{ include "posit-chronicle.serviceAccountName" . }}
       containers:
       - name: {{ .Chart.Name }}
+        {{- if .Values.image.sha }}
+        image: "{{ required "An image registry must be specified" .Values.image.registry }}/{{ required "An image repository must be specified" .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}@sha256:{{ .Values.image.sha }}"
+        {{- else }}
         image: "{{ required "An image registry must be specified" .Values.image.registry }}/{{ required "An image repository must be specified" .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+        {{- end}}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- with .Values.pod.command }}
         command:
