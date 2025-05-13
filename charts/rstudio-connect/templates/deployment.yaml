@@ -94,7 +94,7 @@ spec:
       initContainers:
       {{- if .Values.chronicleAgent.enabled }}
       - name: chronicle-agent
-        image: "{{ .Values.chronicleAgent.image.registry }}{{ .Values.chronicleAgent.image.repository }}:{{ .Values.chronicleAgent.image.tag }}"
+        image: {{ include "chronicle-agent.image" . | quote }}
         imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
         restartPolicy: Always
         env:
