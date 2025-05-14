@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.26
+
+- Adds a shortcut resource deployment for Chronicle Agent via `chronicleAgent.enabled`. The value is disabled by default
+  and does not affect existing deployments that use `sidecar` or `initContainer` to deploy the Chronicle Agent.
+
 ## 0.7.25
 
 - Bump Connect version to 2025.04.0
