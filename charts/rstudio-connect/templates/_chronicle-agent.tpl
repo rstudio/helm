@@ -20,11 +20,15 @@
 
 {{- define "chronicle-agent.serverAddress" }}
 {{- if .Values.chronicleAgent.enabled }}
+{{- if .Values.chronicleAgent.serverAddress }}
+{{ .Values.chronicleAgent.serverAddress }}
+{{- else }}
 {{- range $index, $service := (lookup "v1" "Service" .Release.Namespace "").items }}
 {{- $name := get $service.metadata.labels "app.kubernetes.io/name "}}
 {{- $component := get $service.metadata.labels "app.kubernetes.io/component "}}
 {{- if and (contains "posit-chronicle" $name) (eq $component "server") }}
 {{ $name }}.{{ $service.metadata.namespace }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
