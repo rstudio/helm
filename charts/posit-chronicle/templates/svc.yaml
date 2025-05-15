@@ -20,7 +20,7 @@ spec:
   selector:
     {{ include "posit-chronicle.selectorLabels" . | trim | nindent 4 }}
   ports:
-  {{- if .Values.server.https.enabled }}
+  {{- if .Values.config.HTTPS.Enabled }}
   - port: {{ .Values.service.port }}
     targetPort: 443
     name: https

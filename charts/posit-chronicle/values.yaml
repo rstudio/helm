@@ -48,9 +48,9 @@ service:
 replicas: 1
 
 pod:
-  # -- The command and args to run in the chronicle-server container
-  command: ["/chronicle"]
-  args: ["start", "-c", "/etc/posit-chronicle/posit-chronicle.gcfg"]
+  # -- The command and args to run in the chronicle-server container, defaults to the image entrypoint and args
+  command: []
+  args: []
   # -- Optional environment variables
   env: []
   # -- Additional annotations to add to the chronicle-server pods
@@ -107,49 +107,48 @@ extraSecretMounts: []
 # Configurations for the underlying Chronicle server instance
 # ref: https://docs.posit.co/chronicle/appendix/library/advanced-server.html
 #
-server:
-  https:
+config:
+  HTTPS:
     # If https.enabled=true, ignore any http
     # values and enable https in the config instead
     # -- If set to true, Chronicle will use HTTPS instead of HTTP
-    enabled: false
+    Enabled: false
     # -- Path to a PEM encoded TLS certificate file
-    certificate: ""
+    Certificate: ""
     # -- Path to a PEM encoded private key file corresponding to the specified certificate
-    key: ""
-  metrics:
+    Key: ""
+  Metrics:
     # -- If set to true, Chronicle will expose a metrics endpoint for Prometheus
-    enabled: false
-  profiling:
+    Enabled: false
+  Profiling:
     # -- If set to true, Chronicle will expose a pprof profiling server
-    enabled: false
+    Enabled: false
     # -- The port to use for the profiling server
-    port: 3030
-  logging:
+    Port: 3030
+  Logging:
     # -- Specified the output for log messages, can be one of "STDOUT", "STDERR", or a file path
-    serviceLog: "STDOUT"
+    ServiceLog: "STDOUT"
     # -- The log level for the service, can be one of "TRACE", "DEBUG", "INFO", "WARN", or "ERROR"
-    serviceLogLevel: "INFO"
+    ServiceLogLevel: "INFO"
     # -- The log format for the service, can be one of "TEXT" or "JSON"
-    serviceLogFormat: "TEXT"
-  storage:
-    # -- Configuration for local data storage with Chronicle, for configuring persistence of this data see the persistence section
-    local:
-      # -- If set to true, Chronicle will use a local path for data storage
-      enabled: true
-      # -- The path to the local storage location
-      path: "/opt/chronicle-data"
-      # -- The retention period for data before it is purged
-      retentionPeriod: "30d"
-    # -- Configuration for S3 data storage with Chronicle
-    s3:
-      # -- If set to true, Chronicle will use S3 for data storage
-      enabled: false
-      # -- The S3 bucket to use for storage
-      bucket: ""
-      # -- (Optional) the prefix to use when writing to the S3 bucket, defaults to the bucket root
-      prefix: ""
-      # -- (Optional) the profile to use when writing to the S3 bucket, defaults is to use the `AWS_PROFILE` env var
-      profile: ""
-      # -- (Optional) the region to use when writing to the S3 bucket, defaults is to use the `AWS_REGION` env var
-      region: ""
+    ServiceLogFormat: "TEXT"
+  # -- Configuration for local data storage with Chronicle, for configuring persistence of this data see the persistence section
+  LocalStorage:
+    # -- If set to true, Chronicle will use a local path for data storage. This should be used in conjunction with persistence.
+    Enabled: true
+    # -- The path to the local storage location
+    Path: "/opt/chronicle-data"
+    # -- The retention period for data before it is purged
+    RetentionPeriod: "30d"
+  # -- Configuration for S3 data storage with Chronicle
+  S3Storage:
+    # -- If set to true, Chronicle will use S3 for data storage
+    Enabled: false
+    # -- The S3 bucket to use for storage
+    Bucket: ""
+    # -- (Optional) the prefix to use when writing to the S3 bucket, defaults to the bucket root
+    Prefix: ""
+    # -- (Optional) the profile to use when writing to the S3 bucket, defaults is to use the `AWS_PROFILE` env var
+    Profile: ""
+    # -- (Optional) the region to use when writing to the S3 bucket, defaults is to use the `AWS_REGION` env var
+    Region: ""

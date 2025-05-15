@@ -12,49 +12,49 @@ metadata:
   {{- end }}
 data:
   posit-chronicle.gcfg: |
-    {{- if .Values.server.https.enabled }}
+    {{- if .Values.config.HTTPS.Enabled }}
     [HTTPS]
     Listen = :443
-    Certificate = {{ required ".Values.server.https.certificate must be specified when .Values.server.https.enabled is true." .Values.server.https.certificate }}
-    Key = {{ required ".Values.server.https.key must be specified when .Values.server.https.enabled is true." .Values.server.https.key }}
+    Certificate = {{ required ".Values.config.HTTPS.Certificate must be specified when .Values.config.HTTPS.Enabled is true." .Values.config.HTTPS.Certificate }}
+    Key = {{ required ".Values.config.HTTPS.Key must be specified when .Values.config.HTTPS.Enabled is true." .Values.config.HTTPS.Key }}
     {{- else}}
     [HTTP]
     Listen = :5252
     {{- end }}
 
     [Logging]
-    ServiceLog = {{ .Values.server.logging.serviceLog }}
-    ServiceLogLevel = {{ .Values.server.logging.serviceLogLevel }}
-    ServiceLogFormat = {{ .Values.server.logging.serviceLogFormat }}
+    ServiceLog = {{ .Values.config.Logging.ServiceLog }}
+    ServiceLogLevel = {{ .Values.config.Logging.ServiceLogLevel }}
+    ServiceLogFormat = {{ .Values.config.Logging.ServiceLogFormat }}
 
     [Metrics]
-    Enabled = {{ .Values.server.metrics.enabled }}
+    Enabled = {{ .Values.config.Metrics.Enabled }}
 
     [Profiling]
-    Enabled = {{ .Values.server.profiling.enabled }}
-    {{- if .Values.server.profiling.enabled }}
-    Listen = :{{ .Values.server.profiling.port }}
+    Enabled = {{ .Values.config.Profiling.Enabled }}
+    {{- if .Values.config.Profiling.Enabled }}
+    Listen = :{{ .Values.config.Profiling.Port }}
     {{- end }}
 
     [LocalStorage]
-    Enabled = {{ .Values.server.storage.local.enabled }}
-    {{- if .Values.server.storage.local.enabled }}
-    Location = {{ .Values.server.storage.local.path }}
-    RetentionPeriod = {{ .Values.server.storage.local.retentionPeriod }}
+    Enabled = {{ .Values.config.LocalStorage.Enabled }}
+    {{- if .Values.config.LocalStorage.Enabled }}
+    Location = {{ .Values.config.LocalStorage.Path }}
+    RetentionPeriod = {{ .Values.config.LocalStorage.RetentionPeriod }}
     {{- end }}
 
     [S3Storage]
-    Enabled = {{ .Values.server.storage.s3.enabled }}
-    {{- if .Values.server.storage.s3.enabled }}
-    Bucket = {{ required "A .Values.server.storage.s3.bucket must be specified when S3 storage is enabled." .Values.server.storage.s3.bucket }}
-    {{- if ne .Values.server.storage.s3.prefix "" }}
-    Prefix = {{ .Values.server.storage.s3.prefix }}
+    Enabled = {{ .Values.config.S3Storage.Enabled }}
+    {{- if .Values.config.S3Storage.Enabled }}
+    Bucket = {{ required "A .Values.config.S3Storage.Bucket must be specified when S3 storage is enabled." .Values.config.S3Storage.Bucket }}
+    {{- if .Values.config.S3Storage.Prefix }}
+    Prefix = {{ .Values.config.S3Storage.Prefix }}
     {{- end }}
-    {{- if ne .Values.server.storage.s3.profile "" }}
-    Profile = {{ .Values.server.storage.s3.profile }}
+    {{- if .Values.config.S3Storage.Profile }}
+    Profile = {{ .Values.config.S3Storage.Profile }}
     {{- end }}
-    {{- if ne .Values.server.storage.s3.region "" }}
-    Region = {{ .Values.server.storage.s3.region }}
+    {{- if .Values.config.S3Storage.Region }}
+    Region = {{ .Values.config.S3Storage.Region }}
     {{- end }}
     {{- end }}
 ---

@@ -272,47 +272,47 @@
         ]
       }
     },
-    "server": {
+    "config": {
       "description": "Chronicle server configuration",
       "type": "object",
       "properties": {
-        "https": {
+        "HTTPS": {
           "description": "Configuration for using HTTPS",
           "type": "object",
           "properties": {
-            "enabled": {
+            "Enabled": {
               "description": "Enable HTTPS",
               "type": "boolean"
             },
-            "certificate": {
+            "Certificate": {
               "description": "Path to the certificate file",
               "type": "string"
             },
-            "key": {
+            "Key": {
               "description": "Path to the key file",
               "type": "string"
             }
           }
         },
-        "metrics": {
+        "Metrics": {
           "description": "Configuration for Prometheus metrics",
           "type": "object",
           "properties": {
-            "enabled": {
+            "Enabled": {
               "description": "Enable metrics",
               "type": "boolean"
             }
           }
         },
-        "profiling": {
+        "Profiling": {
           "description": "Configuration for profiling server",
           "type": "object",
           "properties": {
-            "enabled": {
+            "Enabled": {
               "description": "Enable profiling",
               "type": "boolean"
             },
-            "port": {
+            "Port": {
               "description": "Port for profiling server",
               "type": "integer",
               "default": 3030,
@@ -321,119 +321,113 @@
             }
           }
         },
-        "logging": {
+        "Logging": {
           "description": "Configuration for logging",
           "type": "object",
           "properties": {
-            "serviceLog": {
+            "ServiceLog": {
               "description": "Logging output destination",
               "type": "string"
             },
-            "serviceLogLevel": {
+            "ServiceLogLevel": {
               "description": "Logging level",
               "type": "string",
               "pattern": "(?i)^(trace|debug|info|warn|error)$"
             },
-            "format": {
+            "ServiceLogFormat": {
               "description": "Logging format",
               "type": "string",
               "pattern": "(?i)^(json|text)$"
             }
           }
         },
-        "storage": {
+        "LocalStorage": {
+          "description": "Configuration for local storage",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enable local storage",
+              "type": "boolean",
+              "default": true
+            },
+            "path": {
+              "description": "Path to the local storage directory",
+              "type": "string",
+              "default": "/opt/chronicle-data"
+            },
+            "retentionPeriod": {
+              "description": "Retention period for local storage",
+              "type": "string",
+              "default": "30d"
+            }
+          }
+        },
+        "S3Storage": {
           "description": "Configuration for storage",
           "type": "object",
           "properties": {
-            "local": {
-              "description": "Configuration for local storage",
-              "type": "object",
+            "Enabled": {
+              "description": "Enable S3 storage",
+              "type": "boolean",
+              "default": false
+            },
+            "Bucket": {
+              "description": "S3 bucket name",
+              "type": "string"
+            },
+            "Prefix": {
+              "description": "S3 bucket path prefix for storing data",
+              "type": "string"
+            },
+            "Profile": {
+              "description": "S3 secret access key",
+              "type": "string"
+            },
+            "Region": {
+              "description": "S3 region",
+              "type": "string"
+            },
+            "if": {
               "properties": {
                 "enabled": {
-                  "description": "Enable local storage",
-                  "type": "boolean",
-                  "default": true
-                },
-                "path": {
-                  "description": "Path to the local storage directory",
-                  "type": "string",
-                  "default": "/opt/chronicle-data"
-                },
-                "retentionPeriod": {
-                  "description": "Retention period for local storage",
-                  "type": "string",
-                  "default": "30d"
+                  "const": true
                 }
               }
             },
-            "s3": {
-              "description": "Configuration for S3 storage",
-              "type": "object",
+            "then": {
               "properties": {
-                "enabled": {
-                  "description": "Enable S3 storage",
-                  "type": "boolean",
-                  "default": false
-                },
                 "bucket": {
-                  "description": "S3 bucket name",
-                  "type": "string"
-                },
-                "region": {
-                  "description": "S3 region",
-                  "type": "string"
-                },
-                "accessKeyId": {
-                  "description": "S3 access key ID",
-                  "type": "string"
-                },
-                "secretAccessKey": {
-                  "description": "S3 secret access key",
-                  "type": "string"
-                }
-              },
-              "if": {
-                "properties": {
-                  "enabled": {
-                    "const": true
-                  }
-                }
-              },
-              "then": {
-                "properties": {
-                  "bucket": {
-                    "minLength": 3
-                  }
+                  "minLength": 3
                 }
               }
             }
-          },
-          "anyOf": [
-            {
-              "properties": {
-                "local": {
-                  "properties": {
-                    "enabled": {
-                      "const": true
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "properties": {
-                "s3": {
-                  "properties": {
-                    "enabled": {
-                      "const": true
-                    }
-                  }
-                }
-              }
-            }
-          ]
+          }
         }
-      }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "LocalStorage": {
+              "properties": {
+                "enabled": {
+                  "const": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "S3Storage": {
+              "properties": {
+                "enabled": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "title": "Values",

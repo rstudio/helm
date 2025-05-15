@@ -84,9 +84,9 @@ Generate annotations for various resources
 */}}
 {{- define "posit-chronicle.pod.annotations" }}
 {{- $podAnnotations := merge .Values.pod.annotations .Values.commonAnnotations }}
-{{- if .Values.server.metrics.enabled }}
+{{- if .Values.config.Metrics.Enabled }}
 {{- $_ := set $podAnnotations "prometheus.io/scrape" "true" }}
-{{- if .Values.server.https.enabled }}
+{{- if .Values.config.HTTPS.Enabled }}
 {{- $_ := set $podAnnotations "prometheus.io/port" "443" }}
 {{- else }}
 {{- $_ := set $podAnnotations "prometheus.io/port" "5252" }}

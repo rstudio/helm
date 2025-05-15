@@ -90,9 +90,9 @@ tests:
           test-pod: value
   - it: should set prometheus pod annotations when metrics are enabled
     set:
-      server:
-        metrics:
-          enabled: true
+      config:
+        Metrics:
+          Enabled: true
     asserts:
     - isSubset:
         path: spec.template.metadata.annotations
@@ -171,12 +171,6 @@ tests:
         path: spec.template.spec.containers
         content:
           name: posit-chronicle
-          command:
-          - /chronicle
-          args:
-          - start
-          - -c
-          - /etc/posit-chronicle/posit-chronicle.gcfg
           image: "ghcr.io/rstudio/chronicle:9999.9.9"
           imagePullPolicy: IfNotPresent
           ports:
@@ -231,9 +225,9 @@ tests:
         value: ["-c", "echo \"Hello world\""]
   - it: should open https port on container if enabled
     set:
-      server:
-        https:
-          enabled: true
+      config:
+        HTTPS:
+          Enabled: true
     asserts:
     - equal:
         path: spec.template.spec.containers[0].ports
