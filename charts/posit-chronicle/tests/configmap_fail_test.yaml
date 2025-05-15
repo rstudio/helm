@@ -1,0 +1,46 @@
+suite: Configmap tests
+templates:
+  - templates/configmap.yaml
+tests:
+  - it: should fail if https is enabled but no certificate is specified
+    set:
+      config:
+        HTTPS:
+          Enabled: true
+          Key: /etc/ssl/ssl.key
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*Certificate must be specified.*"
+  - it: should fail if https is enabled but no key is specified
+    set:
+      config:
+        HTTPS:
+          Enabled: true
+          Certificate: /etc/ssl/ssl.crt
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*Key must be specified.*"
+  - it: should fail for invalid log level values
+    set:
+      config:
+        Logging:
+          ServiceLogLevel: INVALID
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*ServiceLogLevel: Does not match pattern.*"
+  - it: should fail for invalid log level values
+    set:
+      config:
+        Logging:
+          ServiceLogFormat: INVALID
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*ServiceLogFormat: Does not match pattern.*"
+  - it: should fail if S3 is enabled but no bucket is specified
+    set:
+      config:
+        S3Storage:
+          Enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*Bucket must be specified when S3 storage is enabled.*"

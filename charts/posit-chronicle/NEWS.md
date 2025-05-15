@@ -4,7 +4,6 @@
 
 - Improvements for chart annotations.
 - Values changes.
-  - Replace upper-case values with lower-case to avoid confusion and follow Helm best practices.
   - Allow name and namespace overrides in chart values.
   - Add common labels and annotations values to apply to all resources.
   - Moves default tag source to appVersion, image.tag changed to a blank override.

@@ -73,11 +73,11 @@ tests:
       name: test-release
       namespace: test-namespace
     set:
-      server:
-        https:
-          enabled: true
-          certificate: test-cert
-          key: test-key
+      config:
+        HTTPS:
+          Enabled: true
+          Certificate: test-cert
+          Key: test-key
     asserts:
       - isKind:
           of: Service
