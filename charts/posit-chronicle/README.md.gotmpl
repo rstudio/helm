@@ -13,7 +13,8 @@
 This chart deploys only the Chronicle server and is meant to be used in tandem
 with the Workbench and Connect charts. To actually send data to the server, you
 will need to run the Chronicle agent as a sidecar container on your
-Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files
+Workbench or Connect server pods by adding a native sidecar Chronicle agent
+definition to the `initContainers` value in their respective `values.yaml` files.
 
 Here is an example of Helm values to run the agent sidecar in **Workbench**,
 where we set up a shared volume between containers for audit logs:
@@ -28,46 +29,78 @@ pod:
   volumeMounts:
     - name: logs
       mountPath: "/var/lib/rstudio-server/audit"
-  sidecar:
-    - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
-      volumeMounts:
+initContainers:
+  - name: chronicle-agent
+    image: ghcr.io/rstudio/chronicle-agent:{{ .Chart.AppVersion }}
+    volumeMounts:
       - name: logs
         mountPath: "/var/lib/rstudio-server/audit"
-      env:
+    env:
       - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default"
+        value: "http://<service>.<namespace>"
 ```
 
 And here is an example of Helm values for Connect, where a **Connect**
 API key from a Kubernetes Secret is used to unlock more detailed metrics:
 
 ```yaml
-pod:
-  sidecar:
-    - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
-      env:
-      - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default"
-      - name: CONNECT_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: connect
-            key: apikey
+initContainers:
+- name: chronicle-agent
+  image: ghcr.io/rstudio/chronicle-agent:{{ .Chart.AppVersion }}
+  env:
+    - name: CHRONICLE_SERVER_ADDRESS
+      value: "http://<service>.<namespace>"
+    - name: CONNECT_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: connect
+          key: apikey
 ```
 
-Note that it is up to the user to provision this Kubernetes Secret for the
-Connect API key.
+It is up to the user to provision this Kubernetes Secret for the
+Connect API key. The `extraObjects` value in the Connect chart can be used to
+create the secret and mount it to the Chronicle agent container. Due to the
+nature of the Chronicle agent, the pod may need to be restarted to pick up
+changes to the secret after initial deployment.
+
+## HTTPS Configuration
+
+Chronicle can be configured to use HTTPS for secure communication. The
+`config.HTTPS` section of the configuration allows you to specify the certificate
+and key files to use for HTTPS. Both `config.HTTPS.Certificate` and
+`config.HTTPS.Key` are expected to be paths to files accessible by Chronicle.
+The `extraSecretMounts` value can be used to mount the certificate and key files
+into the Chronicle pod. Here is an example of how to do this, assuming that
+the certificate and key files are stored together in a Kubernetes TLS secret:
+
+```yaml
+extraSecretMounts:
+  - name: chronicle-https
+    mountPath: /etc/chronicle/ssl
+    secretName: chronicle-https
+    items:
+      - key: tls.crt
+      - key: tls.key
+config:
+  HTTPS:
+    Enabled: true
+    Certificate: "/etc/chronicle/ssl/tls.crt"
+    Key: "/etc/chronicle/ssl/tls.key"
+```
 
 ## Storage Configuration
 
-Chronicle can be configured to persist data to a local Kubernetes Volume, AWS S3, or both.
+Chronicle can be configured to persist data to local storage, AWS S3, or both.
 
-The default configuration uses a local volume, which is suitable if you'd like to
-access and analyze the data within your cluster:
+The default configuration uses a local volume with persistence enabled, which
+is suitable if you'd like to access and analyze the data within your cluster:
 
 ```yaml
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
 config:
   LocalStorage:
     Enabled: true
@@ -75,12 +108,22 @@ config:
     RetentionPeriod: "30d"
 ```
 
-`retentionPeriod` controls how long usage data are kept. For example, `"120m"`
-for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for unbounded retention.
-(Units smaller than seconds or larger than days are not supported.)
+The `persistence` section configures the persistent volume claim in the
+cluster while the `config.LocalStorage` section directly applies to Chronicle's
+configuration file. The persistent volume will always mount to the path specified
+by `config.LocalStorage.Path` to avoid potential misconfiguration and data loss.
 
-You can also persist data to AWS S3 instead of (or in addition to) local
-storage:
+By default, Chronicle requests 10Gi of storage. In most cases, this amount of
+storage should be sufficient for thirty days of monitoring data. Organizations
+are responsible for managing the size of the persistent volume.
+
+`retentionPeriod` controls how long usage data is retained. For example, `"120m"`
+for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for unbounded
+retention. Units smaller than seconds or larger than days are not currently
+supported. `retentionPeriod` does not apply to other types of data stored by
+Chronicle.
+
+You can also persist data to AWS S3 in place of or in tandem with local storage:
 
 ```yaml
 config:
@@ -90,7 +133,7 @@ config:
     Region: "us-east-2"
 ```
 
-### Using Iam for S3
+### Using IAM roles for S3 access
 
 If you are running on EKS, you can use [IAM Roles for Service
 Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
@@ -118,7 +161,6 @@ config:
     Region: "us-east-2"
 ```
 
-
 ### Needed S3 Policy Permissions
 
 The credentials Chronicle uses for S3 storage must have the following permissions enabled:
@@ -127,6 +169,12 @@ The credentials Chronicle uses for S3 storage must have the following permission
 - `s3:ListBucket`
 - `s3:PutObject`
 - `s3:DeleteObject`
+
+## Additional Configuration
+
+Chronicle has a multitude of configuration options not specifically mentioned in this
+README. For a complete list of configuration options, please refer to the
+[Chronicle documentation](https://docs.posit.co/chronicle/).
 
 {{ template "chart.valuesSection" . }}
 
