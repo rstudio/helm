@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.32
+
+- Add `rstudio-library.chronicle-agent.image` and `rstudio-library.chronicle-agent.serverAddress` helper functions for
+  Chronicle server deployment auto-discovery.
+
 ## 0.1.31
 
 - Add helm unit test scaffold.
