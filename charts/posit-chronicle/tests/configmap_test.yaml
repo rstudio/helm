@@ -17,11 +17,11 @@ tests:
           Listen = :5252
   - it: should properly configure https when enabled
     set:
-      server:
-        https:
-          enabled: true
-          certificate: /etc/ssl/ssl.crt
-          key: /etc/ssl/ssl.key
+      config:
+        HTTPS:
+          Enabled: true
+          Certificate: /etc/ssl/ssl.crt
+          Key: /etc/ssl/ssl.key
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -41,11 +41,11 @@ tests:
           ServiceLogFormat = TEXT
   - it: should set values for a custom logging configuration
     set:
-        server:
-          logging:
-            serviceLog: STDERR
-            serviceLogLevel: DEBUG
-            serviceLogFormat: JSON
+        config:
+          Logging:
+            ServiceLog: STDERR
+            ServiceLogLevel: DEBUG
+            ServiceLogFormat: JSON
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -63,9 +63,9 @@ tests:
           Enabled = false
   - it: should enable metrics when specified
     set:
-      server:
-        metrics:
-          enabled: true
+      config:
+        Metrics:
+          Enabled: true
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -81,9 +81,9 @@ tests:
           Enabled = false
   - it: should enable profiling when specified
     set:
-      server:
-        profiling:
-          enabled: true
+      config:
+        Profiling:
+          Enabled: true
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -93,10 +93,10 @@ tests:
           Listen = :3030
   - it: should set the profiling listening port when specified
     set:
-      server:
-        profiling:
-          enabled: true
-          port: 3131
+      config:
+        Profiling:
+          Enabled: true
+          Port: 3131
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -115,11 +115,10 @@ tests:
           RetentionPeriod = 30d
   - it: should set values for a custom local storage configuration
     set:
-      server:
-        storage:
-          local:
-            path: /custom/data/path
-            retentionPeriod: 60d
+      config:
+        LocalStorage:
+          Path: /custom/data/path
+          RetentionPeriod: 60d
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -130,14 +129,13 @@ tests:
           RetentionPeriod = 60d
   - it: should disable local storage when specified
     set:
-      server:
-        storage:
-          local:
-            enabled: false
-          # One of these must be set to true
-          s3:
-            enabled: true
-            bucket: test
+      config:
+        LocalStorage:
+          Enabled: false
+        # One of these must be set to true
+        S3Storage:
+          Enabled: true
+          Bucket: test
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -151,11 +149,10 @@ tests:
           RetentionPeriod = 30d
   - it: should enable and configure S3 storage when specified
     set:
-      server:
-        storage:
-          s3:
-            enabled: true
-            bucket: test
+      config:
+        S3Storage:
+          Enabled: true
+          Bucket: test
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -171,14 +168,13 @@ tests:
           Region = .*
   - it: should add extra options to S3 when specified
     set:
-      server:
-        storage:
-          s3:
-            enabled: true
-            bucket: test
-            prefix: test-prefix
-            profile: test-profile
-            region: test-region
+      config:
+        S3Storage:
+          Enabled: true
+          Bucket: test
+          Prefix: test-prefix
+          Profile: test-profile
+          Region: test-region
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
