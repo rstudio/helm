@@ -1,10 +1,33 @@
-image:
-  repository: "ghcr.io/rstudio/chronicle"
-  tag: "2025.03.0"
-  imagePullPolicy: "IfNotPresent"
+# -- Override for the name of the chart deployment
+nameOverride: ""
+# -- Override for the full name of the release
+fullnameOverride: ""
+# -- Override for the namespace of the chart deployment
+namespaceOverride: ""
+# -- Common labels to add to all resources
+commonLabels: {}
+# -- Common annotations to add to all resources
+commonAnnotations: {}
 
-serviceaccount:
+# -- Additional manifests to deploy with the chart
+extraObjects: []
+
+image:
+  # -- The image registry
+  registry: "ghcr.io"
+  # -- The image repository
+  repository: "rstudio/chronicle"
+  # -- Overrides the image tag whose default is the chart appVersion
+  tag: ""
+  # -- (Optional) The image digest
+  sha: ""
+  # -- The image pull policy
+  pullPolicy: "IfNotPresent"
+
+serviceAccount:
   create: false
+  # -- The name of the service account to use
+  name: ""
   # -- Additional annotations to add to the chronicle-server serviceaccount
   annotations: {
     # EKS role arn example
@@ -20,29 +43,24 @@ service:
   annotations: {}
   # -- Additional labels to add to the chronicle-server service
   labels: {}
-  # -- Additional selector labels to add to the chronicle-server service
-  selectorLabels: {}
 
 # -- The number of replica pods to maintain for this service
 replicas: 1
 
-# -- A map used verbatim as the pod's "nodeSelector" definition
-nodeSelector: {}
-
 pod:
-  # -- The command and args to run in the chronicle-server container
-  command: "/chronicle"
-  args: ["start", "-c", "/etc/posit-chronicle/posit-chronicle.gcfg"]
+  # -- The command and args to run in the chronicle-server container, defaults to the image entrypoint and args
+  command: []
+  args: []
   # -- Optional environment variables
   env: []
   # -- Additional annotations to add to the chronicle-server pods
   annotations: {}
   # -- Additional labels to add to the chronicle-server pods
   labels: {}
-  # -- Additional selector labels to add to the chronicle-server pods
-  selectorLabels: {}
   # -- A map used verbatim as the pod's "affinity" definition
   affinity: {}
+  # -- A map used verbatim as the pod's "nodeSelector" definition
+  nodeSelector: {}
   # -- An array used verbatim as the pod's "tolerations" definition
   tolerations: []
   # -- The termination grace period seconds allowed for the pod before shutdown
@@ -51,33 +69,88 @@ pod:
 # If config.LocalStorage.Enabled is set to true,
 # the chart will provision a pvc of size storage.persistentVolumeSize for
 # the chronicle server stateful-set
-storage:
-  persistentVolumeSize: 1Gi
 
+
+# Enable persistence using Persistent Volume Claims
+# ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+#
+persistence:
+  # -- Enable persistence using Persistent Volume Claims
+  enabled: true
+  # -- Persistent Volume Storage Class
+  #    (Leave empty if using the default storage class)
+  storageClassName: ""
+  # -- Size of the data volume
+  size: 10Gi
+  # -- Persistent Volume Access Modes
+  accessModes:
+    - ReadWriteOnce
+  # -- Selector to match an existing Persistent Volume for the data PVC
+  selectorLabels: {}
+  # -- Additional annotations to add to the PVC
+  annotations: {}
+  # -- Additional labels to add to the PVC
+  labels: {}
+  # -- Finalizers added verbatim to the PVC
+  finalizers:
+    - kubernetes.io/pvc-protection
+
+# Additional secrets to mount to the Chronicle server pod
+extraSecretMounts: []
+# this option can be used to mount secrets such as an SSL certificate and key into the pod
+#  - name: "ssl"
+#    secretName: "chronicle-ssl"
+#    mountPath: "/etc/chronicle/ssl"
+#    optional: false
+#    items:
+#      - key: "tls.crt"
+#      - key: "tls.key"
+
+# Configurations for the underlying Chronicle server instance
+# ref: https://docs.posit.co/chronicle/appendix/library/advanced-server.html
+#
 config:
   HTTPS:
     # If https.enabled=true, ignore any http
     # values and enable https in the config instead
+    # -- If set to true, Chronicle will use HTTPS instead of HTTP
     Enabled: false
-    Key: ""
+    # -- Path to a PEM encoded TLS certificate file
     Certificate: ""
+    # -- Path to a PEM encoded private key file corresponding to the specified certificate
+    Key: ""
   Metrics:
-    Enabled: true
+    # -- If set to true, Chronicle will expose a metrics endpoint for Prometheus
+    Enabled: false
   Profiling:
+    # -- If set to true, Chronicle will expose a pprof profiling server
     Enabled: false
+    # -- The port to use for the profiling server
+    Port: 3030
   Logging:
+    # -- Specified the output for log messages, can be one of "STDOUT", "STDERR", or a file path
     ServiceLog: "STDOUT"
+    # -- The log level for the service, can be one of "TRACE", "DEBUG", "INFO", "WARN", or "ERROR"
     ServiceLogLevel: "INFO"
+    # -- The log format for the service, can be one of "TEXT" or "JSON"
     ServiceLogFormat: "TEXT"
+  # -- Configuration for local data storage with Chronicle, for configuring persistence of this data see the persistence section
   LocalStorage:
-    # By default LocalStorage.Enabled=true, so that installs work with the default values
+    # -- If set to true, Chronicle will use a local path for data storage. This should be used in conjunction with persistence.
     Enabled: true
-    Location: "./chronicle-data"
+    # -- The path to the local storage location
+    Path: "/opt/chronicle-data"
+    # -- The retention period for data before it is purged
     RetentionPeriod: "30d"
+  # -- Configuration for S3 data storage with Chronicle
   S3Storage:
+    # -- If set to true, Chronicle will use S3 for data storage
     Enabled: false
-    Bucket: "posit-chronicle"
+    # -- The S3 bucket to use for storage
+    Bucket: ""
+    # -- (Optional) the prefix to use when writing to the S3 bucket, defaults to the bucket root
     Prefix: ""
+    # -- (Optional) the profile to use when writing to the S3 bucket, defaults is to use the `AWS_PROFILE` env var
     Profile: ""
-    # An AWS region must be set if S3 Storage is enabled
-    Region: "us-east-2"
+    # -- (Optional) the region to use when writing to the S3 bucket, defaults is to use the `AWS_REGION` env var
+    Region: ""
