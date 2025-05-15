@@ -23,6 +23,7 @@
   - Fix logo URL.
   - Add suggestions for compatible product charts.
   - Add annotation to include source image used in pod.
+- Update README.md and other documentation to reflect changes.
 
 ## 0.3.8
 
