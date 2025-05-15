@@ -64,6 +64,45 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
+## Chronicle Agent
+
+This chart supports use of a sidecar Chronicle agent to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
+
+By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
+searched namespace can be changed setting `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  serverAddress: <server-address>
+  image:
+    tag: <agent-version>
+```
+
+In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
+a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example
+of how to set the API key using a secret:
+```yaml
+chronicleAgent:
+  enabled: true
+  connectApiKey:
+    secretKeyRef:
+      name: <secret-name>
+      key: <key-name>
+```
+
+Due to the way Connect manages its API keys, it is currently not possible to provision an API key automatically for the
+Chronicle agent at the time of deployment. To workaround this issue in a fresh deployment, you can initially leave
+the API key unset for the Chronicle agent, deploy the chart, create an administrator API key, and then provision a
+secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
+can be set and the chart can be upgraded to include the new value.
+
+For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format

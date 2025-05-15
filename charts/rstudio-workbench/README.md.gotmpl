@@ -358,6 +358,45 @@ launcher:
           effect: "NoSchedule"
 ```
 
+## Chronicle Agent
+
+This chart supports use of a sidecar Chronicle agent to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
+
+By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
+searched namespace can be changed setting `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  serverAddress: <server-address>
+  image:
+    tag: <agent-version>
+```
+
+If desired, audit logging can be mounted into the Chronicle agent container by setting the following values:
+```yaml
+pod:
+  # We will need to create a new volume to share audit logs between
+  # the rstudio (workbench) and chronicle-agent containers
+  volumes:
+    - name: logs
+      emptyDir: {}
+  volumeMounts:
+    - name: logs
+      mountPath: "/var/lib/rstudio-server/audit"
+chronicleAgent:
+  enabled: true
+  volumeMounts:
+    - name: logs
+      mountPath: "/var/lib/rstudio-server/audit"
+```
+
+For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
 ## Sealed secrets
 
 This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
