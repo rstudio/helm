@@ -6292,6 +6292,35 @@ entries:
         - name: About RStudio Team
           url: https://www.rstudio.com/products/team/
     apiVersion: v2
+    appVersion: 0.1.32
+    created: "2025-05-15T15:48:10.710645396Z"
+    description: Helm library helpers for use by official RStudio charts
+    digest: d5bfb818541326dc8a819dda203794af9c6653deaf899cbcb12410c768fa7920
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - rstudio
+    - library
+    - posit
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-library
+    sources:
+    - https://github.com/rstudio/helm
+    type: library
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-library-0.1.32/rstudio-library-0.1.32.tgz
+    version: 0.1.32
+  - annotations:
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
     appVersion: 0.1.31
     created: "2024-10-31T20:31:07.749976779Z"
     description: Helm library helpers for use by official RStudio charts
@@ -15371,4 +15400,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2025-05-08T11:57:49.194582016Z"
+generated: "2025-05-15T15:48:10.714427001Z"
