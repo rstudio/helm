@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.9.1](https://img.shields.io/badge/Version-0.9.1-informational?style=flat-square) ![AppVersion: 2025.05.0](https://img.shields.io/badge/AppVersion-2025.05.0-informational?style=flat-square)
+![Version: 0.9.2](https://img.shields.io/badge/Version-0.9.2-informational?style=flat-square) ![AppVersion: 2025.05.0](https://img.shields.io/badge/AppVersion-2025.05.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.9.1:
+To install the chart with the release name `my-release` at version 0.9.2:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.1
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.2
 ```
 
 To explore other chart versions, look at:
@@ -413,6 +413,45 @@ launcher:
           effect: "NoSchedule"
 ```
 
+## Chronicle Agent
+
+This chart supports use of a sidecar Chronicle agent to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
+
+By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
+searched namespace can be changed setting `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  serverAddress: <server-address>
+  image:
+    tag: <agent-version>
+```
+
+If desired, audit logging can be mounted into the Chronicle agent container by setting the following values:
+```yaml
+pod:
+  # We will need to create a new volume to share audit logs between
+  # the rstudio (workbench) and chronicle-agent containers
+  volumes:
+    - name: logs
+      emptyDir: {}
+  volumeMounts:
+    - name: logs
+      mountPath: "/var/lib/rstudio-server/audit"
+chronicleAgent:
+  enabled: true
+  volumeMounts:
+    - name: logs
+      mountPath: "/var/lib/rstudio-server/audit"
+```
+
+For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
 ## Sealed secrets
 
 This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
@@ -433,6 +472,17 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
+| chronicleAgent | object | `{"autoDiscovery":true,"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"serverAddress":"","serverNamespace":"","volumeMounts":[]}` | Settings for the Chronicle Agent sidecar container |
+| chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
+| chronicleAgent.enabled | bool | `false` | Whether to enable the Chronicle Agent sidecar container |
+| chronicleAgent.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the container spec |
+| chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle Agent image |
+| chronicleAgent.image.registry | string | `"ghcr.io"` | The registry to use for the Chronicle Agent image |
+| chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The repository to use for the Chronicle Agent image |
+| chronicleAgent.image.tag | string | `""` | A tag to use for the Chronicle Agent image. If not set, the chart will attempt to look up the version of the deployed Chronicle server in the current namespace. |
+| chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
+| chronicleAgent.serverNamespace | string | `""` | The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace. |
+| chronicleAgent.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the container spec |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
 | config.defaultMode.pam | int | 0644 | default mode for pam scripts |
