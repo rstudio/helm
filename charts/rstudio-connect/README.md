@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.7.25](https://img.shields.io/badge/Version-0.7.25-informational?style=flat-square) ![AppVersion: 2025.04.0](https://img.shields.io/badge/AppVersion-2025.04.0-informational?style=flat-square)
+![Version: 0.7.27](https://img.shields.io/badge/Version-0.7.27-informational?style=flat-square) ![AppVersion: 2025.04.0](https://img.shields.io/badge/AppVersion-2025.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.7.25:
+To install the chart with the release name `my-release` at version 0.7.27:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.25
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.27
 ```
 
 To explore other chart versions, look at:
@@ -124,6 +124,45 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
+## Chronicle Agent
+
+This chart supports use of a sidecar Chronicle agent to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
+
+By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
+searched namespace can be changed setting `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  serverAddress: <server-address>
+  image:
+    tag: <agent-version>
+```
+
+In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
+a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example
+of how to set the API key using a secret:
+```yaml
+chronicleAgent:
+  enabled: true
+  connectApiKey:
+    secretKeyRef:
+      name: <secret-name>
+      key: <key-name>
+```
+
+Due to the way Connect manages its API keys, it is currently not possible to provision an API key automatically for the
+Chronicle agent at the time of deployment. To workaround this issue in a fresh deployment, you can initially leave
+the API key unset for the Chronicle agent, deploy the chart, create an administrator API key, and then provision a
+secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
+can be set and the chart can be upgraded to include the new value.
+
+For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
@@ -148,6 +187,18 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
+| chronicleAgent | object | `{"autoDiscovery":true,"connectApiKey":{"secretKeyRef":{}},"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"serverAddress":"","serverNamespace":"","volumeMounts":[]}` | Settings for the Chronicle Agent sidecar container |
+| chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
+| chronicleAgent.connectApiKey | object | `{"secretKeyRef":{}}` | An API key generated in Connect that can be used for the Chronicle Agent to authenticate with the Connect server for metrics. This generally must be set after the initial deployment of the Connect pod. |
+| chronicleAgent.enabled | bool | `false` | Whether to enable the Chronicle Agent sidecar container |
+| chronicleAgent.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the container spec |
+| chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle Agent image |
+| chronicleAgent.image.registry | string | `"ghcr.io"` | The registry to use for the Chronicle Agent image |
+| chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The repository to use for the Chronicle Agent image |
+| chronicleAgent.image.tag | string | `""` | A tag to use for the Chronicle Agent image. If not set, the chart will attempt to look up the version of the deployed Chronicle server in the current namespace. |
+| chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
+| chronicleAgent.serverNamespace | string | `""` | The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace. |
+| chronicleAgent.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the container spec |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
