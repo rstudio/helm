@@ -2,6 +2,7 @@
 
 ## 0.7.26
 
+- Bump `rstudio-library` chart version to `0.1.32`.
 - Adds a shortcut resource deployment for Chronicle Agent via `chronicleAgent.enabled`. The value is disabled by default
   and does not affect existing deployments that use `sidecar` or `initContainer` to deploy the Chronicle Agent.
 

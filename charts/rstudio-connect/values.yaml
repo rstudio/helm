@@ -265,6 +265,10 @@ ingress:
 chronicleAgent:
   # -- Whether to enable the Chronicle Agent sidecar container
   enabled: false
+  # -- An array of maps that is injected as-is into the "env:" component of the container spec
+  env: []
+  # -- An array of maps that is injected as-is into the "volumeMounts" component of the container spec
+  volumeMounts: []
   # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
   autoDiscovery: true
   image:
@@ -276,8 +280,10 @@ chronicleAgent:
     tag: ""
     # -- The pull policy for the Chronicle Agent image
     imagePullPolicy: IfNotPresent
-  # -- The address for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the current namespace.
+  # -- The address for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided.
   serverAddress: ""
+  # -- The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace.
+  serverNamespace: ""
   # -- An API key generated in Connect that can be used for the Chronicle Agent to authenticate with the Connect server for metrics. This generally must be set after the initial deployment of the Connect pod.
   connectApiKey:
     secretKeyRef: {}
