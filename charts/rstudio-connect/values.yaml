@@ -156,10 +156,9 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
-# -- Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
-# launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null`
-securityContext:
-  privileged: true
+# -- Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
+# launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: {}`
+securityContext: {}
 
 prometheus:
   # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
@@ -263,7 +262,7 @@ ingress:
 
 launcher:
   # -- Whether to enable the launcher
-  enabled: false
+  enabled: true
   # -- The namespace to launch sessions into. Uses the Release namespace by default
   namespace: ""
   # -- Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default
