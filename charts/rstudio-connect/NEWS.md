@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+- BREAKING: Connect now runs in [Off-Host Execution mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default
+  - `launcher.enabled` now defaults to `true` instead of `false`
+  - `securityContext` now defaults to `{}` instead of `securityContext.privileged: true`
+
 ## 0.7.25
 
 - Bump Connect version to 2025.04.0
