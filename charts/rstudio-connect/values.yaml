@@ -286,7 +286,10 @@ chronicleAgent:
   serverNamespace: ""
   # -- An API key generated in Connect that can be used for the Chronicle Agent to authenticate with the Connect server for metrics. This generally must be set after the initial deployment of the Connect pod.
   connectApiKey:
-    secretKeyRef: {}
+    # -- The verbatim value for the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. It is recommended to reference a secret with valueFrom instead of this.
+    value: ""
+    # -- The verbatim input for valueFrom to use to retrieve the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent.
+    valueFrom: {}
 
 launcher:
   # -- Whether to enable the launcher
