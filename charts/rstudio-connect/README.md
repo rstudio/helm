@@ -187,9 +187,11 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
-| chronicleAgent | object | `{"autoDiscovery":true,"connectApiKey":{"secretKeyRef":{}},"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"serverAddress":"","serverNamespace":"","volumeMounts":[]}` | Settings for the Chronicle Agent sidecar container |
+| chronicleAgent | object | `{"autoDiscovery":true,"connectApiKey":{"value":"","valueFrom":{}},"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"serverAddress":"","serverNamespace":"","volumeMounts":[]}` | Settings for the Chronicle Agent sidecar container |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
-| chronicleAgent.connectApiKey | object | `{"secretKeyRef":{}}` | An API key generated in Connect that can be used for the Chronicle Agent to authenticate with the Connect server for metrics. This generally must be set after the initial deployment of the Connect pod. |
+| chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An API key generated in Connect that can be used for the Chronicle Agent to authenticate with the Connect server for metrics. This generally must be set after the initial deployment of the Connect pod. |
+| chronicleAgent.connectApiKey.value | string | `""` | The verbatim value for the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. It is recommended to reference a secret with valueFrom instead of this. |
+| chronicleAgent.connectApiKey.valueFrom | object | `{}` | The verbatim input for valueFrom to use to retrieve the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. |
 | chronicleAgent.enabled | bool | `false` | Whether to enable the Chronicle Agent sidecar container |
 | chronicleAgent.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the container spec |
 | chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle Agent image |
