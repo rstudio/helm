@@ -1,6 +1,6 @@
 suite: Configmap tests
 templates:
-  - templates/configmap.yaml
+  - configmap.yaml
 tests:
   - it: should always create a config map
     asserts:
