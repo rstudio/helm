@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.33
+
+- Fixes to `rstudio-library.chronicle-agent.serverAddress` function.
+
 ## 0.1.32
 
 - Add `rstudio-library.chronicle-agent.image` and `rstudio-library.chronicle-agent.serverAddress` helper functions for
