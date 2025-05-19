@@ -1,6 +1,6 @@
 suite: Stateful set tests
 templates:
-  - templates/statefulset.yaml
+  - stateful-set.yaml
 # Unittest cannot use templating for chart values so we need this to be set to a fixed value for testing
 chart:
   version: 9.9.9+test
