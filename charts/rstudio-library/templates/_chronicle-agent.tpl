@@ -17,7 +17,7 @@ Takes a dict:
 {{- range $index, $service := (lookup "v1" "Service" (default .Release.Namespace .chronicleAgent.serverNamespace) "").items }}
 {{- $name := get $service.metadata.labels "app.kubernetes.io/name" }}
 {{- $component := get $service.metadata.labels "app.kubernetes.io/component" }}
-{{- if and (contains "posit-chronicle" $name) (eq $component "server") }}
+{{- if and (eq $name "posit-chronicle") (eq $component "server") }}
 {{- $version = get $service.metadata.labels "app.kubernetes.io/version" }}
 {{- end }}
 {{- end }}
@@ -38,13 +38,13 @@ Takes a dict:
 */}}
 {{- define "rstudio-library.chronicle-agent.serverAddress" }}
 {{- if .chronicleAgent.serverAddress }}
-{{ .chronicleAgent.serverAddress}}
+{{ .chronicleAgent.serverAddress }}
 {{- else }}
 {{- range $index, $service := (lookup "v1" "Service" (default .Release.Namespace .chronicleAgent.serverNamespace) "").items }}
-{{- $name := get $service.metadata.labels "app.kubernetes.io/name "}}
-{{- $component := get $service.metadata.labels "app.kubernetes.io/component "}}
-{{- if and (contains "posit-chronicle" $name) (eq $component "server") }}
-{{ $name }}.{{ $service.metadata.namespace }}
+{{- $name := get $service.metadata.labels "app.kubernetes.io/name" }}
+{{- $component := get $service.metadata.labels "app.kubernetes.io/component" }}
+{{- if and (eq $name "posit-chronicle") (eq $component "server") }}
+{{ $service.metadata.name }}.{{ $service.metadata.namespace }}
 {{- end }}
 {{- end }}
 {{- end }}
