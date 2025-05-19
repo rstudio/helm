@@ -94,7 +94,7 @@ spec:
       initContainers:
       {{- if .Values.chronicleAgent.enabled }}
       - name: chronicle-agent
-        image: {{ include "rstudio-library.chronicle-agent.image" (dict "chronicleAgent" .Values.chronicleAgent) | quote }}
+        image: {{ include "rstudio-library.chronicle-agent.image" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | quote }}
         imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
         restartPolicy: Always
         {{- with .Values.chronicleAgent.volumeMounts }}
@@ -103,7 +103,7 @@ spec:
         {{- end }}
         env:
           - name: CHRONICLE_SERVER_ADDRESS
-            value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent) | quote }}
+            value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | quote }}
           {{- if .Values.chronicleAgent.connectApiKey.secretKeyRef }}
           - name: CONNECT_API_KEY
             valueFrom:
