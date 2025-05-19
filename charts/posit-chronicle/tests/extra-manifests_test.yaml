@@ -1,6 +1,6 @@
 suite: Extra manifests tests
 templates:
-  - templates/extra-manifests.yaml
+  - extra-manifests.yaml
 tests:
   - it: should create extra manifests if specified
     set:

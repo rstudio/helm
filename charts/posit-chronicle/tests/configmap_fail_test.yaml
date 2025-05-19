@@ -1,6 +1,6 @@
 suite: Configmap tests
 templates:
-  - templates/configmap.yaml
+  - configmap.yaml
 tests:
   - it: should fail if https is enabled but no certificate is specified
     set:

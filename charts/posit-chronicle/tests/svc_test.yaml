@@ -1,6 +1,6 @@
 suite: Service tests
 templates:
-  - templates/svc.yaml
+  - svc.yaml
 tests:
   - it: should always create a service
     asserts:
