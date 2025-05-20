@@ -101,6 +101,8 @@ initContainers:
             key: apikey
 ```
 
+For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
 ### Chronicle Connect API Key
 
 In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
@@ -121,8 +123,6 @@ Chronicle agent at the time of deployment. To workaround this issue in a fresh d
 the API key unset for the Chronicle agent, deploy the chart, create an administrator API key, and then provision a
 secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
 can be set and the chart can be upgraded to include the new value.
-
-For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
 ## General principles
 

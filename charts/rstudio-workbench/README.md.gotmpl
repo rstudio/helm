@@ -392,6 +392,20 @@ initContainers:
 
 For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
+### Chronicle Workbench API Key
+
+In most cases where the Chronicle agent is deployed as a sidecar to Workbench, the agent can provision its own API key.
+However, if desired the API key can be set manually by setting the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  workbenchApiKey:
+    valueFrom:
+      secretKeyRef:
+        name: <secret-name>
+        key: <key-name>
+```
+
 ## Sealed secrets
 
 This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
