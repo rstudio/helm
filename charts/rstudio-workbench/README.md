@@ -449,8 +449,13 @@ For more information on Posit Chronicle, see the [Chronicle documentation](https
 
 ### Chronicle Workbench API Key
 
-In most cases where the Chronicle agent is deployed as a sidecar to Workbench, the agent can provision its own API key.
-However, if desired the API key can be set manually by setting the following values:
+> [!WARNING]
+> The Workbench API is currently in preview. See
+> [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html) for more
+> information.
+
+The Chronicle agent can be configured to scrape the Workbench API for additional data. To do this, you must
+provide the Chronicle agent with a Workbench API key. This can be done by setting `chronicleAgent.workbenchApiKey`:
 ```yaml
 chronicleAgent:
   enabled: true
@@ -460,6 +465,9 @@ chronicleAgent:
         name: <secret-name>
         key: <key-name>
 ```
+
+For additional information on enabling the API and generating API keys, see
+[the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html).
 
 ## Sealed secrets
 
