@@ -143,6 +143,26 @@ chronicleAgent:
     tag: <agent-version>
 ```
 
+If preferred, the Chronicle agent can be directly defined as a sidecar container using either `initContainers`
+(recommended) or `sidecar` values. Below is an example of directly defining the Chronicle agent as a native sidecar
+container using `initContainers`:
+```yaml
+initContainers:
+  - name: chronicle-agent
+    restartPolicy: Always
+    image: ghcr.io/rstudio/chronicle-agent:<agent-version>
+    env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://<address>"
+      - name: CHRONICLE_CONNECT_APIKEY
+        valueFrom:
+          secretKeyRef:
+            name: connect
+            key: apikey
+```
+
+### Chronicle Connect API Key
+
 In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
 a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example
 of how to set the API key using a secret:
@@ -150,9 +170,10 @@ of how to set the API key using a secret:
 chronicleAgent:
   enabled: true
   connectApiKey:
-    secretKeyRef:
-      name: <secret-name>
-      key: <key-name>
+    valueFrom:
+      secretKeyRef:
+        name: <secret-name>
+        key: <key-name>
 ```
 
 Due to the way Connect manages its API keys, it is currently not possible to provision an API key automatically for the
@@ -198,7 +219,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The registry to use for the Chronicle Agent image |
 | chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The repository to use for the Chronicle Agent image |
 | chronicleAgent.image.tag | string | `""` | A tag to use for the Chronicle Agent image. If not set, the chart will attempt to look up the version of the deployed Chronicle server in the current namespace. |
-| chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
+| chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server including the protocol (ex. "http://address"). If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
 | chronicleAgent.serverNamespace | string | `""` | The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace. |
 | chronicleAgent.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the container spec |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
