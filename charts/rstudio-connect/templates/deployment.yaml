@@ -104,7 +104,7 @@ spec:
         env:
           - name: CHRONICLE_SERVER_ADDRESS
             value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}
-          - name: CONNECT_API_KEY
+          - name: CHRONICLE_CONNECT_APIKEY
             {{- if .Values.chronicleAgent.connectApiKey.valueFrom }}
             valueFrom:
 {{ toYaml .Values.chronicleAgent.connectApiKey.valueFrom | indent 14 }}
