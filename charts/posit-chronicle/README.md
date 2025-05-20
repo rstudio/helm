@@ -46,19 +46,10 @@ will need to run the Chronicle agent as a sidecar container on your
 Workbench or Connect server pods by adding a native sidecar Chronicle agent
 definition to the `initContainers` value in their respective `values.yaml` files.
 
-Here is an example of Helm values to run the agent sidecar in **Workbench**,
-where we set up a shared volume between containers for audit logs:
+Here is an example of Helm values to run the agent sidecar in **Workbench**:
 
 ```yaml
-pod:
-  # We will need to create a new volume to share audit logs between
-  # the rstudio (workbench) and chronicle-agent containers
-  volumes:
-    - name: logs
-      emptyDir: {}
-  volumeMounts:
-    - name: logs
-      mountPath: "/var/lib/rstudio-server/audit"
 initContainers:
   - name: chronicle-agent
+    restartPolicy: Always
     image: ghcr.io/rstudio/chronicle-agent:
