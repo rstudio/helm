@@ -447,6 +447,20 @@ initContainers:
 
 For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
+### Chronicle Workbench API Key
+
+In most cases where the Chronicle agent is deployed as a sidecar to Workbench, the agent can provision its own API key.
+However, if desired the API key can be set manually by setting the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  workbenchApiKey:
+    valueFrom:
+      secretKeyRef:
+        name: <secret-name>
+        key: <key-name>
+```
+
 ## Sealed secrets
 
 This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
@@ -478,8 +492,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server including the protocol (ex. "http://address"). If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
 | chronicleAgent.serverNamespace | string | `""` | The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace. |
 | chronicleAgent.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the container spec |
-| chronicleAgent.workbenchApiKey.value | string | `""` | The verbatim value for the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. It is recommended to reference a secret with valueFrom instead of this. |
-| chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | The verbatim input for valueFrom to use to retrieve the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. |
+| chronicleAgent.workbenchApiKey.value | string | `""` | The verbatim value for the API Key used in the CHRONICLE_WORKBENCH_APIKEY environment variable passed to the Chronicle Agent. It is recommended to reference a secret with valueFrom instead of this. |
+| chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | The verbatim input for valueFrom to use to retrieve the API Key used in the CHRONICLE_WORKBENCH_APIKEY environment variable passed to the Chronicle Agent. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
 | config.defaultMode.pam | int | 0644 | default mode for pam scripts |
