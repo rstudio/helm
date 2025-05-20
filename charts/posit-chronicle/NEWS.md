@@ -10,6 +10,7 @@
   - Separated an image.registry value from the image.repository value.
   - Improve documentation of values.yaml and add a values.schema.json definition for input validation.
   - An S3 bucket must now be specified in S3 Storage backend is enabled.
+  - Remove deprecated value `config.LocalStorage.RetentionPeriod`.
 - Changes to chart behavior.
   - Resource names are now applied dynamically based on the release name.
   - Additional default recommended Kubernetes labels have been applied to all resources.
