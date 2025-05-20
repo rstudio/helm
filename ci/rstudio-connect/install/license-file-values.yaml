@@ -6,3 +6,5 @@ license:
 # a PVC is required for Connect to run in OHE (now the default)
 sharedStorage:
   create: true
+  # normally this should be ReadWriteMany, setting just for CI
+  accessModes: ReadWriteOnce
