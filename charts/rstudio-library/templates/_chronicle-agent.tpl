@@ -44,7 +44,7 @@ Takes a dict:
 {{- $name := get $service.metadata.labels "app.kubernetes.io/name" }}
 {{- $component := get $service.metadata.labels "app.kubernetes.io/component" }}
 {{- if and (eq $name "posit-chronicle") (eq $component "server") }}
-{{ $service.metadata.name }}.{{ $service.metadata.namespace }}
+{{- (index $service.spec.ports 0).name }}://{{ $name }}.{{ $service.metadata.namespace }}
 {{- end }}
 {{- end }}
 {{- end }}
