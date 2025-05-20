@@ -40,7 +40,6 @@ data:
     Enabled = {{ .Values.config.LocalStorage.Enabled }}
     {{- if .Values.config.LocalStorage.Enabled }}
     Location = {{ .Values.config.LocalStorage.Path }}
-    RetentionPeriod = {{ .Values.config.LocalStorage.RetentionPeriod }}
     {{- end }}
 
     [S3Storage]

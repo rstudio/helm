@@ -140,8 +140,6 @@ config:
     Enabled: true
     # -- The path to the local storage location
     Path: "/opt/chronicle-data"
-    # -- The retention period for data before it is purged
-    RetentionPeriod: "30d"
   # -- Configuration for S3 data storage with Chronicle
   S3Storage:
     # -- If set to true, Chronicle will use S3 for data storage
