@@ -467,7 +467,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
-| chronicleAgent | object | `{"autoDiscovery":true,"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"serverAddress":"","serverNamespace":"","volumeMounts":[]}` | Settings for the Chronicle Agent sidecar container |
+| chronicleAgent | object | `{"autoDiscovery":true,"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"serverAddress":"","serverNamespace":"","volumeMounts":[],"workbenchApiKey":{"value":"","valueFrom":{}}}` | Settings for the Chronicle Agent sidecar container |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.enabled | bool | `false` | Whether to enable the Chronicle Agent sidecar container |
 | chronicleAgent.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the container spec |
@@ -478,6 +478,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server including the protocol (ex. "http://address"). If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
 | chronicleAgent.serverNamespace | string | `""` | The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace. |
 | chronicleAgent.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the container spec |
+| chronicleAgent.workbenchApiKey.value | string | `""` | The verbatim value for the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. It is recommended to reference a secret with valueFrom instead of this. |
+| chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | The verbatim input for valueFrom to use to retrieve the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
 | config.defaultMode.pam | int | 0644 | default mode for pam scripts |
