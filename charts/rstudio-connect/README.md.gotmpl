@@ -8,6 +8,13 @@
 
 {{ template "rstudio.install" . }}
 
+## Upgrade guidance
+
+### 0.8.0
+
+- When upgrading to version 0.8.0 or later, Connect now runs in [Off-Host Execution mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default
+- If you desire to run Connect not in Off-Host Execution mode, then set `securityContext.privileged: true` and `launcher.enabled: false`
+
 ## Required configuration
 
 To function, this chart requires the following:
