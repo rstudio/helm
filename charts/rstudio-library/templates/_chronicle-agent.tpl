@@ -24,7 +24,7 @@ Takes a dict:
 {{- else }}
 {{- $version = .chronicleAgent.image.tag }}
 {{- end }}
-{{ $registry }}/{{ $repository }}:{{ $version }}
+{{- $registry }}/{{ $repository }}:{{ $version }}
 {{- end }}
 
 {{/*
@@ -38,7 +38,7 @@ Takes a dict:
 */}}
 {{- define "rstudio-library.chronicle-agent.serverAddress" }}
 {{- if .chronicleAgent.serverAddress }}
-{{ .chronicleAgent.serverAddress }}
+{{- .chronicleAgent.serverAddress }}
 {{- else }}
 {{- range $index, $service := (lookup "v1" "Service" (default .Release.Namespace .chronicleAgent.serverNamespace) "").items }}
 {{- $name := get $service.metadata.labels "app.kubernetes.io/name" }}
