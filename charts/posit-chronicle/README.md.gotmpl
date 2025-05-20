@@ -22,7 +22,7 @@ Here is an example of Helm values to run the agent sidecar in **Workbench**:
 initContainers:
   - name: chronicle-agent
     restartPolicy: Always
-    image: ghcr.io/rstudio/chronicle-agent:{{ .Chart.AppVersion }}
+    image: ghcr.io/rstudio/chronicle-agent:{{ template "chart.appVersion" . }}
     env:
       - name: CHRONICLE_SERVER_ADDRESS
         value: "http://<service>.<namespace>"
@@ -35,7 +35,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 initContainers:
 - name: chronicle-agent
   restartPolicy: Always
-  image: ghcr.io/rstudio/chronicle-agent:{{ .Chart.AppVersion }}
+  image: ghcr.io/rstudio/chronicle-agent:{{ template "chart.appVersion" . }}
   env:
     - name: CHRONICLE_SERVER_ADDRESS
       value: "http://<service>.<namespace>"
