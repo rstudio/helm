@@ -2,3 +2,7 @@ license:
   file:
     secret: pct-license
     secretKey: pct.lic
+
+# a PVC is required for Connect to run in OHE (now the default)
+sharedStorage:
+  create: true
