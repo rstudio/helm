@@ -7,4 +7,5 @@ license:
 sharedStorage:
   create: true
   # normally this should be ReadWriteMany, setting just for CI
-  accessModes: ReadWriteOnce
+  accessModes:
+    - ReadWriteOnce
