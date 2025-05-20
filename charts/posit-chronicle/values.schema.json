@@ -354,11 +354,6 @@
               "description": "Path to the local storage directory",
               "type": "string",
               "default": "/opt/chronicle-data"
-            },
-            "retentionPeriod": {
-              "description": "Retention period for local storage",
-              "type": "string",
-              "default": "30d"
             }
           }
         },
