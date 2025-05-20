@@ -39,7 +39,7 @@ initContainers:
   env:
     - name: CHRONICLE_SERVER_ADDRESS
       value: "http://<service>.<namespace>"
-    - name: CONNECT_API_KEY
+    - name: CHRONICLE_CONNECT_APIKEY
       valueFrom:
         secretKeyRef:
           name: connect
