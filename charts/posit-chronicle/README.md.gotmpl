@@ -21,6 +21,7 @@ Here is an example of Helm values to run the agent sidecar in **Workbench**:
 ```yaml
 initContainers:
   - name: chronicle-agent
+    restartPolicy: Always
     image: ghcr.io/rstudio/chronicle-agent:{{ .Chart.AppVersion }}
     env:
       - name: CHRONICLE_SERVER_ADDRESS
@@ -33,6 +34,7 @@ API key from a Kubernetes Secret is used to unlock more detailed metrics:
 ```yaml
 initContainers:
 - name: chronicle-agent
+  restartPolicy: Always
   image: ghcr.io/rstudio/chronicle-agent:{{ .Chart.AppVersion }}
   env:
     - name: CHRONICLE_SERVER_ADDRESS
