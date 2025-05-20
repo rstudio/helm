@@ -128,7 +128,7 @@ config:
     # -- The port to use for the profiling server
     Port: 3030
   Logging:
-    # -- Specified the output for log messages, can be one of "STDOUT", "STDERR", or a file path
+    # -- Specifies the output for log messages, can be one of "STDOUT", "STDERR", or a file path
     ServiceLog: "STDOUT"
     # -- The log level for the service, can be one of "TRACE", "DEBUG", "INFO", "WARN", or "ERROR"
     ServiceLogLevel: "INFO"
