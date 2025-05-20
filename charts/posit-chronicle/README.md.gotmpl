@@ -94,7 +94,6 @@ config:
   LocalStorage:
     Enabled: true
     Location: "/chronicle-data"
-    RetentionPeriod: "30d"
 ```
 
 The `persistence` section configures the persistent volume claim in the
@@ -105,12 +104,6 @@ by `config.LocalStorage.Path` to avoid potential misconfiguration and data loss.
 By default, Chronicle requests 10Gi of storage. In most cases, this amount of
 storage should be sufficient for thirty days of monitoring data. Organizations
 are responsible for managing the size of the persistent volume.
-
-`retentionPeriod` controls how long usage data is retained. For example, `"120m"`
-for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for unbounded
-retention. Units smaller than seconds or larger than days are not currently
-supported. `retentionPeriod` does not apply to other types of data stored by
-Chronicle.
 
 You can also persist data to AWS S3 in place of or in tandem with local storage:
 
