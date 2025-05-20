@@ -86,6 +86,11 @@ chronicleAgent:
   serverAddress: ""
   # -- The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace.
   serverNamespace: ""
+  workbenchApiKey:
+    # -- The verbatim value for the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. It is recommended to reference a secret with valueFrom instead of this.
+    value: ""
+    # -- The verbatim input for valueFrom to use to retrieve the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent.
+    valueFrom: {}
 
 launcher:
   # -- determines whether the launcher should be started in the container

@@ -111,8 +111,15 @@ spec:
           env:
             - name: CHRONICLE_SERVER_ADDRESS
               value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}
+            - name: CHRONICLE_WORKBENCH_APIKEY
+              {{- if .Values.chronicleAgent.workbenchApiKey.valueFrom }}
+              valueFrom:
+{{ toYaml .Values.chronicleAgent.workbenchApiKey.valueFrom | indent 16 }}
+              {{- else }}
+              value: {{ .Values.chronicleAgent.workbenchApiKey.value | quote }}
+              {{- end }}
             {{- with .Values.chronicleAgent.env }}
-            {{ toYaml . | indent 10 }}
+            {{ toYaml . | indent 12 }}
             {{- end }}
         {{- end }}
         {{- with .Values.initContainers }}
