@@ -112,13 +112,11 @@ tests:
           \[LocalStorage\]
           Enabled = true
           Location = \/opt\/chronicle-data
-          RetentionPeriod = 30d
   - it: should set values for a custom local storage configuration
     set:
       config:
         LocalStorage:
           Path: /custom/data/path
-          RetentionPeriod: 60d
     asserts:
     - matchRegex:
         path: data["posit-chronicle.gcfg"]
@@ -126,7 +124,6 @@ tests:
           \[LocalStorage\]
           Enabled = true
           Location = \/custom\/data\/path
-          RetentionPeriod = 60d
   - it: should disable local storage when specified
     set:
       config:
@@ -146,7 +143,6 @@ tests:
         path: data["posit-chronicle.gcfg"]
         pattern: |
           Location = \/opt\/chronicle-data
-          RetentionPeriod = 30d
   - it: should enable and configure S3 storage when specified
     set:
       config:
