@@ -280,7 +280,7 @@ chronicleAgent:
     tag: ""
     # -- The pull policy for the Chronicle Agent image
     imagePullPolicy: IfNotPresent
-  # -- The address for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided.
+  # -- The address for the Chronicle server including the protocol (ex. "http://address"). If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided.
   serverAddress: ""
   # -- The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace.
   serverNamespace: ""

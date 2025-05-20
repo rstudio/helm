@@ -377,25 +377,20 @@ chronicleAgent:
     tag: <agent-version>
 ```
 
-If desired, audit logging can be mounted into the Chronicle agent container by setting the following values:
+If preferred, the Chronicle agent can be directly defined as a sidecar container using either `initContainers`
+(recommended) or `sidecar` values. Below is an example of directly defining the Chronicle agent as a native sidecar
+container using `initContainers`:
 ```yaml
-pod:
-  # We will need to create a new volume to share audit logs between
-  # the rstudio (workbench) and chronicle-agent containers
-  volumes:
-    - name: logs
-      emptyDir: {}
-  volumeMounts:
-    - name: logs
-      mountPath: "/var/lib/rstudio-server/audit"
-chronicleAgent:
-  enabled: true
-  volumeMounts:
-    - name: logs
-      mountPath: "/var/lib/rstudio-server/audit"
+initContainers:
+  - name: chronicle-agent
+    restartPolicy: Always
+    image: ghcr.io/rstudio/chronicle-agent:<agent-version>
+    env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://<address>"
 ```
 
-For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
 ## Sealed secrets
 
