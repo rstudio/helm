@@ -489,7 +489,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
-| chronicleAgent | object | `{"autoDiscovery":true,"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"serverAddress":"","serverNamespace":"","volumeMounts":[],"workbenchApiKey":{"value":"","valueFrom":{}}}` | Settings for the Chronicle Agent sidecar container |
+| chronicleAgent | object | `{"autoDiscovery":true,"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"securityContext":{"privileged":false,"runAsNonRoot":true},"serverAddress":"","serverNamespace":"","volumeMounts":[],"workbenchApiKey":{"value":"","valueFrom":{}}}` | Settings for the Chronicle Agent sidecar container |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.enabled | bool | `false` | Whether to enable the Chronicle Agent sidecar container |
 | chronicleAgent.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the container spec |
@@ -497,6 +497,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The registry to use for the Chronicle Agent image |
 | chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The repository to use for the Chronicle Agent image |
 | chronicleAgent.image.tag | string | `""` | A tag to use for the Chronicle Agent image. If not set, the chart will attempt to look up the version of the deployed Chronicle server in the current namespace. |
+| chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | A verbatim securityContext to apply to the Chronicle Agent container |
 | chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server including the protocol (ex. "http://address"). If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
 | chronicleAgent.serverNamespace | string | `""` | The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace. |
 | chronicleAgent.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the container spec |
