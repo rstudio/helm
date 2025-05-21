@@ -218,6 +218,7 @@ README. For a complete list of configuration options, please refer to the
 | image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | image.registry | string | `"ghcr.io"` | The image registry |
 | image.repository | string | `"rstudio/chronicle"` | The image repository |
+| image.securityContext | object | `{"allowPrivilegeEscalation":false,"runAsNonRoot":true}` | The verbatim securityContext for the Chronicle server container in the pod    ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#securitycontext-v1-core |
 | image.sha | Optional | `""` | The image digest |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion |
 | nameOverride | string | `""` | Override for the name of the chart deployment |
@@ -237,6 +238,7 @@ README. For a complete list of configuration options, please refer to the
 | pod.env | list | `[]` | Optional environment variables |
 | pod.labels | object | `{}` | Additional labels to add to the chronicle-server pods |
 | pod.nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
+| pod.securityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | The verbatim pod-level securityContext    ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core |
 | pod.terminationGracePeriodSeconds | int | `30` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
