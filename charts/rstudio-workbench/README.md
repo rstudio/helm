@@ -489,7 +489,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
-| chronicleAgent | object | `{"autoDiscovery":true,"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"securityContext":{"privileged":false,"runAsNonRoot":true},"serverAddress":"","serverNamespace":"","volumeMounts":[],"workbenchApiKey":{"value":"","valueFrom":{}}}` | Settings for the Chronicle Agent sidecar container |
+| chronicleAgent | object | `{"agentEnvironment":"","autoDiscovery":true,"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"securityContext":{"privileged":false,"runAsNonRoot":true},"serverAddress":"","serverNamespace":"","volumeMounts":[],"workbenchApiKey":{"value":"","valueFrom":{}}}` | Settings for the Chronicle Agent sidecar container |
+| chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent. This can be used to identify the source of the metrics in Chronicle in cases where multiple distinct servers or clusters may be present. |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.enabled | bool | `false` | Whether to enable the Chronicle Agent sidecar container |
 | chronicleAgent.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the container spec |
