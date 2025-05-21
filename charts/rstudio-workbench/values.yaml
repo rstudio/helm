@@ -95,6 +95,8 @@ chronicleAgent:
     value: ""
     # -- The verbatim input for valueFrom to use to retrieve the API Key used in the CHRONICLE_WORKBENCH_APIKEY environment variable passed to the Chronicle Agent.
     valueFrom: {}
+  # -- An environment tag to apply to all metrics reported by this agent. This can be used to identify the source of the metrics in Chronicle in cases where multiple distinct servers or clusters may be present.
+  agentEnvironment: ""
 
 launcher:
   # -- determines whether the launcher should be started in the container

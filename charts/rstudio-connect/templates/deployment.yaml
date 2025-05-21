@@ -115,6 +115,10 @@ spec:
             {{- else }}
             value: {{ .Values.chronicleAgent.connectApiKey.value | quote }}
             {{- end }}
+          {{- with .Values.chronicleAgent.agentEnvironment }}
+          - name: CHRONICLE_AGENT_ENVIRONMENT
+            value: {{ . | quote }}
+          {{- end }}
           {{- with .Values.chronicleAgent.env }}
           {{ toYaml . | indent 10 }}
           {{- end }}

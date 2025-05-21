@@ -122,6 +122,10 @@ spec:
               {{- else }}
               value: {{ .Values.chronicleAgent.workbenchApiKey.value | quote }}
               {{- end }}
+            {{- with .Values.chronicleAgent.agentEnvironment }}
+            - name: CHRONICLE_AGENT_ENVIRONMENT
+              value: {{ . | quote }}
+            {{- end }}
             {{- with .Values.chronicleAgent.env }}
             {{ toYaml . | indent 12 }}
             {{- end }}

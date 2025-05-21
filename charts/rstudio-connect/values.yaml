@@ -273,8 +273,6 @@ chronicleAgent:
   securityContext:
     privileged: false
     runAsNonRoot: true
-  # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
-  autoDiscovery: true
   image:
     # -- The registry to use for the Chronicle Agent image
     registry: ghcr.io
@@ -284,6 +282,8 @@ chronicleAgent:
     tag: ""
     # -- The pull policy for the Chronicle Agent image
     imagePullPolicy: IfNotPresent
+  # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
+  autoDiscovery: true
   # -- The address for the Chronicle server including the protocol (ex. "http://address"). If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided.
   serverAddress: ""
   # -- The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace.
@@ -294,6 +294,8 @@ chronicleAgent:
     value: ""
     # -- The verbatim input for valueFrom to use to retrieve the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent.
     valueFrom: {}
+  # -- An environment tag to apply to all metrics reported by this agent. This can be used to identify the source of the metrics in Chronicle in cases where multiple distinct servers or clusters may be present.
+  agentEnvironment: ""
 
 launcher:
   # -- Whether to enable the launcher
