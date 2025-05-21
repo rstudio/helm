@@ -60,6 +60,10 @@
         "pullPolicy": {
           "description": "Container image pull policy",
           "type": "string"
+        },
+        "securityContext": {
+          "description": "Security context to apply at the container-level",
+          "type": "object"
         }
       },
       "required": [
@@ -185,10 +189,14 @@
           }
         },
         "terminationGracePeriodSeconds": {
-            "description": "Termination grace period for the pod",
-            "type": "integer",
-            "default": 30,
-            "minimum": 0
+          "description": "Termination grace period for the pod",
+          "type": "integer",
+          "default": 30,
+          "minimum": 0
+        },
+        "securityContext": {
+          "description": "Security context to apply at the pod-level",
+          "type": "object"
         }
       }
     },
