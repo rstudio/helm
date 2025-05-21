@@ -122,7 +122,7 @@ Due to the way Connect manages its API keys, it is currently not possible to pro
 Chronicle agent at the time of deployment. To workaround this issue in a fresh deployment, you can initially leave
 the API key unset for the Chronicle agent, deploy the chart, create an administrator API key, and then provision a
 secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
-can be set and the chart can be upgraded to include the new value.
+can be set and the release can be upgraded to include the new value.
 
 ## General principles
 
