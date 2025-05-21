@@ -23,6 +23,11 @@ image:
   sha: ""
   # -- The image pull policy
   pullPolicy: "IfNotPresent"
+  # -- The verbatim securityContext for the Chronicle server container in the pod
+  #    ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#securitycontext-v1-core
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
 
 serviceAccount:
   create: false
@@ -65,6 +70,11 @@ pod:
   tolerations: []
   # -- The termination grace period seconds allowed for the pod before shutdown
   terminationGracePeriodSeconds: 30
+  # -- The verbatim pod-level securityContext
+  #    ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core
+  securityContext:
+    fsGroup: 1000
+    fsGroupChangePolicy: "OnRootMismatch"
 
 # If config.LocalStorage.Enabled is set to true,
 # the chart will provision a pvc of size storage.persistentVolumeSize for

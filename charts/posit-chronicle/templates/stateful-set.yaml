@@ -58,6 +58,10 @@ spec:
         args:
         {{- tpl (toYaml .) $root | nindent 8 }}
         {{- end }}
+        {{- with .Values.image.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         {{- if .Values.config.HTTPS.Enabled }}
         - containerPort: 443
@@ -83,6 +87,10 @@ spec:
         env:
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.pod.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
       volumes:
       - name: config

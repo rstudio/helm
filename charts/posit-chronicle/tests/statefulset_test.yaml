@@ -173,6 +173,9 @@ tests:
           name: posit-chronicle
           image: "ghcr.io/rstudio/chronicle:9999.9.9"
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
           ports:
           - containerPort: 5252
             name: http
@@ -223,6 +226,20 @@ tests:
     - equal:
         path: spec.template.spec.containers[0].args
         value: ["-c", "echo \"Hello world\""]
+  - it: should set additional container-level securityContext options if specified
+    set:
+      image:
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+    asserts:
+    - isSubset:
+        path: spec.template.spec.containers[0].securityContext
+        content:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
   - it: should open https port on container if enabled
     set:
       config:
@@ -234,6 +251,27 @@ tests:
         value:
           - containerPort: 443
             name: https
+  - it: should set a pod-level securityContext by default that sets permissions for volumes
+    asserts:
+    - isSubset:
+        path: spec.template.spec.securityContext
+        content:
+          fsGroup: 1000
+          fsGroupChangePolicy: "OnRootMismatch"
+  - it: should set additional pod-level securityContext options if specified
+    set:
+      pod:
+        securityContext:
+          runAsUser: 1001
+          runAsGroup: 1001
+    asserts:
+    - isSubset:
+        path: spec.template.spec.securityContext
+        content:
+          fsGroup: 1000
+          fsGroupChangePolicy: "OnRootMismatch"
+          runAsUser: 1001
+          runAsGroup: 1001
   - it: should not mount a data volume if persistence is disabled
     set:
       persistence:
