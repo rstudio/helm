@@ -108,6 +108,10 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 10 }}
           {{- end }}
+          {{- with .Values.chronicleAgent.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: CHRONICLE_SERVER_ADDRESS
               value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}

@@ -269,6 +269,10 @@ chronicleAgent:
   env: []
   # -- An array of maps that is injected as-is into the "volumeMounts" component of the container spec
   volumeMounts: []
+  # -- A verbatim securityContext to apply to the Chronicle Agent container
+  securityContext:
+    privileged: false
+    runAsNonRoot: true
   # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
   autoDiscovery: true
   image:
