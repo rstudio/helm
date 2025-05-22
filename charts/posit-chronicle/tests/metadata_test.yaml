@@ -1,6 +1,7 @@
 suite: Generic metadata tests
 excludeTemplates:
   - extra-manifests.yaml
+  - NOTES.txt
 set:
   serviceAccount:
     create: true
