@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4.3.0
+        uses: azure/setup-helm@v4
 
       - name: Add rstudio helm repo
         run: helm repo add rstudio https://helm.rstudio.com
@@ -26,7 +26,7 @@ jobs:
           python-version: "3.10"
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
+        uses: helm/chart-testing-action@v2
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -81,7 +81,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4.3.0
+        uses: azure/setup-helm@v4
 
       - name: Install helm unittest plugin
         run: helm plugin install https://github.com/helm-unittest/helm-unittest.git
@@ -129,7 +129,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4.3.0
+        uses: azure/setup-helm@v4
 
       - name: Add rstudio helm repo
         run: helm repo add rstudio https://helm.rstudio.com
@@ -139,7 +139,7 @@ jobs:
           python-version: "3.10"
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
+        uses: helm/chart-testing-action@v2
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -219,7 +219,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4.3.0
+        uses: azure/setup-helm@v4
 
       - uses: extractions/setup-just@v2
 
