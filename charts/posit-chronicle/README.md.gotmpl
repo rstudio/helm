@@ -10,13 +10,12 @@
 
 ## Usage
 
-This chart deploys only the Chronicle server and is meant to be used in tandem
-with the Workbench and Connect charts. To actually send data to the server, you
-will need to run the Chronicle agent as a sidecar container on your
-Workbench or Connect server pods by adding a native sidecar Chronicle agent
-definition to the `initContainers` value in their respective `values.yaml` files.
+This chart deploys the Chronicle server and is intended to be used in tandem
+with the Workbench and Connect charts. For the server to receive data,
+the Chronicle agent must be deployed as a sidecar container alongside
+Workbench or Connect server pods.
 
-Here is an example of Helm values to run the agent sidecar in **Workbench**:
+Below is an example of the values used to run the agent sidecar in **Workbench**.
 
 ```yaml
 initContainers:
@@ -28,8 +27,10 @@ initContainers:
         value: "http://<service>.<namespace>"
 ```
 
-And here is an example of Helm values for Connect, where a **Connect**
-API key from a Kubernetes Secret is used to unlock more detailed metrics:
+The below example shows how to run the Chronicle agent sidecar in **Connect**. The
+usage is similar to the Workbench example, but a Connect API key with Administrator
+permissions must be configured in order to receive a full complement of metrics.
+In the example,
 
 ```yaml
 initContainers:
@@ -81,8 +82,11 @@ config:
 
 Chronicle can be configured to persist data to local storage, AWS S3, or both.
 
-The default configuration uses a local volume with persistence enabled, which
-is suitable if you'd like to access and analyze the data within your cluster:
+### Local Storage
+
+The default configuration will save data to a persistent volume, which
+is suitable if you'd like to access and analyze the data within your cluster.
+The below values show the default configuration for storage:
 
 ```yaml
 persistence:
@@ -93,7 +97,7 @@ persistence:
 config:
   LocalStorage:
     Enabled: true
-    Location: "/chronicle-data"
+    Location: "/opt/chronicle-data"
 ```
 
 The `persistence` section configures the persistent volume claim in the
@@ -102,10 +106,35 @@ configuration file. The persistent volume will always mount to the path specifie
 by `config.LocalStorage.Path` to avoid potential misconfiguration and data loss.
 
 By default, Chronicle requests 10Gi of storage. In most cases, this amount of
-storage should be sufficient for thirty days of monitoring data. Organizations
-are responsible for managing the size of the persistent volume.
+storage should be sufficient for thirty days of monitoring data.
+Users are responsible for managing the size of the persistent volume and
+negotiating and controlling access to the data from other pods. While attaching
+the volume to Workbench is a valid method of accessing the data, keep in mind
+that some data captured by Chronicle may be considered sensitive and should be
+handled with care.
 
-You can also persist data to AWS S3 in place of or in tandem with local storage:
+#### Alternate Storage Class
+
+Depending on the environment or cloud hosting Chronicle, many CSI drivers may
+be available to use as the persistent volume's storage class. While Chronicle
+only natively supports local storage or S3, CSI drivers may be used to provide
+support for other storage backends such as Azure Blob Storage, Azure Files, Google
+Cloud Storage, or other object storage solutions. The storage class for persistent
+volumes can be set with the following value:
+
+```yaml
+persistence:
+  storageClass: "alternate-storage-class"
+```
+
+Please report and performance or stability issues with alternate storage configurations
+to the [issue tracker](https://github.com/rstudio/helm/issues/new?template=chronicle.md).
+
+### S3 Storage
+
+Chronicle can also be configured to store data in an S3 bucket. This can be
+useful for controlling access to data or taking advantage of S3 features
+such as lifecycle management.
 
 ```yaml
 config:
@@ -115,13 +144,13 @@ config:
     Region: "us-east-2"
 ```
 
-### Using IAM roles for S3 access
+#### Using IAM roles for S3 access
 
-If you are running on EKS, you can use [IAM Roles for Service
+If Chronicle is running on EKS, [IAM Roles for Service
 Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
-to manage the credentials needed to access S3. In this scenario, once you have [created an IAM
-role](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
-you can use this role as an annotation on the existing Service Account:
+can be utilized to manage the credentials needed to access S3. Once [an IAM role has been
+created](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
+the role can be attached as an annotation on Chronicle's Service Account:
 
 ```yaml
 serviceaccount:
@@ -130,8 +159,7 @@ serviceaccount:
     eks.amazonaws.com/role-arn:  arn:aws:iam::123456789000:role/iam-role-name-here
 ```
 
-If you are unable to use IAM Roles for Service Accounts, there are any number of
-alternatives for injecting AWS credentials into a container. As a fallback,
+There are alternatives for injecting AWS credentials into a container. As a fallback,
 the S3 storage config allows specifying a profile:
 
 ```yaml
@@ -143,7 +171,7 @@ config:
     Region: "us-east-2"
 ```
 
-### Needed S3 Policy Permissions
+#### Needed S3 Policy Permissions
 
 The credentials Chronicle uses for S3 storage must have the following permissions enabled:
 
@@ -154,9 +182,12 @@ The credentials Chronicle uses for S3 storage must have the following permission
 
 ## Additional Configuration
 
-Chronicle has a multitude of configuration options not specifically mentioned in this
-README. For a complete list of configuration options, please refer to the
-[Chronicle documentation](https://docs.posit.co/chronicle/).
+Chronicle has additional configuration options not specifically mentioned in this
+README. For additional information on administrating or using Posit Chronicle, see
+the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
+For details on server configuration options, see the [advanced server configuration
+reference page](https://docs.posit.co/chronicle/appendix/library/advanced-server.html).
 
 {{ template "chart.valuesSection" . }}
 
