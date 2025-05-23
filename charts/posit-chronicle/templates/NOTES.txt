@@ -14,7 +14,7 @@ rescheduled.
 WARNING: No storage backend is configured. Chronicle will not be able to store any data in a persistent or accessible
 location. Consider redeploying with `.Values.config.LocalStorage` or `.Values.config.S3Storage` set to true.
 {{- end }}
-{{ if and .Values.config.LocalStorage.Enabled and .Values.config.S3Storage.Enabled }}
+{{ if and .Values.config.LocalStorage.Enabled .Values.config.S3Storage.Enabled }}
 WARNING: Both local and S3 storage are currently enabled. Data will be saved both locally and in S3 which could
 result in inflated costs. It is recommended to only enable one storage backend.
 {{- end }}
