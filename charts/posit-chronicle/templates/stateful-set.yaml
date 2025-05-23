@@ -7,10 +7,10 @@ metadata:
   namespace: {{ include "posit-chronicle.namespace" . }}
   labels:
     {{- include "posit-chronicle.labels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
   annotations:
+    {{- with .Values.commonAnnotations }}
     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- end }}
 spec:
   replicas: {{ .Values.replicas }}
   serviceName: {{ include "posit-chronicle.fullname" . }}
@@ -24,10 +24,9 @@ spec:
         {{- with .Values.pod.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- if (include "posit-chronicle.pod.annotations" .) }}
       annotations:
-        {{- include "posit-chronicle.pod.annotations" . | nindent 8 }}
-      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- include "posit-chronicle.pod.annotations" . | trim | nindent 8) }}
     spec:
       {{- with .Values.pod.affinity }}
       affinity:
