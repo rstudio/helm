@@ -126,18 +126,15 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 ## Chronicle Agent
 
-This section details how to deploy and configure a Chronicle agent instance alongside Workbench. For more information on
-Posit Chronicle in general, see the [Posit Chronicle documentation](https://docs.posit.co/chronicle/).
-
-This chart supports use of a sidecar Chronicle agent to capture and report metrics to a Chronicle server. The agent can
-be enabled by setting `chronicleAgent.enabled=true`.
+This chart supports use of a sidecar Chronicle agent to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
 
 By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
-lookup namespace can be changed by providing `chronicleAgent.serverNamespace`. If a server is found, the
-Chronicle agent's `chronicleAgent.serverAddress` value is set to the server's internal service address and the
-`chronicleAgent.image.tag` is set to the server's version. This auto-discovery behavior can be disabled by setting
-`chronicleAgent.autoDiscovery=false` or by manually providing the `chronicleAgent.serverAddress` and
-`chronicleAgent.image.tag` values. Below is an example where these values are set manually:
+searched namespace can be changed setting `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
 ```yaml
 chronicleAgent:
   enabled: true
@@ -164,10 +161,13 @@ initContainers:
             key: apikey
 ```
 
+For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
 ### Chronicle Connect API Key
 
-In order to get full metrics reporting with Connect, the Chronicle agent must be provided an API key with Administrator 
-permissions. Below is an example of how to provide the API key to the Chronicle Agent using a Kubernetes Secret:
+In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
+a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example
+of how to set the API key using a secret:
 ```yaml
 chronicleAgent:
   enabled: true
@@ -178,12 +178,11 @@ chronicleAgent:
         key: <key-name>
 ```
 
-Connect API keys must be generated using an administrator account in the Connect UI after initial deployment.
-`chronicleAgent.connectApiKey` can be updated after the initial installation of the chart with corresponding values
-or references to a generated API key.
-
-For additional information on generating API keys, see the 
-[Posit Connect API documentation](https://docs.posit.co/connect/user/api-keys/#api-keys-creating).
+Due to the way Connect manages its API keys, it is currently not possible to provision an API key automatically for the
+Chronicle agent at the time of deployment. To workaround this issue in a fresh deployment, you can initially leave
+the API key unset for the Chronicle agent, deploy the chart, create an administrator API key, and then provision a
+secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
+can be set and the release can be upgraded to include the new value.
 
 ## General principles
 

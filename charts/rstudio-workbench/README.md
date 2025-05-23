@@ -415,19 +415,15 @@ launcher:
 
 ## Chronicle Agent
 
-This section details how to deploy and configure a Chronicle agent instance alongside Workbench. For more information on 
-Posit Chronicle in general, see the [Posit Chronicle documentation](https://docs.posit.co/chronicle/).
-
-This chart supports use of a sidecar Chronicle agent to capture and report metrics to a Chronicle server. The agent can 
-be enabled by setting `chronicleAgent.enabled=true`.
+This chart supports use of a sidecar Chronicle agent to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
 
 By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
-lookup namespace can be changed by providing `chronicleAgent.serverNamespace`. If a server is found, the
-Chronicle agent's `chronicleAgent.serverAddress` value is set to the server's internal service address and the 
-`chronicleAgent.image.tag` is set to the server's version. This auto-discovery behavior can be disabled by setting 
-`chronicleAgent.autoDiscovery=false` or by manually providing the `chronicleAgent.serverAddress` and 
-`chronicleAgent.image.tag` values. Below is an example where these values are set manually:
+searched namespace can be changed setting `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
 
+To set the server address and/or version manually, set the following values:
 ```yaml
 chronicleAgent:
   enabled: true
@@ -436,7 +432,7 @@ chronicleAgent:
     tag: <agent-version>
 ```
 
-If preferred, the Chronicle agent can be directly defined as a sidecar container using either the `initContainers`
+If preferred, the Chronicle agent can be directly defined as a sidecar container using either `initContainers`
 (recommended) or `sidecar` values. Below is an example of directly defining the Chronicle agent as a native sidecar
 container using `initContainers`:
 ```yaml
@@ -449,6 +445,8 @@ initContainers:
         value: "http://<address>"
 ```
 
+For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
 ### Chronicle Workbench API Key
 
 > [!WARNING]
@@ -456,9 +454,8 @@ initContainers:
 > [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html) for more
 > information.
 
-The Chronicle agent can be configured to scrape the Workbench API for additional data. To enable this behavior, a 
-Workbench API key must be provided to the Chronicle agent with at least read-only administrator privileges. 
-Below is an example of providing a Workbench API key to the Chronicle agent via a Kubernetes secret:
+The Chronicle agent can be configured to scrape the Workbench API for additional data. To do this, you must
+provide the Chronicle agent with a Workbench API key. This can be done by setting `chronicleAgent.workbenchApiKey`:
 ```yaml
 chronicleAgent:
   enabled: true
@@ -468,10 +465,6 @@ chronicleAgent:
         name: <secret-name>
         key: <key-name>
 ```
-
-Workbench API keys must be generated using the Workbench CLI with the Workbench API enabled after initial deployment.
-`chronicleAgent.workbenchApiKey` can be updated after the initial installation of the chart with corresponding values
-or references to a generated API key.
 
 For additional information on enabling the API and generating API keys, see
 [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html).
