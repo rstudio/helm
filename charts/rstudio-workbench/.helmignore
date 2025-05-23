@@ -1,6 +1,7 @@
 snapshot/
 Makefile
 *.gotmpl
+.helmignore
 
 # chart tests
 ci/
