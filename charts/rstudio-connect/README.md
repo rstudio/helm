@@ -208,22 +208,22 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
-| chronicleAgent | object | `{"agentEnvironment":"","autoDiscovery":true,"connectApiKey":{"value":"","valueFrom":{}},"enabled":false,"env":[],"image":{"imagePullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"rstudio/chronicle-agent","tag":""},"securityContext":{"privileged":false,"runAsNonRoot":true},"serverAddress":"","serverNamespace":"","volumeMounts":[]}` | Settings for the Chronicle Agent sidecar container |
-| chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent. This can be used to identify the source of the metrics in Chronicle in cases where multiple distinct servers or clusters may be present. |
+| chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
-| chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An API key generated in Connect that can be used for the Chronicle Agent to authenticate with the Connect server for metrics. This generally must be set after the initial deployment of the Connect pod. |
-| chronicleAgent.connectApiKey.value | string | `""` | The verbatim value for the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. It is recommended to reference a secret with valueFrom instead of this. |
-| chronicleAgent.connectApiKey.valueFrom | object | `{}` | The verbatim input for valueFrom to use to retrieve the API Key used in the CONNECT_API_KEY environment variable passed to the Chronicle Agent. |
-| chronicleAgent.enabled | bool | `false` | Whether to enable the Chronicle Agent sidecar container |
-| chronicleAgent.env | list | `[]` | An array of maps that is injected as-is into the "env:" component of the container spec |
-| chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle Agent image |
-| chronicleAgent.image.registry | string | `"ghcr.io"` | The registry to use for the Chronicle Agent image |
-| chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The repository to use for the Chronicle Agent image |
-| chronicleAgent.image.tag | string | `""` | A tag to use for the Chronicle Agent image. If not set, the chart will attempt to look up the version of the deployed Chronicle server in the current namespace. |
-| chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | A verbatim securityContext to apply to the Chronicle Agent container |
-| chronicleAgent.serverAddress | string | `""` | The address for the Chronicle server including the protocol (ex. "http://address"). If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace or the serverNamespace if provided. |
-| chronicleAgent.serverNamespace | string | `""` | The namespace for the Chronicle server. If not set, the chart will attempt to look up the address of the Chronicle Server in the release namespace. |
-| chronicleAgent.volumeMounts | list | `[]` | An array of maps that is injected as-is into the "volumeMounts" component of the container spec |
+| chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
+| chronicleAgent.connectApiKey.value | string | `""` | Connect API key as a raw string to set as the `CHRONICLE_CONNECT_APIKEY` environment variable (not recommended) |
+| chronicleAgent.connectApiKey.valueFrom | object | `{}` | Connect API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_CONNECT_APIKEY` environment variable (recommended) |
+| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
+| chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
+| chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
+| chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The Chronicle agent image repository |
+| chronicleAgent.image.sha | string | `""` | The Chronicle agent image digest |
+| chronicleAgent.image.tag | string | `""` | The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if    `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | The container-level security context for the Chronicle agent container |
+| chronicleAgent.serverAddress | string | `""` | Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.serverNamespace | string | `""` | Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if    `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.volumeMounts | list | `[]` | Verbatim volumeMounts to attach to the Chronicle agent container |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
