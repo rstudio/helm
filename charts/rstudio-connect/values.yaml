@@ -261,6 +261,51 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+# Settings for the Chronicle Agent sidecar container
+chronicleAgent:
+  # -- Creates a Chronicle agent sidecar container in the pod if true
+  enabled: false
+  # -- Additional environment variables to set on the Chronicle agent container `env`
+  env: []
+  # -- Verbatim volumeMounts to attach to the Chronicle agent container
+  volumeMounts: []
+  # -- The container-level security context for the Chronicle agent container
+  securityContext:
+    privileged: false
+    runAsNonRoot: true
+  image:
+    # -- The Chronicle agent image registry
+    registry: ghcr.io
+    # -- The Chronicle agent image repository
+    repository: rstudio/chronicle-agent
+    # -- The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if
+    #    `chronicleAgent.autoDiscovery=false`
+    tag: ""
+    # -- The Chronicle agent image digest
+    sha: ""
+    # -- The pull policy for the Chronicle agent image
+    imagePullPolicy: IfNotPresent
+  # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
+  autoDiscovery: true
+  # -- Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered
+  #    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false`
+  serverAddress: ""
+  # -- Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if
+  #    `chronicleAgent.autoDiscovery=false`
+  serverNamespace: ""
+  # -- An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be
+  #    created after Connect has been deployed so this value may need to be filled in later if performing an initial
+  #    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating))
+  connectApiKey:
+    # -- Connect API key as a raw string to set as the `CHRONICLE_CONNECT_APIKEY` environment variable (not recommended)
+    value: ""
+    # -- Connect API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the
+    #    `CHRONICLE_CONNECT_APIKEY` environment variable (recommended)
+    valueFrom: {}
+  # -- An environment tag to apply to all metrics reported by this agent
+  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment))
+  agentEnvironment: ""
+
 launcher:
   # -- Whether to enable the launcher
   enabled: false
