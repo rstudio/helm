@@ -19,6 +19,7 @@
   - Storage class can now be overridden on the pod's volume claim template.
   - Selector labels definitions between pod and service are now merged into a single definition. Removed the ability to override these values.
   - Add support for additional custom manifest input via `extraObjects` value.
+  - `securityContext` is now specified for both the pod and container. The default values are set to prevent privilege escalation, running as root, and set the `fsGroup` to match Chronicle's service account.
 - Add unittests for chart templates.
 - Various Chart.yaml metadata changes.
   - Fix logo URL.
