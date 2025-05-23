@@ -94,7 +94,11 @@ spec:
       initContainers:
       {{- if .Values.chronicleAgent.enabled }}
       - name: chronicle-agent
+        {{- if .Values.chronicleAgent.image.sha }}
+        image: {{ printf "%s@sha256:%s" (include "rstudio-library.chronicle-agent.image" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim) .Values.chronicleAgent.image.sha }}
+        {{- else }}
         image: {{ include "rstudio-library.chronicle-agent.image" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}
+        {{- end }}
         imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
         restartPolicy: Always
         {{- with .Values.chronicleAgent.volumeMounts }}
