@@ -30,14 +30,6 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
 
-      - name: Symlink ci-lint -> ci
-        run: |
-          for dir in ci/*/lint; do
-            dir=${dir#ci/}
-            dir=${dir%/lint}
-            ln -s ../../ci/${dir}/lint charts/${dir}/ci
-          done
-
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
@@ -98,14 +90,6 @@ jobs:
       - name: Install helm unittest plugin
         run: helm plugin install --version v0.6.3  https://github.com/helm-unittest/helm-unittest.git
 
-      - name: Symlink ci-tests -> tests
-        run: |
-          for dir in ci/*/tests; do
-            dir=${dir#ci/}
-            dir=${dir%/tests}
-            ln -s ../../ci/${dir}/tests charts/${dir}/tests
-          done
-
       - name: Run chart unit tests
         id: unittest
         run: |
@@ -162,14 +146,6 @@ jobs:
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
-
-      - name: Symlink ci-install -> ci
-        run: |
-          for dir in ci/*/install; do
-            dir=${dir#ci/}
-            dir=${dir%/install}
-            ln -s ../../ci/${dir}/install charts/${dir}/ci
-          done
 
       - name: Run chart-testing (list-changed)
         id: list-changed
