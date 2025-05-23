@@ -3,4 +3,6 @@ Makefile
 *.gotmpl
 
 # chart tests
+ci/
+lint/
 tests/
