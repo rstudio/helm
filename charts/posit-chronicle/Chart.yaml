@@ -21,6 +21,8 @@ annotations:
   artifacthub.io/links: |
     - name: Chronicle Documentation
       url: https://docs.posit.co/chronicle
+    - name: Posit Helm Documentation
+      url: https://docs.posit.co/helm
     - name: Docker Images
       url: https://github.com/rstudio/rstudio-docker-products
     - name: Posit Community
