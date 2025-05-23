@@ -15,3 +15,5 @@ _publish.yml
 
 /.quarto/
 
+# helm packages
+*.tgz
