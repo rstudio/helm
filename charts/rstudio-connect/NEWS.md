@@ -7,6 +7,12 @@
   - `securityContext` now defaults to `{}` instead of `securityContext.privileged: true`
   - If you would like to run Connect not in OHE mode using the previous defaults then set the following in your values.yaml. `launcher.enabled: false` and `securityContext.privileged: true`.
 
+## 0.7.26
+
+- Bump `rstudio-library` chart version to `0.1.34`.
+- Adds a shortcut resource deployment for Chronicle Agent via `chronicleAgent.enabled`. The value is disabled by default
+  and does not affect existing deployments that use `sidecar` or `initContainer` to deploy the Chronicle Agent.
+
 ## 0.7.25
 
 - Bump Connect version to 2025.04.0
