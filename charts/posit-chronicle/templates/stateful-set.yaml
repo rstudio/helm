@@ -26,7 +26,7 @@ spec:
         {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- include "posit-chronicle.pod.annotations" . | trim | nindent 8) }}
+        {{- include "posit-chronicle.pod.annotations" . | trim | nindent 8 }}
     spec:
       {{- with .Values.pod.affinity }}
       affinity:
