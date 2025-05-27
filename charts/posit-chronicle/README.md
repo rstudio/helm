@@ -45,43 +45,16 @@ with the Workbench and Connect charts. For the server to receive data,
 the Chronicle agent must be deployed as a sidecar container alongside
 Workbench or Connect server pods.
 
-Below is an example of the values used to run the agent sidecar in **Workbench**.
+Both [Workbench](https://docs.posit.co/helm/charts/rstudio-workbench/README.html#chronicle-agent)
+(`>=0.9.2`) and [Connect](https://docs.posit.co/helm/charts/rstudio-connect/README.html#chronicle-agent)
+(`>=0.7.26`) charts include out of the box support for Chronicle agent sidecars.
+The sidecar can be enabled by setting the `chronicleAgent.enabled` value to `true`
+in either product's chart.
 
-```yaml
-initContainers:
-  - name: chronicle-agent
-    restartPolicy: Always
-    image: ghcr.io/rstudio/chronicle-agent:2025.03.0
-    env:
-      - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://<service>.<namespace>"
-```
-
-The below example shows how to run the Chronicle agent sidecar in **Connect**. The
-usage is similar to the Workbench example, but a Connect API key with Administrator
-permissions must be configured in order to receive a full complement of metrics.
-In the example,
-
-```yaml
-initContainers:
-- name: chronicle-agent
-  restartPolicy: Always
-  image: ghcr.io/rstudio/chronicle-agent:2025.03.0
-  env:
-    - name: CHRONICLE_SERVER_ADDRESS
-      value: "http://<service>.<namespace>"
-    - name: CHRONICLE_CONNECT_APIKEY
-      valueFrom:
-        secretKeyRef:
-          name: connect
-          key: apikey
-```
-
-It is up to the user to provision this Kubernetes Secret for the
-Connect API key. The `extraObjects` value in the Connect chart can be used to
-create the secret and mount it to the Chronicle agent container. Due to the
-nature of the Chronicle agent, the pod may need to be restarted to pick up
-changes to the secret after initial deployment.
+For additional information on deploying and configuring Chronicle agents,
+see the [Workbench](https://docs.posit.co/helm/charts/rstudio-workbench/README.html#chronicle-agent)
+or [Connect](https://docs.posit.co/helm/charts/rstudio-connect/README.html#chronicle-agent)
+chart documentation.
 
 ## HTTPS Configuration
 
