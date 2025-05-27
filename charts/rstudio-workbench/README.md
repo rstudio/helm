@@ -419,7 +419,7 @@ This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chr
 by setting `chronicleAgent.enabled=true`.
 
 By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
-searched namespace can be changed setting `chronicleAgent.serverNamespace`. If a server exists, it will set the
+searched namespace can be changed setting by `chronicleAgent.serverNamespace`. If a server exists, it will set the
 Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
 This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
 
