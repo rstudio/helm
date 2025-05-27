@@ -126,7 +126,7 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 ## Chronicle Agent
 
-This chart supports use of a sidecar Chronicle agent to report data to a Chronicle server. The agent can be enabled
+This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
 
 By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
