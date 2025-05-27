@@ -454,8 +454,8 @@ For more information on Posit Chronicle, see the [Chronicle documentation](https
 > [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html) for more
 > information.
 
-The Chronicle agent can be configured to scrape the Workbench API for additional data. To do this, a Workbench API key 
-must be provided to the Chronicle Agent. This can be done by setting `chronicleAgent.workbenchApiKey`:
+The Chronicle agent can be configured to scrape the Workbench API for additional data. To do this, you must
+provide the Chronicle agent with a Workbench API key. This can be done by setting `chronicleAgent.workbenchApiKey`:
 ```yaml
 chronicleAgent:
   enabled: true
