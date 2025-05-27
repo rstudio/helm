@@ -68,10 +68,10 @@ tests:
           app.kubernetes.io/instance: test-release
           app.kubernetes.io/version: 9999.9.9
           another: label
-  - it: should not set pod annotations by default
+  - it: should set checksum annotation by default for pods to ensure changes apply
     asserts:
-    - notExists:
-        path: spec.template.metadata.annotations
+    - exists:
+        path: spec.template.metadata.annotations.checksum/config
   - it: should set the annotations if specified with pod annotations favored during merge
     set:
       commonAnnotations:
