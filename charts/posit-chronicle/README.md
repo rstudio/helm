@@ -110,11 +110,17 @@ by `config.LocalStorage.Path` to avoid potential misconfiguration and data loss.
 
 By default, Chronicle requests 10Gi of storage. In most cases, this amount of
 storage should be sufficient for thirty days of monitoring data.
-Users are responsible for managing the size of the persistent volume and
-negotiating and controlling access to the data from other pods. While attaching
-the volume to Workbench is a valid method of accessing the data, keep in mind
-that some data captured by Chronicle may be considered sensitive and should be
-handled with care.
+
+::: {.callout-important}
+Users are responsible for managing the size of the persistent volume, retention
+of stored data, and controlling access to the data from other pods. Consider
+utilizing a dynamic volume provisioner to avoid storage-related service
+interruptions.
+:::
+
+While attaching the volume to Workbench is a valid method of accessing the data,
+keep in mind that some data captured by Chronicle may be considered sensitive and
+should be handled with care.
 
 #### Alternate Storage Class
 
