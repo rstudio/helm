@@ -2,16 +2,21 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: chronicle-server-config
+  name: {{ include "posit-chronicle.fullname" . }}
+  namespace: {{ include "posit-chronicle.namespace" . }}
+  labels:
+    {{ include "posit-chronicle.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
 data:
-  server: |
-
-    # switch between http and https
+  posit-chronicle.gcfg: |
     {{- if .Values.config.HTTPS.Enabled }}
     [HTTPS]
     Listen = :443
-    Key = {{ .Values.config.HTTPS.Key }}
-    Certificate = {{ .Values.config.HTTPS.Certificate }}
+    Certificate = {{ required ".Values.config.HTTPS.Certificate must be specified when .Values.config.HTTPS.Enabled is true." .Values.config.HTTPS.Certificate }}
+    Key = {{ required ".Values.config.HTTPS.Key must be specified when .Values.config.HTTPS.Enabled is true." .Values.config.HTTPS.Key }}
     {{- else}}
     [HTTP]
     Listen = :5252
@@ -27,18 +32,28 @@ data:
 
     [Profiling]
     Enabled = {{ .Values.config.Profiling.Enabled }}
-    Listen = :3030
+    {{- if .Values.config.Profiling.Enabled }}
+    Listen = :{{ .Values.config.Profiling.Port }}
+    {{- end }}
 
     [LocalStorage]
     Enabled = {{ .Values.config.LocalStorage.Enabled }}
-    Location = {{ .Values.config.LocalStorage.Location }}
-    RetentionPeriod = {{ .Values.config.LocalStorage.RetentionPeriod }}
+    {{- if .Values.config.LocalStorage.Enabled }}
+    Location = {{ .Values.config.LocalStorage.Path }}
+    {{- end }}
 
     [S3Storage]
     Enabled = {{ .Values.config.S3Storage.Enabled }}
-    Bucket = {{ .Values.config.S3Storage.Bucket }}
+    {{- if .Values.config.S3Storage.Enabled }}
+    Bucket = {{ required "A .Values.config.S3Storage.Bucket must be specified when S3 storage is enabled." .Values.config.S3Storage.Bucket }}
+    {{- if .Values.config.S3Storage.Prefix }}
     Prefix = {{ .Values.config.S3Storage.Prefix }}
+    {{- end }}
+    {{- if .Values.config.S3Storage.Profile }}
     Profile = {{ .Values.config.S3Storage.Profile }}
+    {{- end }}
+    {{- if .Values.config.S3Storage.Region }}
     Region = {{ .Values.config.S3Storage.Region }}
+    {{- end }}
+    {{- end }}
 ---
-

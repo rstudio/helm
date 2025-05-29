@@ -24,3 +24,6 @@
 
 # chart tests
 tests/
+
+# helm unittest debug files
+.debug/
