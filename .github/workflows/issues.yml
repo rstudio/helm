@@ -27,6 +27,9 @@ jobs:
           elif [ "${{ github.event.label.name }}" = "team: chronicle" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/134" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.label.name }}" = "team: launcher" ]; then
+            echo "PROJECT=https://github.com/orgs/rstudio/projects/222" >> "$GITHUB_OUTPUT"
+            echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
           else
             echo "PROJECT=none" >> "$GITHUB_OUTPUT"
           fi
