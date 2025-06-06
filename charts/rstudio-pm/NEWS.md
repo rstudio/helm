@@ -1,5 +1,9 @@
 # Changelog
  
+## 0.5.47
+
+- Update default Posit Package Manager version to 2025.04.2-8
+
 ## 0.5.46
 
 - Update default Posit Package Manager version to 2025.04.0-4
