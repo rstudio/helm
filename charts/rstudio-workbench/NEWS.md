@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3
+
+- Bump Workbench version to 2025.05.1
+
 ## 0.9.2
 
 - Bump `rstudio-library` chart version to `0.1.34`.
