@@ -23,7 +23,7 @@ service:
 
 pod:
   replicas: 4
-  command: "/bash"
+  command: ["/bash"]
   args: ["echo", "hello world"]
   # -- Optional environment variables
   env:
