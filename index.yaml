@@ -2,6 +2,53 @@ apiVersion: v1
 entries:
   posit-chronicle:
   - annotations:
+      artifacthub.io/images: |
+        - name: chronicle
+          image: ghcr.io/rstudio/chronicle:2025.05.1
+          platforms:
+            - linux/amd64
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chronicle Documentation
+          url: https://docs.posit.co/chronicle
+        - name: Posit Helm Documentation
+          url: https://docs.posit.co/helm
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: Posit Community
+          url: https://forum.posit.co/c/posit-professional-hosted/5
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
+    apiVersion: v2
+    appVersion: 2025.05.1
+    created: "2025-06-09T17:16:26.60061221Z"
+    description: Official Helm chart for Posit Chronicle Server
+    digest: 23e211cdd6d051c5c2fb88409789e81ac0bdcb7f2e7f4e245fbff6bf2233a475
+    home: https://www.posit.co
+    icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png
+    keywords:
+    - rstudio
+    - posit
+    - chronicle
+    - metrics
+    - monitoring
+    - observability
+    - analytics
+    - data science
+    maintainers:
+    - email: docker@posit.co
+      name: rstudio
+      url: https://github.com/rstudio/helm
+    name: posit-chronicle
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/posit-chronicle-0.4.0/posit-chronicle-0.4.0.tgz
+    version: 0.4.0
+  - annotations:
       artifacthub.io/license: MIT
       artifacthub.io/links: |
         - name: Chronicle Documentation
@@ -15733,4 +15780,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2025-06-09T16:20:17.567716545Z"
+generated: "2025-06-09T17:16:26.601890743Z"
