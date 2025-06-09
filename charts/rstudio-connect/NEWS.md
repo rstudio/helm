@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0
+
+- BREAKING: Connect now runs in [Off-Host Execution (OHE) mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default.
+  - `launcher.enabled` now defaults to `true` instead of `false`
+  - `securityContext` now defaults to `{}` instead of `securityContext.privileged: true`
+  - If you would like to run Connect not in OHE mode using the previous defaults then set the following in your values.yaml. `launcher.enabled: false` and `securityContext.privileged: true`.
+
 ## 0.7.28
 
 - The `prestart.bash` no longer uses the service account certificate bundle to

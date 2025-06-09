@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.7.28](https://img.shields.io/badge/Version-0.7.28-informational?style=flat-square) ![AppVersion: 2025.05.0](https://img.shields.io/badge/AppVersion-2025.05.0-informational?style=flat-square)
+![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square) ![AppVersion: 2025.05.0](https://img.shields.io/badge/AppVersion-2025.05.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.7.28:
+To install the chart with the release name `my-release` at version 0.8.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.28
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.0
 ```
 
 To explore other chart versions, look at:
@@ -42,6 +42,13 @@ To explore other chart versions, look at:
 ```{.bash}
 helm search repo rstudio/rstudio-connect -l
 ```
+
+## Upgrade guidance
+
+### 0.8.0
+
+- When upgrading to version 0.8.0 or later, Connect now runs in [Off-Host Execution mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default
+- If you desire to run Connect not in Off-Host Execution mode, then set `securityContext.privileged: true` and `launcher.enabled: false`
 
 ## Required configuration
 
@@ -250,7 +257,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | launcher.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
-| launcher.enabled | bool | `false` | Whether to enable the launcher |
+| launcher.enabled | bool | `true` | Whether to enable the launcher |
 | launcher.extraTemplates | object | `{}` | extra templates to render in the template directory. |
 | launcher.includeDefaultTemplates | bool | `true` | whether to include the default `job.tpl` and `service.tpl` files included with the chart |
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
@@ -301,7 +308,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | Used to configure the container's readinessProbe. Only included if enabled = true |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources | object | `{}` | Defines resources for the rstudio-connect container |
-| securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
+| securityContext | object | `{}` | Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: {}` |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
