@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fixup-chart-release
 
 
 jobs:
