@@ -7011,6 +7011,53 @@ entries:
         - name: About Posit Team
           url: https://posit.co/products/enterprise/team/
     apiVersion: v2
+    appVersion: 2025.04.2
+    created: "2025-06-09T15:00:11.547797687Z"
+    dependencies:
+    - name: rstudio-library
+      repository: https://helm.rstudio.com
+      version: 0.1.31
+    description: Official Helm chart for Posit Package Manager
+    digest: 30690c63402a81aa1d47dd249c380fe88865db93218e3a7150e2241dcedffc30
+    home: https://www.rstudio.com
+    icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    - posit
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/rstudio/helm
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    - https://github.com/rstudio/rstudio-docker-products
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.5.47/rstudio-pm-0.5.47.tgz
+    version: 0.5.47
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-package-manager
+          image: rstudio/rstudio-package-manager:ubuntu2204-2025.04.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+    apiVersion: v2
     appVersion: 2025.04.0
     created: "2025-04-16T19:23:40.765144948Z"
     dependencies:
@@ -15594,4 +15641,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2025-05-29T12:52:19.445213579Z"
+generated: "2025-06-09T15:00:11.721034449Z"
