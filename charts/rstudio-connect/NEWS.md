@@ -7,6 +7,15 @@
   - `securityContext` now defaults to `{}` instead of `securityContext.privileged: true`
   - If you would like to run Connect not in OHE mode using the previous defaults then set the following in your values.yaml. `launcher.enabled: false` and `securityContext.privileged: true`.
 
+## 0.7.28
+
+- The `prestart.bash` no longer uses the service account certificate bundle to
+  configure the system.
+
+## 0.7.27
+
+- Bump Connect version to 2025.05.0
+
 ## 0.7.26
 
 - Bump `rstudio-library` chart version to `0.1.34`.
