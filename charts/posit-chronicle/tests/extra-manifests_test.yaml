@@ -1,0 +1,28 @@
+suite: Extra manifests tests
+templates:
+  - extra-manifests.yaml
+tests:
+  - it: should create extra manifests if specified
+    set:
+      extraObjects:
+        - apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: test-configmap
+          data:
+            test-key: test-value
+        - apiVersion: v1
+          kind: Secret
+          metadata:
+            name: test-secret
+          data:
+            test-key: dGVzdC12YWx1ZQ==
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: ConfigMap
+        documentIndex: 0
+      - isKind:
+          of: Secret
+        documentIndex: 1

@@ -1,27 +1,37 @@
 apiVersion: v2
 name: posit-chronicle
 description: Official Helm chart for Posit Chronicle Server
-version: 0.3.8
-appVersion: 2025.03.0
-icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+version: 0.4.0
+appVersion: 2025.05.1
+icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png
 home: https://www.posit.co
 sources:
   - https://github.com/rstudio/helm
 maintainers:
-  - name: sol-eng
+  - name: rstudio
     email: docker@posit.co
     url: https://github.com/rstudio/helm
 annotations:
+  artifacthub.io/images: |
+    - name: chronicle
+      image: ghcr.io/rstudio/chronicle:2025.05.1
+      platforms:
+        - linux/amd64
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Chronicle Documentation
       url: https://docs.posit.co/chronicle
+    - name: Posit Helm Documentation
+      url: https://docs.posit.co/helm
     - name: Docker Images
       url: https://github.com/rstudio/rstudio-docker-products
     - name: Posit Community
       url: https://forum.posit.co/c/posit-professional-hosted/5
     - name: About Posit Team
       url: https://posit.co/products/enterprise/team/
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
 keywords:
   - "rstudio"
   - "posit"
