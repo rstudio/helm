@@ -187,13 +187,13 @@ spec:
             subPath: "launcher.kubernetes.profiles.conf"
           {{- if .Values.launcher.useTemplates }}
           - name: rstudio-connect-templates
-            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            mountPath: "{{ default "/var/lib/rstudio-connect-launcher" .Values.config.Launcher.KubernetesScratchPath }}/Kubernetes/rstudio-library-templates-data.tpl"
             subPath: "rstudio-library-templates-data.tpl"
           - name: rstudio-connect-templates
-            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/job.tpl"
+            mountPath: "{{ default "/var/lib/rstudio-connect-launcher" .Values.config.Launcher.KubernetesScratchPath }}/Kubernetes/job.tpl"
             subPath: "job.tpl"
           - name: rstudio-connect-templates
-            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/service.tpl"
+            mountPath: "{{ default "/var/lib/rstudio-connect-launcher" .Values.config.Launcher.KubernetesScratchPath }}/Kubernetes/service.tpl"
             subPath: "service.tpl"
           {{- end }}
           {{- if not .Values.launcher.useTemplates }}
