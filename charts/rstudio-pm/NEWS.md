@@ -1,4 +1,8 @@
 # Changelog
+
+## 0.5.48
+
+- Add recommended labels to all PVCs created by the chart.
  
 ## 0.5.47
 

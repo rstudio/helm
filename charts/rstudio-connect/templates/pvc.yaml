@@ -6,6 +6,8 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   annotations:
     {{- .Values.sharedStorage.annotations | toYaml | nindent 4 }}
+  labels:
+    {{- include "rstudio-connect.labels" . | nindent 4 }}
 spec:
   accessModes:
     {{- .Values.sharedStorage.accessModes | toYaml | nindent 4 }}

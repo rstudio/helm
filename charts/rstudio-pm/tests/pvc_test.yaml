@@ -1,0 +1,24 @@
+suite: test pvc
+templates:
+  - pvc.yaml
+tests:
+  - it: should have standard Helm labels on shared storage PVC
+    set:
+      sharedStorage.create: true
+    asserts:
+      - exists:
+          path: metadata.labels
+      - matchRegex:
+          path: metadata.labels["helm.sh/chart"]
+          pattern: "^rstudio-pm-[0-9]+\\.[0-9]+\\.[0-9]+.*"
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: rstudio-pm
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: RELEASE-NAME
+      - equal:
+          path: metadata.labels["app.kubernetes.io/managed-by"]
+          value: Helm
+      - exists:
+          path: metadata.labels["app.kubernetes.io/version"]
