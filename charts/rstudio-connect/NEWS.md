@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.3
+
+- Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
+
 ## 0.8.2
 
 - Add recommended labels to all PVCs created by the chart.

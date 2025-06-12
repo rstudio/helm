@@ -102,9 +102,9 @@ spec:
         {{- if .Values.chronicleAgent.enabled }}
         - name: chronicle-agent
           {{- if .Values.chronicleAgent.image.sha }}
-          image: {{ printf "%s@sha256:%s" (include "rstudio-library.chronicle-agent.image" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim) .Values.chronicleAgent.image.sha }}
+          image: "{{ required "chronicleAgent.image.registry must be specified" .Values.chronicleAgent.image.registry }}/{{ required "chronicleAgent.image.repository must be specified" .Values.chronicleAgent.image.repository }}:{{ required "chronicleAgent.image.tag must be specified" .Values.chronicleAgent.image.tag }}@sha256:{{ .Values.chronicleAgent.image.sha }}"
           {{- else }}
-          image: {{ include "rstudio-library.chronicle-agent.image" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}
+          image: "{{ required "chronicleAgent.image.registry must be specified" .Values.chronicleAgent.image.registry }}/{{ required "chronicleAgent.image.repository must be specified" .Values.chronicleAgent.image.repository }}:{{ required "chronicleAgent.image.tag must be specified" .Values.chronicleAgent.image.tag }}"
           {{- end }}
           imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
           restartPolicy: Always
