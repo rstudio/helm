@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+
+- Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
+
 ## 0.8.0
 
 - BREAKING: Connect now runs in [Off-Host Execution (OHE) mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default.
