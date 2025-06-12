@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4
+
+- Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
+
 ## 0.9.3
 
 - Bump Workbench version to 2025.05.1
