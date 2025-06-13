@@ -526,7 +526,7 @@ config:
       posit.publisher
     vscode-user-settings.json: |
       {
-            "terminal.integrated.shell.linux": "/bin/bash",
+            "terminal.integrated.defaultProfile.linux": "bash",
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
       }
@@ -537,7 +537,7 @@ config:
     #    posit.publisher
     #  positron-user-settings.json: |
     #    {
-    #          "terminal.integrated.shell.linux": "/bin/bash",
+    #          "terminal.integrated.defaultProfile.linux": "bash",
     #          "extensions.autoUpdate": false,
     #          "extensions.autoCheckUpdates": false
     #    }
