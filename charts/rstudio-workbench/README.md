@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.9.3](https://img.shields.io/badge/Version-0.9.3-informational?style=flat-square) ![AppVersion: 2025.05.1](https://img.shields.io/badge/AppVersion-2025.05.1-informational?style=flat-square)
+![Version: 0.9.4](https://img.shields.io/badge/Version-0.9.4-informational?style=flat-square) ![AppVersion: 2025.05.1](https://img.shields.io/badge/AppVersion-2025.05.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.9.3:
+To install the chart with the release name `my-release` at version 0.9.4:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.3
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.4
 ```
 
 To explore other chart versions, look at:
