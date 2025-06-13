@@ -514,7 +514,6 @@ config:
         type: Kubernetes
     jupyter.conf:
       jupyter-exe: /usr/local/bin/jupyter
-      notebooks-enabled: 1
       labs-enabled: 1
       default-session-cluster: Kubernetes
     vscode.conf:
@@ -526,18 +525,19 @@ config:
       posit.publisher
     vscode-user-settings.json: |
       {
-            "terminal.integrated.shell.linux": "/bin/bash",
+            "terminal.integrated.defaultProfile.linux": "bash",
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
       }
     #  positron.conf:
     #    enabled: 1
+    #    session-timeout-kill-hours: 12
     #  positron.extensions.conf: |
     #    posit.shiny
     #    posit.publisher
     #  positron-user-settings.json: |
     #    {
-    #          "terminal.integrated.shell.linux": "/bin/bash",
+    #          "terminal.integrated.defaultProfile.linux": "bash",
     #          "extensions.autoUpdate": false,
     #          "extensions.autoCheckUpdates": false
     #    }
