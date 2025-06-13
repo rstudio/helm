@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+
+- Fix bug where the chart did not respect the `config.Launcher.KubernetesScratchPath` configuration.
+
 ## 0.8.0
 
 - BREAKING: Connect now runs in [Off-Host Execution (OHE) mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default.
