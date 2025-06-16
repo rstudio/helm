@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4
+
+- Add recommended labels to all PVCs created by the chart.
+
 ## 0.9.3
 
 - Bump Workbench version to 2025.05.1

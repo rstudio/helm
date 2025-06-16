@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.2
+
+- Add recommended labels to all PVCs created by the chart.
+
 ## 0.8.1
 
 - Fix bug where the chart did not respect the `config.Launcher.KubernetesScratchPath` configuration.
