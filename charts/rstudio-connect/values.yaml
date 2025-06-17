@@ -279,7 +279,7 @@ chronicleAgent:
     repository: rstudio/chronicle-agent
     # -- The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if
     #    `chronicleAgent.autoDiscovery=false`
-    tag: ""
+    tag: 2025.05.1
     # -- The Chronicle agent image digest
     sha: ""
     # -- The pull policy for the Chronicle agent image

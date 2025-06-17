@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.3
+
+- Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
+- Move user provided init containers ahead of the Chronicle Agent init container in priority.
+
 ## 0.8.2
 
 - Add recommended labels to all PVCs created by the chart.
