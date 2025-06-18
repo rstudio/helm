@@ -1,0 +1,35 @@
+suite: test scratch path configuration
+templates:
+  - configmap.yaml
+  - configmap-prestart.yaml
+  - deployment.yaml
+tests:
+  - it: should use default scratch path when not specified
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+        useTemplates: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[3].mountPath
+          value: /var/lib/rstudio-connect-launcher/Kubernetes/rstudio-library-templates-data.tpl
+  - it: should use custom scratch path when specified
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+        useTemplates: true
+      config:
+        Launcher:
+          KubernetesScratchPath: /custom/path
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[3].mountPath
+          value: /custom/path/Kubernetes/rstudio-library-templates-data.tpl
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[4].mountPath
+          value: /custom/path/Kubernetes/job.tpl
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[5].mountPath
+          value: /custom/path/Kubernetes/service.tpl

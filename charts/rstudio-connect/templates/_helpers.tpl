@@ -69,7 +69,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- end }}
     {{- if .Values.launcher.useTemplates }}
       {{- $_ := set $launcherSettingsDict "KubernetesUseTemplates" "true" }}
-      {{- $_ = set $launcherSettingsDict "ScratchPath" "/var/lib/rstudio-connect-launcher" }}
+      {{- $_ = set $launcherSettingsDict "ScratchPath" (default "/var/lib/rstudio-connect-launcher" .Values.config.Launcher.KubernetesScratchPath) }}
     {{- else }}
       {{- $_ := set $launcherSettingsDict "KubernetesUseTemplates" "false" }}
     {{- end }}

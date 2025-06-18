@@ -4,6 +4,7 @@
 
 - Align VSCode and Positron settings with Workbench defaults
 - Remove JupyterHub sessions by default, per Posit Workbench 2024.09.0
+- Add recommended labels to all PVCs created by the chart.
 
 ## 0.9.3
 

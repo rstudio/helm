@@ -438,3 +438,4 @@ config:
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Metrics:
     Enabled: true
+  Launcher: {}
