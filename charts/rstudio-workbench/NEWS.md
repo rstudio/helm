@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.5
+
+- Align VSCode and Positron settings with Workbench defaults
+- Remove JupyterHub sessions by default, per Posit Workbench 2024.09.0
+
 ## 0.9.4
 
 - Add recommended labels to all PVCs created by the chart.
@@ -75,9 +80,9 @@
 ## 0.8.3
 
 - Bump version of launcher templates `job.tpl` and `service.tpl`
-    - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
-      To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`
-    - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
+  - `enableServiceLinks` now defaults to `false` for sessions (instead of not being set).
+    To enable them for sessions, set `launcher.templateValues.enableServiceLinks: true`
+  - Also see related discussion [on the Kubernetes project](https://github.com/kubernetes/kubernetes/issues/121787)
 
 ## 0.8.2
 
@@ -473,6 +478,7 @@
   - To avoid the breaking change, add the defaults to your explicitly enumerated values
   - See why this happened and an alternative forward-looking pattern below
   - The previous defaults:
+
 ```yaml
 config:
   server:
@@ -482,7 +488,9 @@ config:
         container-images: rstudio/r-session-complete:bionic-1.4.1106-5
         allow-unknown-images: 1
 ```
+
 - BREAKING: we now automatically mount session configuration into the session pod
+
   - This adds default `job-json-overrides` using the mechanism above
   - This can be disabled by setting `session.defaultConfigMount=false`
   - This is useful for things like `repos.conf`, `rsession.conf` (default Connect server, etc.), etc.
@@ -490,6 +498,7 @@ config:
 - Switch to using the `rstudio-library` chart for configuration generation
   - This enables putting verbatim files in place if that is preferred to values-interpolation (converting values into a config file dynamically by the chart)
   - i.e. passing a string to the configuration value will short-circuit configuration generation
+
 ```yaml
 config:
   server:
@@ -503,10 +512,10 @@ config:
   - This will only be used if the `launcher.kubernetes.profiles.conf` key is not in `config.server` (testing for key
     duplication is tricky in helm, so we pick the most common key)
   - Before, we would have something like this in `values.yaml`:
+
 ```yaml
 jobJsonOverridesFiles:
-  some.json:
-    "text"
+  some.json: "text"
   other.json:
     - an
     - array
@@ -517,7 +526,9 @@ config:
         job-json-overrides: '"some/target:some.json","other/target:other.json"'
         container-images: "one-image:tag,two-image:tag"
 ```
+
 - Now, we can do something like the following. A bit more verbose, but much easier to read and understand:
+
 ```yaml
 config:
   profiles:
@@ -578,8 +589,8 @@ config:
 ## 0.3.2
 
 - Fix a bug in the `load-balancer-manager` (`sidecar` container)
-    - The helm chart (as a result of previous changes) no longer defines an `app` label, but an `app.kubernetes.io/name` label.
-    - update the selector, make error handling better, etc. This requires version 2.0 of the load-balancer-manager
+  - The helm chart (as a result of previous changes) no longer defines an `app` label, but an `app.kubernetes.io/name` label.
+  - update the selector, make error handling better, etc. This requires version 2.0 of the load-balancer-manager
 
 ## 0.3.1
 
@@ -588,6 +599,7 @@ config:
 - default image.tag to Chart.AppVersion
 
 ## 0.3.0
+
 - BREAKING: changed `rstudio` container `command` and `args` to tell `tini` how to supervise processes and run a differently named prestart script. Also made `/usr/local/bin/startup.sh` script execution a part of the `args`.
 
 ## 0.2.2
@@ -604,12 +616,12 @@ config:
 ## 0.2.0
 
 - Change naming convention
-    - Fix issues with namespacing
-    - However, this will damage backwards compatibility, particularly for PVCs if using `sharedStorage.create = true`
-    - If you need to migrate data, set `replicas: 0`, upgrade, and then copy the data to the new PVC
-    - Alternatively, you can set `fullnameOverride: "previous-release-name"` to force backwards compatibility
-    - Finally, deployment selectors have changed, so you will need to delete the current deployment manually, then put back with `helm upgrade --install`
-    - Use `helm diff upgrade` to ensure things are working as you expect before upgrading
+  - Fix issues with namespacing
+  - However, this will damage backwards compatibility, particularly for PVCs if using `sharedStorage.create = true`
+  - If you need to migrate data, set `replicas: 0`, upgrade, and then copy the data to the new PVC
+  - Alternatively, you can set `fullnameOverride: "previous-release-name"` to force backwards compatibility
+  - Finally, deployment selectors have changed, so you will need to delete the current deployment manually, then put back with `helm upgrade --install`
+  - Use `helm diff upgrade` to ensure things are working as you expect before upgrading
 
 ## 0.0.8
 
