@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.3
+
+- Bump Connect version to 2025.06.0
+
 ## 0.8.2
 
 - Add recommended labels to all PVCs created by the chart.
