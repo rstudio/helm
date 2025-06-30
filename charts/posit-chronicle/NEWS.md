@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.1
+- Bump Chronicle to version 2025.05.3
+
 ## 0.4.0
 
 - Improvements for chart annotations.
