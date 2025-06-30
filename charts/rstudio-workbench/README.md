@@ -14,7 +14,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
@@ -497,7 +497,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
 | chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The Chronicle agent image repository |
 | chronicleAgent.image.sha | string | `""` | The Chronicle agent image digest |
-| chronicleAgent.image.tag | string | `"2025.05.1"` | The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if    `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.image.tag | string | `"2025.05.2"` | The Chronicle agent image tag. |
 | chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | The container-level security context for the Chronicle agent container |
 | chronicleAgent.serverAddress | string | `""` | Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false` |
 | chronicleAgent.serverNamespace | string | `""` | Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if    `chronicleAgent.autoDiscovery=false` |
