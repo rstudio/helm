@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.9.5
+## 0.9.6
 
 - Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
 - Move user provided init containers ahead of the Chronicle Agent init container in priority.
