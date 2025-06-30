@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.4](https://img.shields.io/badge/Version-0.8.4-informational?style=flat-square) ![AppVersion: 2025.05.0](https://img.shields.io/badge/AppVersion-2025.05.0-informational?style=flat-square)
+![Version: 0.8.4](https://img.shields.io/badge/Version-0.8.4-informational?style=flat-square) ![AppVersion: 2025.06.0](https://img.shields.io/badge/AppVersion-2025.06.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -226,7 +226,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
 | chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The Chronicle agent image repository |
 | chronicleAgent.image.sha | string | `""` | The Chronicle agent image digest |
-| chronicleAgent.image.tag | string | `"2025.05.2"` | The Chronicle agent image tag. |
+| chronicleAgent.image.tag | string | `"2025.05.2"` | The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if    `chronicleAgent.autoDiscovery=false` |
 | chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | The container-level security context for the Chronicle agent container |
 | chronicleAgent.serverAddress | string | `""` | Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false` |
 | chronicleAgent.serverNamespace | string | `""` | Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if    `chronicleAgent.autoDiscovery=false` |
