@@ -231,7 +231,7 @@ reference page](https://docs.posit.co/chronicle/appendix/library/advanced-server
 | image.tag | string | `""` | The image tag, defaults to the chart app version |
 | nameOverride | string | `""` | Override for the name of the release |
 | namespaceOverride | string | `""` | Override for the namespace of the chart deployment |
-| persistence.accessModes | list | `["ReadWriteOnce"]` | Persistent Volume Access Modes |
+| persistence.accessModes | list | `["ReadWriteMany"]` | Persistent Volume Access Modes |
 | persistence.annotations | object | `{}` | Additional annotations for the PVC |
 | persistence.enabled | bool | `true` | Enable persistence using Persistent Volume Claims |
 | persistence.finalizers | list | `["kubernetes.io/pvc-protection"]` | Finalizers for the PVC |
