@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![AppVersion: 2025.05.3](https://img.shields.io/badge/AppVersion-2025.05.3-informational?style=flat-square)
+![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square) ![AppVersion: 2025.05.3](https://img.shields.io/badge/AppVersion-2025.05.3-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -25,11 +25,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.4.1:
+To install the chart with the release name `my-release` at version 0.4.2:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.1
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.2
 ```
 
 To explore other chart versions, look at:
@@ -231,7 +231,7 @@ reference page](https://docs.posit.co/chronicle/appendix/library/advanced-server
 | image.tag | string | `""` | The image tag, defaults to the chart app version |
 | nameOverride | string | `""` | Override for the name of the release |
 | namespaceOverride | string | `""` | Override for the namespace of the chart deployment |
-| persistence.accessModes | list | `["ReadWriteOnce"]` | Persistent Volume Access Modes |
+| persistence.accessModes | list | `["ReadWriteMany"]` | Persistent Volume Access Modes |
 | persistence.annotations | object | `{}` | Additional annotations for the PVC |
 | persistence.enabled | bool | `true` | Enable persistence using Persistent Volume Claims |
 | persistence.finalizers | list | `["kubernetes.io/pvc-protection"]` | Finalizers for the PVC |

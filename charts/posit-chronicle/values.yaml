@@ -89,7 +89,7 @@ persistence:
   size: 10Gi
   # -- Persistent Volume Access Modes
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   # -- Selector to match an existing Persistent Volume for the data PVC
   selectorLabels: {}
   # -- Additional annotations for the PVC

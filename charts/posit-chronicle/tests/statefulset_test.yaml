@@ -339,7 +339,7 @@ tests:
               helm.sh/chart: posit-chronicle-9.9.9_test
           spec:
             accessModes:
-            - ReadWriteOnce
+            - ReadWriteMany
             resources:
               requests:
                 storage: 10Gi
