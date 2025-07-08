@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.49
+
+- Update default Posit Package Manager version to 2025.04.4-13
+
 ## 0.5.48
 
 - Add recommended labels to all PVCs created by the chart.
