@@ -41,8 +41,9 @@ session:
 launcher:
   useTemplates: true # Required to set `imagePullSecrets` for `session.image`
   templateValues:
-    imagePullSecrets:
-    - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster containing authentication credentials to your registry. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
+    pod:
+      imagePullSecrets:
+      - name: private-registry-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster containing authentication credentials to your registry. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
 
 config:
   secret:
