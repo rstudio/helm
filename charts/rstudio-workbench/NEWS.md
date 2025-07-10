@@ -2,7 +2,7 @@
 
 ## 0.9.7
 
-- Correct the `README.md` to use the correct `imagePullSecrets` syntax for the launcher template values (`launcher.templateValues.pod.imagePullSecrets`).
+- Correct the `README.md` example to use the correct `imagePullSecrets` syntax for the launcher template values (`launcher.templateValues.pod.imagePullSecrets`).
 
 ## 0.9.6
 
