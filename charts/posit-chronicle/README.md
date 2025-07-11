@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square) ![AppVersion: 2025.05.3](https://img.shields.io/badge/AppVersion-2025.05.3-informational?style=flat-square)
+![Version: 0.4.3](https://img.shields.io/badge/Version-0.4.3-informational?style=flat-square) ![AppVersion: 2025.05.3](https://img.shields.io/badge/AppVersion-2025.05.3-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -25,11 +25,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.4.2:
+To install the chart with the release name `my-release` at version 0.4.3:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.2
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.3
 ```
 
 To explore other chart versions, look at:
