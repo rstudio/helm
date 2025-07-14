@@ -24,6 +24,53 @@ entries:
         - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
     apiVersion: v2
     appVersion: 2025.05.3
+    created: "2025-07-14T14:10:33.150801719Z"
+    description: Official Helm chart for Posit Chronicle Server
+    digest: 2173ac43ec3aa969a20c22de2bf0b4ef445616e498aa476db151ce70fd8b011e
+    home: https://www.posit.co
+    icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png
+    keywords:
+    - rstudio
+    - posit
+    - chronicle
+    - metrics
+    - monitoring
+    - observability
+    - analytics
+    - data science
+    maintainers:
+    - email: docker@posit.co
+      name: rstudio
+      url: https://github.com/rstudio/helm
+    name: posit-chronicle
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/posit-chronicle-0.4.3/posit-chronicle-0.4.3.tgz
+    version: 0.4.3
+  - annotations:
+      artifacthub.io/images: |
+        - name: chronicle
+          image: ghcr.io/rstudio/chronicle:2025.05.3
+          platforms:
+            - linux/amd64
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Chronicle Documentation
+          url: https://docs.posit.co/chronicle
+        - name: Posit Helm Documentation
+          url: https://docs.posit.co/helm
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: Posit Community
+          url: https://forum.posit.co/c/posit-professional-hosted/5
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
+    apiVersion: v2
+    appVersion: 2025.05.3
     created: "2025-07-03T18:37:58.361555432Z"
     description: Official Helm chart for Posit Chronicle Server
     digest: f0e86d99cf1728f13e96220cc3e7d11963a57ef98d9149b9902fabb144b74681
@@ -16332,4 +16379,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2025-07-08T15:06:04.429108468Z"
+generated: "2025-07-14T14:10:33.151426325Z"
