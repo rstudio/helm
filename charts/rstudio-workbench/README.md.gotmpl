@@ -342,8 +342,9 @@ For example, if you want to add a container image registry credentials secret to
 ```yaml
 launcher:
   templateValues:
-    imagePullSecrets:
-    - name: private-registry-creds
+    pod:
+      imagePullSecrets:
+      - name: private-registry-creds
 ```
 
 For example, if you want to add a toleration to each session, you can do so with the following:

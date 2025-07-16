@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.9.6](https://img.shields.io/badge/Version-0.9.6-informational?style=flat-square) ![AppVersion: 2025.05.1](https://img.shields.io/badge/AppVersion-2025.05.1-informational?style=flat-square)
+![Version: 0.9.7](https://img.shields.io/badge/Version-0.9.7-informational?style=flat-square) ![AppVersion: 2025.05.1](https://img.shields.io/badge/AppVersion-2025.05.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.9.6:
+To install the chart with the release name `my-release` at version 0.9.7:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.6
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.7
 ```
 
 To explore other chart versions, look at:
@@ -397,8 +397,9 @@ For example, if you want to add a container image registry credentials secret to
 ```yaml
 launcher:
   templateValues:
-    imagePullSecrets:
-    - name: private-registry-creds
+    pod:
+      imagePullSecrets:
+      - name: private-registry-creds
 ```
 
 For example, if you want to add a toleration to each session, you can do so with the following:

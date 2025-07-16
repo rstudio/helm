@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.7
+
+- Correct the `README.md` example to use the correct `imagePullSecrets` syntax for the launcher template values (`launcher.templateValues.pod.imagePullSecrets`).
+
 ## 0.9.6
 
 - Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
