@@ -150,6 +150,9 @@ launcher:
       affinity: {}
       nodeSelector: {}
       hostAliases: []
+      ephemeralStorage:
+        request: ""
+        limit: ""
       # -- command for all pods. This is really not something we should expose and will be removed once we have a better option
       command: []
     job:
