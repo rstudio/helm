@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.8
+
+- Allow setting ephemeral-storage limit and request for Workbench session pods via the settings `launcher.templateValues.pod.ephemeralStorage.request` and `launcher.templateValues.pod.ephemeralStorage.limit`.
+
 ## 0.9.7
 
 - Correct the `README.md` example to use the correct `imagePullSecrets` syntax for the launcher template values (`launcher.templateValues.pod.imagePullSecrets`).

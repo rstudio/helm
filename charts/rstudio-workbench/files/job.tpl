@@ -309,19 +309,21 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if any (ne (len $requests) 0) (ne (len $limits) 0) }}
+          {{- if any (ne (len $requests) 0) (ne (len $limits) 0) (ne (len $templateData.pod.ephemeralStorage) 0) }}
           resources:
-            {{- if ne (len $requests) 0 }}
+            {{- if any (ne (len $requests) 0) (ne (len $templateData.pod.ephemeralStorage.request) 0) }}
             requests:
               {{- range $key, $val := $requests }}
               {{ $key }}: {{ toYaml $val }}
               {{- end }}
+              ephemeral-storage: {{ $templateData.pod.ephemeralStorage.request }}
             {{- end }}
-            {{- if ne (len $limits) 0 }}
+            {{- if any (ne (len $limits) 0) (ne (len $templateData.pod.ephemeralStorage.limit) 0) }}
             limits:
               {{- range $key, $val := $limits }}
               {{ $key }}: {{ toYaml $val }}
               {{- end }}
+              ephemeral-storage: {{ $templateData.pod.ephemeralStorage.limit }}
             {{- end }}
           {{- end }}
           {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
