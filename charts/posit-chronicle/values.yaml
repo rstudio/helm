@@ -78,6 +78,15 @@ pod:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
 
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "1000m"
+    ephemeralStorage: "100Mi"
+  limits:
+    memory: "3Gi"
+    cpu: "2000m"
+    ephemeralStorage: "200Mi"
 
 # Configuration for application Persistent Volume Claims
 persistence:

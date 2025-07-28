@@ -179,6 +179,15 @@ tests:
           ports:
           - containerPort: 5252
             name: http
+          resources:
+            limits:
+              cpu: 2000m
+              ephemeral-storage: 200Mi
+              memory: 3Gi
+            requests:
+              cpu: 1000m
+              ephemeral-storage: 100Mi
+              memory: 2Gi
           volumeMounts:
           - name: test-release-posit-chronicle
             mountPath: /opt/chronicle-data
