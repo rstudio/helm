@@ -250,6 +250,12 @@ reference page](https://docs.posit.co/chronicle/appendix/library/advanced-server
 | pod.terminationGracePeriodSeconds | int | `30` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod "tolerations" definition |
 | replicas | int | `1` | The number of replica pods to maintain |
+| resources.limits.cpu | string | `"2000m"` |  |
+| resources.limits.ephemeralStorage | string | `"200Mi"` |  |
+| resources.limits.memory | string | `"3Gi"` |  |
+| resources.requests.cpu | string | `"1000m"` |  |
+| resources.requests.ephemeralStorage | string | `"100Mi"` |  |
+| resources.requests.memory | string | `"2Gi"` |  |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.labels | object | `{}` | Labels to add to the service |
 | service.port | int | `80` | The port to use for the REST API service |
