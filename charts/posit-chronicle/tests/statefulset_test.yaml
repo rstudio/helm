@@ -179,21 +179,35 @@ tests:
           ports:
           - containerPort: 5252
             name: http
-          resources:
-            limits:
-              cpu: 2000m
-              ephemeral-storage: 200Mi
-              memory: 3Gi
-            requests:
-              cpu: 1000m
-              ephemeral-storage: 100Mi
-              memory: 2Gi
           volumeMounts:
           - name: test-release-posit-chronicle
             mountPath: /opt/chronicle-data
           - name: config
             mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
             subPath: posit-chronicle.gcfg
+  - it: should set resource limits if given
+    set:
+      resources:
+        limits:
+          cpu: 2000m
+          ephemeral-storage: 200Mi
+          memory: 3Gi
+        requests:
+          cpu: 1000m
+          ephemeral-storage: 100Mi
+          memory: 2Gi
+    asserts:
+    - equal:
+        path: spec.template.spec.containers[0].resources
+        value:
+          limits:
+            cpu: 2000m
+            ephemeral-storage: 200Mi
+            memory: 3Gi
+          requests:
+            cpu: 1000m
+            ephemeral-storage: 100Mi
+            memory: 2Gi
   - it: should set an overridden image if given
     set:
       image:

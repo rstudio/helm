@@ -78,15 +78,14 @@ pod:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
 
-resources:
-  requests:
-    memory: "2Gi"
-    cpu: "1000m"
-    ephemeralStorage: "100Mi"
-  limits:
-    memory: "3Gi"
-    cpu: "2000m"
-    ephemeralStorage: "200Mi"
+# -- Defines resources for the posit-chronicle container
+resources: {}
+  # requests:
+  #   memory: "1Gi"
+  #   cpu: "100m"
+  # limits:
+  #   memory: "2Gi"
+  #   cpu: "2000m"
 
 # Configuration for application Persistent Volume Claims
 persistence:

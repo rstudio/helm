@@ -69,19 +69,10 @@ spec:
         - containerPort: 5252
           name: http
         {{- end }}
+        {{- with .Values.resources }}
         resources:
-          {{- with .Values.resources.requests }}
-          requests:
-            memory: "{{ .memory }}"
-            cpu: "{{ .cpu }}"
-            ephemeral-storage: "{{ .ephemeralStorage }}"
-          {{- end }}
-          {{- with .Values.resources.limits }}
-          limits:
-            memory: "{{ .memory }}"
-            cpu: "{{ .cpu }}"
-            ephemeral-storage: "{{ .ephemeralStorage }}"
-          {{- end }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         {{- if .Values.persistence.enabled }}
         - name: {{ include "posit-chronicle.fullname" . }}
