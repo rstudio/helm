@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.5
+
+- Bump Connect version to 2025.07.0
+
 ## 0.8.4
 
 - Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
