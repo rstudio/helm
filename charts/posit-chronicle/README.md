@@ -246,11 +246,11 @@ reference page](https://docs.posit.co/chronicle/appendix/library/advanced-server
 | pod.env | list | `[]` | Additional environment variables to set on the Chronicle server container |
 | pod.labels | object | `{}` | Additional labels for pods |
 | pod.nodeSelector | object | `{}` | A map used verbatim as the pod "nodeSelector" definition |
+| pod.resources | object | `{}` | Defines resources for the posit-chronicle container |
 | pod.securityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | The pod-level security context    ([reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core)) |
 | pod.terminationGracePeriodSeconds | int | `30` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod "tolerations" definition |
 | replicas | int | `1` | The number of replica pods to maintain |
-| resources | object | `{}` | Defines resources for the posit-chronicle container |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.labels | object | `{}` | Labels to add to the service |
 | service.port | int | `80` | The port to use for the REST API service |
