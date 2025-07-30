@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.4.4
-- Add resource requests and limits to the chart.
+- Add option for CPU/Memory requests and limits to the chart.
 
 ## 0.4.1
 - Bump Chronicle to version 2025.05.3
