@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.5
+
+- Add options to specify resources for the Chronicle Agent container.
+
 ## 0.8.4
 
 - Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
