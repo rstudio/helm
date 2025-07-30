@@ -89,6 +89,14 @@ chronicleAgent:
     imagePullPolicy: IfNotPresent
   # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
   autoDiscovery: true
+  # -- Defines resources for the posit-chronicle-agent container
+  resources: {}
+    # requests:
+    #   memory: "256Mi"
+    #   cpu: "100m"
+    # limits:
+    #   memory: "512Mi"
+    #   cpu: "200m"
   # -- Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered
   #    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false`
   serverAddress: ""

@@ -108,7 +108,6 @@ spec:
         resources:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-
         {{- with .Values.chronicleAgent.volumeMounts }}
         volumeMounts:
           {{- toYaml . | nindent 10 }}
