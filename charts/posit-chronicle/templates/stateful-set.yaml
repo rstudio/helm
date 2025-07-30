@@ -69,7 +69,7 @@ spec:
         - containerPort: 5252
           name: http
         {{- end }}
-        {{- with .Values.resources }}
+        {{- with .Values.pod.resources }}
         resources:
           {{- toYaml . | nindent 10 }}
         {{- end }}
