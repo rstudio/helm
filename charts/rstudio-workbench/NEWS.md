@@ -2,7 +2,7 @@
 
 ## 0.9.10
 
-- Fix a bug with the new `ephermalStorage` options where it was set every time, even if it was unset in the `values.yaml`
+- Fix a bug with the new `ephermalStorage` options where it was set every time, even if it was unset in the `values.yaml`.
 
 ## 0.9.9
 
