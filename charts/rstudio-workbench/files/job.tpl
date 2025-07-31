@@ -316,14 +316,18 @@ spec:
               {{- range $key, $val := $requests }}
               {{ $key }}: {{ toYaml $val }}
               {{- end }}
+              {{- if gt (len $templateData.pod.ephemeralStorage.request) 0 }}
               ephemeral-storage: {{ $templateData.pod.ephemeralStorage.request }}
+              {{- end }}
             {{- end }}
             {{- if any (ne (len $limits) 0) (ne (len $templateData.pod.ephemeralStorage.limit) 0) }}
             limits:
               {{- range $key, $val := $limits }}
               {{ $key }}: {{ toYaml $val }}
               {{- end }}
+              {{- if gt (len $templateData.pod.ephemeralStorage.limit) 0 }}
               ephemeral-storage: {{ $templateData.pod.ephemeralStorage.limit }}
+              {{- end }}
             {{- end }}
           {{- end }}
           {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
