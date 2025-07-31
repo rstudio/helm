@@ -1,9 +1,8 @@
 suite: chronicle agent configuration
 templates:
-  - deployment.yaml
   - configmap.yaml
-  - rstudio-connect.yaml
-  # - rstudio-library.yaml
+  - configmap-prestart.yaml
+  - deployment.yaml
 tests:
   - it: should set resource limits if given
     set:
