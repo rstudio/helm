@@ -104,6 +104,10 @@ spec:
         {{- end }}
         imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
         restartPolicy: Always
+        {{- with .Values.chronicleAgent.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         {{- with .Values.chronicleAgent.volumeMounts }}
         volumeMounts:
           {{- toYaml . | nindent 10 }}

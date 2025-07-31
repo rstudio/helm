@@ -1,6 +1,6 @@
 # Posit Chronicle
 
-![Version: 0.4.3](https://img.shields.io/badge/Version-0.4.3-informational?style=flat-square) ![AppVersion: 2025.05.3](https://img.shields.io/badge/AppVersion-2025.05.3-informational?style=flat-square)
+![Version: 0.4.4](https://img.shields.io/badge/Version-0.4.4-informational?style=flat-square) ![AppVersion: 2025.05.3](https://img.shields.io/badge/AppVersion-2025.05.3-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
@@ -25,11 +25,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.4.3:
+To install the chart with the release name `my-release` at version 0.4.4:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.3
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.4
 ```
 
 To explore other chart versions, look at:
@@ -246,6 +246,7 @@ reference page](https://docs.posit.co/chronicle/appendix/library/advanced-server
 | pod.env | list | `[]` | Additional environment variables to set on the Chronicle server container |
 | pod.labels | object | `{}` | Additional labels for pods |
 | pod.nodeSelector | object | `{}` | A map used verbatim as the pod "nodeSelector" definition |
+| pod.resources | object | `{}` | Defines resources for the posit-chronicle container |
 | pod.securityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | The pod-level security context    ([reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core)) |
 | pod.terminationGracePeriodSeconds | int | `30` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.tolerations | list | `[]` | An array used verbatim as the pod "tolerations" definition |

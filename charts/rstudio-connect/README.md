@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.5](https://img.shields.io/badge/Version-0.8.5-informational?style=flat-square) ![AppVersion: 2025.07.0](https://img.shields.io/badge/AppVersion-2025.07.0-informational?style=flat-square)
+![Version: 0.8.6](https://img.shields.io/badge/Version-0.8.6-informational?style=flat-square) ![AppVersion: 2025.07.0](https://img.shields.io/badge/AppVersion-2025.07.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.5:
+To install the chart with the release name `my-release` at version 0.8.6:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.5
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.6
 ```
 
 To explore other chart versions, look at:
@@ -227,6 +227,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The Chronicle agent image repository |
 | chronicleAgent.image.sha | string | `""` | The Chronicle agent image digest |
 | chronicleAgent.image.tag | string | `"2025.05.2"` | The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if    `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.resources | object | `{}` | Defines resources for the posit-chronicle-agent container |
 | chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | The container-level security context for the Chronicle agent container |
 | chronicleAgent.serverAddress | string | `""` | Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false` |
 | chronicleAgent.serverNamespace | string | `""` | Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if    `chronicleAgent.autoDiscovery=false` |

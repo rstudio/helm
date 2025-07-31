@@ -1,6 +1,6 @@
 name: rstudio-connect
 description: Official Helm chart for Posit Connect
-version: 0.8.5
+version: 0.8.6
 apiVersion: v2
 appVersion: 2025.07.0
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png

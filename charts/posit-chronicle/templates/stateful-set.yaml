@@ -69,6 +69,10 @@ spec:
         - containerPort: 5252
           name: http
         {{- end }}
+        {{- with .Values.pod.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         {{- if .Values.persistence.enabled }}
         - name: {{ include "posit-chronicle.fullname" . }}

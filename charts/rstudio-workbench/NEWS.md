@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.9
+
+- Add options to specify resources for the Chronicle Agent container.
+
 ## 0.9.8
 
 - Allow setting ephemeral-storage limit and request for Workbench session pods via the settings `launcher.templateValues.pod.ephemeralStorage.request` and `launcher.templateValues.pod.ephemeralStorage.limit`.
