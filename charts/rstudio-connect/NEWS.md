@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.8.5
+## 0.8.6
 
 - Add options to specify resources for the Chronicle Agent container.
+
+## 0.8.5
+
+- Bump Connect version to 2025.07.0
 
 ## 0.8.4
 
