@@ -1,0 +1,27 @@
+suite: chronicle agent configuration
+templates:
+  - deployment.yaml
+  - configmap.yaml
+  - rstudio-connect.yaml
+  # - rstudio-library.yaml
+tests:
+  - it: should set resource limits if given
+    set:
+      chronicleAgent:
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 128Mi
+    asserts:
+    - equal:
+        path: spec.template.spec.initContainers[0].resources
+        value:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 128Mi
