@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.10
+
+- Fix a bug with the new `ephermalStorage` options where it was set every time, even if it was unset in the `values.yaml`.
+
 ## 0.9.9
 
 - Add options to specify resources for the Chronicle Agent container.
