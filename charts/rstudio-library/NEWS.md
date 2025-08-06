@@ -1,5 +1,10 @@
 # Changelog
 
+# 0.1.35
+
+- Fix `rstudio-library.chronicle-agent.serverAddress` failure when lookup returns none.
+- Fail `rstudio-library.chronicle-agent.serverAddress` if no server address could be resolved.
+
 ## 0.1.34
 
 - Add HTTP/HTTPS protocol prefix to `rstudio-library.chronicle-agent.serverAddress` function return.
