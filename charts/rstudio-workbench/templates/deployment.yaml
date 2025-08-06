@@ -125,7 +125,11 @@ spec:
           {{- end }}
           env:
             - name: CHRONICLE_SERVER_ADDRESS
+              {{- if .Values.chronicleAgent.autoDiscovery }}
               value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}
+              {{- else }}
+              value: {{ required "chronicleAgent.serverAddress must be specified if autoDiscovery is disabled." .Values.chronicleAgent.serverAddress | quote }}
+              {{- end }}
             - name: CHRONICLE_WORKBENCH_APIKEY
               {{- if .Values.chronicleAgent.workbenchApiKey.valueFrom }}
               valueFrom:
