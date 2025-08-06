@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.7
+
+- Skip `rstudio-library` template call when `chronicleAgent.autoDiscovery=false`. Require `chronicleAgent.serverAddress` 
+  to be set instead.
+
 ## 0.8.6
 
 - Add options to specify resources for the Chronicle Agent container.

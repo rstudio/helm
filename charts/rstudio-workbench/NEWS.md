@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.11
+
+- Skip `rstudio-library` template call when `chronicleAgent.autoDiscovery=false`. Require `chronicleAgent.serverAddress`
+  to be set instead.
+
 ## 0.9.10
 
 - Fix a bug with the new `ephermalStorage` options where it was set every time, even if it was unset in the `values.yaml`.
