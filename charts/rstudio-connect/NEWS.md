@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.10
+
+- Skip `rstudio-library` template call when `chronicleAgent.autoDiscovery=false`. Require `chronicleAgent.serverAddress`
+  to be set instead.
+
 ## 0.8.9
 
 - Bump Connect version to 2025.09.0
