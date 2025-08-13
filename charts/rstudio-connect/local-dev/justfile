@@ -1,0 +1,13 @@
+template:
+    helm dependency build ..
+    helm template .. --values ./values.yaml
+
+template-debug:
+    helm dependency build ..
+    helm template --debug .. --values ./values.yaml
+
+up:
+    ./bootstrap.sh
+
+down:
+    k3d cluster delete --config ./k3d-config.yaml
