@@ -1,0 +1,74 @@
+versionOverride: "2025.07.0"
+
+launcher:
+  enabled: true
+  useTemplates: true # Required to set a custom PyPI repo
+  templateValues:
+    pod:
+      volumes:
+        - name: pip-config-volume
+          configMap:
+            name: pip-config-connect
+        - name: netrc-config-volume
+          secret:
+            secretName: connect-netrc
+      volumeMounts:
+        - mountPath: /etc/pip.conf
+          name: pip-config-volume
+          subPath: pip.conf
+        - mountPath: /etc/netrc
+          name: netrc-config-volume
+          subPath: netrc
+      env:
+        - name: NETRC
+          value: /etc/netrc
+
+sharedStorage:
+  create: false
+  mount: true
+  name: connect-pvc
+  storageClassName: nfs
+
+license:
+  file:
+    secret: connect-license
+    secretKey: connect.lic
+
+config:
+  Authentication:
+    Provider: password
+    InsecureDefaultUserAPIKey: true
+    BasicAuth: true
+  Database:
+    Provider: "Postgres"
+  Postgres:
+    URL: "postgres://app@connect-dev-pg-rw.connect-dev:5432/app"
+  Launcher:
+    Kubernetes: true
+    DataDirPVCName: connect-pvc
+
+service:
+  type: NodePort
+  nodePort: 30080
+
+pod:
+  env:
+    - name: CONNECT_POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: connect-dev-pg-app
+          key: password
+
+# Required to set a custom PyPI repo
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: pip-config-connect
+    data:
+      # TODO: if using Posit Package Manager, edit the below to match your package manager python repo URL
+      pip.conf: |
+        [global]
+        timeout = 60
+        index-url = https://packagemanager.posit.co/pypi/latest/simple
+        trusted-host = packagemanager.posit.co
