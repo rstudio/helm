@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.7
+
+- Bump Chronicle Agent to version 2025.08.0
+
 ## 0.8.6
 
 - Add options to specify resources for the Chronicle Agent container.
