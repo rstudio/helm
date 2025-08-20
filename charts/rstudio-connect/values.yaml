@@ -277,8 +277,7 @@ chronicleAgent:
     registry: ghcr.io
     # -- The Chronicle agent image repository
     repository: rstudio/chronicle-agent
-    # -- The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if
-    #    `chronicleAgent.autoDiscovery=false`
+    # -- The Chronicle agent image tag
     tag: 2025.08.0
     # -- The Chronicle agent image digest
     sha: ""
