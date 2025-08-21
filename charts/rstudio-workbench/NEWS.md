@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.11
+
+- Bump Chronicle Agent to version 2025.08.0
+
 ## 0.9.10
 
 - Fix a bug with the new `ephermalStorage` options where it was set every time, even if it was unset in the `values.yaml`.
