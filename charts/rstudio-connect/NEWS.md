@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.8
+
+- Update Python executable versions to `3.12.11` and `3.11.13`
+
 ## 0.8.7
 
 - Bump Chronicle Agent to version 2025.08.0
