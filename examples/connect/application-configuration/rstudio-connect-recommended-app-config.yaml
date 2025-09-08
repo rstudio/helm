@@ -19,8 +19,8 @@ sharedStorage:
   requests:
     storage: 100G
 
-# Required to set a custom PyPI repo
 extraObjects:
+  # Required to set a custom PyPI repo
   - apiVersion: v1
     kind: ConfigMap
     metadata:
@@ -33,19 +33,60 @@ extraObjects:
         index-url = https://packagemanager.posit.co/pypi/latest/simple
         trusted-host = packagemanager.posit.co
 
+  # Required for authenticated R (not Python) repositories
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: curlrc-config-connect
+    data:
+      .curlrc: |
+        --netrc-file /etc/netrc
+
 launcher:
   enabled: true # Required for Off-Host Execution mode
-  useTemplates: true # Required to set a custom PyPI repo
+  useTemplates: true # Required to set a custom R or Python repo
   templateValues:
     pod:
       volumes:
+        # Required to set a custom Python repo
         - name: pip-config-volume
           configMap:
             name: pip-config-connect
+
+        # Required for authenticated R and Python repositories
+        - name: netrc-config-volume
+          secret:
+            secretName: connect-netrc
+
+        # Required for authenticated R (not Python) repositories
+        - name: curlrc-config-volume
+          configMap:
+            name: curlrc-config-connect
+
       volumeMounts:
+        # Required to set a custom Python repo
         - mountPath: /etc/pip.conf
           name: pip-config-volume
           subPath: pip.conf
+
+        # Required for authenticated R and Python repositories
+        - mountPath: /etc/netrc
+          name: netrc-config-volume
+          subPath: netrc
+
+        # Required for authenticated R (not Python) repositories
+        - mountPath: /etc/.curlrc
+          name: curlrc-config-volume
+          subPath: .curlrc
+
+      env:
+        # Required for authenticated R and Python repositories
+        - name: NETRC
+          value: /etc/netrc
+
+        # Required for authenticated R (not Python) repositories
+        - name: CURL_HOME
+          value: /etc
 
 securityContext:
   privileged: false
@@ -64,7 +105,6 @@ config:
     URL: "postgres://connect@postgres.example.com:5432/connect?sslmode=disable"
     Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.
 
-  Authentication:
   "RPackageRepository \"CRAN\"":
     URL: https://packagemanager.posit.co/cran/__linux__/jammy/latest # TODO: If using Package Manager change to match your package manager R repo url
   # If using other R repos, add them here using the below format  
