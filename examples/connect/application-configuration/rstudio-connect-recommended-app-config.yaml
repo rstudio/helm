@@ -54,6 +54,11 @@ launcher:
             name: pip-config-connect
 
         # Required for authenticated R and Python repositories
+        # See the following documentation for more details:
+        # https://packagemanager.posit.co/__docs__/admin/connect.html#authenticated-repositories
+        # This secret must contain a netrc file with credentials to access your private repositories.
+        # Here is an example of how to create this secret:
+        # kubectl create secret generic connect-netrc --from-file=netrc=/path/to/your/netrc --namespace your-connect-namespace
         - name: netrc-config-volume
           secret:
             secretName: connect-netrc
