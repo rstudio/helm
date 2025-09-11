@@ -1,0 +1,23 @@
+template:
+    helm dependency build ..
+    helm template .. --values ./values.yaml
+
+template-debug:
+    helm dependency build ..
+    helm template --debug .. --values ./values.yaml
+
+up:
+    ./bootstrap.sh
+
+down:
+    k3d cluster delete --config ./k3d-config.yaml
+
+update-connect:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    helm upgrade --install connect ../ \
+        --namespace connect-dev \
+        --values "{{ justfile_directory() }}/values.yaml" \
+        --wait \
+        --timeout=600s
