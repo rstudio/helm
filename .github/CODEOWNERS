@@ -6,9 +6,8 @@
 /ci/rstudio-pm/** @rstudio/ppm
 
 # connect resources
-/charts/rstudio-connect/** @aronatkins @dbkegley @christierney @zackverham
-/ci/rstudio-connect/** @aronatkins @dbkegley @christierney @zackverham
-/examples/connect/** @aronatkins @dbkegley @christierney @zackverham
+/charts/rstudio-connect/** @aronatkins @dbkegley @christierney @zackverham @lucasrod16
+/examples/connect/** @aronatkins @dbkegley @christierney @zackverham @lucasrod16
 
 # posit-chronicle resources
 /charts/posit-chronicle/** @matt-urbina @markrtucker @t-margheim
