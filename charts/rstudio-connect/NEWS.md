@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.9
+
+- Bump Connect version to 2025.09.0
+
 ## 0.8.8
 
 - Update Python executable versions to `3.12.11` and `3.11.13`
