@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.9.12
+## 0.9.12git 
 
-- Add options to enable Positron and configure its settings.
+- Enable Positron sessions (enabled, by default) and configure default settings.
 
 ## 0.9.11
 
