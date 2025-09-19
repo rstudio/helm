@@ -539,18 +539,19 @@ config:
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
       }
-    #  positron.conf:
-    #    enabled: 1
-    #    session-timeout-kill-hours: 12
-    #  positron.extensions.conf: |
-    #    posit.shiny
-    #    posit.publisher
-    #  positron-user-settings.json: |
-    #    {
-    #          "terminal.integrated.defaultProfile.linux": "bash",
-    #          "extensions.autoUpdate": false,
-    #          "extensions.autoCheckUpdates": false
-    #    }
+    positron.conf:
+      enabled: 1
+      session-timeout-kill-hours: 12
+    positron.extensions.conf: |
+      quarto.quarto
+      posit.shiny
+      posit.publisher
+    positron-user-settings.json: |
+      {
+            "terminal.integrated.defaultProfile.linux": "bash",
+            "extensions.autoUpdate": false,
+            "extensions.autoCheckUpdates": false
+      }
     logging.conf:
       "*":
         log-level: info
