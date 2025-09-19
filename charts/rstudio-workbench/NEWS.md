@@ -4,7 +4,7 @@
 
 - Add options to enable Positron and configure its settings.
 
-## 0.9.12
+## 0.9.11
 
 - Bump Chronicle Agent to version 2025.08.0
 
