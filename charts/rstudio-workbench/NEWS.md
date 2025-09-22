@@ -3,6 +3,8 @@
 ## 0.9.12
 
 - Bump Workbench version to 2025.09.0
+- Enable Positron Pro Sessions by default
+- Align Positron Pro session settings with Workbench defaults
 
 ## 0.9.11
 
