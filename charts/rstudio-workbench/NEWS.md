@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.9.12git 
+## 0.9.12 
 
 - Enable Positron sessions (enabled, by default) and configure default settings.
 
