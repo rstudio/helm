@@ -566,7 +566,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
 | launcher.useTemplates | bool | `false` | whether to render and use templates in the job launching process |
 | launcherPem.value | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
-| launcherPem.existingSecret | string | `""` | Existing Secret for launcherPem |
+| launcherPem.existingSecret | string | `""` | Existing secret containing launcherPem contents |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file, generally requiring the use of multi-line yaml notation |
