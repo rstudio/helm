@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.13
+
+- Skip `rstudio-library` template call when `chronicleAgent.autoDiscovery=false`. Require `chronicleAgent.serverAddress`
+  to be set instead.
+
 ## 0.9.12
 
 - Bump Workbench version to 2025.09.0
