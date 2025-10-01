@@ -335,7 +335,10 @@ userName: "rstudio"
 # -- userUid determines the UID of the created user
 userUid: "10000"
 # -- userPassword determines the password of the created user
-userPassword: "rstudio"
+userPassword:
+  value: "rstudio"
+  # key 'password'
+  existingSecret: ""
 
 # -- The XDG config dirs (directories where configuration will be read from). Do not change without good reason.
 xdgConfigDirs: "/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"
@@ -441,16 +444,25 @@ extraObjects: []
 jobJsonOverridesFiles: {}
 
 # -- An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details.
-launcherPem: ""
+launcherPem:
+  value: ""
+  # key 'launcher.pem'
+  existingSecret: ""
 # -- An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem`
 launcherPub: false
 
-secureCookieKey: ""
+secureCookieKey:
+  value: ""
+  # key 'secure-cookie-key'
+  existingSecret: ""
 
 dangerRegenerateAutomatedValues: false
 
 global:
-  secureCookieKey: ""
+  secureCookieKey:
+    value: ""
+    # key 'secure-cookie-key'
+    existingSecret: ""
 
 config:
   defaultMode:
@@ -481,6 +493,12 @@ config:
     # -- default mode for pam scripts
     # @default -- 0644
     pam: 0644
+
+  database:
+    conf:
+      value: ""
+      # key 'database.conf'
+      existingSecret: ""
 
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
