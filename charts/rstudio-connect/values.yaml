@@ -277,9 +277,8 @@ chronicleAgent:
     registry: ghcr.io
     # -- The Chronicle agent image repository
     repository: rstudio/chronicle-agent
-    # -- The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if
-    #    `chronicleAgent.autoDiscovery=false`
-    tag: 2025.05.2
+    # -- The Chronicle agent image tag
+    tag: 2025.08.0
     # -- The Chronicle agent image digest
     sha: ""
     # -- The pull policy for the Chronicle agent image
@@ -422,8 +421,8 @@ config:
     # For Off-Host Execution, Python versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/python/
     Executable:
-      - /opt/python/3.12.1/bin/python
-      - /opt/python/3.11.7/bin/python
+      - /opt/python/3.12.11/bin/python
+      - /opt/python/3.11.13/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.

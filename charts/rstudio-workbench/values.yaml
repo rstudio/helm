@@ -80,9 +80,8 @@ chronicleAgent:
     registry: ghcr.io
     # -- The Chronicle agent image repository
     repository: rstudio/chronicle-agent
-    # -- The Chronicle agent image tag, defaults to using the auto-discovered Chronicle server version or is required if
-    #    `chronicleAgent.autoDiscovery=false`
-    tag: 2025.05.2
+    # -- The Chronicle agent image tag
+    tag: 2025.08.0
     # -- The Chronicle agent image digest
     sha: ""
     # -- The pull policy for the Chronicle agent image
@@ -540,18 +539,23 @@ config:
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
       }
-    #  positron.conf:
-    #    enabled: 1
-    #    session-timeout-kill-hours: 12
-    #  positron.extensions.conf: |
-    #    posit.shiny
-    #    posit.publisher
-    #  positron-user-settings.json: |
-    #    {
-    #          "terminal.integrated.defaultProfile.linux": "bash",
-    #          "extensions.autoUpdate": false,
-    #          "extensions.autoCheckUpdates": false
-    #    }
+    positron.conf:
+      enabled: 1
+      session-timeout-kill-hours: 12
+    positron-user-settings.json: |
+      {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "extensions.autoUpdate": false,
+        "extensions.autoCheckUpdates": false,
+        "quarto.path": "/usr/lib/rstudio-server/bin/quarto/bin/quarto",
+        "python.interpreters.exclude": [
+            "/usr/bin",
+            "/bin",
+        ],
+        "python.environmentProviders.enable": {
+            "Conda": false
+        }
+      }
     logging.conf:
       "*":
         log-level: info

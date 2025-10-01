@@ -1,8 +1,8 @@
 apiVersion: v2
 name: posit-chronicle
 description: Official Helm chart for Posit Chronicle Server
-version: 0.4.4
-appVersion: 2025.05.3
+version: 0.4.5
+appVersion: 2025.08.0
 icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png
 home: https://www.posit.co
 sources:
@@ -14,7 +14,7 @@ maintainers:
 annotations:
   artifacthub.io/images: |
     - name: chronicle
-      image: ghcr.io/rstudio/chronicle:2025.05.3
+      image: ghcr.io/rstudio/chronicle:2025.08.0
       platforms:
         - linux/amd64
   artifacthub.io/license: MIT

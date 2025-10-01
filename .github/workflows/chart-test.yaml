@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -47,8 +48,8 @@ jobs:
         run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
         continue-on-error: true
 
-      - name: Notify Slack of chart linting failure
-        if: steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure'
+      - name: Notify Slack of chart linting failure if on main
+        if: github.ref == 'refs/heads/main' && (steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure')
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
@@ -84,7 +85,7 @@ jobs:
         uses: azure/setup-helm@v4
 
       - name: Install helm unittest plugin
-        run: helm plugin install https://github.com/helm-unittest/helm-unittest.git
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.0.0
 
       - name: Run chart unit tests
         id: unittest
@@ -95,8 +96,8 @@ jobs:
           done
         continue-on-error: true
 
-      - name: Notify Slack of chart unittest failure
-        if: steps.unittest.outcome == 'failure'
+      - name: Notify Slack of chart unittest failure if on main
+        if: github.ref == 'refs/heads/main' && steps.unittest.outcome == 'failure'
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
@@ -185,8 +186,8 @@ jobs:
         run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library --namespace posit-test
         continue-on-error: true
 
-      - name: Notify Slack of chart install failure
-        if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure'
+      - name: Notify Slack of chart install failure if on main
+        if: github.ref == 'refs/heads/main' && (steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure')
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"

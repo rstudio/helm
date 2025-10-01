@@ -42,8 +42,8 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Notify Slack of chart documentation failure
-        if: failure()
+      - name: Notify Slack of chart documentation failure on main
+        if: github.ref == 'refs/heads/main' && failure()
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
@@ -100,8 +100,8 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Notify Slack of chart documentation (rbac) failure
-        if: failure()
+      - name: Notify Slack of chart documentation (rbac) failure on main
+        if: github.ref == 'refs/heads/main' && failure()
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload-delimiter: "_"
