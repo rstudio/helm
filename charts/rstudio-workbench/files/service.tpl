@@ -1,4 +1,4 @@
-# Version: 2.4.0
+# Version: 2.5.0
 # DO NOT MODIFY the "Version: " key
 # Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}

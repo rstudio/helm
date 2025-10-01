@@ -156,10 +156,9 @@ license:
     # -- secret is an existing secret with a license file in it
     secret: false
 
-# -- Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
-# launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null`
-securityContext:
-  privileged: true
+# -- Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
+# launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: {}`
+securityContext: {}
 
 prometheus:
   # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
@@ -261,9 +260,61 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+# Settings for the Chronicle Agent sidecar container
+chronicleAgent:
+  # -- Creates a Chronicle agent sidecar container in the pod if true
+  enabled: false
+  # -- Additional environment variables to set on the Chronicle agent container `env`
+  env: []
+  # -- Verbatim volumeMounts to attach to the Chronicle agent container
+  volumeMounts: []
+  # -- The container-level security context for the Chronicle agent container
+  securityContext:
+    privileged: false
+    runAsNonRoot: true
+  image:
+    # -- The Chronicle agent image registry
+    registry: ghcr.io
+    # -- The Chronicle agent image repository
+    repository: rstudio/chronicle-agent
+    # -- The Chronicle agent image tag
+    tag: 2025.08.0
+    # -- The Chronicle agent image digest
+    sha: ""
+    # -- The pull policy for the Chronicle agent image
+    imagePullPolicy: IfNotPresent
+  # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
+  autoDiscovery: true
+  # -- Defines resources for the posit-chronicle-agent container
+  resources: {}
+    # requests:
+    #   memory: "256Mi"
+    #   cpu: "100m"
+    # limits:
+    #   memory: "512Mi"
+    #   cpu: "200m"
+  # -- Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered
+  #    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false`
+  serverAddress: ""
+  # -- Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if
+  #    `chronicleAgent.autoDiscovery=false`
+  serverNamespace: ""
+  # -- An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be
+  #    created after Connect has been deployed so this value may need to be filled in later if performing an initial
+  #    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating))
+  connectApiKey:
+    # -- Connect API key as a raw string to set as the `CHRONICLE_CONNECT_APIKEY` environment variable (not recommended)
+    value: ""
+    # -- Connect API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the
+    #    `CHRONICLE_CONNECT_APIKEY` environment variable (recommended)
+    valueFrom: {}
+  # -- An environment tag to apply to all metrics reported by this agent
+  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment))
+  agentEnvironment: ""
+
 launcher:
   # -- Whether to enable the launcher
-  enabled: false
+  enabled: true
   # -- The namespace to launch sessions into. Uses the Release namespace by default
   namespace: ""
   # -- Optional. The runtime.yaml definition of Kubernetes runtime containers. Defaults to "base", which pulls in the default
@@ -301,6 +352,17 @@ launcher:
       env: []
       imagePullPolicy: ""
       imagePullSecrets: []
+      # -- sets the default resource requests and limits for Jobs launched by Connect
+      # -- to be used when none are provided in the content runtime settings
+      resources:
+        requests: {}
+        #   memory: "1Gi"
+        #   cpu: "500m"
+        #   ephemeral-storage: "100Mi"
+        limits: {}
+        #   memory: "1Gi"
+        #   cpu: "500m"
+        #   ephemeral-storage: "100Mi"
       initContainers: []
       extraContainers: []
       containerSecurityContext: {}
@@ -359,8 +421,8 @@ config:
     # For Off-Host Execution, Python versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/python/
     Executable:
-      - /opt/python/3.12.1/bin/python
-      - /opt/python/3.11.7/bin/python
+      - /opt/python/3.12.11/bin/python
+      - /opt/python/3.11.13/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.
@@ -383,3 +445,4 @@ config:
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Metrics:
     Enabled: true
+  Launcher: {}

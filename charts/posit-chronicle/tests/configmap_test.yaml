@@ -1,0 +1,183 @@
+suite: Configmap tests
+templates:
+  - configmap.yaml
+tests:
+  - it: should always create a config map
+    asserts:
+    - hasDocuments:
+        count: 1
+    - isKind:
+        of: ConfigMap
+  - it: should use http by default
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[HTTP\]
+          Listen = :5252
+  - it: should properly configure https when enabled
+    set:
+      config:
+        HTTPS:
+          Enabled: true
+          Certificate: /etc/ssl/ssl.crt
+          Key: /etc/ssl/ssl.key
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[HTTPS\]
+          Listen = :443
+          Certificate = \/etc\/ssl\/ssl.crt
+          Key = \/etc\/ssl\/ssl.key
+  - it: should set a default logging configuration
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[Logging\]
+          ServiceLog = STDOUT
+          ServiceLogLevel = INFO
+          ServiceLogFormat = TEXT
+  - it: should set values for a custom logging configuration
+    set:
+        config:
+          Logging:
+            ServiceLog: STDERR
+            ServiceLogLevel: DEBUG
+            ServiceLogFormat: JSON
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[Logging\]
+          ServiceLog = STDERR
+          ServiceLogLevel = DEBUG
+          ServiceLogFormat = JSON
+  - it: should disable metrics by default
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[Metrics\]
+          Enabled = false
+  - it: should enable metrics when specified
+    set:
+      config:
+        Metrics:
+          Enabled: true
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[Metrics\]
+          Enabled = true
+  - it: should disable profiling by default
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[Profiling\]
+          Enabled = false
+  - it: should enable profiling when specified
+    set:
+      config:
+        Profiling:
+          Enabled: true
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[Profiling\]
+          Enabled = true
+          Listen = :3030
+  - it: should set the profiling listening port when specified
+    set:
+      config:
+        Profiling:
+          Enabled: true
+          Port: 3131
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[Profiling\]
+          Enabled = true
+          Listen = :3131
+  - it: should enable and configure local storage by default
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[LocalStorage\]
+          Enabled = true
+          Location = \/opt\/chronicle-data
+  - it: should set values for a custom local storage configuration
+    set:
+      config:
+        LocalStorage:
+          Path: /custom/data/path
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[LocalStorage\]
+          Enabled = true
+          Location = \/custom\/data\/path
+  - it: should disable local storage when specified
+    set:
+      config:
+        LocalStorage:
+          Enabled: false
+        # One of these must be set to true
+        S3Storage:
+          Enabled: true
+          Bucket: test
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[LocalStorage\]
+          Enabled = false
+    - notMatchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          Location = \/opt\/chronicle-data
+  - it: should enable and configure S3 storage when specified
+    set:
+      config:
+        S3Storage:
+          Enabled: true
+          Bucket: test
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[S3Storage\]
+          Enabled = true
+          Bucket = test
+    - notMatchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          Prefix = .*
+          Profile = .*
+          Region = .*
+  - it: should add extra options to S3 when specified
+    set:
+      config:
+        S3Storage:
+          Enabled: true
+          Bucket: test
+          Prefix: test-prefix
+          Profile: test-profile
+          Region: test-region
+    asserts:
+    - matchRegex:
+        path: data["posit-chronicle.gcfg"]
+        pattern: |
+          \[S3Storage\]
+          Enabled = true
+          Bucket = test
+          Prefix = test-prefix
+          Profile = test-profile
+          Region = test-region

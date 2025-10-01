@@ -96,7 +96,7 @@ containers:
   {{- end }}
   imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
   ports:
-  - containerPort: 8787
+  - containerPort: {{ .Values.pod.port }}
     name: http
   {{- if and .Values.prometheus.enabled (not .Values.prometheus.legacy) }}
   - containerPort: {{ .Values.prometheus.port }}
@@ -108,6 +108,9 @@ containers:
     {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
     - name: rstudio-shared-storage
       mountPath: "{{ .Values.sharedStorage.path }}"
+      {{- if .Values.sharedStorage.subPath }}
+      subPath: "{{ .Values.sharedStorage.subPath }}"
+      {{- end }}
     {{- end }}
     {{- if or .Values.homeStorage.create .Values.homeStorage.mount }}
     - name: rstudio-home-storage
@@ -209,8 +212,8 @@ containers:
       cpu: "{{ .Values.resources.requests.cpu }}"
       ephemeral-storage: "{{ .Values.resources.requests.ephemeralStorage }}"
     {{- end }}
-    limits:
     {{- if .Values.resources.limits.enabled }}
+    limits:
       memory: "{{ .Values.resources.limits.memory }}"
       cpu: "{{ .Values.resources.limits.cpu }}"
       ephemeral-storage: "{{ .Values.resources.limits.ephemeralStorage }}"

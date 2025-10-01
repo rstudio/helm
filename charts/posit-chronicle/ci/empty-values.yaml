@@ -1,0 +1,3 @@
+persistence:
+  accessModes:
+    - ReadWriteOnce  # Including this for tests, since Kind clusters do not support ReadWriteMany by default.

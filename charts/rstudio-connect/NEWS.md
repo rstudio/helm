@@ -1,5 +1,111 @@
 # Changelog
 
+## 0.8.9
+
+- Bump Connect version to 2025.09.0
+
+## 0.8.8
+
+- Update Python executable versions to `3.12.11` and `3.11.13`
+
+## 0.8.7
+
+- Bump Chronicle Agent to version 2025.08.0
+
+## 0.8.6
+
+- Add options to specify resources for the Chronicle Agent container.
+
+## 0.8.5
+
+- Bump Connect version to 2025.07.0
+
+## 0.8.4
+
+- Switch to a hardcoded default for `chronicleAgent.image.tag` to be regularly updated for new releases.
+- Move user provided init containers ahead of the Chronicle Agent init container in priority.
+
+## 0.8.3
+
+- Bump Connect version to 2025.06.0
+
+## 0.8.2
+
+- Add recommended labels to all PVCs created by the chart.
+
+## 0.8.1
+
+- Fix bug where the chart did not respect the `config.Launcher.KubernetesScratchPath` configuration.
+
+## 0.8.0
+
+- BREAKING: Connect now runs in [Off-Host Execution (OHE) mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default.
+  - `launcher.enabled` now defaults to `true` instead of `false`
+  - `securityContext` now defaults to `{}` instead of `securityContext.privileged: true`
+  - If you would like to run Connect not in OHE mode using the previous defaults then set the following in your values.yaml. `launcher.enabled: false` and `securityContext.privileged: true`.
+
+## 0.7.28
+
+- The `prestart.bash` no longer uses the service account certificate bundle to
+  configure the system.
+
+## 0.7.27
+
+- Bump Connect version to 2025.05.0
+
+## 0.7.26
+
+- Bump `rstudio-library` chart version to `0.1.34`.
+- Adds a shortcut resource deployment for Chronicle Agent via `chronicleAgent.enabled`. The value is disabled by default
+  and does not affect existing deployments that use `sidecar` or `initContainer` to deploy the Chronicle Agent.
+
+## 0.7.25
+
+- Bump Connect version to 2025.04.0
+
+## 0.7.24
+
+- Bump Connect version to 2025.03.0
+
+## 0.7.23
+
+- Bump Chronicle Agent to version 2025.03.0
+
+## 0.7.22
+
+- Bump Connect version to 2025.02.0
+
+## 0.7.21
+
+- Bump Connect version to 2025.01.0
+
+## 0.7.20
+
+- `prestart.bash` startup scripts now support RHEL
+
+## 0.7.19
+
+- Allow overriding the default content Job resource requests/limits settings via the values file
+  using the `launcher.templateValues.pod.resources` key. Note that these settings are applied
+  globally for _all_ jobs including environment restores, document renders, and interactive
+  applications.
+
+## 0.7.18
+
+- Bumps Connect version to 2024.12.0
+
+## 0.7.17
+
+- Bump Chronicle Agent to version 2024.11.0
+
+## 0.7.16
+
+- Change location of helm unittests to `ci/rstudio-connect/tests` so changes to unittest files do not require a chart version bump
+
+## 0.7.15
+
+- Bump Connect version to 2024.11.0
+
 ## 0.7.14
 
 - Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.

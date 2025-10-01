@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.7.14](https://img.shields.io/badge/Version-0.7.14-informational?style=flat-square) ![AppVersion: 2024.09.0](https://img.shields.io/badge/AppVersion-2024.09.0-informational?style=flat-square)
+![Version: 0.8.9](https://img.shields.io/badge/Version-0.8.9-informational?style=flat-square) ![AppVersion: 2025.09.0](https://img.shields.io/badge/AppVersion-2025.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.7.14:
+To install the chart with the release name `my-release` at version 0.8.9:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.7.14
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.9
 ```
 
 To explore other chart versions, look at:
@@ -42,6 +42,13 @@ To explore other chart versions, look at:
 ```{.bash}
 helm search repo rstudio/rstudio-connect -l
 ```
+
+## Upgrade guidance
+
+### 0.8.0
+
+- When upgrading to version 0.8.0 or later, Connect now runs in [Off-Host Execution mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default
+- If you desire to run Connect not in Off-Host Execution mode, then set `securityContext.privileged: true` and `launcher.enabled: false`
 
 ## Required configuration
 
@@ -124,6 +131,66 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
+## Chronicle Agent
+
+This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
+
+By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
+searched namespace can be changed setting by `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  serverAddress: <server-address>
+  image:
+    tag: <agent-version>
+```
+
+If preferred, the Chronicle agent can be directly defined as a sidecar container using either `initContainers`
+(recommended) or `sidecar` values. Below is an example of directly defining the Chronicle agent as a native sidecar
+container using `initContainers`:
+```yaml
+initContainers:
+  - name: chronicle-agent
+    restartPolicy: Always
+    image: ghcr.io/rstudio/chronicle-agent:<agent-version>
+    env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://<address>"
+      - name: CHRONICLE_CONNECT_APIKEY
+        valueFrom:
+          secretKeyRef:
+            name: connect
+            key: apikey
+```
+
+For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
+### Chronicle Connect API Key
+
+In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
+a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example
+of how to set the API key using a secret:
+```yaml
+chronicleAgent:
+  enabled: true
+  connectApiKey:
+    valueFrom:
+      secretKeyRef:
+        name: <secret-name>
+        key: <key-name>
+```
+
+Due to the way Connect manages its API keys, it is currently not possible to provision an API key automatically for the
+Chronicle agent at the time of deployment. To workaround this issue in a fresh deployment, you can initially leave
+the API key unset for the Chronicle agent, deploy the chart, create an administrator API key, and then provision a
+secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
+can be set and the release can be upgraded to include the new value.
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
@@ -148,6 +215,23 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
+| chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
+| chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
+| chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
+| chronicleAgent.connectApiKey.value | string | `""` | Connect API key as a raw string to set as the `CHRONICLE_CONNECT_APIKEY` environment variable (not recommended) |
+| chronicleAgent.connectApiKey.valueFrom | object | `{}` | Connect API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_CONNECT_APIKEY` environment variable (recommended) |
+| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
+| chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
+| chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
+| chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The Chronicle agent image repository |
+| chronicleAgent.image.sha | string | `""` | The Chronicle agent image digest |
+| chronicleAgent.image.tag | string | `"2025.08.0"` | The Chronicle agent image tag |
+| chronicleAgent.resources | object | `{}` | Defines resources for the posit-chronicle-agent container |
+| chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | The container-level security context for the Chronicle agent container |
+| chronicleAgent.serverAddress | string | `""` | Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.serverNamespace | string | `""` | Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if    `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.volumeMounts | list | `[]` | Verbatim volumeMounts to attach to the Chronicle agent container |
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
@@ -174,14 +258,15 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | launcher.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
-| launcher.enabled | bool | `false` | Whether to enable the launcher |
+| launcher.enabled | bool | `true` | Whether to enable the launcher |
 | launcher.extraTemplates | object | `{}` | extra templates to render in the template directory. |
 | launcher.includeDefaultTemplates | bool | `true` | whether to include the default `job.tpl` and `service.tpl` files included with the chart |
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.launcherKubernetesProfilesConf | object | `{}` | User definition of launcher.kubernetes.profiles.conf for job customization |
 | launcher.namespace | string | `""` | The namespace to launch sessions into. Uses the Release namespace by default |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the Posit Connect session templating process |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"priorityClassName":"","resources":{"limits":{},"requests":{}},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | Values to pass along to the Posit Connect session templating process |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
+| launcher.templateValues.pod.resources | object | `{"limits":{},"requests":{}}` | to be used when none are provided in the content runtime settings |
 | launcher.useTemplates | bool | `true` | Whether to use launcher templates when launching sessions. Defaults to true |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
 | license.file.contents | bool | `false` | contents is an in-line license file |
@@ -224,7 +309,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | Used to configure the container's readinessProbe. Only included if enabled = true |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources | object | `{}` | Defines resources for the rstudio-connect container |
-| securityContext | object | `{"privileged":true}` | Values to set the `securityContext` for Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: null` |
+| securityContext | object | `{}` | Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: {}` |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |

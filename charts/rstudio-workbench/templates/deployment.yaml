@@ -72,6 +72,10 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.pod.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -93,9 +97,50 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
-      {{- if .Values.initContainers }}
+      {{- if or .Values.initContainers .Values.chronicleAgent.enabled }}
       initContainers:
-        {{- toYaml .Values.initContainers | nindent 8 }}
+        {{- with .Values.initContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.chronicleAgent.enabled }}
+        - name: chronicle-agent
+          {{- if .Values.chronicleAgent.image.sha }}
+          image: "{{ required "chronicleAgent.image.registry must be specified" .Values.chronicleAgent.image.registry }}/{{ required "chronicleAgent.image.repository must be specified" .Values.chronicleAgent.image.repository }}:{{ required "chronicleAgent.image.tag must be specified" .Values.chronicleAgent.image.tag }}@sha256:{{ .Values.chronicleAgent.image.sha }}"
+          {{- else }}
+          image: "{{ required "chronicleAgent.image.registry must be specified" .Values.chronicleAgent.image.registry }}/{{ required "chronicleAgent.image.repository must be specified" .Values.chronicleAgent.image.repository }}:{{ required "chronicleAgent.image.tag must be specified" .Values.chronicleAgent.image.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
+          restartPolicy: Always
+          {{- with .Values.chronicleAgent.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.chronicleAgent.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.chronicleAgent.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: CHRONICLE_SERVER_ADDRESS
+              value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}
+            - name: CHRONICLE_WORKBENCH_APIKEY
+              {{- if .Values.chronicleAgent.workbenchApiKey.valueFrom }}
+              valueFrom:
+{{ toYaml .Values.chronicleAgent.workbenchApiKey.valueFrom | indent 16 }}
+              {{- else }}
+              value: {{ .Values.chronicleAgent.workbenchApiKey.value | quote }}
+              {{- end }}
+            {{- with .Values.chronicleAgent.agentEnvironment }}
+            - name: CHRONICLE_AGENT_ENVIRONMENT
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.chronicleAgent.env }}
+            {{ toYaml . | indent 12 }}
+            {{- end }}
+        {{- end }}
       {{- end }}
 {{- /*
   this is where most important definition of containers takes place

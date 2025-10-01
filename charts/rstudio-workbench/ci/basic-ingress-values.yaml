@@ -1,0 +1,14 @@
+license:
+  file:
+    secret: pwb-license
+    secretKey: pwb.lic
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+
+  hosts:
+    - host: workbench.rstudio.com
+      paths:
+        - path: /test/

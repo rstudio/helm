@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.8.7](https://img.shields.io/badge/Version-0.8.7-informational?style=flat-square) ![AppVersion: 2024.09.1](https://img.shields.io/badge/AppVersion-2024.09.1-informational?style=flat-square)
+![Version: 0.9.12](https://img.shields.io/badge/Version-0.9.12-informational?style=flat-square) ![AppVersion: 2025.09.0](https://img.shields.io/badge/AppVersion-2025.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -23,11 +23,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.7:
+To install the chart with the release name `my-release` at version 0.9.12:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.8.7
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.9.12
 ```
 
 To explore other chart versions, look at:
@@ -149,12 +149,8 @@ Alternatively, database passwords may be set during `helm install` with the foll
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
   valid `.ini` or `.dcf` file formats required by Workbench.
   - Those configuration files and their mount locations are covered in the [Configuration files](#configuration-files) section below.
-- If you need to modify the jobs launched by Workbench, use `job-json-overrides`.
-  - Review the [Job Json overrides](#job-json-overrides) section on this below. For general information, see [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes).
+- If you need to modify the jobs (sessions) launched by Workbench, use `launcher.templateValues` as described in the [Launcher Templates](#launcher-templates) section below.
 - The prestart scripts for Workbench and Posit Job Launcher are highly customized to get the service account information off of the Workbench pod for use in launching jobs.
-- Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter.
-  - This is described in the
-  [Monitoring Posit Team Using Prometheus and Graphite](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite) support article.
 
 ## Configuration files
 
@@ -238,15 +234,9 @@ the `XDG_CONFIG_DIRS` environment variable.
 
 #### Python repositories
 
-pip can be configured with `config.session.pip.conf`. To ensure `pip.conf` is mounted into the session pods, it is important that:
-
-- `launcher.useTemplates: true` is set
-- `pip.conf` settings are listed under `config.session` as shown in the following example for adding Posit Public Package Manager's PyPI:
+pip can be configured with `config.session.pip.conf`:
 
   ```yaml
-  launcher:
-    useTemplates: true
-
   config:
     session:
       pip.conf:
@@ -397,38 +387,87 @@ some-key: value1,value2,value3,value4
 This appending/concatenation/array translation behavior only works with the helm chart.
 :::
 
-### Job Json overrides
+## Launcher Templates
 
-If you want to customize the job launch process (i.e., how sessions are defined), edit the following configuration:
+If you want to customize the launcher job templates, use the `launcher.templateValues` section of the `values.yaml` file. These values are then used within session templates.
 
-- Modify:
-  ```yaml
-  config.profiles.launcher\.kubernetes\.profiles\.conf.<< some selector >>.job-json-overrides`
-  ```
-- Create an array of maps with the following keys:
-  - `target`: The "target" part of the job spec to replace.
-  - `name`: A unique identifier (ideally with no spaces) becomes a configuration filename on disk.
-  - `json`: A YAML value that is translated directly to JSON and injected into the job spec at `target`.
-
-Explore the docs in the [Helm repository](https://github.com/rstudio/helm/blob/main/docs/customize.md) for additional information.
+For example, if you want to add a container image registry credentials secret to allow session images to authenticate to a container registry, you can do so with the following:
 
 ```yaml
-config:
-  profiles:
-    launcher.kubernetes.profiles.conf:
-      "*":
-        job-json-overrides:
-          - target: "/spec/template/spec/containers/0/imagePullPolicy"
-            json: "Always"
-            name: imagePullPolicy
-          - target: "/spec/template/spec/imagePullSecrets"
-            json:
-              - name: my-pull-secret
-            name: imagePullSecrets
-        container-images:
-          - "one-image:tag"
-          - "two-image:tag
+launcher:
+  templateValues:
+    pod:
+      imagePullSecrets:
+      - name: private-registry-creds
 ```
+
+For example, if you want to add a toleration to each session, you can do so with the following:
+
+```yaml
+launcher:
+  templateValues:
+    pod:
+      tolerations:
+        - key: "posit-sessions"
+          operator: "Exists"
+          effect: "NoSchedule"
+```
+
+## Chronicle Agent
+
+This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
+
+By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
+searched namespace can be changed setting by `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  serverAddress: <server-address>
+  image:
+    tag: <agent-version>
+```
+
+If preferred, the Chronicle agent can be directly defined as a sidecar container using either `initContainers`
+(recommended) or `sidecar` values. Below is an example of directly defining the Chronicle agent as a native sidecar
+container using `initContainers`:
+```yaml
+initContainers:
+  - name: chronicle-agent
+    restartPolicy: Always
+    image: ghcr.io/rstudio/chronicle-agent:<agent-version>
+    env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://<address>"
+```
+
+For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
+### Chronicle Workbench API Key
+
+> [!WARNING]
+> The Workbench API is currently in preview. See
+> [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html) for more
+> information.
+
+The Chronicle agent can be configured to scrape the Workbench API for additional data. To do this, you must
+provide the Chronicle agent with a Workbench API key. This can be done by setting `chronicleAgent.workbenchApiKey`:
+```yaml
+chronicleAgent:
+  enabled: true
+  workbenchApiKey:
+    valueFrom:
+      secretKeyRef:
+        name: <secret-name>
+        key: <key-name>
+```
+
+For additional information on enabling the API and generating API keys, see
+[the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html).
 
 ## Sealed secrets
 
@@ -450,6 +489,23 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | args is the pod container's run arguments. |
+| chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
+| chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
+| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
+| chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
+| chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
+| chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The Chronicle agent image repository |
+| chronicleAgent.image.sha | string | `""` | The Chronicle agent image digest |
+| chronicleAgent.image.tag | string | `"2025.08.0"` | The Chronicle agent image tag |
+| chronicleAgent.resources | object | `{}` | Defines resources for the posit-chronicle-agent container |
+| chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | The container-level security context for the Chronicle agent container |
+| chronicleAgent.serverAddress | string | `""` | Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.serverNamespace | string | `""` | Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if    `chronicleAgent.autoDiscovery=false` |
+| chronicleAgent.volumeMounts | list | `[]` | Verbatim volumeMounts to attach to the Chronicle agent container |
+| chronicleAgent.workbenchApiKey | object | `{"value":"","valueFrom":{}}` | A read-only administrator permissions API key generated for Workbench for the Chronicle agent to use, API keys    can only be created after Workbench has been deployed so this value may need to be filled in later if performing    an initial deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
+| chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
+| chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
 | config.database.conf.value | string | 0644 | Database connection config |
 | config.database.conf.existingSecret | string | `""` | Secret for database connection config |
@@ -506,14 +562,14 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.kubernetesHealthCheck | object | `{"enabled":true,"extraCurlArgs":["-fsSL"]}` | configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup |
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"extraContainers":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
 | launcher.useTemplates | bool | `false` | whether to render and use templates in the job launching process |
 | launcherPem.value | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
 | launcherPem.existingSecret | string | `""` | Existing Secret for launcherPem |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
-| license.file.contents | bool | `false` | contents is an in-line license file |
+| license.file.contents | bool | `false` | contents is an in-line license file, generally requiring the use of multi-line yaml notation |
 | license.file.mountPath | string | `"/etc/rstudio-licensing"` | mountPath is the place the license file will be mounted into the container |
 | license.file.mountSubPath | bool | `false` | It can be preferable _not_ to enable this, because then updates propagate automatically |
 | license.file.secret | bool | `false` | secret is an existing secret with a license file in it |
@@ -526,6 +582,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
+| pod.hostAliases | list | `[]` | Array of hostnames to supply to the main pod |
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.lifecycle | object | `{}` | container lifecycle hooks |
 | pod.port | int | `8787` | The containerPort used by the main pod container |
@@ -563,6 +620,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
 | service.nodePort | bool | `false` | The explicit nodePort to use for `service.type` NodePort. If not provided, Kubernetes will choose one automatically |
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
+| service.targetPort | int | `8787` | The port to forward to on the Workbench pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
@@ -583,6 +641,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | sharedStorage.requests.storage | string | `"10Gi"` | the volume of storage to request for this persistent volume claim |
 | sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | storageClassName - the type of storage to use. Must allow ReadWriteMany |
+| sharedStorage.subPath | string | `""` | an optional subPath for the volume mount |
 | sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | startupProbe is used to configure the container's startupProbe |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |

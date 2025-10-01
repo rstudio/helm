@@ -1,83 +1,164 @@
-image:
-  repository: "ghcr.io/rstudio/chronicle"
-  tag: "2024.09.0"
-  imagePullPolicy: "IfNotPresent"
+# -- Override for the name of the release
+nameOverride: ""
+# -- Override for the full name of the release
+fullnameOverride: ""
+# -- Override for the namespace of the chart deployment
+namespaceOverride: ""
+# -- Common labels to add to all resources
+commonLabels: {}
+# -- Common annotations to add to all resources
+commonAnnotations: {}
 
-serviceaccount:
+# -- Additional manifests to deploy with the chart with template value rendering
+extraObjects: []
+
+image:
+  # -- The image registry
+  registry: "ghcr.io"
+  # -- The image repository
+  repository: "rstudio/chronicle"
+  # -- The image tag, defaults to the chart app version
+  tag: ""
+  # -- The image digest
+  sha: ""
+  # -- The image pull policy
+  pullPolicy: "IfNotPresent"
+  # -- The container-level security context
+  #    ([reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#securitycontext-v1-core))
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+
+serviceAccount:
+  # -- Creates a service account for Posit Chronicle if true
   create: false
-  # -- Additional annotations to add to the chronicle-server serviceaccount
+  # -- Override for the service account name, defaults to fullname
+  name: ""
+  # -- Annotations to add to the service account
   annotations: {
     # EKS role arn example
     # eks.amazonaws.com/role-arn: my-aws-iam-role-arn
   }
-  # -- Additional labels to add to the chronicle-server serviceaccount
+  # -- Labels to add to the service account
   labels: {}
 
 service:
-  # -- The port to use for the REST service
+  # -- The port to use for the REST API service
   port: 80
-  # -- Additional annotations to add to the chronicle-server service
+  # -- Annotations to add to the service
   annotations: {}
-  # -- Additional labels to add to the chronicle-server service
+  # -- Labels to add to the service
   labels: {}
-  # -- Additional selector labels to add to the chronicle-server service
-  selectorLabels: {}
 
-# -- The number of replica pods to maintain for this service
+# -- The number of replica pods to maintain
 replicas: 1
 
-# -- A map used verbatim as the pod's "nodeSelector" definition
-nodeSelector: {}
-
 pod:
-  # -- The command and args to run in the chronicle-server container
-  command: "/chronicle"
-  args: ["start", "-c", "/etc/posit-chronicle/posit-chronicle.gcfg"]
-  # -- Optional environment variables
+  # -- The command to run in the Chronicle server container, defaults to the image `ENTRYPOINT` value
+  command: []
+  # -- The arguments to pass to the command, defaults to the image `CMD` values
+  args: []
+  # -- Additional environment variables to set on the Chronicle server container
   env: []
-  # -- Additional annotations to add to the chronicle-server pods
+  # -- Additional annotations for pods
   annotations: {}
-  # -- Additional labels to add to the chronicle-server pods
+  # -- Additional labels for pods
   labels: {}
-  # -- Additional selector labels to add to the chronicle-server pods
-  selectorLabels: {}
-  # -- A map used verbatim as the pod's "affinity" definition
+  # -- A map used verbatim as the pod "affinity" definition
   affinity: {}
-  # -- An array used verbatim as the pod's "tolerations" definition
+  # -- A map used verbatim as the pod "nodeSelector" definition
+  nodeSelector: {}
+  # -- An array used verbatim as the pod "tolerations" definition
   tolerations: []
   # -- The termination grace period seconds allowed for the pod before shutdown
   terminationGracePeriodSeconds: 30
+  # -- The pod-level security context
+  #    ([reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core))
+  securityContext:
+    fsGroup: 1000
+    fsGroupChangePolicy: "OnRootMismatch"
+  # -- Defines resources for the posit-chronicle container
+  resources: {}
+    # requests:
+    #   memory: "1Gi"
+    #   cpu: "100m"
+    # limits:
+    #   memory: "2Gi"
+    #   cpu: "2000m"
 
-# If config.LocalStorage.Enabled is set to true,
-# the chart will provision a pvc of size storage.persistentVolumeSize for
-# the chronicle server stateful-set
-storage:
-  persistentVolumeSize: 1Gi
+# Configuration for application Persistent Volume Claims
+persistence:
+  # -- Enable persistence using Persistent Volume Claims
+  enabled: true
+  # -- Persistent Volume Storage Class, defaults to the default Storage Class for the cluster
+  storageClassName: ""
+  # -- Size of the data volume
+  size: 10Gi
+  # -- Persistent Volume Access Modes
+  accessModes:
+    - ReadWriteMany
+  # -- Selector to match an existing Persistent Volume for the data PVC
+  selectorLabels: {}
+  # -- Additional annotations for the PVC
+  annotations: {}
+  # -- Additional labels for the PVC
+  labels: {}
+  # -- Finalizers for the PVC
+  finalizers:
+    - kubernetes.io/pvc-protection
 
+# -- Additional secrets to mount to the Chronicle server pod
+extraSecretMounts: []
+# this option can be used to mount secrets such as an SSL certificate and key into the pod
+#  - name: "ssl"
+#    secretName: "chronicle-ssl"
+#    mountPath: "/etc/chronicle/ssl"
+#    optional: false
+#    items:
+#      - key: "tls.crt"
+#      - key: "tls.key"
+
+# Configurations for the underlying Chronicle server instance ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-server.html))
 config:
   HTTPS:
     # If https.enabled=true, ignore any http
     # values and enable https in the config instead
+    # -- If set to true, Chronicle will use HTTPS instead of HTTP
     Enabled: false
-    Key: ""
+    # -- Path to a PEM encoded certificate file, required if `HTTPS.Enabled=true`
     Certificate: ""
+    # -- Path to a PEM encoded private key file corresponding to the specified certificate, required if `HTTPS.Enabled=true`
+    Key: ""
   Metrics:
-    Enabled: true
+    # -- Exposes a metrics endpoint for Prometheus if true
+    Enabled: false
   Profiling:
+    # -- Exposes a pprof profiling server if true
     Enabled: false
+    # -- The port to use for the profiling server
+    Port: 3030
   Logging:
+    # -- Specifies the output for log messages, can be one of "STDOUT", "STDERR", or a file path
     ServiceLog: "STDOUT"
+    # -- The log level for the service, can be one of "TRACE", "DEBUG", "INFO", "WARN", or "ERROR"
     ServiceLogLevel: "INFO"
+    # -- The log format for the service, can be one of "TEXT" or "JSON"
     ServiceLogFormat: "TEXT"
+  # Configuration for local data storage with Chronicle, for configuring persistence of this data see the persistence section
   LocalStorage:
-    # By default LocalStorage.Enabled=true, so that installs work with the default values
+    # -- Use `config.LocalStorage.Path` for data storage if true, use in conjunction with `persistence.enabled=true` for persistent data storage
     Enabled: true
-    Location: "./chronicle-data"
-    RetentionPeriod: "30d"
+    # -- The path to use for local storage
+    Path: "/opt/chronicle-data"
+  # Configuration for S3 data storage with Chronicle
   S3Storage:
+    # -- Use S3 for data storage if true
     Enabled: false
-    Bucket: "posit-chronicle"
+    # -- The S3 bucket to use for storage, required if `S3Storage.Enabled=true`
+    Bucket: ""
+    # -- An optional prefix path to use when writing to the S3 bucket
     Prefix: ""
+    # -- An IAM Profile to use for accessing the S3 bucket, default is to read from the `AWS_PROFILE` env var
     Profile: ""
-    # An AWS region must be set if S3 Storage is enabled
-    Region: "us-east-2"
+    # -- Region of the S3 bucket, default is to read from the `AWS_REGION` env var
+    Region: ""

@@ -1,4 +1,4 @@
-# Version: 2.4.0
+# Version: 2.5.0
 # DO NOT MODIFY the "Version: " key
 # Helm Version: v1
 {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
@@ -88,6 +88,10 @@ spec:
       {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
       serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
       {{- end }}
+      {{- with $templateData.pod.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
       volumes:
@@ -144,6 +148,48 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 12 }}
       {{- end }}
       initContainers:
+        {{- with .Job.initContainers }}
+        {{- range . }}
+        - name: {{ toYaml .name }}
+          image: {{ toYaml .image }}
+          {{- $isShell := false }}
+          {{- if .command }}
+          command: ['/bin/sh']
+          {{- $isShell = true }}
+          {{- else if .exe }}
+          command: [{{ toYaml .exe }}]
+          {{- $isShell = false }}
+          {{- end }}
+          {{- if or .args $isShell }}
+          args:
+            {{- if $isShell }}
+            - '-c'
+            {{- if .args }}
+            - {{ .args | join " " | cat .command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+            {{- else }}
+            - {{ .command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+            {{- end }}
+            {{- else }}
+            {{- range .args }}
+            - {{ toYaml . | indent 12 | trimPrefix (repeat 12 " ") }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .environment }}
+          env:
+            {{- range .environment }}
+            - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
+              value: {{ toYaml .value | indent 14 | trimPrefix (repeat 14 " ") }}
+            {{- end }}
+          {{- end }}
+          {{- if .mounts }}
+          volumeMounts:
+            {{- range .mounts }}
+            - {{ nindent 14 (toYaml .) | trim -}}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
         {{- with .Job.metadata.pod.initContainers }}
         {{- range . }}
         - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
@@ -263,18 +309,24 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if any (ne (len $requests) 0) (ne (len $limits) 0) }}
+          {{- if any (ne (len $requests) 0) (ne (len $limits) 0) (ne (len $templateData.pod.ephemeralStorage) 0) }}
           resources:
-            {{- if ne (len $requests) 0 }}
+            {{- if any (ne (len $requests) 0) (ne (len $templateData.pod.ephemeralStorage.request) 0) }}
             requests:
               {{- range $key, $val := $requests }}
               {{ $key }}: {{ toYaml $val }}
               {{- end }}
+              {{- if gt (len $templateData.pod.ephemeralStorage.request) 0 }}
+              ephemeral-storage: {{ $templateData.pod.ephemeralStorage.request }}
+              {{- end }}
             {{- end }}
-            {{- if ne (len $limits) 0 }}
+            {{- if any (ne (len $limits) 0) (ne (len $templateData.pod.ephemeralStorage.limit) 0) }}
             limits:
               {{- range $key, $val := $limits }}
               {{ $key }}: {{ toYaml $val }}
+              {{- end }}
+              {{- if gt (len $templateData.pod.ephemeralStorage.limit) 0 }}
+              ephemeral-storage: {{ $templateData.pod.ephemeralStorage.limit }}
               {{- end }}
             {{- end }}
           {{- end }}

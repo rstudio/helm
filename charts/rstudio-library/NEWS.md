@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.34
+
+- Add HTTP/HTTPS protocol prefix to `rstudio-library.chronicle-agent.serverAddress` function return.
+- Fix left-hand whitespace on `rstudio-library.chronicle-agent.serverAddress` and
+  `rstudio-library.chronicle-agent.image` functions.
+
+## 0.1.33
+
+- Fixes to `rstudio-library.chronicle-agent.serverAddress` function.
+
+## 0.1.32
+
+- Add `rstudio-library.chronicle-agent.image` and `rstudio-library.chronicle-agent.serverAddress` helper functions for
+  Chronicle server deployment auto-discovery.
+
 ## 0.1.31
 
 - Add helm unit test scaffold.

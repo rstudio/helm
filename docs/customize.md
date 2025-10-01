@@ -8,8 +8,7 @@ This is relevant for both Posit Workbench and Posit Connect when the job launche
 The original mechanism for modifying kubernetes jobs using the Job Launcher is to use 
 [`job-json-overrides`](https://docs.posit.co/ide/server-pro/job_launcher/job_launcher.html).
 
-[There is a support article discussing the topic and examples in a legacy context 
-here](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes)
+See the [documentation](https://docs.posit.co/ide/server-pro/job_launcher/kubernetes_plugin.html#kube-json) discussing this topic in more detail.
 
 In helm, there is a helper that simplifies some of this configuration. As a result, we will include several snippets
 below to simplify use cases.

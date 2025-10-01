@@ -90,9 +90,50 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.initContainers }}
+      {{- if or .Values.initContainers .Values.chronicleAgent.enabled }}
       initContainers:
-{{ toYaml .Values.initContainers | indent 8 }}
+      {{- with .Values.initContainers }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.chronicleAgent.enabled }}
+      - name: chronicle-agent
+        {{- if .Values.chronicleAgent.image.sha }}
+        image: "{{ required "chronicleAgent.image.registry must be specified" .Values.chronicleAgent.image.registry }}/{{ required "chronicleAgent.image.repository must be specified" .Values.chronicleAgent.image.repository }}:{{ required "chronicleAgent.image.tag must be specified" .Values.chronicleAgent.image.tag }}@sha256:{{ .Values.chronicleAgent.image.sha }}"
+        {{- else }}
+        image: "{{ required "chronicleAgent.image.registry must be specified" .Values.chronicleAgent.image.registry }}/{{ required "chronicleAgent.image.repository must be specified" .Values.chronicleAgent.image.repository }}:{{ required "chronicleAgent.image.tag must be specified" .Values.chronicleAgent.image.tag }}"
+        {{- end }}
+        imagePullPolicy: {{ .Values.chronicleAgent.image.imagePullPolicy }}
+        restartPolicy: Always
+        {{- with .Values.chronicleAgent.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.chronicleAgent.volumeMounts }}
+        volumeMounts:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.chronicleAgent.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        env:
+          - name: CHRONICLE_SERVER_ADDRESS
+            value: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.chronicleAgent "Release" .Release) | trim | quote }}
+          - name: CHRONICLE_CONNECT_APIKEY
+            {{- if .Values.chronicleAgent.connectApiKey.valueFrom }}
+            valueFrom:
+{{ toYaml .Values.chronicleAgent.connectApiKey.valueFrom | indent 14 }}
+            {{- else }}
+            value: {{ .Values.chronicleAgent.connectApiKey.value | quote }}
+            {{- end }}
+          {{- with .Values.chronicleAgent.agentEnvironment }}
+          - name: CHRONICLE_AGENT_ENVIRONMENT
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.chronicleAgent.env }}
+          {{ toYaml . | indent 10 }}
+          {{- end }}
+      {{- end }}
       {{- end }}
       containers:
       - name: connect
@@ -150,13 +191,13 @@ spec:
             subPath: "launcher.kubernetes.profiles.conf"
           {{- if .Values.launcher.useTemplates }}
           - name: rstudio-connect-templates
-            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            mountPath: "{{ default "/var/lib/rstudio-connect-launcher" .Values.config.Launcher.KubernetesScratchPath }}/Kubernetes/rstudio-library-templates-data.tpl"
             subPath: "rstudio-library-templates-data.tpl"
           - name: rstudio-connect-templates
-            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/job.tpl"
+            mountPath: "{{ default "/var/lib/rstudio-connect-launcher" .Values.config.Launcher.KubernetesScratchPath }}/Kubernetes/job.tpl"
             subPath: "job.tpl"
           - name: rstudio-connect-templates
-            mountPath: "/var/lib/rstudio-connect-launcher/Kubernetes/service.tpl"
+            mountPath: "{{ default "/var/lib/rstudio-connect-launcher" .Values.config.Launcher.KubernetesScratchPath }}/Kubernetes/service.tpl"
             subPath: "service.tpl"
           {{- end }}
           {{- if not .Values.launcher.useTemplates }}

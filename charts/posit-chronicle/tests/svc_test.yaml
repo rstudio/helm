@@ -1,0 +1,145 @@
+suite: Service tests
+templates:
+  - svc.yaml
+tests:
+  - it: should always create a service
+    asserts:
+    - hasDocuments:
+        count: 1
+    - isKind:
+        of: Service
+  - it: should apply service labels if given
+    set:
+      service:
+        labels:
+          test: label
+    asserts:
+    - isSubset:
+        path: metadata.labels
+        content:
+          test: label
+  - it: should have no annotations by default
+    asserts:
+    - notExists:
+        path: metadata.annotations
+  - it: should set annotations if specified with service annotations favored during merge
+    set:
+      service:
+        annotations:
+          test-merge: value2
+          test-svc: value
+      commonAnnotations:
+        test-merge: value1
+        test-common: value
+    asserts:
+    - isSubset:
+        path: metadata.annotations
+        content:
+          test-merge: value2
+          test-common: value
+          test-svc: value
+  - it: should create a service targeting http by default
+    release:
+      name: test-release
+      namespace: test-namespace
+    asserts:
+    - isKind:
+        of: Service
+    - equal:
+        path: metadata.name
+        value: test-release-posit-chronicle
+    - equal:
+        path: metadata.namespace
+        value: test-namespace
+    - isSubset:
+        path: spec.selector
+        content:
+          app.kubernetes.io/name: posit-chronicle
+          app.kubernetes.io/instance: test-release
+    - contains:
+        path: spec.ports
+        content:
+          name: http
+          port: 80
+          targetPort: 5252
+    - notContains:
+        path: spec.ports
+        content:
+          name: https
+          port: 80
+          targetPort: 443
+  - it: should create a service targeting https when enabled
+    release:
+      name: test-release
+      namespace: test-namespace
+    set:
+      config:
+        HTTPS:
+          Enabled: true
+          Certificate: test-cert
+          Key: test-key
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-release-posit-chronicle
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: posit-chronicle
+            app.kubernetes.io/instance: test-release
+      - contains:
+          path: spec.ports
+          content:
+            name: https
+            port: 80
+            targetPort: 443
+      - notContains:
+          path: spec.ports
+          content:
+            name: http
+            port: 80
+            targetPort: 5252
+  - it: should use an alternate port when specified by user
+    release:
+      name: test-release
+      namespace: test-namespace
+    set:
+      service:
+        port: 8787
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-release-posit-chronicle
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: posit-chronicle
+            app.kubernetes.io/instance: test-release
+      - contains:
+          path: spec.ports
+          content:
+            name: http
+            port: 8787
+            targetPort: 5252
+      - notContains:
+          path: spec.ports
+          content:
+            name: http
+            port: 80
+            targetPort: 5252
+      - notContains:
+          path: spec.ports
+          content:
+            name: https
+            port: 80
+            targetPort: 443

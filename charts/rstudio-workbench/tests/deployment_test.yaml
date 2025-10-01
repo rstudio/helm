@@ -1,0 +1,730 @@
+suite: Workbench Deployment
+templates:
+  - configmap-general.yaml
+  - configmap-prestart.yaml
+  - configmap-secret.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+tests:
+  - it: should not specify the RollingUpdate configuration if the strategy type is not RollingUpdate
+    template: deployment.yaml
+    set:
+      strategy:
+        type: "Recreate"
+    asserts:
+      - notExists:
+          path: "spec.strategy.rollingUpdate"
+  - it: should specify the RollingUpdate configuration if the strategy type is RollingUpdate
+    template: deployment.yaml
+    set:
+      strategy:
+        type: "RollingUpdate"
+        rollingUpdate:
+          maxUnavailable: 1
+          maxSurge: "50%"
+    asserts:
+      - equal:
+          path: "spec.strategy.type"
+          value: "RollingUpdate"
+      - equal:
+          path: "spec.strategy.rollingUpdate.maxUnavailable"
+          value: 1
+      - equal:
+          path: "spec.strategy.rollingUpdate.maxSurge"
+          value: "50%"
+  - it: should specify the diagnostic env vars if diagnostics is enabled
+    template: deployment.yaml
+    set:
+      diagnostics:
+        enabled: true
+        directory: "/var/log/rstudio-workbench"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_DIR")].value'
+          value: "/var/log/rstudio-workbench"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ENABLE")].value'
+          value: "true"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ONLY")].value'
+          value: "true"
+  - it: should not specify the diagnostic env vars if diagnostics is not enabled
+    template: deployment.yaml
+    set:
+      diagnostics:
+        enabled: false
+        directory: "/var/log/rstudio-workbench"
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_DIR")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ENABLE")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="DIAGNOSTIC_ONLY")]'
+  - it: should set the RSTUDIO_LAUNCHER_STARTUP_HEALTHCHECK_ARGS env var if launcher.kubernetesHealthCheck.enabled is true
+    template: deployment.yaml
+    set:
+      launcher:
+        kubernetesHealthCheck:
+          enabled: true
+          extraCurlArgs: ["-fsSL", "-k"]
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS")].value'
+          value: "-fsSL -k"
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK")]'
+  - it: should set the RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK to disabled if launcher.kubernetesHealthCheck.enabled is false
+    template: deployment.yaml
+    set:
+      launcher:
+        kubernetesHealthCheck:
+          enabled: false
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK")].value'
+          value: "disabled"
+  - it: should set the ENV vars for user creation if userCreate is true
+    template: deployment.yaml
+    set:
+      userCreate: true
+      userName: "testuser"
+      userPassword: "testpassword"
+      userUid: 1000
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER")].value'
+          value: "testuser"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_PASSWD")].value'
+          value: "testpassword"
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_UID")].value'
+          value: "1000"
+  - it: should set the RSW_TESTUSER ENV var to an empty string if userCreate is false
+    template: deployment.yaml
+    set:
+      userCreate: false
+      userName: "testuser"
+      userPassword: "testpassword"
+      userUid: 1000
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER")].value'
+          value: ""
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_PASSWD")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_TESTUSER_UID")]'
+  - it: should set the RSW_LOAD_BALANCING env var to true if replicas > 1
+    template: deployment.yaml
+    set:
+      replicas: 2
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
+          value: "true"
+  - it: should not set the RSW_LOAD_BALANCING env var replicas = 1
+    template: deployment.yaml
+    set:
+      replicas: 1
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")]'
+  - it: should set the RSW_LOAD_BALANCING env var to true if loadBalancer.forceEnabled is true even if replicas = 1
+    template: deployment.yaml
+    set:
+      replicas: 1
+      loadBalancer:
+        forceEnabled: true
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
+          value: "true"
+  - it: should specify a volumeMount and a volume for sharedStorage if sharedStorage.create is true
+    template: deployment.yaml
+    set:
+      sharedStorage:
+        create: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-shared-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-shared-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-shared-storage"
+  - it: should specify a volumeMount and a volume for sharedStorage if sharedStorage.mount is true
+    template: deployment.yaml
+    set:
+      sharedStorage:
+        mount: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-shared-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-shared-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-shared-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.create is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        create: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.mount is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        mount: true
+        path: "/mnt/shared"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.create is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        create: true
+        path: "/mnt/shared"
+        subPath: "subpath"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+          value: "subpath"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for homeStorage if homeStorage.mount is true
+    template: deployment.yaml
+    set:
+      homeStorage:
+        mount: true
+        path: "/mnt/shared"
+        subPath: "subpath"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].mountPath'
+          value: "/mnt/shared"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-home-storage")].subPath'
+          value: "subpath"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-home-storage")].persistentVolumeClaim.claimName'
+          value: "RELEASE-NAME-rstudio-workbench-home-storage"
+  - it: should specify a volumeMount and a volume for the session secret if config.sessionSecret is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          sessionSecret: 0420
+        sessionSecret:
+          odbc.ini:
+            dsn: "test"
+            driver: "test"
+      session:
+        defaultSecretMountPath: "/mnt/session-secret"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")].mountPath'
+          value: "/mnt/session-secret"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")].name'
+          value: "rstudio-session-secret"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")].name'
+          value: "rstudio-session-secret"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")].secret.secretName'
+          value: "RELEASE-NAME-rstudio-workbench-session-secret"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")].secret.defaultMode'
+          value: 0420
+  - it: should not specify a volumeMount and a volume for the session secret if config.sessionSecret is not defined
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")]'
+  - it: should specify a volumeMount and a volume for userProvisioning if config.userProvisioning is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          userProvisioning: 0600
+        userProvisioning:
+          sssd.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].mountPath'
+          value: "/etc/sssd/conf.d/"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].name'
+          value: "rstudio-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")].name'
+          value: "rstudio-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")].secret.secretName'
+          value: "RELEASE-NAME-rstudio-workbench-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")].secret.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for userProvisioning if config.userProvisioning is not defined
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user")]'
+  - it: should specify a volumeMount and a volume for launcher if launcher.enabled is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          launcher: 0755
+      launcher:
+        enabled: true
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")].mountPath'
+          value: "/startup/launcher"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-start-launcher"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.defaultMode'
+          value: 0755
+  - it: should not specify a volumeMount and a volume for launcher if launcher.enabled is false
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")]'
+  - it: should specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupUserProvisioning:
+          sssd.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
+          value: "/startup/user-provisioning"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].name'
+          value: "rstudio-user-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].name'
+          value: "rstudio-user-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-start-user"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].configMap.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupUserProvisioning: null
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")]'
+  - it: should specify a volumeMount and a volume for startupCustom if config.startupCustom is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupCustom:
+          sssd.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-custom-startup")].mountPath'
+          value: "/startup/custom"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-custom-startup")].name'
+          value: "rstudio-custom-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")].name'
+          value: "rstudio-custom-startup"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-start-custom"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")].configMap.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for startupCustom if config.startupCustom is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          startup: 0600
+        startupCustom: null
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-custom-startup")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-custom-startup")]'
+  - it: should specify a volumeMount and a volume for pam if config.pam is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          pam: 0600
+        pam:
+          thing.conf:
+            dsn: "test"
+            driver: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")].mountPath'
+          value: "/etc/pam.d/thing.conf"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")].name'
+          value: "rstudio-pam"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")].subPath'
+          value: "thing.conf"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")].name'
+          value: "rstudio-pam"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-pam"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")].configMap.defaultMode'
+          value: 0600
+  - it: should not specify a volumeMount and a volume for pam if config.pam is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          pam: 0600
+        pam: null
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-pam")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")]'
+  - it: should specify a volumeMount and a volume for the old style jobJsonOverridesFiles if jobJsonOverridesFiles is defined and not empty
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      jobJsonOverridesFiles:
+        - name: "test"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")].mountPath'
+          value: "/mnt/job-json-overrides"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")].name'
+          value: "rstudio-job-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].name'
+          value: "rstudio-job-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-overrides-old"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify a volumeMount and a volume for the old style jobJsonOverridesFiles if jobJsonOverridesFiles is not defined
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      jobJsonOverridesFiles: {}
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-old")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-old")]'
+
+# $useNewOverrides is defined as {- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
+  - it: should specify a volumeMount and a volume for the new style jobJsonOverridesFiles if $useNewerOverrides is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          jobJsonOverrides: 0644
+      launcher:
+        useTemplates: false
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")].mountPath'
+          value: "/mnt/job-json-overrides-new"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")].name'
+          value: "rstudio-job-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].name'
+          value: "rstudio-job-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-overrides-new"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify a volumeMount and a volume for the new style jobJsonOverridesFiles if $useNewerOverrides is false
+    template: deployment.yaml
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            thing: "test"
+      launcher:
+        useTemplates: true
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-job-overrides-new")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-job-overrides-new")]'
+  - it: should specify 3 volumeMounts and a volume if Values.launcher.useTemplates is true
+    template: deployment.yaml
+    set:
+      config:
+        defaultMode:
+          server: 0644
+      launcher:
+        useTemplates: true
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            subPath: "rstudio-library-templates-data.tpl"
+          any: true
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+            subPath: "job.tpl"
+          any: true
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+            subPath: "service.tpl"
+          any: true
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")].name'
+          value: "session-templates"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")].configMap.name'
+          value: "RELEASE-NAME-rstudio-workbench-templates"
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")].configMap.defaultMode'
+          value: 0644
+  - it: should not specify any volumeMounts or a volume if Values.launcher.useTemplates is false
+    template: deployment.yaml
+    set:
+      launcher:
+        useTemplates: false
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            subPath: "rstudio-library-templates-data.tpl"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+            subPath: "job.tpl"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "session-templates"
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+            subPath: "service.tpl"
+          any: true
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="session-templates")]'
+      - notExists:
+          path: 'spec.template.spec.volumeMounts[?(@.name=="session-templates")]'
+  - it: should have the pod volumemounts defined by the user
+    template: deployment.yaml
+    set:
+      pod:
+        volumeMounts:
+          - name: "test"
+            mountPath: "/mnt/test"
+          - name: "secondTest"
+            mountPath: "/mnt/secondTest"
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "test"
+            mountPath: "/mnt/test"
+          any: true
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "secondTest"
+            mountPath: "/mnt/secondTest"
+          any: true
+  - it: should set the resource requests if enabled
+    template: deployment.yaml
+    set:
+      resources:
+        requests:
+          enabled: true
+          cpu: "100m"
+          memory: "128Mi"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.cpu'
+          value: "100m"
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.memory'
+          value: "128Mi"
+      - notExists:
+          path: 'spec.template.spec.containers[0].resources.limits'
+  - it: should set the resource limits if enabled
+    template: deployment.yaml
+    set:
+      resources:
+        limits:
+          enabled: true
+          cpu: "1000m"
+          memory: "1024Mi"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.cpu'
+          value: "1000m"
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.memory'
+          value: "1024Mi"
+      - notExists:
+          path: 'spec.template.spec.containers[0].resources.requests'
+  - it: should configure the livenessProbe if values.livenessProbe.enabled is true
+    template: deployment.yaml
+    set:
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].livenessProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].livenessProbe.periodSeconds'
+          value: 20
+  - it: should not configure the livenessProbe if values.livenessProbe.enabled is false
+    template: deployment.yaml
+    set:
+      livenessProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].livenessProbe'
+  - it: should configure the startupProbe if values.startupsProbe.enabled is true
+    template: deployment.yaml
+    set:
+      startupProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].startupProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].startupProbe.periodSeconds'
+          value: 20
+  - it: should not configure the startupProbe if values.startupProbe.enabled is false
+    template: deployment.yaml
+    set:
+      startupProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].startupProbe'
+  - it: should configure the readinessProbe if values.readinessProbe.enabled is true
+    template: deployment.yaml
+    set:
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].readinessProbe.initialDelaySeconds'
+          value: 10
+      - equal:
+          path: 'spec.template.spec.containers[0].readinessProbe.periodSeconds'
+          value: 20
+  - it: should not configure the readinessProbe if values.readinessProbe.enabled is false
+    template: deployment.yaml
+    set:
+      readinessProbe:
+        enabled: false
+        initialDelaySeconds: 10
+        periodSeconds: 20
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].readinessProbe'
+  - it: should create a sidecar container if pod.sidecar is defined
+    template: deployment.yaml
+    set:
+      pod:
+        sidecar:
+          - name: "sidecarTest"
+            image: "test"
+    asserts:
+      - exists:
+          path: 'spec.template.spec.containers[?(@.name=="sidecarTest")]'

@@ -1,0 +1,51 @@
+# When an issue is labeled, add to a project
+on:
+  issues:
+    types:
+    - labeled
+  # This is just for testing, comment out before merging
+  pull_request:
+    types:
+    - labeled
+
+jobs:
+  issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Map label to project URL
+        id: project-url
+        run: |
+          if [ "${{ github.event.label.name }}" = "team: connect" ]; then
+            echo "PROJECT=https://github.com/orgs/posit-dev/projects/23" >> "$GITHUB_OUTPUT"
+            echo "ORG=posit-dev" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.label.name }}" = "team: workbench" ]; then
+            echo "PROJECT=https://github.com/orgs/rstudio/projects/92" >> "$GITHUB_OUTPUT"
+            echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.label.name }}" = "team: package manager" ]; then
+            echo "PROJECT=https://github.com/orgs/rstudio/projects/48" >> "$GITHUB_OUTPUT"
+            echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.label.name }}" = "team: chronicle" ]; then
+            echo "PROJECT=https://github.com/orgs/rstudio/projects/134" >> "$GITHUB_OUTPUT"
+            echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.label.name }}" = "team: launcher" ]; then
+            echo "PROJECT=https://github.com/orgs/rstudio/projects/222" >> "$GITHUB_OUTPUT"
+            echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
+          else
+            echo "PROJECT=none" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Generate token for GitHub App
+        id: generate-token
+        if: steps.project-url.outputs.project != 'none'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: 1064714
+          private-key: ${{ secrets.POSIT_PLATFORM_PROJECTS_PEM }}
+          owner: ${{ steps.project-url.outputs.ORG }}
+      - name: Add issue to project
+        id: add-to-project
+        if: steps.project-url.outputs.project != 'none'
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: ${{ steps.project-url.outputs.PROJECT }}
+          github-token: ${{ steps.generate-token.outputs.token }}
+          labeled: ${{ github.event.label.name }}

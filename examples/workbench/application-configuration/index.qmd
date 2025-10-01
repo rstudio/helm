@@ -12,10 +12,10 @@ These settings are recommend for most deployments and are described below:
  - [Set a default Posit Connect URL](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/rstudio_connect_server.html)
  - [Set a default Posit Package Manager CRAN URL](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories)
  - [Set a default Posit Package Manager PyPI URL](https://pip.pypa.io/en/stable/topics/configuration/)
- - [Set RStudio Pro IDE timeout settings](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.htmlsession-timeout)
+ - [Set RStudio Pro IDE timeout settings](https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/user_and_group_profiles.html)
  - [Set Jupyter IDE timeout settings](https://docs.posit.co/ide/server-pro/jupyter_sessions/configuration.html)
  - [Enable the administrator dashboard and set user group(s) to have admin and admin super user permissions](https://docs.posit.co/ide/server-pro/server_management/administrative_dashboard.html)
- - [Set default and max resource limits for users](https://docs.posit.co/ide/server-pro/job_launcher/kubernetes_plugin.htmlkube-profiles)
+ - [Set default and max resource limits for users](https://docs.posit.co/ide/server-pro/admin/job_launcher/kubernetes_plugin.html)
 
 {{< include ../_prereqs.qmd >}}
 

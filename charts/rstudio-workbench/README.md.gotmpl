@@ -95,12 +95,8 @@ Alternatively, database passwords may be set during `helm install` with the foll
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
   valid `.ini` or `.dcf` file formats required by Workbench.
   - Those configuration files and their mount locations are covered in the [Configuration files](#configuration-files) section below.
-- If you need to modify the jobs launched by Workbench, use `job-json-overrides`.
-  - Review the [Job Json overrides](#job-json-overrides) section on this below. For general information, see [a support article](https://support.rstudio.com/hc/en-us/articles/360051652094-Using-Job-Json-Overrides-with-RStudio-Server-Pro-and-Kubernetes).
+- If you need to modify the jobs (sessions) launched by Workbench, use `launcher.templateValues` as described in the [Launcher Templates](#launcher-templates) section below.
 - The prestart scripts for Workbench and Posit Job Launcher are highly customized to get the service account information off of the Workbench pod for use in launching jobs.
-- Workbench does not export prometheus metrics on its own. Instead, we run a sidecar graphite exporter.
-  - This is described in the
-  [Monitoring Posit Team Using Prometheus and Graphite](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite) support article.
 
 ## Configuration files
 
@@ -184,15 +180,9 @@ the `XDG_CONFIG_DIRS` environment variable.
 
 #### Python repositories
 
-pip can be configured with `config.session.pip.conf`. To ensure `pip.conf` is mounted into the session pods, it is important that:
-
-- `launcher.useTemplates: true` is set
-- `pip.conf` settings are listed under `config.session` as shown in the following example for adding Posit Public Package Manager's PyPI:
+pip can be configured with `config.session.pip.conf`:
 
   ```yaml
-  launcher:
-    useTemplates: true
-
   config:
     session:
       pip.conf:
@@ -343,38 +333,87 @@ some-key: value1,value2,value3,value4
 This appending/concatenation/array translation behavior only works with the helm chart.
 :::
 
-### Job Json overrides
+## Launcher Templates
 
-If you want to customize the job launch process (i.e., how sessions are defined), edit the following configuration:
+If you want to customize the launcher job templates, use the `launcher.templateValues` section of the `values.yaml` file. These values are then used within session templates.
 
-- Modify:
-  ```yaml
-  config.profiles.launcher\.kubernetes\.profiles\.conf.<< some selector >>.job-json-overrides`
-  ```
-- Create an array of maps with the following keys:
-  - `target`: The "target" part of the job spec to replace.
-  - `name`: A unique identifier (ideally with no spaces) becomes a configuration filename on disk.
-  - `json`: A YAML value that is translated directly to JSON and injected into the job spec at `target`.
-
-Explore the docs in the [Helm repository](https://github.com/rstudio/helm/blob/main/docs/customize.md) for additional information.
+For example, if you want to add a container image registry credentials secret to allow session images to authenticate to a container registry, you can do so with the following:
 
 ```yaml
-config:
-  profiles:
-    launcher.kubernetes.profiles.conf:
-      "*":
-        job-json-overrides:
-          - target: "/spec/template/spec/containers/0/imagePullPolicy"
-            json: "Always"
-            name: imagePullPolicy
-          - target: "/spec/template/spec/imagePullSecrets"
-            json:
-              - name: my-pull-secret
-            name: imagePullSecrets
-        container-images:
-          - "one-image:tag"
-          - "two-image:tag
+launcher:
+  templateValues:
+    pod:
+      imagePullSecrets:
+      - name: private-registry-creds
 ```
+
+For example, if you want to add a toleration to each session, you can do so with the following:
+
+```yaml
+launcher:
+  templateValues:
+    pod:
+      tolerations:
+        - key: "posit-sessions"
+          operator: "Exists"
+          effect: "NoSchedule"
+```
+
+## Chronicle Agent
+
+This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
+by setting `chronicleAgent.enabled=true`.
+
+By default, the chart will attempt to lookup an existing Chronicle server deployed in the release namespace. The
+searched namespace can be changed setting by `chronicleAgent.serverNamespace`. If a server exists, it will set the
+Chronicle agent's server value to the server's service name and will use an agent version to match the server version.
+This auto-discovery behavior can be disabled by setting `chronicleAgent.autoDiscovery=false`.
+
+To set the server address and/or version manually, set the following values:
+```yaml
+chronicleAgent:
+  enabled: true
+  serverAddress: <server-address>
+  image:
+    tag: <agent-version>
+```
+
+If preferred, the Chronicle agent can be directly defined as a sidecar container using either `initContainers`
+(recommended) or `sidecar` values. Below is an example of directly defining the Chronicle agent as a native sidecar
+container using `initContainers`:
+```yaml
+initContainers:
+  - name: chronicle-agent
+    restartPolicy: Always
+    image: ghcr.io/rstudio/chronicle-agent:<agent-version>
+    env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://<address>"
+```
+
+For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
+### Chronicle Workbench API Key
+
+> [!WARNING]
+> The Workbench API is currently in preview. See
+> [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html) for more
+> information.
+
+The Chronicle agent can be configured to scrape the Workbench API for additional data. To do this, you must
+provide the Chronicle agent with a Workbench API key. This can be done by setting `chronicleAgent.workbenchApiKey`:
+```yaml
+chronicleAgent:
+  enabled: true
+  workbenchApiKey:
+    valueFrom:
+      secretKeyRef:
+        name: <secret-name>
+        key: <key-name>
+```
+
+For additional information on enabling the API and generating API keys, see
+[the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html).
 
 ## Sealed secrets
 

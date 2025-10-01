@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.5.50
+
+- Update default Posit Package Manager version to 2025.09.0-7
+
+## 0.5.49
+
+- Update default Posit Package Manager version to 2025.04.4-13
+
+## 0.5.48
+
+- Add recommended labels to all PVCs created by the chart.
+ 
+## 0.5.47
+
+- Update default Posit Package Manager version to 2025.04.2-8
+
+## 0.5.46
+
+- Update default Posit Package Manager version to 2025.04.0-4
+
+## 0.5.45
+
+- Allow values for `service.targetPort`, `pod.port`, and `pod.hostAliases`
+
+## 0.5.44
+
+- Set `enableMigration: false` to by default disable the migration job because it is not needed for new installations and is only needed if you update from a Package Manager version that is 3+ years old. If you are upgrading from a Package Manager version that does run as root, you can enable the migration job by setting `enableMigration: true`.
+
+## 0.5.43
+
+- Update default Posit Package Manager version to 2024.11.0-7
+
 ## 0.5.41
 
 - Update the default `pod.startupProbe` to use the `/__api__/status` route instead of `/__ping__` for a more reliable startup.

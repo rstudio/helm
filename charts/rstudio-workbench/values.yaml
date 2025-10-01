@@ -52,6 +52,8 @@ sharedStorage:
   # -- Define the annotations for the Persistent Volume Claim resource
   annotations:
     helm.sh/resource-policy: keep
+  # -- an optional subPath for the volume mount
+  subPath: ""
 
 # -- How to handle updates to the service. RollingUpdate (the default) minimizes downtime, but
 # will not work well if your license only allows a single activation.
@@ -60,6 +62,59 @@ strategy:
   rollingUpdate:
     maxSurge: "100%"
     maxUnavailable: 0
+
+# Settings for the Chronicle Agent sidecar container
+chronicleAgent:
+  # -- Creates a Chronicle agent sidecar container in the pod if true
+  enabled: false
+  # -- Additional environment variables to set on the Chronicle agent container `env`
+  env: []
+  # -- Verbatim volumeMounts to attach to the Chronicle agent container
+  volumeMounts: []
+  # -- The container-level security context for the Chronicle agent container
+  securityContext:
+    privileged: false
+    runAsNonRoot: true
+  image:
+    # -- The Chronicle agent image registry
+    registry: ghcr.io
+    # -- The Chronicle agent image repository
+    repository: rstudio/chronicle-agent
+    # -- The Chronicle agent image tag
+    tag: 2025.08.0
+    # -- The Chronicle agent image digest
+    sha: ""
+    # -- The pull policy for the Chronicle agent image
+    imagePullPolicy: IfNotPresent
+  # -- If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster
+  autoDiscovery: true
+  # -- Defines resources for the posit-chronicle-agent container
+  resources: {}
+    # requests:
+    #   memory: "256Mi"
+    #   cpu: "100m"
+    # limits:
+    #   memory: "512Mi"
+    #   cpu: "200m"
+  # -- Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered
+  #    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false`
+  serverAddress: ""
+  # -- Namespace to search for the Chronicle server when `chronicleAgent.autoDiscovery=true`, has no effect if
+  #    `chronicleAgent.autoDiscovery=false`
+  serverNamespace: ""
+  # -- A read-only administrator permissions API key generated for Workbench for the Chronicle agent to use, API keys
+  #    can only be created after Workbench has been deployed so this value may need to be filled in later if performing
+  #    an initial deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating))
+  workbenchApiKey:
+    # -- Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable
+    #    (not recommended)
+    value: ""
+    # -- Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the
+    #    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended)
+    valueFrom: {}
+  # -- An environment tag to apply to all metrics reported by this agent
+  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment))
+  agentEnvironment: ""
 
 launcher:
   # -- determines whether the launcher should be started in the container
@@ -71,7 +126,7 @@ launcher:
     enabled: true
     extraCurlArgs: ["-fsSL"]
   # -- whether to render and use templates in the job launching process
-  useTemplates: false
+  useTemplates: true
   # -- extra templates to render in the template directory.
   extraTemplates: {}
   # -- whether to include the default `job.tpl` and `service.tpl` files included with the chart
@@ -101,6 +156,10 @@ launcher:
       tolerations: []
       affinity: {}
       nodeSelector: {}
+      hostAliases: []
+      ephemeralStorage:
+        request: ""
+        limit: ""
       # -- command for all pods. This is really not something we should expose and will be removed once we have a better option
       command: []
     job:
@@ -188,6 +247,9 @@ service:
   nodePort: false
   # -- The Service port. This is the port your service will run under.
   port: 80
+  # -- The port to forward to on the Workbench pod. Also see pod.port
+  targetPort: 8787
+
 
 # -- resources define requests and limits for the rstudio-server pod
 resources:
@@ -251,7 +313,7 @@ license:
   server: false
   # -- the file section is used for licensing with a license file
   file:
-    # -- contents is an in-line license file
+    # -- contents is an in-line license file, generally requiring the use of multi-line yaml notation
     contents: false
     # -- mountPath is the place the license file will be mounted into the container
     mountPath: "/etc/rstudio-licensing"
@@ -323,6 +385,9 @@ pod:
   lifecycle: {}
   # -- The termination grace period seconds allowed for the pod before shutdown
   terminationGracePeriodSeconds: 120
+  # -- Array of hostnames to supply to the main pod
+  hostAliases: []
+
 
 prometheus:
   # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
@@ -462,6 +527,7 @@ config:
       launcher-port: 5559
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
+      audited-jobs: 1
     launcher.conf:
       server:
         address: 127.0.0.1
@@ -476,18 +542,37 @@ config:
         type: Kubernetes
     jupyter.conf:
       jupyter-exe: /usr/local/bin/jupyter
-      notebooks-enabled: 1
       labs-enabled: 1
       default-session-cluster: Kubernetes
     vscode.conf:
       enabled: 1
-      exe: /opt/code-server/bin/code-server
-      args: --host=0.0.0.0
+      session-timeout-kill-hours: 12
+    vscode.extensions.conf: |
+      quarto.quarto
+      posit.shiny
+      posit.publisher
     vscode-user-settings.json: |
       {
-            "terminal.integrated.shell.linux": "/bin/bash",
+            "terminal.integrated.defaultProfile.linux": "bash",
             "extensions.autoUpdate": false,
             "extensions.autoCheckUpdates": false
+      }
+    positron.conf:
+      enabled: 1
+      session-timeout-kill-hours: 12
+    positron-user-settings.json: |
+      {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "extensions.autoUpdate": false,
+        "extensions.autoCheckUpdates": false,
+        "quarto.path": "/usr/lib/rstudio-server/bin/quarto/bin/quarto",
+        "python.interpreters.exclude": [
+            "/usr/bin",
+            "/bin",
+        ],
+        "python.environmentProviders.enable": {
+            "Conda": false
+        }
       }
     logging.conf:
       "*":

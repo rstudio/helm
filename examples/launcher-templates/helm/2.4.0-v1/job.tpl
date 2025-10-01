@@ -88,6 +88,10 @@ spec:
       {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
       serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
       {{- end }}
+      {{- with $templateData.pod.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       shareProcessNamespace: {{ .Job.shareProcessNamespace }}
       {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
       volumes:

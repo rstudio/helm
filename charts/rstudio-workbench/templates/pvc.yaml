@@ -6,6 +6,8 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   annotations:
 {{ .Values.sharedStorage.annotations | toYaml | indent 4}}
+  labels:
+    {{- include "rstudio-workbench.labels" . | nindent 4 }}
 spec:
   accessModes:
     {{- .Values.sharedStorage.accessModes | toYaml | nindent 4 }}
@@ -33,6 +35,8 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   annotations:
     "helm.sh/resource-policy": keep
+  labels:
+    {{- include "rstudio-workbench.labels" . | nindent 4 }}
 spec:
   accessModes:
     {{- .Values.homeStorage.accessModes | toYaml | nindent 4 }}

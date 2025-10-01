@@ -1,0 +1,224 @@
+image:
+  repository: rstudio/rstudio-server-pro
+  tag: daily
+  imagePullSecrets:
+    - name: "some-secret"
+license:
+  key: test
+service:
+  nodePort: 31878
+  type: NodePort
+  annotations:
+    key: value
+replicas: 2
+
+sealedSecret:
+  enabled: true
+  annotations:
+    is-a-sealed-secret: "yes"
+
+revisionHistoryLimit: 3
+
+pod:
+  env:
+    - name: TEST_ENV_WORKS
+      value: "true"
+  volumeMounts:
+    - name: logs
+      mountPath: "/var/lib/rstudio-server/audit"
+  volumes:
+    - name: logs
+      emptyDir: {}
+  labels:
+    app.kubernetes.io/part-of: rstudio-team
+  annotations:
+    testannotation2: three
+  # This will spin up the chronicle-agent sidecar container
+  sidecar:
+    - name: chronicle-agent
+      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
+      volumeMounts:
+      - name: logs
+        mountPath: "/var/lib/rstudio-server/audit"
+      env:
+      - name: CHRONICLE_SERVER_ADDRESS
+        value: "http://chronicle-server.default"
+    - name: busybox-sidecar
+      image: "busybox"
+      imagePullPolicy: "IfNotPresent"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+
+  # Defines network routing in the traefik configuration.
+  hosts:
+    - host: workbench.rstudio.com
+      paths:
+        - /
+
+xdgConfigDirs: '/tmp/base/'
+xdgConfigDirsExtra:
+  - '/tmp/one/'
+  - '/tmp/two/'
+
+rbac:
+  create: true
+  serviceAccount:
+    name: rstudio-server-job-launcher
+    annotations:
+      one-two: three
+
+sharedStorage:
+  create: true
+  path: "/var/lib/awesome"
+  storageClassName: nfs
+  requests:
+    storage: "200Gi"
+
+homeStorage:
+  create: true
+  path: "/mnt/home"
+  storageClassName: nfs
+  requests:
+    storage: "500Gi"
+  subPath: "/another"
+
+prometheusExporter:
+  securityContext:
+    privileged: false
+  mappingYaml:
+    mappings:
+      - match: "rstudio\\.([\\w-]+)\\.system\\.load\\.(.*)"
+        match_type: regex
+        name: "rstudio_system_load_test"
+        labels:
+          host: "$1"
+          duration: "$2"
+
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "test"
+    data:
+      something: fun
+  - |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "test2"
+    data:
+      something: {{ printf "fun2" }}
+
+jobJsonOverridesFiles:
+  test:
+    one: two
+    three: four
+    array:
+      - one
+      - two:
+        - three
+        - 4
+        - false
+  two:
+    three: four
+
+loadBalancer:
+  env:
+    - name: FAIL_ON_ERROR
+      value: "false"
+
+podDisruptionBudget:
+  minAvailable: 30%
+
+config:
+  defaultMode:
+    session: 0644
+    sessionSecret: 0420
+    secret: 0600
+    userProvisioning: 0600
+    server: 0644
+    jobJsonOverrides: 0644
+    startup: 0755
+    prestart: 0755
+    pam: 0644
+  session:
+    repos.conf:
+      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+      CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+    rsession.conf: {}
+    notifications.conf: {}
+    r-versions:
+      - Label: test
+        Path: /opt/R/3.6.3
+      - Label: other
+        Path: /opt/R/4.0.2
+  sessionSecret:
+    odbc.ini: |
+      [hello]
+      uid=someval
+  secret:
+    "database.conf": {}
+  server:
+    rserver.conf:
+      server-health-check-enabled: 1
+      admin-enabled: 1
+      www-port: 8787
+      server-project-sharing: 1
+      launcher-address: 127.0.0.1
+      launcher-port: 5559
+      launcher-sessions-enabled: 1
+      launcher-default-cluster: Kubernetes
+      launcher-sessions-callback-address: http://127.0.0.1:8787
+    launcher.conf:
+      server:
+        address: 127.0.0.1
+        port: 5559
+        server-user: rstudio-server
+        admin-group: rstudio-server
+        authorization-enabled: 1
+        thread-pool-size: 4
+        enable-debug-logging: 1
+      cluster:
+        name: Kubernetes
+        type: Kubernetes
+    "jupyter.conf":
+      jupyter-exe: /opt/python/3.6.5/bin/jupyter
+      notebooks-enabled: 1
+      labs-enabled: 1
+      default-session-cluster: Kubernetes
+    logging.conf: {}
+  serverDcf:
+    launcher-mounts:
+      - MountType: KubernetesPersistentVolumeClaim
+        MountPath: /shared
+        ClaimName: rstudio-shared-data
+    launcher-env:
+      - JobType: session
+        Environment:
+          TEST: 1
+          TEST2: 2
+      - JobType: adhoc
+        Environment:
+          TESTA: A
+          TESTB: B
+  userProvisioning:
+    # fake .test ending to avoid killing the image
+    some-value.conf.test: |
+      some-value
+  startupCustom:
+    # fake .test ending to avoid killing the image
+    somefile.conf.test: |
+      some-value
+  pam:
+    pam-example:
+      # NOTE: order is not deterministic when using a dict... BAD for PAM!
+      somekey: |
+        account some_thing.so
+      anotherkey: |
+        session some_other_thing.so
+    pam-example-2: |
+      account some_thing.so
+      session something_else.so

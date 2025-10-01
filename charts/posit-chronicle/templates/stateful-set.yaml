@@ -1,47 +1,65 @@
 ---
+{{- $root := . }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: chronicle-server
-  namespace: {{ $.Release.Namespace }}
+  name: {{ include "posit-chronicle.fullname" . }}
+  namespace: {{ include "posit-chronicle.namespace" . }}
+  labels:
+    {{- include "posit-chronicle.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  serviceName: chronicle-server
   replicas: {{ .Values.replicas }}
+  serviceName: {{ include "posit-chronicle.fullname" . }}
   selector:
     matchLabels:
-      {{- include "posit-chronicle.pod.selectorLabels" . | trim | nindent 6 }}
+      {{- include "posit-chronicle.selectorLabels" . | trim | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "posit-chronicle.pod.labels" . | trim |  nindent 8 }}
-        {{- include "posit-chronicle.pod.selectorLabels" . | trim |  nindent 8 }}
+        {{- include "posit-chronicle.labels" . | trim |  nindent 8 }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
-        {{- include "posit-chronicle.pod.annotations" . | trim |  nindent 8 }}
+        checksum/config: {{ print .Values.config | sha256sum }}
+        {{- include "posit-chronicle.pod.annotations" . | trim | nindent 8 }}
     spec:
       {{- with .Values.pod.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- tpl (toYaml .) $root | nindent 8 }}
       {{- end }}
       {{- with .Values.pod.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        {{- tpl (toYaml .) $root | nindent 8 }}
       {{- end }}
       {{- with .Values.pod.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
+      {{- tpl (toYaml .) $root | nindent 6 }}
       {{- end }}
-      {{- if .Values.serviceaccount.create }}
-      serviceAccountName: chronicle-sa
-      {{- end }}
+      serviceAccountName: {{ include "posit-chronicle.serviceAccountName" . }}
       containers:
-      - name: chronicle-server
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+      - name: {{ .Chart.Name }}
+        {{- if .Values.image.sha }}
+        image: "{{ required "An image registry must be specified" .Values.image.registry }}/{{ required "An image repository must be specified" .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}@sha256:{{ .Values.image.sha }}"
+        {{- else }}
+        image: "{{ required "An image registry must be specified" .Values.image.registry }}/{{ required "An image repository must be specified" .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+        {{- end}}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.pod.command }}
         command:
-        - {{ .Values.pod.command }}
-        {{- if .Values.pod.args }}
+        {{- tpl (toYaml .) $root | nindent 8 }}
+        {{- end }}
+        {{- with .Values.pod.args }}
         args:
-        {{- toYaml .Values.pod.args | nindent 8 }}
+        {{- tpl (toYaml .) $root | nindent 8 }}
+        {{- end }}
+        {{- with .Values.image.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         ports:
         {{- if .Values.config.HTTPS.Enabled }}
@@ -51,31 +69,92 @@ spec:
         - containerPort: 5252
           name: http
         {{- end }}
+        {{- with .Values.pod.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
-        {{- if .Values.config.LocalStorage.Enabled }}
-        - name: data
-          mountPath: {{ .Values.config.LocalStorage.Location }}
+        {{- if .Values.persistence.enabled }}
+        - name: {{ include "posit-chronicle.fullname" . }}
+          mountPath: {{ .Values.config.LocalStorage.Path }}
         {{- end }}
-        - name: chronicle-server-config
+        - name: config
           mountPath: /etc/posit-chronicle/posit-chronicle.gcfg
-          subPath: server
-        {{- if .Values.pod.env }}
-        env:
-        {{- toYaml .Values.pod.env | nindent 8 }}
+          subPath: posit-chronicle.gcfg
+        {{- range .Values.extraSecretMounts }}
+        - name: {{ .name }}
+          mountPath: {{ .mountPath }}
+          readOnly: {{ .readOnly }}
         {{- end }}
+        {{- with .Values.pod.env }}
+        env:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.pod.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
       volumes:
-      - name: chronicle-server-config
+      - name: config
         configMap:
-          name: chronicle-server-config
-{{- if .Values.config.LocalStorage.Enabled }}
+          name: {{ include "posit-chronicle.fullname" . }}
+          items:
+            - key: posit-chronicle.gcfg
+              path: "posit-chronicle.gcfg"
+      {{- range .Values.extraSecretMounts }}
+      {{- if .secretName }}
+      - name: {{ .name }}
+        secret:
+          secretName: {{ .secretName }}
+          {{- with .defaultMode }}
+          defaultMode: {{ . }}
+          {{- end }}
+          {{- with .optional }}
+          optional: {{ . }}
+          {{- end }}
+          {{- with .items }}
+          items:
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+      {{- else if .projected }}
+      - name: {{ .name }}
+        projected:
+        {{- toYaml .projected | nindent 8 }}
+      {{- else if .csi }}
+      - name: {{ .name }}
+        csi:
+        {{- toYaml .csi | nindent 8 }}
+      {{- end }}
+      {{- end }}
+  {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
-  - metadata:
-      name: data
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: {{ include "posit-chronicle.fullname" . }}
+      namespace: {{ include "posit-chronicle.namespace" . }}
+      labels:
+        {{- include "posit-chronicle.labels" . | nindent 8 }}
+      {{- with .Values.commonAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      accessModes:
+      {{- range .Values.persistence.accessModes }}
+      - {{ . | quote }}
+      {{- end }}
       resources:
         requests:
-          storage: {{ .Values.storage.persistentVolumeSize }}
-{{- end }}
+          storage: {{ .Values.persistence.size | quote }}
+      {{- with .Values.persistence.storageClassName }}
+      storageClassName: {{ . }}
+      {{- end }}
+      {{- with .Values.persistence.selectorLabels }}
+      selector:
+        matchLabels:
+          {{ toYaml . | nindent 10 }}
+      {{- end }}
+  {{- end }}
 ---

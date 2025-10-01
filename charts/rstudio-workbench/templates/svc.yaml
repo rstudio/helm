@@ -27,7 +27,7 @@ spec:
 {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
 {{- end }}
-    targetPort: 8787
+    targetPort: {{ .Values.service.targetPort }}
   {{- if .Values.prometheus.enabled }}
   - name: metrics
     targetPort: metrics

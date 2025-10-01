@@ -1,10 +1,10 @@
 # Posit Chronicle
 
-![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square) ![AppVersion: 2024.09.0](https://img.shields.io/badge/AppVersion-2024.09.0-informational?style=flat-square)
+![Version: 0.4.5](https://img.shields.io/badge/Version-0.4.5-informational?style=flat-square) ![AppVersion: 2025.08.0](https://img.shields.io/badge/AppVersion-2025.08.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Chronicle Server_
 
-Chronicle helps data science managers and other stakeholders understand their
+[Posit Chronicle](https://docs.posit.co/chronicle/) helps data science managers and other stakeholders understand their
 organization's use of other Posit products, primarily Posit Connect and
 Workbench.
 
@@ -25,11 +25,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.3.5:
+To install the chart with the release name `my-release` at version 0.4.5:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.3.5
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.5
 ```
 
 To explore other chart versions, look at:
@@ -40,77 +40,110 @@ helm search repo rstudio/posit-chronicle -l
 
 ## Usage
 
-This chart deploys only the Chronicle server and is meant to be used in tandem
-with the Workbench and Connect charts. To actually send data to the server, you
-will need to run the Chronicle agent as a sidecar container on your
-Workbench or Connect server pods by setting `pod.sidecar` in their respective `values.yaml` files
+This chart deploys the Chronicle server and is intended to be used in tandem
+with the Workbench and Connect charts. For the server to receive data,
+the Chronicle agent must be deployed as a sidecar container alongside
+Workbench or Connect server pods.
 
-Here is an example of Helm values to run the agent sidecar in **Workbench**,
-where we set up a shared volume between containers for audit logs:
+Both [Workbench](https://docs.posit.co/helm/charts/rstudio-workbench/README.html#chronicle-agent)
+(`>=0.9.2`) and [Connect](https://docs.posit.co/helm/charts/rstudio-connect/README.html#chronicle-agent)
+(`>=0.7.26`) charts include out of the box support for Chronicle agent sidecars.
+The sidecar can be enabled by setting the `chronicleAgent.enabled` value to `true`
+in either product's chart.
 
-```yaml
-pod:
-  # We will need to create a new volume to share audit logs between
-  # the rstudio (workbench) and chronicle-agent containers
-  volumes:
-    - name: logs
-      emptyDir: {}
-  volumeMounts:
-    - name: logs
-      mountPath: "/var/lib/rstudio-server/audit"
-  sidecar:
-    - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2024.09.0
-      volumeMounts:
-      - name: logs
-        mountPath: "/var/lib/rstudio-server/audit"
-      env:
-      - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default"
-```
+For additional information on deploying and configuring Chronicle agents,
+see the [Workbench](https://docs.posit.co/helm/charts/rstudio-workbench/README.html#chronicle-agent)
+or [Connect](https://docs.posit.co/helm/charts/rstudio-connect/README.html#chronicle-agent)
+chart documentation.
 
-And here is an example of Helm values for Connect, where a **Connect**
-API key from a Kubernetes Secret is used to unlock more detailed metrics:
+## HTTPS Configuration
+
+Chronicle can be configured to use HTTPS for secure communication. The
+`config.HTTPS` section of the configuration allows you to specify the certificate
+and key files to use for HTTPS. Both `config.HTTPS.Certificate` and
+`config.HTTPS.Key` are expected to be paths to files accessible by Chronicle.
+The `extraSecretMounts` value can be used to mount the certificate and key files
+into the Chronicle pod. Here is an example of how to do this, assuming that
+the certificate and key files are stored together in a Kubernetes TLS secret:
 
 ```yaml
-pod:
-  sidecar:
-    - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2024.09.0
-      env:
-      - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default"
-      - name: CONNECT_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: connect
-            key: apikey
+extraSecretMounts:
+  - name: chronicle-https
+    mountPath: /etc/chronicle/ssl
+    secretName: chronicle-https
+    items:
+      - key: tls.crt
+      - key: tls.key
+config:
+  HTTPS:
+    Enabled: true
+    Certificate: "/etc/chronicle/ssl/tls.crt"
+    Key: "/etc/chronicle/ssl/tls.key"
 ```
-
-Note that it is up to the user to provision this Kubernetes Secret for the
-Connect API key.
 
 ## Storage Configuration
 
-Chronicle can be configured to persist data to a local Kubernetes Volume, AWS S3, or both.
+Chronicle can be configured to persist data to local storage, AWS S3, or both.
 
-The default configuration uses a local volume, which is suitable if you'd like to
-access and analyze the data within your cluster:
+### Local Storage
+
+The default configuration will save data to a persistent volume, which
+is suitable if you'd like to access and analyze the data within your cluster.
+The below values show the default configuration for storage:
 
 ```yaml
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
 config:
   LocalStorage:
     Enabled: true
-    Location: "/chronicle-data"
-    RetentionPeriod: "30d"
+    Location: "/opt/chronicle-data"
 ```
 
-`retentionPeriod` controls how long usage data are kept. For example, `"120m"`
-for 120 minutes, `"36h"` for 36 hours, `14d` for two weeks, or `"0"` for unbounded retention.
-(Units smaller than seconds or larger than days are not supported.)
+The `persistence` section configures the persistent volume claim in the
+cluster while the `config.LocalStorage` section directly applies to Chronicle's
+configuration file. The persistent volume will always mount to the path specified
+by `config.LocalStorage.Path` to avoid potential misconfiguration and data loss.
 
-You can also persist data to AWS S3 instead of (or in addition to) local
-storage:
+By default, Chronicle requests 10Gi of storage. In most cases, this amount of
+storage should be sufficient for thirty days of monitoring data.
+
+::: {.callout-important}
+Users are responsible for managing the size of the persistent volume, retention
+of stored data, and controlling access to the data from other pods. Consider
+utilizing a dynamic volume provisioner to avoid storage-related service
+interruptions.
+:::
+
+While attaching the volume to Workbench is a valid method of accessing the data,
+keep in mind that some data captured by Chronicle may be considered sensitive and
+should be handled with care.
+
+#### Alternate Storage Class
+
+Depending on the environment or cloud hosting Chronicle, many CSI drivers may
+be available to use as the persistent volume's storage class. While Chronicle
+only natively supports local storage or S3, CSI drivers may be used to provide
+support for other storage backends such as Azure Blob Storage, Azure Files, Google
+Cloud Storage, or other object storage solutions. The storage class for persistent
+volumes can be set with the following value:
+
+```yaml
+persistence:
+  storageClass: "alternate-storage-class"
+```
+
+Please report and performance or stability issues with alternate storage configurations
+to the [issue tracker](https://github.com/rstudio/helm/issues/new?template=chronicle.md).
+
+### S3 Storage
+
+Chronicle can also be configured to store data in an S3 bucket. This can be
+useful for controlling access to data or taking advantage of S3 features
+such as lifecycle management.
 
 ```yaml
 config:
@@ -120,13 +153,13 @@ config:
     Region: "us-east-2"
 ```
 
-### Using Iam for S3
+#### Using IAM roles for S3 access
 
-If you are running on EKS, you can use [IAM Roles for Service
+If Chronicle is running on EKS, [IAM Roles for Service
 Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
-to manage the credentials needed to access S3. In this scenario, once you have [created an IAM
-role](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
-you can use this role as an annotation on the existing Service Account:
+can be utilized to manage the credentials needed to access S3. Once [an IAM role has been
+created](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html),
+the role can be attached as an annotation on Chronicle's Service Account:
 
 ```yaml
 serviceaccount:
@@ -135,8 +168,7 @@ serviceaccount:
     eks.amazonaws.com/role-arn:  arn:aws:iam::123456789000:role/iam-role-name-here
 ```
 
-If you are unable to use IAM Roles for Service Accounts, there are any number of
-alternatives for injecting AWS credentials into a container. As a fallback,
+There are alternatives for injecting AWS credentials into a container. As a fallback,
 the S3 storage config allows specifying a profile:
 
 ```yaml
@@ -148,7 +180,7 @@ config:
     Region: "us-east-2"
 ```
 
-### Needed S3 Policy Permissions
+#### Needed S3 Policy Permissions
 
 The credentials Chronicle uses for S3 storage must have the following permissions enabled:
 
@@ -157,50 +189,75 @@ The credentials Chronicle uses for S3 storage must have the following permission
 - `s3:PutObject`
 - `s3:DeleteObject`
 
+## Additional Configuration
+
+Chronicle has additional configuration options not specifically mentioned in this
+README. For additional information on administrating or using Posit Chronicle, see
+the [Chronicle documentation](https://docs.posit.co/chronicle/).
+
+For details on server configuration options, see the [advanced server configuration
+reference page](https://docs.posit.co/chronicle/appendix/library/advanced-server.html).
+
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| config.HTTPS.Certificate | string | `""` |  |
-| config.HTTPS.Enabled | bool | `false` |  |
-| config.HTTPS.Key | string | `""` |  |
-| config.LocalStorage.Enabled | bool | `true` |  |
-| config.LocalStorage.Location | string | `"./chronicle-data"` |  |
-| config.LocalStorage.RetentionPeriod | string | `"30d"` |  |
-| config.Logging.ServiceLog | string | `"STDOUT"` |  |
-| config.Logging.ServiceLogFormat | string | `"TEXT"` |  |
-| config.Logging.ServiceLogLevel | string | `"INFO"` |  |
-| config.Metrics.Enabled | bool | `true` |  |
-| config.Profiling.Enabled | bool | `false` |  |
-| config.S3Storage.Bucket | string | `"posit-chronicle"` |  |
-| config.S3Storage.Enabled | bool | `false` |  |
-| config.S3Storage.Prefix | string | `""` |  |
-| config.S3Storage.Profile | string | `""` |  |
-| config.S3Storage.Region | string | `"us-east-2"` |  |
-| image.imagePullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"ghcr.io/rstudio/chronicle"` |  |
-| image.tag | string | `"2024.09.0"` |  |
-| nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
-| pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
-| pod.annotations | object | `{}` | Additional annotations to add to the chronicle-server pods |
-| pod.args[0] | string | `"start"` |  |
-| pod.args[1] | string | `"-c"` |  |
-| pod.args[2] | string | `"/etc/posit-chronicle/posit-chronicle.gcfg"` |  |
-| pod.command | string | `"/chronicle"` | The command and args to run in the chronicle-server container |
-| pod.env | list | `[]` | Optional environment variables |
-| pod.labels | object | `{}` | Additional labels to add to the chronicle-server pods |
-| pod.selectorLabels | object | `{}` | Additional selector labels to add to the chronicle-server pods |
+| commonAnnotations | object | `{}` | Common annotations to add to all resources |
+| commonLabels | object | `{}` | Common labels to add to all resources |
+| config.HTTPS.Certificate | string | `""` | Path to a PEM encoded certificate file, required if `HTTPS.Enabled=true` |
+| config.HTTPS.Enabled | bool | `false` | If set to true, Chronicle will use HTTPS instead of HTTP |
+| config.HTTPS.Key | string | `""` | Path to a PEM encoded private key file corresponding to the specified certificate, required if `HTTPS.Enabled=true` |
+| config.LocalStorage.Enabled | bool | `true` | Use `config.LocalStorage.Path` for data storage if true, use in conjunction with `persistence.enabled=true` for persistent data storage |
+| config.LocalStorage.Path | string | `"/opt/chronicle-data"` | The path to use for local storage |
+| config.Logging.ServiceLog | string | `"STDOUT"` | Specifies the output for log messages, can be one of "STDOUT", "STDERR", or a file path |
+| config.Logging.ServiceLogFormat | string | `"TEXT"` | The log format for the service, can be one of "TEXT" or "JSON" |
+| config.Logging.ServiceLogLevel | string | `"INFO"` | The log level for the service, can be one of "TRACE", "DEBUG", "INFO", "WARN", or "ERROR" |
+| config.Metrics.Enabled | bool | `false` | Exposes a metrics endpoint for Prometheus if true |
+| config.Profiling.Enabled | bool | `false` | Exposes a pprof profiling server if true |
+| config.Profiling.Port | int | `3030` | The port to use for the profiling server |
+| config.S3Storage.Bucket | string | `""` | The S3 bucket to use for storage, required if `S3Storage.Enabled=true` |
+| config.S3Storage.Enabled | bool | `false` | Use S3 for data storage if true |
+| config.S3Storage.Prefix | string | `""` | An optional prefix path to use when writing to the S3 bucket |
+| config.S3Storage.Profile | string | `""` | An IAM Profile to use for accessing the S3 bucket, default is to read from the `AWS_PROFILE` env var |
+| config.S3Storage.Region | string | `""` | Region of the S3 bucket, default is to read from the `AWS_REGION` env var |
+| extraObjects | list | `[]` | Additional manifests to deploy with the chart with template value rendering |
+| extraSecretMounts | list | `[]` | Additional secrets to mount to the Chronicle server pod |
+| fullnameOverride | string | `""` | Override for the full name of the release |
+| image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
+| image.registry | string | `"ghcr.io"` | The image registry |
+| image.repository | string | `"rstudio/chronicle"` | The image repository |
+| image.securityContext | object | `{"allowPrivilegeEscalation":false,"runAsNonRoot":true}` | The container-level security context    ([reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#securitycontext-v1-core)) |
+| image.sha | string | `""` | The image digest |
+| image.tag | string | `""` | The image tag, defaults to the chart app version |
+| nameOverride | string | `""` | Override for the name of the release |
+| namespaceOverride | string | `""` | Override for the namespace of the chart deployment |
+| persistence.accessModes | list | `["ReadWriteMany"]` | Persistent Volume Access Modes |
+| persistence.annotations | object | `{}` | Additional annotations for the PVC |
+| persistence.enabled | bool | `true` | Enable persistence using Persistent Volume Claims |
+| persistence.finalizers | list | `["kubernetes.io/pvc-protection"]` | Finalizers for the PVC |
+| persistence.labels | object | `{}` | Additional labels for the PVC |
+| persistence.selectorLabels | object | `{}` | Selector to match an existing Persistent Volume for the data PVC |
+| persistence.size | string | `"10Gi"` | Size of the data volume |
+| persistence.storageClassName | string | `""` | Persistent Volume Storage Class, defaults to the default Storage Class for the cluster |
+| pod.affinity | object | `{}` | A map used verbatim as the pod "affinity" definition |
+| pod.annotations | object | `{}` | Additional annotations for pods |
+| pod.args | list | `[]` | The arguments to pass to the command, defaults to the image `CMD` values |
+| pod.command | list | `[]` | The command to run in the Chronicle server container, defaults to the image `ENTRYPOINT` value |
+| pod.env | list | `[]` | Additional environment variables to set on the Chronicle server container |
+| pod.labels | object | `{}` | Additional labels for pods |
+| pod.nodeSelector | object | `{}` | A map used verbatim as the pod "nodeSelector" definition |
+| pod.resources | object | `{}` | Defines resources for the posit-chronicle container |
+| pod.securityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | The pod-level security context    ([reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core)) |
 | pod.terminationGracePeriodSeconds | int | `30` | The termination grace period seconds allowed for the pod before shutdown |
-| pod.tolerations | list | `[]` | An array used verbatim as the pod's "tolerations" definition |
-| replicas | int | `1` | The number of replica pods to maintain for this service |
-| service.annotations | object | `{}` | Additional annotations to add to the chronicle-server service |
-| service.labels | object | `{}` | Additional labels to add to the chronicle-server service |
-| service.port | int | `80` | The port to use for the REST service |
-| service.selectorLabels | object | `{}` | Additional selector labels to add to the chronicle-server service |
-| serviceaccount.annotations | object | `{}` | Additional annotations to add to the chronicle-server serviceaccount |
-| serviceaccount.create | bool | `false` |  |
-| serviceaccount.labels | object | `{}` | Additional labels to add to the chronicle-server serviceaccount |
-| storage.persistentVolumeSize | string | `"1Gi"` |  |
+| pod.tolerations | list | `[]` | An array used verbatim as the pod "tolerations" definition |
+| replicas | int | `1` | The number of replica pods to maintain |
+| service.annotations | object | `{}` | Annotations to add to the service |
+| service.labels | object | `{}` | Labels to add to the service |
+| service.port | int | `80` | The port to use for the REST API service |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.create | bool | `false` | Creates a service account for Posit Chronicle if true |
+| serviceAccount.labels | object | `{}` | Labels to add to the service account |
+| serviceAccount.name | string | `""` | Override for the service account name, defaults to fullname |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)

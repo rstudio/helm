@@ -1,0 +1,58 @@
+license:
+  file:
+    secret: pwb-license
+    secretKey: pwb.lic
+
+config:
+  sessionSecret:
+    example-file.json: '{"some-contents": "test"}'
+launcher:
+  enabled: true
+  useTemplates: true
+  templateValues:
+    service:
+      type: ClusterIP
+      annotations:
+        five: six
+    job:
+      ttlSecondsAfterFinished: 99
+      annotations:
+        seven: eight
+      labels:
+        nine: ten
+    pod:
+      serviceAccountName: test
+      annotations:
+        one: two
+      labels:
+        three: four
+      volumes:
+        - name: test
+          emptyDir: {}
+      volumeMounts:
+        - name: test
+          mountPath: /tmp/mnt
+      env:
+        - name: SOME_ENV_VAR
+          value: the-env-var-value
+      securityContext:
+        runAsUser: 999
+      defaultSecurityContext:
+        fsGroupChangePolicy: "Always"
+        runAsGroup: 999
+      containerSecurityContext:
+        privileged: false
+      tolerations:
+        - key: "kubernetes.azure.com/scalesetpriority"
+          operator: "Equal"
+          value: "spot"
+          effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.azure.com/scalesetpriority"
+                    operator: In
+                    values:
+                      - "spot"
