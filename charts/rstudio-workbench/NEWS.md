@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.13
+
+- Bump Workbench version to 2025.09.1
+
 ## 0.9.12
 
 - Bump Workbench version to 2025.09.0
