@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.15
+
+- Bump `rstudio-library` chart version
+
 ## 0.9.14
 
 - Skip `rstudio-library` template call when `chronicleAgent.autoDiscovery=false`. Require `chronicleAgent.serverAddress`
