@@ -508,6 +508,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| config.database.conf.value | string | 0644 | Database connection config. If both config.database.conf.existingSecret and this are defined, only existingSecret will be used |
+| config.database.conf.existingSecret | string | `""` | Secret for database connection config. If both config.database.conf.value and this are defined, only existingSecret will be used |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
 | config.defaultMode.pam | int | 0644 | default mode for pam scripts |
 | config.defaultMode.prestart | int | 0755 | default mode for prestart config |
@@ -531,7 +533,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
-| global.secureCookieKey | string | `""` |  |
+| global.secureCookieKey.value | string | `""` | Secure Cookie Key. If global.secureCookieKey.existingSecret and this are both defined, only existingSecret will be used. |
+| global.secureCookieKey.existingSecret | string | `""` | Secret containing secureCookieKey. If both this and global.secureCookieKey.value and this are defined, only existingSecret will be used. |
 | homeStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | homeStorage.create | bool | `false` | whether to create the persistentVolumeClaim for homeStorage |
 | homeStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
@@ -562,7 +565,9 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
 | launcher.templateValues | object | `{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
-| launcher.useTemplates | bool | `true` | whether to render and use templates in the job launching process |
+| launcher.useTemplates | bool | `false` | whether to render and use templates in the job launching process |
+| launcherPem.value | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. If both launcherPem.existingSecret and this are defined, only existingSecret is used. |
+| launcherPem.existingSecret | string | `""` | Existing secret containing launcherPem contents. If both launcherPem.value and this are both defined, only existingSecret will be used. |
 | launcherPem | string | `""` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
 | launcherPub | bool | `false` | An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem` |
 | license.file | object | `{"contents":false,"mountPath":"/etc/rstudio-licensing","mountSubPath":false,"secret":false,"secretKey":"license.lic"}` | the file section is used for licensing with a license file |
@@ -609,7 +614,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | sealedSecret.annotations | object | `{}` | annotations for SealedSecret resources |
 | sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
-| secureCookieKey | string | `""` |  |
+| secureCookieKey.value | string | `""` | Secure Cookie Key value. If both secureCookieKey.existingSecret and this are defined, only existingSecret will be used.  |
+| secureCookieKey.existingSecret | string | `""` | Secret containing secureCookieKey. If both secureCookieKey.value and this are defined, only existingSecret will be used. |
 | securityContext | object | `{}` |  |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
@@ -646,7 +652,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | topologySpreadConstraints | list | `[]` | An array used verbatim as the pod's "topologySpreadConstraints" definition |
 | userCreate | bool | `false` | userCreate determines whether a user should be created at startup (if true) |
 | userName | string | `"rstudio"` | userName determines the username of the created user |
-| userPassword | string | `"rstudio"` | userPassword determines the password of the created user |
+| userPassword.value | string | `"rstudio"` | userPassword determines the password of the created user. If both userPassword.existingSecret and this are used, only existingSecret will be used. |
+| userPassword.existingSecret | string | `""` | Existing Secret for userPassword. If both userPassword.value are defined, only existingSecret will be used. |
 | userUid | string | `"10000"` | userUid determines the UID of the created user |
 | versionOverride | string | `""` | A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194 |
 | xdgConfigDirs | string | `"/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"` | The XDG config dirs (directories where configuration will be read from). Do not change without good reason. |
