@@ -68,8 +68,7 @@ containers:
       secretKeyRef:
         key: password
         name: {{ .Values.userPassword.existingSecret }}
-  {{- end }}
-  {{- if .Values.userPassword.value }}
+  {{- else if .Values.userPassword.value }}
   - name: RSW_TESTUSER_PASSWD
     value: {{ .Values.userPassword.value }}
   {{- end }}
