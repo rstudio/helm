@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.12
+
+- Bump `rstudio-library` chart version
+
 ## 0.8.11
 
 - Bump Connect version to 2025.09.1
