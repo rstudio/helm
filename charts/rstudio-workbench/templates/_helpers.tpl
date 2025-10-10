@@ -503,8 +503,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/*
     Precedence:
-      - .Values.global.secureCookieKey
-      - .Values.secureCookieKey
+      - .Values.global.secureCookieKey.value
+      - .Values.secureCookieKey.value
       - auto-generated value
           - we check to see if the secret is already created
           - if it is, we warn and leave it alone
