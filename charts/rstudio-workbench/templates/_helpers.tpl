@@ -133,7 +133,7 @@ containers:
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}
     {{- end }}
-    {{- if or (not .Values.launcherPem.existingSecret) (not .Values.secureCookieKey.existingSecret) }}
+    {{- if or (not .Values.launcherPem.existingSecret) (not .Values.secureCookieKey.existingSecret) (not .Values.config.database.conf.existingSecret) }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
