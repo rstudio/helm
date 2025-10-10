@@ -39,7 +39,7 @@ Takes a dict:
 {{- define "rstudio-library.chronicle-agent.serverAddress" }}
 {{- if .chronicleAgent.serverAddress }}
 {{- .chronicleAgent.serverAddress }}
-{{- else }}
+{{- else if lookup "v1" "Service" (default .Release.Namespace .chronicleAgent.serverNamespace) "" }}
 {{- range $index, $service := (lookup "v1" "Service" (default .Release.Namespace .chronicleAgent.serverNamespace) "").items }}
 {{- $name := get $service.metadata.labels "app.kubernetes.io/name" }}
 {{- $component := get $service.metadata.labels "app.kubernetes.io/component" }}
@@ -47,5 +47,7 @@ Takes a dict:
 {{- (index $service.spec.ports 0).name }}://{{ $service.metadata.name }}.{{ $service.metadata.namespace }}
 {{- end }}
 {{- end }}
+{{- else }}
+{{- fail "Unable to resolve a Chronicle server address for Chronicle agent. Ensure that a Chronicle server is deployed in the same namespace as this chart or the namespace is specfied with chronicleAgent.serverNamespace when using chronicleAgent.autoDiscovery=true. Alternatively, specify chronicleAgent.serverAddress in the values.yaml file." }}
 {{- end }}
 {{- end }}
