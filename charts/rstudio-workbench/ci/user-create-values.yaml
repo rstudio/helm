@@ -5,4 +5,5 @@ license:
 
 userCreate: true
 userName: jforest-test
-userPassword: djhkjhij870jjbJye
+userPassword:
+  value: djhkjhij870jjbJye

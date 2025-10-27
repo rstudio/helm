@@ -89,7 +89,7 @@ tests:
     set:
       userCreate: true
       userName: "testuser"
-      userPassword: "testpassword"
+      userPassword.value: "testpassword"
       userUid: 1000
     asserts:
       - equal:
@@ -106,7 +106,7 @@ tests:
     set:
       userCreate: false
       userName: "testuser"
-      userPassword: "testpassword"
+      userPassword.value: "testpassword"
       userUid: 1000
     asserts:
       - equal:
