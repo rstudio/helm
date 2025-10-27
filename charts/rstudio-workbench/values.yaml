@@ -336,8 +336,9 @@ userName: "rstudio"
 userUid: "10000"
 # -- userPassword determines the password of the created user
 userPassword:
+  # -- userPassword determines the password of the created user. Will only be used if `userPassword.existingSecret` is not set.
   value: "rstudio"
-  # key 'password'
+  # -- Existing Secret for userPassword. Will take precedence over `userPassword.value`. Key: 'password'
   existingSecret: ""
 
 # -- The XDG config dirs (directories where configuration will be read from). Do not change without good reason.
@@ -445,23 +446,26 @@ jobJsonOverridesFiles: {}
 
 # -- An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details.
 launcherPem:
+  # -- An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. Will only be used if `launcherPem.existingSecret` is not set.
   value: ""
-  # key 'launcher.pem'
+  # -- Existing secret containing launcherPem contents. Will take precedence over `launcherPem.value`. Key: 'launcher.pem'
   existingSecret: ""
 # -- An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem`
 launcherPub: false
 
 secureCookieKey:
+  # -- Will only be used if `secureCookieKey.existingSecret` is not set.
   value: ""
-  # key 'secure-cookie-key'
+  # -- Secret containing secureCookieKey. Will take precedence over `secureCookieKey.value`. Key: 'secure-cookie-key'
   existingSecret: ""
 
 dangerRegenerateAutomatedValues: false
 
 global:
   secureCookieKey:
+    # -- Will only be used if `global.secureCookieKey.existingSecret` is not set
     value: ""
-    # key 'secure-cookie-key'
+    # -- Secret containing secureCookieKey. Will take precedence over `global.secureCookieKey.value`. Key: 'secure-cookie-key'
     existingSecret: ""
 
 config:
@@ -496,8 +500,9 @@ config:
 
   database:
     conf:
+      # -- Database connection config. Will only be used if `config.database.conf.existingSecret` is not set.
       value: ""
-      # key 'database.conf'
+      # -- Secret for database connection config. Will take precedence over `config.database.conf.value`.  Key: 'database.conf'
       existingSecret: ""
 
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
