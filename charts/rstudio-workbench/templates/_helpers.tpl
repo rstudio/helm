@@ -339,11 +339,19 @@ volumes:
         path: launcher.pem
         mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
-{{- if .Values.secureCookieKey.existingSecret  }}
+{{- if .Values.secureCookieKey.existingSecret }}
     - secret:
       name: secure-cookie-key-secret
       items:
       - key: {{ .Values.secureCookieKey.existingSecret }}
+        path: secure-cookie-key
+        mode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
+{{- if and .Values.global.secureCookieKey.existingSecret (not .Values.secureCookieKey.existingSecret) }}
+    - secret:
+      name: secure-cookie-key-secret
+      items:
+      - key: {{ .Values.global.secureCookieKey.existingSecret }}
         path: secure-cookie-key
         mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
