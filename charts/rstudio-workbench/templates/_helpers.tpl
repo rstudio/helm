@@ -133,24 +133,9 @@ containers:
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}
     {{- end }}
-    {{- if or (not .Values.launcherPem.existingSecret) (not .Values.secureCookieKey.existingSecret) (not .Values.config.database.conf.existingSecret) }}
+    {{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
-    {{- end }}
-    {{- if .Values.launcherPem.existingSecret }}
-    - name: launcher-pem-secret
-      mountPath: "/mnt/secret-configmap/rstudio/launcher.pem"
-      subPath: "launcher.pem"
-    {{- end }}
-    {{- if .Values.secureCookieKey.existingSecret }}
-    - name: secure-cookie-key-secret
-      mountPath: "/mnt/secret-configmap/rstudio/secure-cookie-key"
-      subPath: "secure-cookie-key"
-    {{- end }}
-    {{- if .Values.config.database.conf.existingSecret }}
-    - name: database-conf-secret
-      mountPath: "/mnt/secret-configmap/rstudio/database.conf"
-      subPath: "database.conf"
     {{- end }}
     {{- if .Values.config.userProvisioning }}
     - name: rstudio-user
@@ -331,29 +316,45 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-pam
     defaultMode: {{ .Values.config.defaultMode.pam }}
 {{- end }}
-{{- if or (not .Values.launcherPem.existingSecret) (not .Values.secureCookieKey.existingSecret) (not .Values.config.database.conf.existingSecret) }}
+{{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
 - name: rstudio-secret
-  secret:
-    secretName: {{ include "rstudio-workbench.fullname" . }}-secret
-    defaultMode: {{ .Values.config.defaultMode.secret }}
+  projected:
+    sources:
+{{- if .Values.config.secret }}
+{{- range $key, $value := .Values.config.secret }}
+    - secret:
+      name: {{ $key }}
+      items:
+      - key: {{ $key }}
+        value: {{ $value }}
+        path: {{ $key }}
+        mode: {{ $.Values.config.defaultMode.secret }}
+{{- end }}
 {{- end }}
 {{- if .Values.launcherPem.existingSecret  }}
-- name: launcher-pem-secret
-  secret:
-    secretName: {{ .Values.launcherPem.existingSecret }}
-    defaultMode: {{ .Values.config.defaultMode.secret }}
+    - secret:
+      name: launcher-pem-secret
+      items:
+      - key: {{ .Values.launcherPem.existingSecret }}
+        path: launcher.pem
+        mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
 {{- if .Values.secureCookieKey.existingSecret  }}
-- name: secure-cookie-key-secret
-  secret:
-    secretName: {{ .Values.secureCookieKey.existingSecret }}
-    defaultMode: {{ .Values.config.defaultMode.secret }}
+    - secret:
+      name: secure-cookie-key-secret
+      items:
+      - key: {{ .Values.secureCookieKey.existingSecret }}
+        path: secure-cookie-key
+        mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
 {{- if .Values.config.database.conf.existingSecret  }}
-- name: database-conf-secret
-  secret:
-    secretName: {{ .Values.config.database.conf.existingSecret }}
-    defaultMode: {{ .Values.config.defaultMode.secret }}
+    - secret:
+      name: database-conf-secret
+      items:
+      - key: {{ .Values.config.database.conf.existingSecret }}
+        path: database.conf
+        mode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
 {{- end }}
 {{- if .Values.config.userProvisioning }}
 - name: rstudio-user

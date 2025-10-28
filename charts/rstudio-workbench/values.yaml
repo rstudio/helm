@@ -498,6 +498,7 @@ config:
     # @default -- 0644
     pam: 0644
 
+  # -- a map of database connection config files. Mounted to `/mnt/secret-configmap/rstudio/database.conf` with 0600 permissions
   database:
     conf:
       # -- Database connection config. Will only be used if `config.database.conf.existingSecret` is not set.

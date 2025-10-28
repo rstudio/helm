@@ -109,7 +109,25 @@ Alternatively, license files can be set during `helm install` with the following
 
 Workbench requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/ide/server-pro/database/configuration.html#postgresql) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
 
-### Database configuration
+### Database configuration the new way:
+You can now specify your database connection details in `config.database.conf` as follows:
+```yaml
+config:
+  database:
+    conf:
+      value: |
+        provider=postgresql
+        connection-uri=postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow
+```
+
+or you can use an existing `Secret` that contains the database configuration file:
+```yaml
+config:
+  database:
+    conf:
+      existingSecret:
+
+### Database configuration the old way:
 
 Add the following to your `values.yaml`, replacing the `connection-uri` with your database details.
 
@@ -128,6 +146,12 @@ First, create a `Secret` declaratively with YAML or imperatively using the follo
 ```bash
 kubectl create secret generic rstudio-workbench-database --from-literal=password=YOURPASSWORDHERE
 ```
+
+To avoid storing the password in your shell history, use:
+```bash
+kubectl create secret generic rstudio-workbench-database --from-file=password=/path/to/password-file
+```
+the file at `/path/to/password-file` should contain only the password.
 
 Second, specify the following in your `values.yaml`:
 
@@ -508,6 +532,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| config.database | object | `{"conf":{"existingSecret":"","value":""}}` | a map of database connection config files. Mounted to `/mnt/secret-configmap/rstudio/database.conf` with 0600 permissions |
 | config.database.conf.existingSecret | string | `""` | Secret for database connection config. Will take precedence over `config.database.conf.value`.  Key: 'database.conf' |
 | config.database.conf.value | string | `""` | Database connection config. Will only be used if `config.database.conf.existingSecret` is not set. |
 | config.defaultMode.jobJsonOverrides | int | 0644 | default mode for jobJsonOverrides config |
