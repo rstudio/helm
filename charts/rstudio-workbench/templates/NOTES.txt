@@ -1,7 +1,7 @@
 
 {{ include "rstudio-workbench.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
 
-{{- if or (eq .Values.launcherPem.value "") (eq .Values.launcherPem.existingSecret "") }}
+{{- if and (eq .Values.launcherPem.value "") (eq .Values.launcherPem.existingSecret "") }}
 
 NOTE: Using auto-generated value for "launcher.pem"
   - We recommend making this value persistent by setting `.Values.launcherPem.value` or `.Values.launcherPem.existingSecret`
@@ -11,7 +11,7 @@ NOTE: Using auto-generated value for "launcher.pem"
 kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fullname" . }}-secret --template='{{print "{{" }}index .data "launcher.pem" | base64decode {{print "}}" }}'
 ```
 {{- end }}
-{{- if or (eq (default .Values.secureCookieKey.value .Values.global.secureCookieKey.value) "") (eq (default .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret) "") }}
+{{- if and (eq (default .Values.secureCookieKey.value .Values.global.secureCookieKey.value) "") (eq (default .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret) "") }}
 
 NOTE: Using an auto-generated value for "secure-cookie-key"
   - We recommend making this value persistent by setting `.Values.global.secureCookieKey.value`
