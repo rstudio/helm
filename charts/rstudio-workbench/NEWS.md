@@ -18,7 +18,7 @@
   - This allows for better secret management and avoids putting secure cookie keys in plaintext in `values.yaml`
   - If you were using `global.secureCookieKey`, you can migrate by setting `global.secureCookieKey.value` to the same value
   - Alternatively, you can create a Kubernetes secret with the secure cookie key and set `global.secureCookieKey.existingSecret` to the name of the secret
-- NEW `config.database.conf` section can be used to configure database settings. Either `config.database.conf.value` or `config.database.conf.existingSecret` can be used to set the database configuration.
+- Add `config.database.conf` section can be used to configure database settings. Either `config.database.conf.value` or `config.database.conf.existingSecret` can be used to set the database configuration.
   - This can be used instead of specifying the database config values in plain text in `config.secret.database.conf`
 
 ## 0.9.15
