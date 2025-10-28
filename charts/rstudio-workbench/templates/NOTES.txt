@@ -14,7 +14,7 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 {{- if and (eq (default .Values.secureCookieKey.value .Values.global.secureCookieKey.value) "") (eq (default .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret) "") }}
 
 NOTE: Using an auto-generated value for "secure-cookie-key"
-  - We recommend making this value persistent by setting `.Values.global.secureCookieKey.value`
+  - We recommend making this value persistent by setting `.Values.global.secureCookieKey.value`,`.Values.global.secureCookieKey.existingSecret`,`.Values.secureCookieKey.value`, or `.Values.secureCookieKey.existingSecret`g
   - If the value changes, authenticated sessions will be invalidated (all users will be logged out) and some old sessions will not be accessible
   - You can get the current value with:
 ```
