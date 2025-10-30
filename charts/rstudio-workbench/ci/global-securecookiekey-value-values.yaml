@@ -1,0 +1,8 @@
+license:
+  file:
+    secret: pwb-license
+    secretKey: pwb.lic
+
+global:
+  secureCookieKey:
+    value: "testsecurecookiekey"

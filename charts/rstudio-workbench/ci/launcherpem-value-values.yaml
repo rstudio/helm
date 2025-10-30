@@ -1,0 +1,7 @@
+license:
+  file:
+    secret: pwb-license
+    secretKey: pwb.lic
+
+launcherPem:
+  value: "TESTDATA"
