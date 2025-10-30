@@ -349,7 +349,7 @@ volumes:
 {{- end }}
 {{- if .Values.global.secureCookieKey.existingSecret }}
     - secret:
-        name: secure-cookie-key-secret
+        name: global-secure-cookie-key-secret
         items:
         - key: {{ .Values.global.secureCookieKey.existingSecret }}
           path: secure-cookie-key
