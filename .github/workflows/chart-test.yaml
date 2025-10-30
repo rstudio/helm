@@ -173,7 +173,7 @@ jobs:
           kubectl create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
           rm ppm.lic
 
-      - name: Create Workbench Secrets to test exitingSecrets
+      - name: Create Workbench Secrets to test existingSecrets
         run: |
           kubectl create secret generic launcherpem-secret --from-literal=launcher.pem="testlaunchepem" --namespace posit-test
           kubectl create secret generic userpassword-secret --from-literal=password="testpassword" --namespace posit-test
