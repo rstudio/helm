@@ -335,7 +335,7 @@ volumes:
     - secret:
         name: {{ .Values.launcherPem.existingSecret }}
         items:
-        - key: {{ .Values.launcherPem.existingSecret }}
+        - key: launcher.pem
           path: launcher.pem
           mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
@@ -343,7 +343,7 @@ volumes:
     - secret:
         name: {{ .Values.secureCookieKey.existingSecret }}
         items:
-        - key: {{ .Values.secureCookieKey.existingSecret }}
+        - key: secure-cookie-key
           path: secure-cookie-key
           mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
@@ -351,7 +351,7 @@ volumes:
     - secret:
         name: {{ .Values.global.secureCookieKey.existingSecret }}
         items:
-        - key: {{ .Values.global.secureCookieKey.existingSecret }}
+        - key: secure-cookie-key
           path: secure-cookie-key
           mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
@@ -359,7 +359,7 @@ volumes:
     - secret:
         name: {{ .Values.config.database.conf.existingSecret }}
         items:
-        - key: {{ .Values.config.database.conf.existingSecret }}
+        - key: database.conf
           path: database.conf
           mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
