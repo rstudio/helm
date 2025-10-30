@@ -333,7 +333,7 @@ volumes:
 {{- end }}
 {{- if .Values.launcherPem.existingSecret  }}
     - secret:
-        name: launcher-pem-secret
+        name: {{ .Values.launcherPem.existingSecret }}
         items:
         - key: {{ .Values.launcherPem.existingSecret }}
           path: launcher.pem
@@ -341,7 +341,7 @@ volumes:
 {{- end }}
 {{- if and .Values.secureCookieKey.existingSecret (not .Values.global.secureCookieKey.existingSecret) }}
     - secret:
-        name: secure-cookie-key-secret
+        name: {{ .Values.secureCookieKey.existingSecret }}
         items:
         - key: {{ .Values.secureCookieKey.existingSecret }}
           path: secure-cookie-key
@@ -349,7 +349,7 @@ volumes:
 {{- end }}
 {{- if .Values.global.secureCookieKey.existingSecret }}
     - secret:
-        name: global-secure-cookie-key-secret
+        name: {{ .Values.global.secureCookieKey.existingSecret }}
         items:
         - key: {{ .Values.global.secureCookieKey.existingSecret }}
           path: secure-cookie-key
@@ -357,7 +357,7 @@ volumes:
 {{- end }}
 {{- if .Values.config.database.conf.existingSecret  }}
     - secret:
-        name: database-conf-secret
+        name: {{ .Values.config.database.conf.existingSecret }}
         items:
         - key: {{ .Values.config.database.conf.existingSecret }}
           path: database.conf
