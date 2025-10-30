@@ -491,14 +491,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/*
     Precedence:
-      - .Values.launcherPem
+      - .Values.launcherPem.existingSecret
+      - .Values.launcherPem.value
       - auto-generated value
           - we check to see if the secret is already created
           - if it is, we warn and leave it alone
 */}}
 {{- define "rstudio-workbench.launcherPem" -}}
-{{- $pemVar := $.Values.launcherPem.value -}}
-{{- if and (eq $.Values.launcherPem.value "") (eq $.Values.launcherPem.existingSecret "") -}}
+{{- $pemVar := "" }}
+{{- if $.Values.launcherPem.existingSecret -}}
+{{- $currentSecret := lookup "v1" "Secret" $.Release.Namespace $.Values.launcherPem.existingSecret -}}
+{{- if $currentSecret }}
+{{- $pemVar = get $currentSecret.data "launcher.pem" | b64dec }}
+{{- else -}}
+{{- fail (print "Launcher PEM existing secret " $.Values.launcherPem.existingSecret " not found in namespace " $.Release.Namespace) -}}
+{{- end -}}
+{{- else if ne $.Values.launcherPem.value "" -}}
+{{- $pemVar = $.Values.launcherPem.value -}}
+{{- else if and (eq $.Values.launcherPem.value "") (eq $.Values.launcherPem.existingSecret "") -}}
 {{- $secretName := print (include "rstudio-workbench.fullname" .) "-secret" }}
 {{- $currentSecret := lookup "v1" "Secret" $.Release.Namespace $secretName }}
 {{- if and $currentSecret (not .Values.dangerRegenerateAutomatedValues) }}
@@ -512,15 +522,35 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/*
     Precedence:
+      - .Values.global.secureCookieKey.existingSecret
       - .Values.global.secureCookieKey.value
+      - .Values.secureCookieKey.existingSecret
       - .Values.secureCookieKey.value
       - auto-generated value
           - we check to see if the secret is already created
           - if it is, we warn and leave it alone
 */}}
 {{- define "rstudio-workbench.secureCookieKey" -}}
-{{- $cookieVar := default .Values.secureCookieKey.value .Values.global.secureCookieKey.value -}}
-{{- if eq ($cookieVar) ("") -}}
+{{- $cookieVar := "" }}
+{{- if ne $.Values.global.secureCookieKey.existingSecret "" -}}
+{{- $currentSecret := lookup "v1" "Secret" $.Release.Namespace $.Values.global.secureCookieKey.existingSecret -}}
+{{- if $currentSecret }}
+{{- $cookieVar = get $currentSecret.data "secure-cookie-key" | b64dec }}
+{{- else -}}
+{{- fail (print "Global secureCookieKey existing secret " $.Values.global.secureCookieKey.existingSecret " not found in namespace " $.Release.Namespace) -}}
+{{- end -}}
+{{- else if ne $.Values.global.secureCookieKey.value "" -}}
+{{- $cookieVar = $.Values.global.secureCookieKey.value -}}
+{{- else if ne $.Values.secureCookieKey.existingSecret "" -}}
+{{- $currentSecret := lookup "v1" "Secret" $.Release.Namespace $.Values.secureCookieKey.existingSecret -}}
+{{- if $currentSecret }}
+{{- $cookieVar = get $currentSecret.data "secure-cookie-key" | b64dec }}
+{{- else -}}
+{{- fail (print "SecureCookieKey existing secret " $.Values.secureCookieKey.existingSecret " not found in namespace " $.Release.Namespace) -}}
+{{- end -}}
+{{- else if ne $.Values.secureCookieKey.value "" -}}
+{{- $cookieVar = $.Values.secureCookieKey.value -}}
+{{- else if eq ($cookieVar) ("") -}}
 {{- $secretName := print (include "rstudio-workbench.fullname" .) "-secret" }}
 {{- $currentSecret := lookup "v1" "Secret" $.Release.Namespace $secretName }}
 {{- if and $currentSecret (not .Values.dangerRegenerateAutomatedValues ) }}
