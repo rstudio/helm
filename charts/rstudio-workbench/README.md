@@ -558,6 +558,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
+| global.secureCookieKey | object | `{"existingSecret":"","value":""}` | global.secureCookieKey takes precedence over secureCookieKey |
 | global.secureCookieKey.existingSecret | string | `""` | Secret containing secureCookieKey. Will take precedence over `global.secureCookieKey.value`. Key: 'secure-cookie-key' |
 | global.secureCookieKey.value | string | `""` | Will only be used if `global.secureCookieKey.existingSecret` is not set |
 | homeStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
@@ -639,6 +640,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | sealedSecret.annotations | object | `{}` | annotations for SealedSecret resources |
 | sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
+| secureCookieKey | object | `{"existingSecret":"","value":""}` | global.secureCookieKey takes precedence over secureCookieKey |
 | secureCookieKey.existingSecret | string | `""` | Secret containing secureCookieKey. Will take precedence over `secureCookieKey.value`. Key: 'secure-cookie-key' |
 | secureCookieKey.value | string | `""` | Will only be used if `secureCookieKey.existingSecret` is not set. |
 | securityContext | object | `{}` |  |
