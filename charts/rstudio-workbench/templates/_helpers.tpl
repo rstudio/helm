@@ -133,7 +133,7 @@ containers:
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}
     {{- end }}
-    {{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
+    {{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
@@ -316,52 +316,52 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-pam
     defaultMode: {{ .Values.config.defaultMode.pam }}
 {{- end }}
-{{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
+{{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
 - name: rstudio-secret
   projected:
     sources:
 {{- if .Values.config.secret }}
 {{- range $key, $value := .Values.config.secret }}
     - secret:
-      name: {{ $key }}
-      items:
-      - key: {{ $key }}
-        value: {{ $value }}
-        path: {{ $key }}
-        mode: {{ $.Values.config.defaultMode.secret }}
+        name: {{ $key }}
+        items:
+        - key: {{ $key }}
+          value: {{ $value }}
+          path: {{ $key }}
+          mode: {{ $.Values.config.defaultMode.secret }}
 {{- end }}
 {{- end }}
 {{- if .Values.launcherPem.existingSecret  }}
     - secret:
-      name: launcher-pem-secret
-      items:
-      - key: {{ .Values.launcherPem.existingSecret }}
-        path: launcher.pem
-        mode: {{ .Values.config.defaultMode.secret }}
+        name: launcher-pem-secret
+        items:
+        - key: {{ .Values.launcherPem.existingSecret }}
+          path: launcher.pem
+          mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
-{{- if .Values.secureCookieKey.existingSecret }}
+{{- if and .Values.secureCookieKey.existingSecret (not .Values.global.secureCookieKey.existingSecret) }}
     - secret:
-      name: secure-cookie-key-secret
-      items:
-      - key: {{ .Values.secureCookieKey.existingSecret }}
-        path: secure-cookie-key
-        mode: {{ .Values.config.defaultMode.secret }}
+        name: secure-cookie-key-secret
+        items:
+        - key: {{ .Values.secureCookieKey.existingSecret }}
+          path: secure-cookie-key
+          mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
-{{- if and .Values.global.secureCookieKey.existingSecret (not .Values.secureCookieKey.existingSecret) }}
+{{- if .Values.global.secureCookieKey.existingSecret }}
     - secret:
-      name: secure-cookie-key-secret
-      items:
-      - key: {{ .Values.global.secureCookieKey.existingSecret }}
-        path: secure-cookie-key
-        mode: {{ .Values.config.defaultMode.secret }}
+        name: secure-cookie-key-secret
+        items:
+        - key: {{ .Values.global.secureCookieKey.existingSecret }}
+          path: secure-cookie-key
+          mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
 {{- if .Values.config.database.conf.existingSecret  }}
     - secret:
-      name: database-conf-secret
-      items:
-      - key: {{ .Values.config.database.conf.existingSecret }}
-        path: database.conf
-        mode: {{ .Values.config.defaultMode.secret }}
+        name: database-conf-secret
+        items:
+        - key: {{ .Values.config.database.conf.existingSecret }}
+          path: database.conf
+          mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
 {{- end }}
 {{- if .Values.config.userProvisioning }}

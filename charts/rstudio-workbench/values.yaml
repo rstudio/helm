@@ -453,6 +453,7 @@ launcherPem:
 # -- An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem`
 launcherPub: false
 
+# -- global.secureCookieKey takes precedence over secureCookieKey
 secureCookieKey:
   # -- Will only be used if `secureCookieKey.existingSecret` is not set.
   value: ""
@@ -462,6 +463,7 @@ secureCookieKey:
 dangerRegenerateAutomatedValues: false
 
 global:
+  # -- global.secureCookieKey takes precedence over secureCookieKey
   secureCookieKey:
     # -- Will only be used if `global.secureCookieKey.existingSecret` is not set
     value: ""
