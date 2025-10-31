@@ -21,6 +21,10 @@
 - Add `config.database.conf` section can be used to configure database settings. Either `config.database.conf.value` or `config.database.conf.existingSecret` can be used to set the database configuration.
   - This can be used instead of specifying the database config values in plain text in `config.secret.database.conf`
 
+## 0.9.16
+
+- Bump Workbench version to 2025.09.2
+
 ## 0.9.15
 
 - Bump `rstudio-library` chart version

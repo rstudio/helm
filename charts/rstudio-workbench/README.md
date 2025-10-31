@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square) ![AppVersion: 2025.09.1](https://img.shields.io/badge/AppVersion-2025.09.1-informational?style=flat-square)
+![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square) ![AppVersion: 2025.09.2](https://img.shields.io/badge/AppVersion-2025.09.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
