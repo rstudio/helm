@@ -1,0 +1,271 @@
+suite: Connect Nameservice
+templates:
+  - nameservice-secret.yaml
+  - deployment.yaml
+  - configmap.yaml
+  - configmap-prestart.yaml
+tests:
+  # =============================================================================
+  # nameservice-secret.yaml
+  # =============================================================================
+
+  - it: should not create secret when nameservice is disabled
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: false
+        apiKey: "test-key"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create secret when nameservice is enabled with valid auth provider and apiKey
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+      config:
+        Authentication:
+          Provider: oauth2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: kind
+          value: Secret
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-rstudio-connect-nameservice-config
+      - equal:
+          path: type
+          value: Opaque
+      - exists:
+          path: data["libnss_connect.conf"]
+      - equal:
+          path: data["libnss_connect.conf"]
+          decodeBase64: true
+          value: |-
+            CONNECT_API_KEY=test-key
+            CONNECT_SERVER=http://127.0.0.1:3939
+
+  - it: should work with oauth2 authentication provider
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+      config:
+        Authentication:
+          Provider: oauth2
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should work with saml authentication provider
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+      config:
+        Authentication:
+          Provider: saml
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should work with ldap authentication provider
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+      config:
+        Authentication:
+          Provider: ldap
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should fail when nameservice enabled with password authentication
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+      config:
+        Authentication:
+          Provider: password
+    asserts:
+      - failedTemplate:
+          errorMessage: "nameservice.enabled requires config.Authentication.Provider to be one of: oauth2, saml, ldap. Current provider: 'password'"
+
+  - it: should fail when both secretName and apiKey are provided
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+        secretName: "existing-secret"
+      config:
+        Authentication:
+          Provider: oauth2
+    asserts:
+      - failedTemplate:
+          errorMessage: "nameservice.secretName and nameservice.apiKey cannot both be set. Use secretName to use an existing secret OR apiKey to create a new secret."
+
+  - it: should fail when neither secretName nor apiKey are provided
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+      config:
+        Authentication:
+          Provider: oauth2
+    asserts:
+      - failedTemplate:
+          errorMessage: "When nameservice.enabled is true, either nameservice.secretName (for existing secret) or nameservice.apiKey (to create new secret) must be provided."
+
+  - it: should not create secret when using existing secretName
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        secretName: "my-existing-secret"
+      config:
+        Authentication:
+          Provider: oauth2
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should use custom server value in secret
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+        server: "https://connect.example.com:3939"
+      config:
+        Authentication:
+          Provider: oauth2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: data["libnss_connect.conf"]
+      - equal:
+          path: data["libnss_connect.conf"]
+          decodeBase64: true
+          value: |-
+            CONNECT_API_KEY=test-key
+            CONNECT_SERVER=https://connect.example.com:3939
+
+  - it: should have proper labels on created secret
+    template: nameservice-secret.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+      config:
+        Authentication:
+          Provider: oauth2
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: rstudio-connect
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: RELEASE-NAME
+      - equal:
+          path: metadata.labels["app.kubernetes.io/managed-by"]
+          value: Helm
+      - exists:
+          path: metadata.labels["app.kubernetes.io/version"]
+
+  # =============================================================================
+  # deployment.yaml
+  # =============================================================================
+
+  - it: should not mount nameservice config when disabled
+    template: deployment.yaml
+    set:
+      nameservice:
+        enabled: false
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "nameservice-config")]
+      - notExists:
+          path: spec.template.spec.volumes[?(@.name == "nameservice-config")]
+
+  - it: should mount nameservice config when enabled with apiKey
+    template: deployment.yaml
+    set:
+      nameservice:
+        enabled: true
+        apiKey: "test-key"
+      config:
+        Authentication:
+          Provider: oauth2
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: nameservice-config
+            mountPath: "/etc/libnss_connect.conf"
+            subPath: "libnss_connect.conf"
+            readOnly: true
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: nameservice-config
+            secret:
+              secretName: RELEASE-NAME-rstudio-connect-nameservice-config
+              defaultMode: 0444
+              items:
+              - key: libnss_connect.conf
+                path: libnss_connect.conf
+
+  - it: should mount nameservice config when enabled with existing secretName
+    template: deployment.yaml
+    set:
+      nameservice:
+        enabled: true
+        secretName: "my-existing-secret"
+      config:
+        Authentication:
+          Provider: oauth2
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: nameservice-config
+            mountPath: "/etc/libnss_connect.conf"
+            subPath: "libnss_connect.conf"
+            readOnly: true
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: nameservice-config
+            secret:
+              secretName: "my-existing-secret"
+              defaultMode: 0444
+              items:
+              - key: libnss_connect.conf
+                path: libnss_connect.conf
