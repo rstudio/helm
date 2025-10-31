@@ -1,0 +1,28 @@
+# Values to test nameservice integration
+
+nameservice:
+  enabled: true
+  apiKey: "fake-key"
+
+config:
+  Applications:
+    RunAsCurrentUser: true
+  EarlyAccess:
+    RunAsCurrentUserSSO: true
+  Authentication:
+    Provider: oauth2
+  OAuth2:
+    ClientId: connect-oidc
+    ClientSecret: "fake-secret"
+
+license:
+  file:
+    secret: pct-license
+    secretKey: pct.lic
+
+# Required for Connect to run in OHE
+sharedStorage:
+  create: true
+  # normally this should be ReadWriteMany, setting just for CI
+  accessModes:
+    - ReadWriteOnce
