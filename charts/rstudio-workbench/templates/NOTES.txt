@@ -1,20 +1,20 @@
 
 {{ include "rstudio-workbench.fullname" . }} successfully deployed to namespace {{ $.Release.Namespace }}
 
-{{- if eq .Values.launcherPem "" }}
+{{- if and (eq .Values.launcherPem.value "") (eq .Values.launcherPem.existingSecret "") }}
 
 NOTE: Using auto-generated value for "launcher.pem"
-  - We recommend making this value persistent by setting `.Values.launcherPem`
+  - We recommend making this value persistent by setting `.Values.launcherPem.value` or `.Values.launcherPem.existingSecret`
   - If the value changes, sessions started before the change will not be accessible
   - You can get the current value with:
 ```
 kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fullname" . }}-secret --template='{{print "{{" }}index .data "launcher.pem" | base64decode {{print "}}" }}'
 ```
 {{- end }}
-{{- if eq (default .Values.secureCookieKey .Values.global.secureCookieKey) "" }}
+{{- if and (eq (default .Values.secureCookieKey.value .Values.global.secureCookieKey.value) "") (eq (default .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret) "") }}
 
 NOTE: Using an auto-generated value for "secure-cookie-key"
-  - We recommend making this value persistent by setting `.Values.global.secureCookieKey`
+  - We recommend making this value persistent by setting `.Values.global.secureCookieKey.value`,`.Values.global.secureCookieKey.existingSecret`,`.Values.secureCookieKey.value`, or `.Values.secureCookieKey.existingSecret`
   - If the value changes, authenticated sessions will be invalidated (all users will be logged out) and some old sessions will not be accessible
   - You can get the current value with:
 ```

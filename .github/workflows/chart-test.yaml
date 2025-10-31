@@ -173,6 +173,16 @@ jobs:
           kubectl create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
           rm ppm.lic
 
+      - name: Create Workbench Secrets to test existingSecrets
+        run: |
+          echo "Generating a fake launcher.pem file"
+          openssl genrsa -out launcher.pem 4096
+          kubectl create secret generic launcherpem-secret --from-file=launcher.pem=launcher.pem --namespace posit-test
+          kubectl create secret generic userpassword-secret --from-literal=password="testpassword" --namespace posit-test
+          kubectl create secret generic securecookiekey-secret --from-literal=secure-cookie-key="ec44ae41-5b74-44a4-915b-3b0ac8ef72b6" --namespace posit-test
+          kubectl create secret generic globalsecurecookiekey-secret --from-literal=secure-cookie-key="ec44ae41-5b74-44a4-915b-3b0ac8ef72b6" --namespace posit-test
+          kubectl create secret generic databaseconf-secret --from-literal=database.conf="testdatabaseconf" --namespace posit-test
+
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install changed)
         id: ct-install

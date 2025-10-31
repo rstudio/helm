@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0
+
+- BREAKING: `userPassword` has been replaced by `userPassword.value` or `userPassword.existingSecret`
+  - This allows for better secret management and avoids putting passwords in plaintext in `values.yaml`
+  - If you were using `userPassword`, you can migrate by setting `userPassword.value` to the same value
+  - Alternatively, you can create a Kubernetes secret with the password and set `userPassword.existingSecret` to the name of the secret
+- BREAKING: `launcherPem` has been replaced by `launcherPem.value` or `launcherPem.existingSecret`
+  - This allows for better secret management and avoids putting PEM keys in plaintext in `values.yaml`
+  - If you were using `launcherPem`, you can migrate by setting `launcherPem.value` to the same value
+  - Alternatively, you can create a Kubernetes secret with the PEM key and set `launcherPem.existingSecret` to the name of the secret
+- BREAKING: `secureCookieKey` has been replaced by `secureCookieKey.value` or `secureCookieKey.existingSecret`
+  - This allows for better secret management and avoids putting secure cookie keys in plaintext in `values.yaml`
+  - If you were using `secureCookieKey`, you can migrate by setting `secureCookieKey.value` to the same value
+  - Alternatively, you can create a Kubernetes secret with the secure cookie key and set `secureCookieKey.existingSecret` to the name of the secret
+- BREAKING `global.secureCookieKey` has been replaced by `global.secureCookieKey.value` or `global.secureCookieKey.existingSecret`
+  - This allows for better secret management and avoids putting secure cookie keys in plaintext in `values.yaml`
+  - If you were using `global.secureCookieKey`, you can migrate by setting `global.secureCookieKey.value` to the same value
+  - Alternatively, you can create a Kubernetes secret with the secure cookie key and set `global.secureCookieKey.existingSecret` to the name of the secret
+- Add `config.database.conf` section can be used to configure database settings. Either `config.database.conf.value` or `config.database.conf.existingSecret` can be used to set the database configuration.
+  - This can be used instead of specifying the database config values in plain text in `config.secret.database.conf`
+
 ## 0.9.16
 
 - Bump Workbench version to 2025.09.2

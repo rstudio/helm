@@ -335,7 +335,11 @@ userName: "rstudio"
 # -- userUid determines the UID of the created user
 userUid: "10000"
 # -- userPassword determines the password of the created user
-userPassword: "rstudio"
+userPassword:
+  # -- Existing Secret for userPassword. Will take precedence over `userPassword.value`. Key: 'password'
+  existingSecret: ""
+  # -- userPassword determines the password of the created user. Will only be used if `userPassword.existingSecret` is not set.
+  value: "rstudio"
 
 # -- The XDG config dirs (directories where configuration will be read from). Do not change without good reason.
 xdgConfigDirs: "/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"
@@ -441,16 +445,30 @@ extraObjects: []
 jobJsonOverridesFiles: {}
 
 # -- An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details.
-launcherPem: ""
+launcherPem:
+  # -- Existing secret containing launcherPem contents. Will take precedence over `launcherPem.value`. Key: 'launcher.pem'
+  existingSecret: ""
+  # -- An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. Will only be used if `launcherPem.existingSecret` is not set.
+  value: ""
 # -- An inline launcher.pub key to pair with launcher.pem. If `false` (the default), we will try to generate a `launcher.pub` from the provided `launcher.pem`
 launcherPub: false
 
-secureCookieKey: ""
+# -- global.secureCookieKey takes precedence over secureCookieKey
+secureCookieKey:
+  # -- Secret containing secureCookieKey. Will take precedence over `secureCookieKey.value`. Key: 'secure-cookie-key'
+  existingSecret: ""
+  # -- Will only be used if `secureCookieKey.existingSecret` is not set.
+  value: ""
 
 dangerRegenerateAutomatedValues: false
 
 global:
-  secureCookieKey: ""
+  # -- global.secureCookieKey takes precedence over secureCookieKey
+  secureCookieKey:
+    # -- Secret containing secureCookieKey. Will take precedence over `global.secureCookieKey.value`. Key: 'secure-cookie-key'
+    existingSecret: ""
+    # -- Will only be used if `global.secureCookieKey.existingSecret` is not set
+    value: ""
 
 config:
   defaultMode:
@@ -481,6 +499,14 @@ config:
     # -- default mode for pam scripts
     # @default -- 0644
     pam: 0644
+
+  # -- a map of database connection config files. Mounted to `/mnt/secret-configmap/rstudio/database.conf` with 0600 permissions
+  database:
+    conf:
+      # -- Secret for database connection config. Will take precedence over `config.database.conf.value`.  Key: 'database.conf'
+      existingSecret: ""
+      # -- Database connection config. Will only be used if `config.database.conf.existingSecret` is not set.
+      value: ""
 
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
