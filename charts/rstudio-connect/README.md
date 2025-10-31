@@ -280,9 +280,9 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | nameOverride | string | `""` | The name of the chart deployment (can be overridden) |
 | nameservice | object | `{"apiKey":"","enabled":false,"secretName":"","server":"http://127.0.0.1:3939"}` | This can only be enabled if using an SSO authentication provider (OAuth2, SAML, or LDAP). |
 | nameservice.apiKey | string | `""` | Connect API key for nameservice module. Must be a Viewer API key. |
-| nameservice.enabled | bool | `false` | Whether to enable nameservice integration |
+| nameservice.enabled | bool | `false` | Whether to enable nameservice integration. |
 | nameservice.secretName | string | `""` | The secret must be in the same namespace as the Connect deployment. |
-| nameservice.server | string | `"http://127.0.0.1:3939"` | Connect server URL for nameservice module |
+| nameservice.server | string | `"http://127.0.0.1:3939"` | Connect server URL for nameservice module. |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-connect pods |
