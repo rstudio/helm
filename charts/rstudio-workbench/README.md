@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square) ![AppVersion: 2025.09.2](https://img.shields.io/badge/AppVersion-2025.09.2-informational?style=flat-square)
+![Version: 0.10.1](https://img.shields.io/badge/Version-0.10.1-informational?style=flat-square) ![AppVersion: 2025.09.2](https://img.shields.io/badge/AppVersion-2025.09.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.10.0:
+To install the chart with the release name `my-release` at version 0.10.1:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.1
 ```
 
 To explore other chart versions, look at:
@@ -125,7 +125,8 @@ or you can use an existing `Secret` that contains the database configuration fil
 config:
   database:
     conf:
-      existingSecret:
+      existingSecret: REPLACEME
+```
 
 ### Database configuration the old way:
 
