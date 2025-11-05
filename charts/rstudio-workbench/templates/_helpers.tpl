@@ -323,7 +323,7 @@ volumes:
 {{- if .Values.config.secret }}
 {{- range $key, $value := .Values.config.secret }}
     - secret:
-        name: {{ $key }}
+        name: {{ include "rstudio-workbench.fullname" $ }}-secret
         items:
         - key: {{ $key }}
           path: {{ $key }}
