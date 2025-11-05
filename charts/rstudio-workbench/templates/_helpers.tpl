@@ -326,7 +326,6 @@ volumes:
         name: {{ $key }}
         items:
         - key: {{ $key }}
-          value: {{ $value }}
           path: {{ $key }}
           mode: {{ $.Values.config.defaultMode.secret }}
 {{- end }}
