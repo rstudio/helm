@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.1
+
+- Resolve bug in database.conf legacy support for config.secret.database.conf key.
+
 ## 0.10.0
 
 - BREAKING: `userPassword` has been replaced by `userPassword.value` or `userPassword.existingSecret`

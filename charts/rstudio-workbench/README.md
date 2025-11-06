@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square) ![AppVersion: 2025.09.2](https://img.shields.io/badge/AppVersion-2025.09.2-informational?style=flat-square)
+![Version: 0.10.1](https://img.shields.io/badge/Version-0.10.1-informational?style=flat-square) ![AppVersion: 2025.09.2](https://img.shields.io/badge/AppVersion-2025.09.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.10.0:
+To install the chart with the release name `my-release` at version 0.10.1:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.1
 ```
 
 To explore other chart versions, look at:
@@ -107,10 +107,12 @@ Alternatively, license files can be set during `helm install` with the following
 
 ## Database
 
-Workbench requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/ide/server-pro/database/configuration.html#postgresql) for the product to function correctly. Both the connection URI and password may be specified in the `config` section of `values.yaml`. However, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
+Workbench requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/ide/server-pro/database/configuration.html#postgresql) for the product to function correctly. The `database.conf` values may be defined in either `config.database.conf` or `config.secret.database.conf`. The former permits using a `database.conf` file as an existing Kubernetes `Secret`. The latter will automatically create a Kubernetes `Secret` for `database.conf` based on the defined values. In either method of defining database configuration details in the `values.yaml` file, it is possible to include the database password in the configuration section, however, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
 
-### Database configuration the new way:
-You can now specify your database connection details in `config.database.conf` as follows:
+### Database configuration via `config.database.conf`
+
+You can specify your database connection details in `config.database.conf` as follows:
+
 ```yaml
 config:
   database:
@@ -121,13 +123,15 @@ config:
 ```
 
 or you can use an existing `Secret` that contains the database configuration file:
+
 ```yaml
 config:
   database:
     conf:
-      existingSecret:
+      existingSecret: <name-of-secret-containing-database.conf`>
+```
 
-### Database configuration the old way:
+### Database configuration via `config.secret.database.conf`
 
 Add the following to your `values.yaml`, replacing the `connection-uri` with your database details.
 
@@ -138,7 +142,6 @@ config:
       provider: "postgresql"
       connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=allow"
 ```
-
 ### Database password
 
 First, create a `Secret` declaratively with YAML or imperatively using the following command (replacing with your actual password):
