@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.10.1](https://img.shields.io/badge/Version-0.10.1-informational?style=flat-square) ![AppVersion: 2025.09.2](https://img.shields.io/badge/AppVersion-2025.09.2-informational?style=flat-square)
+![Version: 0.10.2](https://img.shields.io/badge/Version-0.10.2-informational?style=flat-square) ![AppVersion: 2025.09.2](https://img.shields.io/badge/AppVersion-2025.09.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.10.1:
+To install the chart with the release name `my-release` at version 0.10.2:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.1
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.2
 ```
 
 To explore other chart versions, look at:
@@ -497,6 +497,41 @@ chronicleAgent:
 For additional information on enabling the API and generating API keys, see
 [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html).
 
+## Using existing secrets
+
+This chart supports referencing existing Kubernetes Secrets for sensitive configuration values.
+
+### Using existing secrets for launcher.pem and secureCookieKey
+
+Instead of having the chart generate and manage `launcher.pem` and `secureCookieKey`, you can reference existing Kubernetes Secrets:
+
+```yaml
+launcherPem:
+  existingSecret: my-launcher-pem-secret  # Secret must have key: launcher.pem
+
+secureCookieKey:
+  existingSecret: my-cookie-key-secret    # Secret must have key: secure-cookie-key
+```
+
+When using `existingSecret`, the chart will **not** template these values into the chart-managed secret, avoiding duplication and ensuring the external secret is the single source of truth.
+
+### Using existing secrets for arbitrary configuration files
+
+For other secret configuration files (like `openid-client-secret`), use `config.existingSecrets`:
+
+```yaml
+config:
+  existingSecrets:
+    - name: my-oidc-secret
+      items:
+        - key: openid-client-secret
+          path: openid-client-secret
+```
+
+All files specified in `config.existingSecrets` are mounted to `/mnt/secret-configmap/rstudio/` with `0600` permissions, alongside any files defined in `config.secret`.
+
+**Note**: `config.existingSecrets` and `config.secret` work together - you can use both simultaneously. Use `config.secret` for inline values and `config.existingSecrets` for externally managed secrets.
+
 ## Sealed secrets
 
 This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
@@ -547,6 +582,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | config.defaultMode.sessionSecret | int | 0420 | default mode for session secrets |
 | config.defaultMode.startup | int | 0755 | default mode for startup config |
 | config.defaultMode.userProvisioning | int | 0600 | default mode for userProvisioning config |
+| config.existingSecrets | list | `[]` | a list of existing Kubernetes Secrets to project into `/mnt/secret-configmap/rstudio/`. Each item should have `name` (secret name) and `items` (list of keys to mount with their paths). Mounted with 0600 permissions by default. |
 | config.pam | object | `{}` | a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files |
 | config.profiles | object | `{}` | a map of server-scoped config files (akin to `config.server`), but with specific behavior that supports profiles. See README for more information. |
 | config.secret | string | `nil` | a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |

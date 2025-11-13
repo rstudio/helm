@@ -443,6 +443,41 @@ chronicleAgent:
 For additional information on enabling the API and generating API keys, see
 [the Workbench documentation](https://docs.posit.co/ide/server-pro/admin/workbench_api/workbench_api.html).
 
+## Using existing secrets
+
+This chart supports referencing existing Kubernetes Secrets for sensitive configuration values.
+
+### Using existing secrets for launcher.pem and secureCookieKey
+
+Instead of having the chart generate and manage `launcher.pem` and `secureCookieKey`, you can reference existing Kubernetes Secrets:
+
+```yaml
+launcherPem:
+  existingSecret: my-launcher-pem-secret  # Secret must have key: launcher.pem
+
+secureCookieKey:
+  existingSecret: my-cookie-key-secret    # Secret must have key: secure-cookie-key
+```
+
+When using `existingSecret`, the chart will **not** template these values into the chart-managed secret, avoiding duplication and ensuring the external secret is the single source of truth.
+
+### Using existing secrets for arbitrary configuration files
+
+For other secret configuration files (like `openid-client-secret`), use `config.existingSecrets`:
+
+```yaml
+config:
+  existingSecrets:
+    - name: my-oidc-secret
+      items:
+        - key: openid-client-secret
+          path: openid-client-secret
+```
+
+All files specified in `config.existingSecrets` are mounted to `/mnt/secret-configmap/rstudio/` with `0600` permissions, alongside any files defined in `config.secret`.
+
+**Note**: `config.existingSecrets` and `config.secret` work together - you can use both simultaneously. Use `config.secret` for inline values and `config.existingSecrets` for externally managed secrets.
+
 ## Sealed secrets
 
 This chart supports the use of [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) to allow for storing secrets in SCM and to ensure secrets are never leaked via Helm. The target cluster must include a `SealedSecret` controller as the controller is responsible for converting a `SealedSecret` to a `Secret`.
