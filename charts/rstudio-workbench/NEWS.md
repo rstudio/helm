@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.2
+
+- Add support for `config.existingSecrets` to reference external Kubernetes Secrets.
+- Avoid templating `launcher.pem` and `secureCookieKey` into chart-managed secret when using existing secrets (redundant).
+
 ## 0.10.1
 
 - Resolve bug in database.conf legacy support for config.secret.database.conf key.

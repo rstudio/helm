@@ -501,7 +501,9 @@ For additional information on enabling the API and generating API keys, see
 
 This chart supports referencing existing Kubernetes Secrets for sensitive configuration values.
 
-### Using existing secrets for launcher.pem and secureCookieKey
+**Note**: For database configuration, see the [Database](#database) section above for usage of `config.database.conf.existingSecret`.
+
+### Using existing secrets for `launcher.pem` and `secureCookieKey`
 
 Instead of having the chart generate and manage `launcher.pem` and `secureCookieKey`, you can reference existing Kubernetes Secrets:
 
@@ -515,14 +517,14 @@ secureCookieKey:
 
 When using `existingSecret`, the chart will **not** template these values into the chart-managed secret, avoiding duplication and ensuring the external secret is the single source of truth.
 
-### Using existing secrets for arbitrary configuration files
+### Using existing secrets for arbitrary configurations
 
 For other secret configuration files (like `openid-client-secret`), use `config.existingSecrets`:
 
 ```yaml
 config:
   existingSecrets:
-    - name: my-oidc-secret
+    - name: my-secret-name
       items:
         - key: openid-client-secret
           path: openid-client-secret
