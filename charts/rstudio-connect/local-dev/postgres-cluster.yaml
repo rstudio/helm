@@ -1,0 +1,8 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: connect-dev-pg
+  namespace: connect-dev
+spec:
+  storage:
+    size: 20Gi
