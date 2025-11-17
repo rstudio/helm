@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.14
+
+- Use individual `R`, `python`, `scripts`, `ext` subPath mounts when mounting the `rsc-volume` EmptyDir
+  to the content runtime container after the init-container copy. This avoids masking all of `/opt/rstudio-connect`.
+
 ## 0.8.13
 
 - Bump Connect version to 2025.10.0

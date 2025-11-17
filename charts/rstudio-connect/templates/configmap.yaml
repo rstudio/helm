@@ -16,8 +16,14 @@ data:
       {{- $emptyRscVolume := dict "name" ("rsc-volume") "emptydir" (dict) }}
       {{- $jobJsonRuntimeVolume := dict "target" ("/spec/template/spec/volumes/-") "name" ("defaultRuntimeConnectVolume") "json" ( $emptyRscVolume ) }}
     {{- /* 2 - volumeMount */ -}}
-      {{- $rscVolumeMount := dict "name" ("rsc-volume") "mountPath" ("/opt/rstudio-connect") }}
-      {{- $jobJsonRuntimeMount := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMount") "json" ( $rscVolumeMount ) }}
+      {{- $rscVolumeMountR := dict "name" ("rsc-volume") "mountPath" ("/opt/rstudio-connect/R") "subPath" ("R") }}
+      {{- $rscVolumeMountPython := dict "name" ("rsc-volume") "mountPath" ("/opt/rstudio-connect/python") "subPath" ("python") }}
+      {{- $rscVolumeMountScripts := dict "name" ("rsc-volume") "mountPath" ("/opt/rstudio-connect/scripts") "subPath" ("scripts") }}
+      {{- $rscVolumeMountExt := dict "name" ("rsc-volume") "mountPath" ("/opt/rstudio-connect/ext") "subPath" ("ext") }}
+      {{- $jobJsonRuntimeMountR := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMountR") "json" ( $rscVolumeMountR ) }}
+      {{- $jobJsonRuntimeMountPython := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMountPython") "json" ( $rscVolumeMountPython ) }}
+      {{- $jobJsonRuntimeMountScripts := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMountScripts") "json" ( $rscVolumeMountScripts ) }}
+      {{- $jobJsonRuntimeMountExt := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMountExt") "json" ( $rscVolumeMountExt ) }}
     {{- /* 3 - init container */ -}}
       {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
       {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default (printf "%s%s" .Values.launcher.defaultInitContainer.tagPrefix $defaultVersion )}}
@@ -31,7 +37,7 @@ data:
     {{- /* set up job-json defaults */ -}}
       {{- $jobJsonDefaults := list }}
       {{- if and (not .Values.launcher.useTemplates) .Values.launcher.defaultInitContainer.enabled }}
-        {{- $jobJsonDefaults = list $jobJsonRuntimeVolume $jobJsonRuntimeMount $jobJsonInitContainer }}
+        {{- $jobJsonDefaults = list $jobJsonRuntimeVolume $jobJsonRuntimeMountR $jobJsonRuntimeMountPython $jobJsonRuntimeMountScripts $jobJsonRuntimeMountExt $jobJsonInitContainer }}
       {{- end }}
     {{- /* build the configuration for profiles */ -}}
       {{- $profilesConfig := .Values.launcher.launcherKubernetesProfilesConf }}
@@ -48,7 +54,7 @@ data:
       {{- $_ := set $sessionTemplate.pod "initContainers" $initList }}
       {{- $volumeList := append $sessionTemplate.pod.volumes $emptyRscVolume }}
       {{- $_ := set $sessionTemplate.pod "volumes" $volumeList }}
-      {{- $volumeMountList := append $sessionTemplate.pod.volumeMounts $rscVolumeMount }}
+      {{- $volumeMountList := concat $sessionTemplate.pod.volumeMounts (list $rscVolumeMountR $rscVolumeMountPython $rscVolumeMountScripts $rscVolumeMountExt ) }}
       {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
     {{- end }}
 {{- if not .Values.launcher.useTemplates }}
