@@ -133,7 +133,7 @@ containers:
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}
     {{- end }}
-    {{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
+    {{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret .Values.config.existingSecrets }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
@@ -316,7 +316,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-pam
     defaultMode: {{ .Values.config.defaultMode.pam }}
 {{- end }}
-{{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret }}
+{{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret .Values.config.existingSecrets }}
 - name: rstudio-secret
   projected:
     sources:
@@ -361,6 +361,16 @@ volumes:
         - key: database.conf
           path: database.conf
           mode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
+{{- range .Values.config.existingSecrets }}
+    - secret:
+        name: {{ .name }}
+        items:
+        {{- range .items }}
+        - key: {{ .key }}
+          path: {{ .path }}
+          mode: {{ $.Values.config.defaultMode.secret }}
+        {{- end }}
 {{- end }}
 {{- end }}
 {{- if .Values.config.userProvisioning }}

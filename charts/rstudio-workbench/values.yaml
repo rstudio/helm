@@ -520,6 +520,16 @@ config:
   sessionSecret: {}
   # -- a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions
   secret:
+  # -- a list of existing Kubernetes Secrets to project into `/mnt/secret-configmap/rstudio/`. Each item should have `name` (secret name) and `items` (list of keys to mount with their paths). Mounted with 0600 permissions by default.
+  existingSecrets: []
+  # - name: my-oidc-secret
+  #   items:
+  #   - key: openid-client-secret
+  #     path: openid-client-secret
+  # - name: my-custom-secret
+  #   items:
+  #   - key: custom-file.conf
+  #     path: custom-file.conf
   # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
   userProvisioning: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
