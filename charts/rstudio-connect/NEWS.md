@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.15
+
+- Bump Connect version to 2025.11.0
+
 ## 0.8.14
 
 - Use individual `R`, `python`, `scripts`, `ext` subPath mounts when mounting the `rsc-volume` EmptyDir
