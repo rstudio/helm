@@ -105,6 +105,19 @@ Alternatively, license files can be set during `helm install` with the following
 --set-file license.file.contents=licenses/rstudio-workbench.lic
 ```
 
+## Session Management
+
+By default, VSCode and Positron session pods do not have a timeout configured and may run indefinitely. To prevent excessive resource usage, it is recommended to configure the `session-timeout-kill-hours` setting.
+
+This should be configured in the `vscode.conf` and `positron.conf` files. In the Helm chart, you can set this using the `config` value:
+
+```yaml
+config:
+  vscode:
+    session-timeout-kill-hours: 10
+  positron:
+    session-timeout-kill-hours: 10
+
 ## Database
 
 Workbench requires a PostgreSQL database when running in Kubernetes. You must configure a [valid connection URI and a password](https://docs.posit.co/ide/server-pro/database/configuration.html#postgresql) for the product to function correctly. The `database.conf` values may be defined in either `config.database.conf` or `config.secret.database.conf`. The former permits using a `database.conf` file as an existing Kubernetes `Secret`. The latter will automatically create a Kubernetes `Secret` for `database.conf` based on the defined values. In either method of defining database configuration details in the `values.yaml` file, it is possible to include the database password in the configuration section, however, we recommend only adding the connection URI and putting the database password in a Kubernetes `Secret`, which can be [automatically set as an environment variable](#database-password).
