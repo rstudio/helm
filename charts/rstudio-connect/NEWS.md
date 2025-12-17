@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.16
+
+- Bump Connect version to 2025.12.0
+
 ## 0.8.15
 
 - Bump Connect version to 2025.11.0
