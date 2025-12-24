@@ -2,7 +2,7 @@
 
 ## 0.5.52
 
-- Update default Posit Package Manager version to 2025.12.0-12
+- Update default Posit Package Manager version to 2025.12.0-14
 
 ## 0.5.51
 
