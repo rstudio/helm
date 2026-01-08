@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.3
+
+- Bump Workbench version to 2026.01.0
+
 ## 0.10.2
 
 - Add support for `config.existingSecrets` to reference external Kubernetes Secrets.
