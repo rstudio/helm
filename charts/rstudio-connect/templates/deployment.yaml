@@ -219,6 +219,12 @@ spec:
             {{- end }}
           {{- end }}
           {{ include "rstudio-library.license-mount" (dict "license" ( .Values.license )) | indent 10 }}
+          {{- if .Values.nameservice.enabled }}
+          - name: nameservice-config
+            mountPath: "/etc/libnss_connect.conf"
+            subPath: "libnss_connect.conf"
+            readOnly: true
+          {{- end }}
       {{- if .Values.pod.volumeMounts }}
           {{- toYaml .Values.pod.volumeMounts | nindent 10 }}
       {{- end }}
@@ -288,6 +294,15 @@ spec:
       {{- end }}
       {{- if .Values.pod.volumes }}
 {{ toYaml .Values.pod.volumes | indent 6 }}
+      {{- end }}
+      {{- if .Values.nameservice.enabled }}
+      - name: nameservice-config
+        secret:
+          secretName: {{ .Values.nameservice.secretName | default (printf "%s-nameservice-config" (include "rstudio-connect.fullname" .)) }}
+          defaultMode: 0444
+          items:
+          - key: libnss_connect.conf
+            path: libnss_connect.conf
       {{- end }}
       {{- if .Values.launcher.enabled }}
       {{- if .Values.launcher.useTemplates }}

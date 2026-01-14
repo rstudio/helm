@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.17](https://img.shields.io/badge/Version-0.8.17-informational?style=flat-square) ![AppVersion: 2025.12.1](https://img.shields.io/badge/AppVersion-2025.12.1-informational?style=flat-square)
+![Version: 0.8.18](https://img.shields.io/badge/Version-0.8.18-informational?style=flat-square) ![AppVersion: 2025.12.1](https://img.shields.io/badge/AppVersion-2025.12.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.17:
+To install the chart with the release name `my-release` at version 0.8.18:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.17
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.18
 ```
 
 To explore other chart versions, look at:
@@ -278,6 +278,11 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | license.server | bool | `false` | server is the <hostname>:<port> for a license server |
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | Used to configure the container's livenessProbe. Only included if enabled = true |
 | nameOverride | string | `""` | The name of the chart deployment (can be overridden) |
+| nameservice | object | `{"apiKey":"","enabled":false,"secretName":"","server":"http://127.0.0.1:3939"}` | Nameservice configuration for current user execution (RunAsCurrentUser). This can only be enabled if using an SSO authentication provider (OAuth2, SAML, or LDAP). |
+| nameservice.apiKey | string | `""` | Connect API key for nameservice module. Must be a Viewer API key. |
+| nameservice.enabled | bool | `false` | Whether to enable nameservice integration. |
+| nameservice.secretName | string | `""` | Optional: name of existing secret containing libnss_connect.conf (overrides apiKey and server). The secret must be in the same namespace as the Connect deployment. |
+| nameservice.server | string | `"http://127.0.0.1:3939"` | Connect server URL for nameservice module. |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
 | pod.affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-connect pods |
