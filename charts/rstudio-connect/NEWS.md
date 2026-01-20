@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.19
+
+- Add release notes for 0.8.18
+
+## 0.8.18
+
+- Add nameservice configuration for current user execution. Requires Connect version 2026.01.0 or later. See the `nameservice.*` values in the README and values.yaml for details.
+
 ## 0.8.17
 
 - Bump Connect version to 2025.12.1
