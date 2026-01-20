@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.24
+
+- Fix bug in chart where launcher.templateValues.pod.securityContext did not respect configuration and complex mappings lead to launcher errors.
+
 ## 0.8.23
 
 - Bump Connect version to 2026.01.1

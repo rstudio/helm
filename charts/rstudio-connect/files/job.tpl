@@ -136,13 +136,11 @@ spec:
           {{- $groupIds = append $groupIds . }}
         {{- end }}
         {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
-        {{- $securityContext := mergeOverwrite $securityContext $templateData.pod.securityContext }}
       {{- end }}
       {{- if $securityContext }}
+      {{- $securityContext := mergeOverwrite $securityContext $templateData.pod.securityContext }}
       securityContext:
-        {{- range $key, $val := $securityContext }}
-        {{ $key }}: {{ $val }}
-        {{- end }}
+        {{- toYaml $securityContext | nindent 8 }}
       {{- end }}
       {{- with $templateData.pod.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 12 }}
