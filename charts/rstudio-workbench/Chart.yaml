@@ -1,8 +1,8 @@
 name: rstudio-workbench
 description: Official Helm chart for Posit Workbench
-version: 0.10.3
+version: 0.10.4
 apiVersion: v2
-appVersion: 2026.01.0
+appVersion: 2185.04.0
 icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
 home: https://www.rstudio.com
 sources:
@@ -18,9 +18,9 @@ dependencies:
 annotations:
   artifacthub.io/images: |
     - name: rstudio-workbench
-      image: rstudio/rstudio-workbench:ubuntu2204-2026.01.0
+      image: rstudio/rstudio-workbench:ubuntu2204-2185.04.0
     - name: r-session-complete
-      image: rstudio/r-session-complete:ubuntu2204-2026.01.0
+      image: rstudio/r-session-complete:ubuntu2204-2185.04.0
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images
@@ -32,13 +32,13 @@ annotations:
     - name: About RStudio Team
       url: https://www.rstudio.com/products/team/
 keywords:
-  - "data science"
-  - "machine learning"
-  - "r"
-  - "rstats"
-  - "python"
-  - "ide"
-  - "editor"
-  - "jupyter"
-  - "vscode"
-  - "rstudio"
+  - data science
+  - machine learning
+  - r
+  - rstats
+  - python
+  - ide
+  - editor
+  - jupyter
+  - vscode
+  - rstudio
