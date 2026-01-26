@@ -4,4 +4,4 @@ license:
     secretKey: pwb.lic
 
 secureCookieKey:
-  value: "testsecurecookiekey"
+  value: "testsecurecookiekeyvalue1234567890"
