@@ -3,6 +3,7 @@ license:
     secret: pwb-license
     secretKey: pwb.lic
 
+# Created a private key with openssl genrsa -out launcher.pem 4096 for testing purposes
 launcherPem:
   value: "-----BEGIN PRIVATE KEY-----
 MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQCpyX4nFjgWmqkT
