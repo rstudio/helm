@@ -5,4 +5,4 @@ license:
 
 global:
   secureCookieKey:
-    value: "testsecurecookiekey1234567890"
+    value: "testsecurecookiekeyvalue1234567890"
