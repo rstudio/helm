@@ -133,7 +133,9 @@ containers:
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}
     {{- end }}
-    {{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret .Values.config.existingSecrets }}
+    {{- /* Mount rstudio-secret volume when any secret content needs to be available in the pod.
+           This includes both existingSecret references AND direct .value settings for launcherPem and secureCookieKey. */ -}}
+    {{- if or .Values.launcherPem.existingSecret .Values.launcherPem.value .Values.secureCookieKey.existingSecret .Values.secureCookieKey.value .Values.global.secureCookieKey.existingSecret .Values.global.secureCookieKey.value .Values.config.database.conf.existingSecret .Values.config.secret .Values.config.existingSecrets }}
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
@@ -316,7 +318,9 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-pam
     defaultMode: {{ .Values.config.defaultMode.pam }}
 {{- end }}
-{{- if or .Values.launcherPem.existingSecret .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret .Values.config.database.conf.existingSecret .Values.config.secret .Values.config.existingSecrets }}
+{{- /* Create rstudio-secret volume when any secret content needs to be projected into the pod.
+       This includes both existingSecret references AND direct .value settings for launcherPem and secureCookieKey. */ -}}
+{{- if or .Values.launcherPem.existingSecret .Values.launcherPem.value .Values.secureCookieKey.existingSecret .Values.secureCookieKey.value .Values.global.secureCookieKey.existingSecret .Values.global.secureCookieKey.value .Values.config.database.conf.existingSecret .Values.config.secret .Values.config.existingSecrets }}
 - name: rstudio-secret
   projected:
     sources:
@@ -338,6 +342,15 @@ volumes:
           path: launcher.pem
           mode: {{ .Values.config.defaultMode.secret }}
 {{- end }}
+{{- /* Project launcher.pem from chart-managed secret when using .value (not existingSecret). */ -}}
+{{- if and .Values.launcherPem.value (not .Values.launcherPem.existingSecret) }}
+    - secret:
+        name: {{ include "rstudio-workbench.fullname" . }}-secret
+        items:
+        - key: launcher.pem
+          path: launcher.pem
+          mode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
 {{- if and .Values.secureCookieKey.existingSecret (not .Values.global.secureCookieKey.existingSecret) }}
     - secret:
         name: {{ .Values.secureCookieKey.existingSecret }}
@@ -349,6 +362,17 @@ volumes:
 {{- if .Values.global.secureCookieKey.existingSecret }}
     - secret:
         name: {{ .Values.global.secureCookieKey.existingSecret }}
+        items:
+        - key: secure-cookie-key
+          path: secure-cookie-key
+          mode: {{ .Values.config.defaultMode.secret }}
+{{- end }}
+{{- /* Project secure-cookie-key from chart-managed secret when using .value (not existingSecret).
+       This handles the case where secureCookieKey.value or global.secureCookieKey.value is set directly,
+       or when the key is auto-generated. */ -}}
+{{- if and (or .Values.secureCookieKey.value .Values.global.secureCookieKey.value) (not (or .Values.secureCookieKey.existingSecret .Values.global.secureCookieKey.existingSecret)) }}
+    - secret:
+        name: {{ include "rstudio-workbench.fullname" . }}-secret
         items:
         - key: secure-cookie-key
           path: secure-cookie-key
