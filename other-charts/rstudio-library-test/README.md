@@ -40,18 +40,20 @@ The test suite covers all `rstudio-library` template functions:
 ## Test Structure
 
 Each test file follows this pattern:
-1. Includes only the specific test template being tested
-2. Sets only the relevant test values, nullifying others to prevent interference
+1. Includes the base values file (`tests/_base_values.yaml`) which nullifies all test categories
+2. Overrides only the specific test values needed for that test
 3. Uses assertions to verify expected output
+
+The `_base_values.yaml` file provides test isolation by setting all test categories to `null`, preventing unrelated templates from rendering during tests.
 
 ## Adding New Tests
 
 When adding tests for new `rstudio-library` templates:
 
 1. Create a test template in `templates/test-*.yaml` that invokes the library template
-2. Add test values to `values.yaml`
-3. Create a test file in `tests/*_test.yaml` with assertions
-4. Ensure test isolation by setting unrelated test values to `null`
+2. Add test values to `values.yaml` with documentation comments
+3. Update `tests/_base_values.yaml` to include the new test category (set to `null`)
+4. Create a test file in `tests/*_test.yaml` that includes `_base_values.yaml` and overrides only needed values
 
 ## Manual Verification
 
