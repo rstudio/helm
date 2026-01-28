@@ -1,67 +1,91 @@
+
+
 # rstudio-library-test
 
-Test harness chart for unit testing the `rstudio-library` Helm library chart.
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
-## Overview
+Test harness for rstudio-library templates
 
-Helm library charts cannot be installed or tested directly because they only define template functions. This test harness chart depends on `rstudio-library` and creates test templates that exercise all library functions, enabling comprehensive unit testing with [helm-unittest](https://github.com/helm-unittest/helm-unittest).
+## Requirements
 
-## Prerequisites
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../../charts/rstudio-library | rstudio-library | 0.1.35 |
 
-- Helm 3.x
-- helm-unittest plugin: `helm plugin install https://github.com/helm-unittest/helm-unittest.git`
+## Values
 
-## Running Tests
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| testChronicle.enabled | bool | `true` |  |
+| testChronicle.image.registry | string | `"ghcr.io"` |  |
+| testChronicle.image.repository | string | `"rstudio/chronicle-agent"` |  |
+| testChronicle.image.tag | string | `"1.0.0"` |  |
+| testChronicle.serverAddress | string | `"http://chronicle-server.default:8080"` |  |
+| testChronicle.serverNamespace | string | `""` |  |
+| testConfig.dcf.config.key1 | string | `"value1"` |  |
+| testConfig.dcf.config.nested.subkey | string | `"subvalue"` |  |
+| testConfig.dcf.filename | string | `"test.dcf"` |  |
+| testConfig.gcfg.config.section1.key1 | string | `"value1"` |  |
+| testConfig.gcfg.config.section1.key2 | string | `"value2"` |  |
+| testConfig.gcfg.config.section2.arrayKey[0] | string | `"item1"` |  |
+| testConfig.gcfg.config.section2.arrayKey[1] | string | `"item2"` |  |
+| testConfig.gcfg.filename | string | `"test.gcfg"` |  |
+| testConfig.ini.config.section1.key1 | string | `"value1"` |  |
+| testConfig.ini.config.section1.key2 | int | `123` |  |
+| testConfig.ini.filename | string | `"test.ini"` |  |
+| testConfig.json.config.arrayKey[0] | string | `"item1"` |  |
+| testConfig.json.config.arrayKey[1] | string | `"item2"` |  |
+| testConfig.json.config.boolKey | bool | `true` |  |
+| testConfig.json.config.numberKey | int | `42` |  |
+| testConfig.json.config.stringKey | string | `"stringValue"` |  |
+| testConfig.json.filename | string | `"test.json"` |  |
+| testConfig.txt.config.key1 | string | `"value1"` |  |
+| testConfig.txt.config.key2 | string | `"value2"` |  |
+| testConfig.txt.filename | string | `"test.txt"` |  |
+| testDebug.boolValue | bool | `true` |  |
+| testDebug.mapValue.key | string | `"value"` |  |
+| testDebug.sliceValue[0] | string | `"item1"` |  |
+| testDebug.sliceValue[1] | string | `"item2"` |  |
+| testDebug.stringValue | string | `"test string"` |  |
+| testIngress.path | string | `"/test"` |  |
+| testIngress.pathType | string | `"Prefix"` |  |
+| testIngress.serviceName | string | `"test-service"` |  |
+| testIngress.servicePort | int | `8080` |  |
+| testLauncherTemplates.content.key1 | string | `"value1"` |  |
+| testLauncherTemplates.content.key2 | string | `"value2"` |  |
+| testLauncherTemplates.content.nested.subkey | string | `"subvalue"` |  |
+| testLauncherTemplates.templateName | string | `"test-template"` |  |
+| testLicense.licenseFile | string | `"LICENSE CONTENT HERE\n"` |  |
+| testLicense.licenseKey | string | `"test-license-key"` |  |
+| testLicense.licenseServer | string | `"license.example.com"` |  |
+| testProfiles.advanced.data."launcher.kubernetes.profiles.conf".*.default-cpus | int | `1` |  |
+| testProfiles.advanced.data."launcher.kubernetes.profiles.conf".testuser.default-cpus | int | `4` |  |
+| testProfiles.advanced.filePath | string | `"/etc/rstudio/"` |  |
+| testProfiles.advanced.jobJsonDefaults | list | `[]` |  |
+| testProfiles.basicIni."launcher.kubernetes.profiles.conf".*.default-cpus | int | `1` |  |
+| testProfiles.basicIni."launcher.kubernetes.profiles.conf".*.default-mem-mb | int | `512` |  |
+| testProfiles.basicIni."launcher.kubernetes.profiles.conf".testuser.default-cpus | int | `2` |  |
+| testProfiles.collapseArray.simple[0] | string | `"one"` |  |
+| testProfiles.collapseArray.simple[1] | string | `"two"` |  |
+| testProfiles.collapseArray.simple[2] | string | `"three"` |  |
+| testProfiles.collapseArray.targetFile[0].file | string | `"/etc/config/pods.json"` |  |
+| testProfiles.collapseArray.targetFile[0].target | string | `"pods"` |  |
+| testProfiles.collapseArray.targetFile[1].file | string | `"/etc/config/services.json"` |  |
+| testProfiles.collapseArray.targetFile[1].target | string | `"services"` |  |
+| testProfiles.singleFile.*.job-name | string | `"default-job"` |  |
+| testProfiles.singleFile.testuser.job-name | string | `"user-job"` |  |
+| testRbac.annotations | object | `{}` |  |
+| testRbac.clusterRoleCreate | bool | `false` |  |
+| testRbac.labels | object | `{}` |  |
+| testRbac.namespace | string | `"test-namespace"` |  |
+| testRbac.removeNamespaceReferences | bool | `false` |  |
+| testRbac.serviceAccountCreate | bool | `true` |  |
+| testRbac.serviceAccountName | string | `"test-sa"` |  |
+| testRbac.targetNamespace | string | `"test-target"` |  |
+| testTplvalues.objectValue.name | string | `"{{ .Release.Name }}"` |  |
+| testTplvalues.objectValue.namespace | string | `"{{ .Release.Namespace }}"` |  |
+| testTplvalues.staticValue | string | `"static"` |  |
+| testTplvalues.templateValue | string | `"{{ .Release.Name }}-suffix"` |  |
 
-```bash
-# Update dependencies first
-helm dependency update other-charts/rstudio-library-test
-
-# Run all tests
-helm unittest other-charts/rstudio-library-test
-```
-
-## Test Coverage
-
-The test suite covers all `rstudio-library` template functions:
-
-| Test File | Library Templates Tested |
-|-----------|-------------------------|
-| `config_test.yaml` | `config.gcfg`, `config.ini`, `config.dcf`, `config.json`, `config.txt` |
-| `ingress_test.yaml` | `ingress.apiVersion`, `ingress.path`, `ingress.backend`, `ingress.supportsIngressClassName`, `ingress.supportsPathType` |
-| `license_test.yaml` | `license-env`, `license-mount`, `license-volume`, `license-secret` |
-| `rbac_test.yaml` | `rbac` (ServiceAccount, Role, RoleBinding, ClusterRole) |
-| `profiles_test.yaml` | `profiles.ini`, `profiles.ini.singleFile`, `profiles.ini.collapse-array`, `profiles.ini.advanced`, `profiles.json-from-overrides-config`, `profiles.apply-everyone-and-default-to-others` |
-| `debug_test.yaml` | `debug.type-check` |
-| `launcher_templates_test.yaml` | `templates.skeleton`, `templates.dataOutput`, `templates.dataOutputPretty` |
-| `tplvalues_test.yaml` | `tplvalues.render` |
-| `chronicle_agent_test.yaml` | `chronicle-agent.image`, `chronicle-agent.serverAddress` |
-
-## Test Structure
-
-Each test file follows this pattern:
-1. Includes the base values file (`tests/_base_values.yaml`) which nullifies all test categories
-2. Overrides only the specific test values needed for that test
-3. Uses assertions to verify expected output
-
-The `_base_values.yaml` file provides test isolation by setting all test categories to `null`, preventing unrelated templates from rendering during tests.
-
-## Adding New Tests
-
-When adding tests for new `rstudio-library` templates:
-
-1. Create a test template in `templates/test-*.yaml` that invokes the library template
-2. Add test values to `values.yaml` with documentation comments
-3. Update `tests/_base_values.yaml` to include the new test category (set to `null`)
-4. Create a test file in `tests/*_test.yaml` that includes `_base_values.yaml` and overrides only needed values
-
-## Manual Verification
-
-To manually verify template output:
-
-```bash
-helm template test-release other-charts/rstudio-library-test
-
-# Test specific template
-helm template test-release other-charts/rstudio-library-test -s templates/test-config.yaml
-```
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
