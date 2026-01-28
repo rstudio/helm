@@ -5,7 +5,7 @@ type: library
 version: 0.1.35
 appVersion: 0.1.35
 
-icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
 home: https://www.rstudio.com
 sources:
   - https://github.com/rstudio/helm
