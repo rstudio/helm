@@ -1,0 +1,40 @@
+{{/*
+Test templates for rstudio-library debug helpers.
+The type-check template either succeeds silently or fails with an error.
+We test this by passing various types and checking for success/failure.
+*/}}
+
+{{- if .Values.testDebug }}
+
+{{- /* Test passing type checks - these should succeed silently */}}
+{{- if .Values.testDebug.mapValue }}
+{{- include "rstudio-library.debug.type-check" (dict "name" "testMap" "object" .Values.testDebug.mapValue "expected" "map" "description" "test map value") }}
+{{- end }}
+
+{{- if .Values.testDebug.sliceValue }}
+{{- include "rstudio-library.debug.type-check" (dict "name" "testSlice" "object" .Values.testDebug.sliceValue "expected" "slice" "description" "test slice value") }}
+{{- end }}
+
+{{- if .Values.testDebug.stringValue }}
+{{- include "rstudio-library.debug.type-check" (dict "name" "testString" "object" .Values.testDebug.stringValue "expected" "string" "description" "test string value") }}
+{{- end }}
+
+{{- if .Values.testDebug.boolValue }}
+{{- include "rstudio-library.debug.type-check" (dict "name" "testBool" "object" .Values.testDebug.boolValue "expected" "bool" "description" "test bool value") }}
+{{- end }}
+
+{{- /* Test failing type check - this should fail */}}
+{{- if .Values.testDebug.failingCheck }}
+{{- include "rstudio-library.debug.type-check" (dict "name" .Values.testDebug.failingCheck.name "object" .Values.testDebug.failingCheck.object "expected" .Values.testDebug.failingCheck.expected "description" .Values.testDebug.failingCheck.description) }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-debug-success
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  status: "type-checks-passed"
+{{- end }}

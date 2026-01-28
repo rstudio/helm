@@ -1,0 +1,48 @@
+{{/*
+Test templates for rstudio-library launcher template helpers.
+These generate Helm template definitions that can be used in launcher configurations.
+*/}}
+
+{{- if .Values.testLauncherTemplates }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-launcher-skeleton
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  template.tpl: |
+    {{- include "rstudio-library.templates.skeleton" (dict "name" .Values.testLauncherTemplates.templateName "value" .Values.testLauncherTemplates.content) | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-launcher-data-output
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  template.tpl: |
+    {{- include "rstudio-library.templates.dataOutput" (dict "name" .Values.testLauncherTemplates.templateName "value" .Values.testLauncherTemplates.content) | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-launcher-data-output-pretty
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  template.tpl: |
+    {{- include "rstudio-library.templates.dataOutputPretty" (dict "name" .Values.testLauncherTemplates.templateName "value" .Values.testLauncherTemplates.content) | nindent 4 }}
+{{- /* Test with trailingDash=false */}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-launcher-no-trailing-dash
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  template.tpl: |
+    {{- include "rstudio-library.templates.skeleton" (dict "name" .Values.testLauncherTemplates.templateName "value" .Values.testLauncherTemplates.content "trailingDash" false) | nindent 4 }}
+{{- end }}

@@ -1,0 +1,17 @@
+{{/*
+Test templates for rstudio-library RBAC helper.
+Outputs RBAC resources directly.
+*/}}
+
+{{- if .Values.testRbac }}
+{{- include "rstudio-library.rbac" (dict
+    "namespace" .Values.testRbac.namespace
+    "targetNamespace" .Values.testRbac.targetNamespace
+    "serviceAccountName" .Values.testRbac.serviceAccountName
+    "serviceAccountCreate" .Values.testRbac.serviceAccountCreate
+    "serviceAccountAnnotations" .Values.testRbac.annotations
+    "serviceAccountLabels" .Values.testRbac.labels
+    "clusterRoleCreate" .Values.testRbac.clusterRoleCreate
+    "removeNamespaceReferences" (default false .Values.testRbac.removeNamespaceReferences)
+) }}
+{{- end }}
