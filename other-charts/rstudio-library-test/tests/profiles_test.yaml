@@ -188,6 +188,22 @@ tests:
   # ========================================
   # Type Safety Tests
   # ========================================
+  - it: should not render basicIni when value is a string instead of map
+    set:
+      testProfiles:
+        basicIni: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render singleFile when value is a string instead of map
+    set:
+      testProfiles:
+        singleFile: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: should not render collapseArray when value is a string instead of map
     set:
       testProfiles:

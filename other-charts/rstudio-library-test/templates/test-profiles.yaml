@@ -6,7 +6,7 @@ Outputs profile configurations to ConfigMaps for testing.
 {{- if .Values.testProfiles }}
 
 {{- /* Test basic profiles.ini */}}
-{{- if .Values.testProfiles.basicIni }}
+{{- if and .Values.testProfiles.basicIni (kindIs "map" .Values.testProfiles.basicIni) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -19,7 +19,7 @@ data:
 {{- end }}
 
 {{- /* Test profiles.ini.singleFile */}}
-{{- if .Values.testProfiles.singleFile }}
+{{- if and .Values.testProfiles.singleFile (kindIs "map" .Values.testProfiles.singleFile) }}
 ---
 apiVersion: v1
 kind: ConfigMap

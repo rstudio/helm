@@ -174,11 +174,15 @@ jobs:
         run: kubectl create namespace posit-test
 
       - name: Create License File Secrets
+        env:
+          PWB_LICENSE: ${{ secrets.PWB_LICENSE_FILE }}
+          PCT_LICENSE: ${{ secrets.PCT_LICENSE_FILE }}
+          PPM_LICENSE: ${{ secrets.PPM_LICENSE_FILE }}
         run: |
-          # Use stdin to avoid writing secrets to disk
-          printf '%s' "${{ secrets.PWB_LICENSE_FILE }}" | kubectl create secret generic pwb-license --from-file=pwb.lic=/dev/stdin --namespace posit-test
-          printf '%s' "${{ secrets.PCT_LICENSE_FILE }}" | kubectl create secret generic pct-license --from-file=pct.lic=/dev/stdin --namespace posit-test
-          printf '%s' "${{ secrets.PPM_LICENSE_FILE }}" | kubectl create secret generic ppm-license --from-file=ppm.lic=/dev/stdin --namespace posit-test
+          # Use env vars and stdin to avoid secrets in temp files and command line args
+          printf '%s' "$PWB_LICENSE" | kubectl create secret generic pwb-license --from-file=pwb.lic=/dev/stdin --namespace posit-test
+          printf '%s' "$PCT_LICENSE" | kubectl create secret generic pct-license --from-file=pct.lic=/dev/stdin --namespace posit-test
+          printf '%s' "$PPM_LICENSE" | kubectl create secret generic ppm-license --from-file=ppm.lic=/dev/stdin --namespace posit-test
 
       - name: Create Workbench Secrets to test existingSecrets
         run: |
