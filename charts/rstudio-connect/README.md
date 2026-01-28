@@ -22,7 +22,7 @@ To ensure reproducibility in your environment and insulate yourself from future 
     * the `--version` flag.
 
       :::{.callout-important}
-      This protects you from breaking changes**
+      This protects you from breaking changes.
       :::
 
 * Before upgrading check for breaking changes using `helm-diff` plugin and `helm diff upgrade`.

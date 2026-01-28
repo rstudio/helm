@@ -10,7 +10,7 @@ Each example has a beginning description and a series of `TODO` comments.
 
 Before using an example, read through all the comments and ensure you address each `TODO`.
 
-While each example focuses on one or more particular configurations, RStudio Workbench has some standard requirements listed in each example. 
+While each example focuses on one or more particular configurations, Posit Workbench has some standard requirements listed in each example. 
 
 Each example needs the following to run correctly:
 

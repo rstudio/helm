@@ -4,9 +4,9 @@ category: "Authentication"
 
 # Configuring Posit Connect with OpenID Connect
 
-This example deploys Posit Connect using OpenID Connect (OIDC) SSO for authentication.
+This example deploys Posit Connect using OpenID Connect (OIDC) Single Sign-On (SSO) for authentication.
 
-Users will be authenticated via SSO (using OIDC) and then users will be created in Connect upon first login or upon creation via the Connect API. Connect will populate user information based on certain claims received from the IdP. See the [Customizing OpenID Connect](https://docs.posit.co/connect/admin/authentication/oauth2-openid-based/openid-connect/#customizing-openid-connect) section of the Connect Admin Guide for a list of the default claims mapping, which can be adjusted if needed.
+Users authenticate via SSO (using OIDC) and Connect creates user accounts upon first login or upon creation via the Connect API. Connect will populate user information based on certain claims received from the IdP. See the [Customizing OpenID Connect](https://docs.posit.co/connect/admin/authentication/oauth2-openid-based/openid-connect/#customizing-openid-connect) section of the Connect Admin Guide for a list of the default claims mapping, which can be adjusted if needed.
 
 By default all users get created with the Viewer role which is the default setting in [`Authorization.DefaultUserRole`](https://docs.posit.co/connect/admin/appendix/configuration/#Authorization.DefaultUserRole). Users can be [automatically mapped to different roles](https://docs.posit.co/connect/admin/authentication/oauth2-openid-based/openid-connect/#user-role-mapping) based on group membership.
 
