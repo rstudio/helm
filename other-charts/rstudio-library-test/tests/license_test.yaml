@@ -4,15 +4,14 @@ templates:
 values:
   - _base_values.yaml
 
-# Note: License templates output multiple document types (Secrets and ConfigMaps)
-# which makes document-index based assertions unreliable. These tests verify
-# basic rendering - for detailed verification, use `helm template` manually.
+# Note: License templates output multiple document types.
+# Document order: 0=ConfigMap (env), 1=ConfigMap (mount), 2=ConfigMap (volume), 3+=Secrets
 
 tests:
   # ========================================
-  # License Template Rendering Tests
+  # License Key Configuration Tests
   # ========================================
-  - it: should render license template with key configured
+  - it: should create license secret with key configured
     set:
       testLicense:
         licenseKey: "SECRET-KEY-12345"
@@ -21,7 +20,36 @@ tests:
     asserts:
       - hasDocuments:
           count: 4
+      - isKind:
+          of: Secret
+        documentIndex: 3
+      - equal:
+          path: stringData["test-product"]
+          value: "SECRET-KEY-12345"
+        documentIndex: 3
 
+  - it: should create env ConfigMap with license environment variable
+    set:
+      testLicense:
+        licenseKey: "SECRET-KEY-12345"
+        licenseServer: ""
+        licenseFile: ""
+    asserts:
+      - isKind:
+          of: ConfigMap
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: test-license-env
+        documentIndex: 0
+      - matchRegex:
+          path: data["env.yaml"]
+          pattern: "TEST_LICENSE"
+        documentIndex: 0
+
+  # ========================================
+  # License File Configuration Tests
+  # ========================================
   - it: should render license template with file configured
     set:
       testLicense:
@@ -33,7 +61,10 @@ tests:
       - hasDocuments:
           count: 4
 
-  - it: should render license template with all options configured
+  # ========================================
+  # Full Configuration Tests
+  # ========================================
+  - it: should render all documents with all options configured
     set:
       testLicense:
         licenseKey: "KEY"
@@ -44,7 +75,10 @@ tests:
       - hasDocuments:
           count: 5
 
-  - it: should include release name in license resources
+  # ========================================
+  # Release Context Tests
+  # ========================================
+  - it: should include release name in secret name
     set:
       testLicense:
         licenseKey: "TEST-KEY"
@@ -53,9 +87,7 @@ tests:
     release:
       name: my-app
     asserts:
-      - hasDocuments:
-          count: 4
       - matchRegex:
           path: metadata.name
-          pattern: "test-license"
-        documentIndex: 0
+          pattern: "my-app-license"
+        documentIndex: 3

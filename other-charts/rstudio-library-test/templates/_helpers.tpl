@@ -1,17 +1,16 @@
 {{/*
-Test harness helpers for rstudio-library templates.
-These helpers invoke library templates and wrap output for testing.
+Standard Helm chart helpers for the test harness.
 */}}
 
 {{/*
-Chart name
+Expand the name of the chart.
 */}}
 {{- define "rstudio-library-test.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Fully qualified app name
+Create a default fully qualified app name.
 */}}
 {{- define "rstudio-library-test.fullname" -}}
 {{- if .Values.fullnameOverride }}
