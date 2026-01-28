@@ -264,3 +264,34 @@ tests:
       - matchRegex:
           path: data["config.txt"]
           pattern: "value1"
+
+  # ========================================
+  # Empty/Null Value Tests
+  # ========================================
+  - it: should render gcfg with empty config section
+    set:
+      testConfig:
+        gcfg:
+          filename: empty.gcfg
+          config:
+            EmptySection: {}
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: data["empty.gcfg"]
+          pattern: "\\[EmptySection\\]"
+
+  - it: should render ini with empty section
+    set:
+      testConfig:
+        ini:
+          filename: empty.ini
+          config:
+            empty_section: {}
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: data["empty.ini"]
+          pattern: "\\[empty_section\\]"

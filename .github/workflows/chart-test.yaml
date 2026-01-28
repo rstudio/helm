@@ -92,15 +92,18 @@ jobs:
       - name: Run chart unit tests
         id: unittest
         run: |
-          for dir in $(ls -d charts/*/); do
-            pushd $dir; helm dependencies update; popd
-            helm unittest $dir
+          # Process charts directory
+          for dir in charts/*/; do
+            [ -d "$dir" ] || continue
+            (cd "$dir" && helm dependencies update)
+            helm unittest "$dir"
           done
           # Run tests for charts in other-charts/ directory
-          for dir in $(ls -d other-charts/*/); do
+          for dir in other-charts/*/; do
+            [ -d "$dir" ] || continue
             if [ -d "$dir/tests" ]; then
-              pushd $dir; helm dependencies update; popd
-              helm unittest $dir
+              (cd "$dir" && helm dependencies update)
+              helm unittest "$dir"
             fi
           done
         continue-on-error: true
@@ -172,15 +175,10 @@ jobs:
 
       - name: Create License File Secrets
         run: |
-          echo "${{ secrets.PWB_LICENSE_FILE }}" > pwb.lic
-          kubectl create secret generic pwb-license --from-file=pwb.lic --namespace posit-test
-          rm pwb.lic
-          echo "${{ secrets.PCT_LICENSE_FILE }}" > pct.lic
-          kubectl create secret generic pct-license --from-file=pct.lic --namespace posit-test
-          rm pct.lic
-          echo "${{ secrets.PPM_LICENSE_FILE }}" > ppm.lic
-          kubectl create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
-          rm ppm.lic
+          # Use stdin to avoid writing secrets to disk
+          printf '%s' "${{ secrets.PWB_LICENSE_FILE }}" | kubectl create secret generic pwb-license --from-file=pwb.lic=/dev/stdin --namespace posit-test
+          printf '%s' "${{ secrets.PCT_LICENSE_FILE }}" | kubectl create secret generic pct-license --from-file=pct.lic=/dev/stdin --namespace posit-test
+          printf '%s' "${{ secrets.PPM_LICENSE_FILE }}" | kubectl create secret generic ppm-license --from-file=ppm.lic=/dev/stdin --namespace posit-test
 
       - name: Create Workbench Secrets to test existingSecrets
         run: |

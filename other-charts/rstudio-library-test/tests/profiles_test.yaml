@@ -184,3 +184,38 @@ tests:
       - matchRegex:
           path: data["profiles.conf"]
           pattern: "shared-setting=everyone-value"
+
+  # ========================================
+  # Type Safety Tests
+  # ========================================
+  - it: should not render collapseArray when value is a string instead of map
+    set:
+      testProfiles:
+        collapseArray: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render advanced when value is a string instead of map
+    set:
+      testProfiles:
+        advanced: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render jsonOverrides when value is a string instead of map
+    set:
+      testProfiles:
+        jsonOverrides: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render applyEveryone when value is a string instead of map
+    set:
+      testProfiles:
+        applyEveryone: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0

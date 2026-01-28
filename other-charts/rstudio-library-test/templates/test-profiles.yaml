@@ -33,7 +33,7 @@ data:
 {{- end }}
 
 {{- /* Test profiles.ini.collapse-array */}}
-{{- if .Values.testProfiles.collapseArray }}
+{{- if and .Values.testProfiles.collapseArray (kindIs "map" .Values.testProfiles.collapseArray) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -43,13 +43,13 @@ metadata:
     {{- include "rstudio-library-test.labels" . | nindent 4 }}
 data:
   simple: {{ include "rstudio-library.profiles.ini.collapse-array" .Values.testProfiles.collapseArray.simple | quote }}
-  {{- if .Values.testProfiles.collapseArray.targetFile }}
+  {{- if and (hasKey .Values.testProfiles.collapseArray "targetFile") .Values.testProfiles.collapseArray.targetFile }}
   targetFile: {{ include "rstudio-library.profiles.ini.collapse-array" .Values.testProfiles.collapseArray.targetFile | quote }}
   {{- end }}
 {{- end }}
 
 {{- /* Test profiles.ini.advanced */}}
-{{- if .Values.testProfiles.advanced }}
+{{- if and .Values.testProfiles.advanced (kindIs "map" .Values.testProfiles.advanced) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -66,7 +66,7 @@ data:
 {{- end }}
 
 {{- /* Test profiles.json-from-overrides-config */}}
-{{- if .Values.testProfiles.jsonOverrides }}
+{{- if and .Values.testProfiles.jsonOverrides (kindIs "map" .Values.testProfiles.jsonOverrides) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -82,7 +82,7 @@ data:
 {{- end }}
 
 {{- /* Test profiles.apply-everyone-and-default-to-others */}}
-{{- if .Values.testProfiles.applyEveryone }}
+{{- if and .Values.testProfiles.applyEveryone (kindIs "map" .Values.testProfiles.applyEveryone) }}
 ---
 apiVersion: v1
 kind: ConfigMap
