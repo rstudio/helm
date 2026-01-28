@@ -49,11 +49,8 @@ testIngress:
 
 # License helper test values
 testLicense:
-  # Test license key
   licenseKey: "test-license-key"
-  # Test license server
   licenseServer: "license.example.com"
-  # Test license file
   licenseFile: |
     LICENSE CONTENT HERE
 
@@ -64,16 +61,57 @@ testRbac:
   clusterRoleCreate: false
   namespace: test-namespace
   targetNamespace: test-target
+  removeNamespaceReferences: false
   labels: {}
   annotations: {}
 
 # Profiles test values
 testProfiles:
-  launcherJobsConf:
+  # Basic INI test
+  basicIni:
+    launcher.kubernetes.profiles.conf:
+      "*":
+        default-cpus: 1
+        default-mem-mb: 512
+      testuser:
+        default-cpus: 2
+  # Single file test
+  singleFile:
     "*":
-      job-name: "test-job"
-    testUser:
-      job-name: "user-job"
+      job-name: default-job
+    testuser:
+      job-name: user-job
+  # Collapse array test
+  collapseArray:
+    simple:
+      - one
+      - two
+      - three
+    targetFile:
+      - target: pods
+        file: /etc/config/pods.json
+      - target: services
+        file: /etc/config/services.json
+  # Advanced profiles test
+  advanced:
+    data:
+      launcher.kubernetes.profiles.conf:
+        "*":
+          default-cpus: 1
+        testuser:
+          default-cpus: 4
+    jobJsonDefaults: []
+    filePath: /etc/rstudio/
+
+# Debug helper test values
+testDebug:
+  mapValue:
+    key: value
+  sliceValue:
+    - item1
+    - item2
+  stringValue: "test string"
+  boolValue: true
 
 # Launcher template test values
 testLauncherTemplates:
@@ -81,16 +119,23 @@ testLauncherTemplates:
   content:
     key1: value1
     key2: value2
+    nested:
+      subkey: subvalue
 
 # Tplvalues test values
 testTplvalues:
   staticValue: "static"
   templateValue: "{{ .Release.Name }}-suffix"
+  objectValue:
+    name: "{{ .Release.Name }}"
+    namespace: "{{ .Release.Namespace }}"
 
 # Chronicle agent test values
 testChronicle:
-  enabled: false
-  serverAddress: ""
+  enabled: true
+  serverAddress: "http://chronicle-server.default:8080"
+  serverNamespace: ""
   image:
-    repository: ghcr.io/rstudio/chronicle-agent
-    tag: ""
+    registry: ghcr.io
+    repository: rstudio/chronicle-agent
+    tag: "1.0.0"

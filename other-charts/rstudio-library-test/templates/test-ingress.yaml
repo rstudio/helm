@@ -1,0 +1,48 @@
+{{/*
+Test templates for rstudio-library ingress helpers.
+Outputs computed ingress values to ConfigMap for testing.
+*/}}
+
+{{- if .Values.testIngress }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-ingress-values
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  apiVersion: {{ include "rstudio-library.ingress.apiVersion" . }}
+  supportsIngressClassName: {{ include "rstudio-library.ingress.supportsIngressClassName" (include "rstudio-library.ingress.apiVersion" .) }}
+  supportsPathType: {{ include "rstudio-library.ingress.supportsPathType" (include "rstudio-library.ingress.apiVersion" .) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-ingress-path-string
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  path.yaml: |
+    {{- include "rstudio-library.ingress.path" (dict "apiVersion" (include "rstudio-library.ingress.apiVersion" .) "pathData" .Values.testIngress.path) | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-ingress-path-object
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  path.yaml: |
+    {{- include "rstudio-library.ingress.path" (dict "apiVersion" (include "rstudio-library.ingress.apiVersion" .) "pathData" (dict "path" .Values.testIngress.path "pathType" .Values.testIngress.pathType)) | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-ingress-backend
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  backend.yaml: |
+    {{- include "rstudio-library.ingress.backend" (dict "apiVersion" (include "rstudio-library.ingress.apiVersion" .) "svcName" .Values.testIngress.serviceName "svcPort" .Values.testIngress.servicePort) | nindent 4 }}
+{{- end }}

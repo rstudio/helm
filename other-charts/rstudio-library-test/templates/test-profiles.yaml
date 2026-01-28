@@ -1,0 +1,102 @@
+{{/*
+Test templates for rstudio-library profiles helpers.
+Outputs profile configurations to ConfigMaps for testing.
+*/}}
+
+{{- if .Values.testProfiles }}
+
+{{- /* Test basic profiles.ini */}}
+{{- if .Values.testProfiles.basicIni }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-profiles-ini
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.profiles.ini" .Values.testProfiles.basicIni | nindent 2 }}
+{{- end }}
+
+{{- /* Test profiles.ini.singleFile */}}
+{{- if .Values.testProfiles.singleFile }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-profiles-single-file
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  profiles.conf: |
+    {{- include "rstudio-library.profiles.ini.singleFile" .Values.testProfiles.singleFile | nindent 4 }}
+{{- end }}
+
+{{- /* Test profiles.ini.collapse-array */}}
+{{- if .Values.testProfiles.collapseArray }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-profiles-collapse-array
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  simple: {{ include "rstudio-library.profiles.ini.collapse-array" .Values.testProfiles.collapseArray.simple | quote }}
+  {{- if .Values.testProfiles.collapseArray.targetFile }}
+  targetFile: {{ include "rstudio-library.profiles.ini.collapse-array" .Values.testProfiles.collapseArray.targetFile | quote }}
+  {{- end }}
+{{- end }}
+
+{{- /* Test profiles.ini.advanced */}}
+{{- if .Values.testProfiles.advanced }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-profiles-advanced
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.profiles.ini.advanced" (dict
+      "data" .Values.testProfiles.advanced.data
+      "jobJsonDefaults" (default (list) .Values.testProfiles.advanced.jobJsonDefaults)
+      "filePath" (default "" .Values.testProfiles.advanced.filePath)
+  ) | nindent 2 }}
+{{- end }}
+
+{{- /* Test profiles.json-from-overrides-config */}}
+{{- if .Values.testProfiles.jsonOverrides }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-profiles-json-overrides
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.profiles.json-from-overrides-config" (dict
+      "data" .Values.testProfiles.jsonOverrides.data
+      "default" (default (list) .Values.testProfiles.jsonOverrides.default)
+  ) | nindent 2 }}
+{{- end }}
+
+{{- /* Test profiles.apply-everyone-and-default-to-others */}}
+{{- if .Values.testProfiles.applyEveryone }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-profiles-apply-everyone
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  profiles.conf: |
+    {{- include "rstudio-library.profiles.apply-everyone-and-default-to-others" (dict
+        "data" .Values.testProfiles.applyEveryone.data
+        "default" (default (list) .Values.testProfiles.applyEveryone.default)
+        "filePath" (default "" .Values.testProfiles.applyEveryone.filePath)
+    ) | nindent 4 }}
+{{- end }}
+
+{{- end }}
