@@ -51,6 +51,6 @@ metadata:
 data:
   volume.yaml: |
     {{- include "rstudio-library.license-volume" $licenseContext | nindent 4 }}
-{{- /* License secret is a special case - it outputs actual Secret resources */}}
-{{- include "rstudio-library.license-secret" $licenseContext }}
+{{- /* License secret outputs its own --- separators, so no additional separator needed */}}
+{{ include "rstudio-library.license-secret" $licenseContext }}
 {{- end }}

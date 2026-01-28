@@ -1,0 +1,382 @@
+suite: Config Formatters
+templates:
+  - templates/test-config.yaml
+
+tests:
+  # ========================================
+  # GCFG Format Tests
+  # ========================================
+  - it: should render gcfg with basic section and key-value pairs
+    set:
+      testConfig:
+        gcfg:
+          filename: test.gcfg
+          config:
+            Server:
+              Host: localhost
+              Port: 8080
+        ini: null
+        dcf: null
+        json: null
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-gcfg
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "\\[Server\\]"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Host = localhost"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Port = 8080"
+
+  - it: should render gcfg with array values as repeated keys
+    set:
+      testConfig:
+        gcfg:
+          filename: test.gcfg
+          config:
+            Server:
+              Listen:
+                - ":8080"
+                - ":8443"
+        ini: null
+        dcf: null
+        json: null
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Listen = :8080"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Listen = :8443"
+
+  - it: should render gcfg with multiple sections
+    set:
+      testConfig:
+        gcfg:
+          filename: config.gcfg
+          config:
+            Server:
+              Host: server1
+            Database:
+              Host: db1
+        ini: null
+        dcf: null
+        json: null
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - matchRegex:
+          path: data["config.gcfg"]
+          pattern: "\\[Server\\]"
+      - matchRegex:
+          path: data["config.gcfg"]
+          pattern: "\\[Database\\]"
+
+  - it: should handle boolean and numeric values in gcfg
+    set:
+      testConfig:
+        gcfg:
+          filename: test.gcfg
+          config:
+            Settings:
+              Enabled: true
+              MaxConnections: 100
+        ini: null
+        dcf: null
+        json: null
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Enabled = true"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "MaxConnections = 100"
+
+  # ========================================
+  # INI Format Tests
+  # ========================================
+  - it: should render ini with basic section and key-value pairs
+    set:
+      testConfig:
+        gcfg: null
+        ini:
+          filename: test.ini
+          config:
+            section1:
+              key1: value1
+              key2: value2
+        dcf: null
+        json: null
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-ini
+      - matchRegex:
+          path: data["test.ini"]
+          pattern: "\\[section1\\]"
+      - matchRegex:
+          path: data["test.ini"]
+          pattern: "key1=value1"
+      - matchRegex:
+          path: data["test.ini"]
+          pattern: "key2=value2"
+
+  - it: should render ini with boolean and numeric values
+    set:
+      testConfig:
+        gcfg: null
+        ini:
+          filename: settings.ini
+          config:
+            options:
+              enabled: true
+              count: 42
+        dcf: null
+        json: null
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - matchRegex:
+          path: data["settings.ini"]
+          pattern: "enabled=true"
+      - matchRegex:
+          path: data["settings.ini"]
+          pattern: "count=42"
+
+  # ========================================
+  # DCF Format Tests
+  # ========================================
+  - it: should render dcf with basic key-value pairs
+    set:
+      testConfig:
+        gcfg: null
+        ini: null
+        dcf:
+          filename: test.dcf
+          config:
+            Package: mypackage
+            Version: 1.0.0
+        json: null
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-dcf
+      - matchRegex:
+          path: data["test.dcf"]
+          pattern: "Package: mypackage"
+      - matchRegex:
+          path: data["test.dcf"]
+          pattern: "Version: 1.0.0"
+
+  # ========================================
+  # JSON Format Tests
+  # ========================================
+  - it: should render json with simple object
+    set:
+      testConfig:
+        gcfg: null
+        ini: null
+        dcf: null
+        json:
+          filename: config.json
+          config:
+            name: test
+            enabled: true
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-json
+      - matchRegex:
+          path: data["config.json"]
+          pattern: '"name": "test"'
+      - matchRegex:
+          path: data["config.json"]
+          pattern: '"enabled": true'
+
+  - it: should render json with nested object
+    set:
+      testConfig:
+        gcfg: null
+        ini: null
+        dcf: null
+        json:
+          filename: nested.json
+          config:
+            server:
+              host: localhost
+              port: 8080
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - matchRegex:
+          path: data["nested.json"]
+          pattern: '"server":'
+      - matchRegex:
+          path: data["nested.json"]
+          pattern: '"host": "localhost"'
+
+  - it: should render json with array values
+    set:
+      testConfig:
+        gcfg: null
+        ini: null
+        dcf: null
+        json:
+          filename: array.json
+          config:
+            items:
+              - first
+              - second
+        txt: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - matchRegex:
+          path: data["array.json"]
+          pattern: '"items":'
+      - matchRegex:
+          path: data["array.json"]
+          pattern: '"first"'
+      - matchRegex:
+          path: data["array.json"]
+          pattern: '"second"'
+
+  # ========================================
+  # TXT Format Tests
+  # ========================================
+  - it: should render txt with default comment delimiter
+    set:
+      testConfig:
+        gcfg: null
+        ini: null
+        dcf: null
+        json: null
+        txt:
+          filename: config.txt
+          config:
+            key1: value1
+            key2: value2
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-txt
+      - matchRegex:
+          path: data["config.txt"]
+          pattern: "# key1"
+      - matchRegex:
+          path: data["config.txt"]
+          pattern: "value1"

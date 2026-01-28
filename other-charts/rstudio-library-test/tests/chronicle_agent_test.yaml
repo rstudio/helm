@@ -1,0 +1,126 @@
+suite: Chronicle Agent Helpers
+templates:
+  - templates/test-chronicle-agent.yaml
+
+# Note: Chronicle agent templates use `lookup` which requires cluster access.
+# These tests only cover static paths where values are explicitly provided.
+# Full testing of cluster lookup functionality requires integration tests.
+
+tests:
+  # ========================================
+  # Image Template Tests (Static Path)
+  # ========================================
+  - it: should return image with specified tag
+    set:
+      testChronicle:
+        enabled: true
+        serverAddress: "http://server:8080"
+        image:
+          registry: ghcr.io
+          repository: rstudio/chronicle-agent
+          tag: "1.2.3"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-chronicle-agent
+      - equal:
+          path: data.image
+          value: "ghcr.io/rstudio/chronicle-agent:1.2.3"
+
+  - it: should use custom registry in image
+    set:
+      testChronicle:
+        enabled: true
+        serverAddress: "http://server:8080"
+        image:
+          registry: my-registry.example.com
+          repository: custom/agent
+          tag: "2.0.0"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+    asserts:
+      - equal:
+          path: data.image
+          value: "my-registry.example.com/custom/agent:2.0.0"
+
+  # ========================================
+  # Server Address Template Tests (Static Path)
+  # ========================================
+  - it: should return provided server address
+    set:
+      testChronicle:
+        enabled: true
+        serverAddress: "http://chronicle-server.monitoring:9090"
+        image:
+          registry: ghcr.io
+          repository: rstudio/chronicle-agent
+          tag: "1.0.0"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+    asserts:
+      - equal:
+          path: data.serverAddress
+          value: "http://chronicle-server.monitoring:9090"
+
+  - it: should handle https server address
+    set:
+      testChronicle:
+        enabled: true
+        serverAddress: "https://secure-chronicle.example.com:443"
+        image:
+          registry: ghcr.io
+          repository: rstudio/chronicle-agent
+          tag: "1.0.0"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+    asserts:
+      - equal:
+          path: data.serverAddress
+          value: "https://secure-chronicle.example.com:443"
+
+  # ========================================
+  # Disabled Chronicle Tests
+  # ========================================
+  - it: should not render when chronicle is disabled
+    set:
+      testChronicle:
+        enabled: false
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+    asserts:
+      - hasDocuments:
+          count: 0

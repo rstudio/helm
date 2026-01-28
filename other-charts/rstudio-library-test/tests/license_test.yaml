@@ -1,0 +1,70 @@
+suite: License Helpers
+templates:
+  - templates/test-license.yaml
+
+# Note: License templates output multiple document types (Secrets and ConfigMaps)
+# which makes document-index based assertions unreliable. These tests verify
+# basic rendering - for detailed verification, use `helm template` manually.
+
+tests:
+  # ========================================
+  # License Template Rendering Tests
+  # ========================================
+  - it: should render license template with key configured
+    set:
+      testLicense:
+        licenseKey: "SECRET-KEY-12345"
+        licenseServer: ""
+        licenseFile: ""
+      testConfig: null
+      testIngress: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 4
+
+  - it: should render license template with file configured
+    set:
+      testLicense:
+        licenseKey: ""
+        licenseServer: ""
+        licenseFile: |
+          LICENSE CONTENT
+      testConfig: null
+      testIngress: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 4
+
+  - it: should render license template with all options configured
+    set:
+      testLicense:
+        licenseKey: "KEY"
+        licenseServer: "server.example.com"
+        licenseFile: |
+          LICENSE
+      testConfig: null
+      testIngress: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 5

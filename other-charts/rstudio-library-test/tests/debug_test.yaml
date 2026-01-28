@@ -1,0 +1,140 @@
+suite: Debug Helpers
+templates:
+  - templates/test-debug.yaml
+
+tests:
+  # ========================================
+  # Passing Type Check Tests
+  # ========================================
+  - it: should pass type check for map type
+    set:
+      testDebug:
+        mapValue:
+          key1: value1
+          key2: value2
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-debug-success
+      - equal:
+          path: data.status
+          value: "type-checks-passed"
+
+  - it: should pass type check for slice type
+    set:
+      testDebug:
+        sliceValue:
+          - item1
+          - item2
+          - item3
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: data.status
+          value: "type-checks-passed"
+
+  - it: should pass type check for string type
+    set:
+      testDebug:
+        stringValue: "test string value"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: data.status
+          value: "type-checks-passed"
+
+  - it: should pass type check for bool type
+    set:
+      testDebug:
+        boolValue: true
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: data.status
+          value: "type-checks-passed"
+
+  # ========================================
+  # Failing Type Check Tests
+  # ========================================
+  - it: should fail type check with descriptive error for wrong type (string instead of map)
+    set:
+      testDebug:
+        failingCheck:
+          name: "testConfig"
+          object: "this is a string"
+          expected: "map"
+          description: "configuration object"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - failedTemplate:
+          errorPattern: "testConfig must be a 'map'"
+
+  - it: should fail type check for string instead of slice
+    set:
+      testDebug:
+        failingCheck:
+          name: "items"
+          object: "not-an-array"
+          expected: "slice"
+          description: "list of items"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - failedTemplate:
+          errorPattern: "items must be a 'slice'"

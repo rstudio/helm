@@ -1,0 +1,309 @@
+suite: RBAC Helper
+templates:
+  - templates/test-rbac.yaml
+
+tests:
+  # ========================================
+  # ServiceAccount Creation Tests
+  # ========================================
+  - it: should create ServiceAccount when serviceAccountCreate is true
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: my-sa
+        namespace: my-namespace
+        targetNamespace: my-namespace
+        clusterRoleCreate: false
+        removeNamespaceReferences: false
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ServiceAccount
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: my-sa
+        documentIndex: 0
+      - equal:
+          path: metadata.namespace
+          value: my-namespace
+        documentIndex: 0
+
+  - it: should not create ServiceAccount when serviceAccountCreate is false
+    set:
+      testRbac:
+        serviceAccountCreate: false
+        serviceAccountName: my-sa
+        namespace: my-namespace
+        targetNamespace: my-namespace
+        clusterRoleCreate: false
+        removeNamespaceReferences: false
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: Role
+        documentIndex: 0
+      - isKind:
+          of: RoleBinding
+        documentIndex: 1
+
+  # ========================================
+  # Role and RoleBinding Tests
+  # ========================================
+  - it: should create Role with correct permissions
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: launcher-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: false
+        removeNamespaceReferences: false
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: Role
+        documentIndex: 1
+      - matchRegex:
+          path: rules[0].resources[0]
+          pattern: "serviceaccounts"
+        documentIndex: 1
+
+  - it: should create RoleBinding linking SA to Role
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: launcher-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: false
+        removeNamespaceReferences: false
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: RoleBinding
+        documentIndex: 2
+      - equal:
+          path: roleRef.kind
+          value: Role
+        documentIndex: 2
+      - equal:
+          path: roleRef.name
+          value: launcher-sa
+        documentIndex: 2
+
+  # ========================================
+  # ClusterRole Tests
+  # ========================================
+  - it: should create ClusterRole when clusterRoleCreate is true
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: cluster-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: true
+        removeNamespaceReferences: false
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ClusterRole
+        documentIndex: 0
+      - matchRegex:
+          path: rules[0].resources[0]
+          pattern: "nodes"
+        documentIndex: 0
+
+  - it: should create ClusterRoleBinding when clusterRoleCreate is true
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: cluster-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: true
+        removeNamespaceReferences: false
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - isKind:
+          of: ClusterRoleBinding
+        documentIndex: 1
+      - equal:
+          path: roleRef.kind
+          value: ClusterRole
+        documentIndex: 1
+
+  # ========================================
+  # Namespace Handling Tests
+  # ========================================
+  - it: should remove namespace references when removeNamespaceReferences is true
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: no-ns-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: false
+        removeNamespaceReferences: true
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - notExists:
+          path: metadata.namespace
+        documentIndex: 0
+      - notExists:
+          path: metadata.namespace
+        documentIndex: 1
+
+  # ========================================
+  # Custom Annotations and Labels Tests
+  # ========================================
+  - it: should add custom annotations to ServiceAccount
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: annotated-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: false
+        removeNamespaceReferences: false
+        labels: {}
+        annotations:
+          eks.amazonaws.com/role-arn: "arn:aws:iam::123456789:role/my-role"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - equal:
+          path: metadata.annotations["eks.amazonaws.com/role-arn"]
+          value: "arn:aws:iam::123456789:role/my-role"
+        documentIndex: 0
+
+  - it: should add custom labels to ServiceAccount
+    set:
+      testRbac:
+        serviceAccountCreate: true
+        serviceAccountName: labeled-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: false
+        removeNamespaceReferences: false
+        labels:
+          app.kubernetes.io/component: launcher
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: launcher
+        documentIndex: 0
+
+  # ========================================
+  # Type Validation Tests
+  # ========================================
+  - it: should fail when serviceAccountCreate is not boolean (string)
+    set:
+      testRbac:
+        serviceAccountCreate: "yes"
+        serviceAccountName: bad-sa
+        namespace: default
+        targetNamespace: default
+        clusterRoleCreate: false
+        removeNamespaceReferences: false
+        labels: {}
+        annotations: {}
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testTplvalues: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - failedTemplate:
+          errorPattern: "serviceAccountCreate must be a 'bool'"

@@ -1,0 +1,176 @@
+suite: tplvalues Helpers
+templates:
+  - templates/test-tplvalues.yaml
+
+tests:
+  # ========================================
+  # String Value Rendering Tests
+  # ========================================
+  - it: should render string value with template expression
+    set:
+      testTplvalues:
+        staticValue: "static"
+        templateValue: "{{ .Release.Name }}-suffix"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testChronicle:
+        enabled: false
+    release:
+      name: my-release
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-tplvalues
+      - equal:
+          path: data.renderedString
+          value: "my-release-suffix"
+
+  - it: should pass through non-template strings unchanged
+    set:
+      testTplvalues:
+        staticValue: "plain-static-value"
+        templateValue: "no-template-here"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - equal:
+          path: data.staticString
+          value: "plain-static-value"
+      - equal:
+          path: data.renderedString
+          value: "no-template-here"
+
+  # ========================================
+  # Release Context Tests
+  # ========================================
+  - it: should access Release.Name in template
+    set:
+      testTplvalues:
+        staticValue: "x"
+        templateValue: "prefix-{{ .Release.Name }}"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testChronicle:
+        enabled: false
+    release:
+      name: test-release
+    asserts:
+      - equal:
+          path: data.renderedString
+          value: "prefix-test-release"
+
+  - it: should access Release.Namespace in template
+    set:
+      testTplvalues:
+        staticValue: "x"
+        templateValue: "ns-{{ .Release.Namespace }}"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testChronicle:
+        enabled: false
+    release:
+      name: test
+      namespace: production
+    asserts:
+      - equal:
+          path: data.renderedString
+          value: "ns-production"
+
+  # ========================================
+  # Object Value Rendering Tests
+  # ========================================
+  - it: should render object value with template expressions
+    set:
+      testTplvalues:
+        staticValue: "x"
+        templateValue: "x"
+        objectValue:
+          name: "{{ .Release.Name }}"
+          namespace: "{{ .Release.Namespace }}"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testChronicle:
+        enabled: false
+    release:
+      name: obj-release
+      namespace: obj-namespace
+    asserts:
+      - matchRegex:
+          path: data.renderedObject
+          pattern: "obj-release"
+      - matchRegex:
+          path: data.renderedObject
+          pattern: "obj-namespace"
+
+  # ========================================
+  # Edge Cases
+  # ========================================
+  - it: should handle empty string template value
+    set:
+      testTplvalues:
+        staticValue: "x"
+        templateValue: ""
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testChronicle:
+        enabled: false
+    asserts:
+      - equal:
+          path: data.renderedString
+          value: ""
+
+  - it: should handle multiple template expressions in one value
+    set:
+      testTplvalues:
+        staticValue: "x"
+        templateValue: "{{ .Release.Name }}-{{ .Release.Namespace }}-app"
+      testConfig: null
+      testIngress: null
+      testLicense: null
+      testRbac: null
+      testProfiles: null
+      testDebug: null
+      testLauncherTemplates: null
+      testChronicle:
+        enabled: false
+    release:
+      name: multi
+      namespace: test
+    asserts:
+      - equal:
+          path: data.renderedString
+          value: "multi-test-app"
