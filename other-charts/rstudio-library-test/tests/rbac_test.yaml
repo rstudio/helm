@@ -1,6 +1,8 @@
 suite: RBAC Helper
 templates:
   - templates/test-rbac.yaml
+values:
+  - _base_values.yaml
 
 tests:
   # ========================================
@@ -17,15 +19,6 @@ tests:
         removeNamespaceReferences: false
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ServiceAccount
@@ -50,15 +43,6 @@ tests:
         removeNamespaceReferences: false
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: Role
@@ -81,15 +65,6 @@ tests:
         removeNamespaceReferences: false
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: Role
@@ -110,15 +85,6 @@ tests:
         removeNamespaceReferences: false
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: RoleBinding
@@ -146,15 +112,6 @@ tests:
         removeNamespaceReferences: false
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ClusterRole
@@ -175,15 +132,6 @@ tests:
         removeNamespaceReferences: false
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ClusterRoleBinding
@@ -207,15 +155,6 @@ tests:
         removeNamespaceReferences: true
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - notExists:
           path: metadata.namespace
@@ -239,15 +178,6 @@ tests:
         labels: {}
         annotations:
           eks.amazonaws.com/role-arn: "arn:aws:iam::123456789:role/my-role"
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - equal:
           path: metadata.annotations["eks.amazonaws.com/role-arn"]
@@ -266,15 +196,6 @@ tests:
         labels:
           app.kubernetes.io/component: launcher
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - equal:
           path: metadata.labels["app.kubernetes.io/component"]
@@ -295,15 +216,6 @@ tests:
         removeNamespaceReferences: false
         labels: {}
         annotations: {}
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - failedTemplate:
           errorPattern: "serviceAccountCreate must be a 'bool'"

@@ -18,8 +18,8 @@ Outputs license configuration to ConfigMaps/Secrets for testing.
             "mountSubPath" false
         )
     )
-    "fullName" "test-release"
-    "namespace" "test-namespace"
+    "fullName" (printf "%s-license" .Release.Name)
+    "namespace" .Release.Namespace
 }}
 ---
 apiVersion: v1

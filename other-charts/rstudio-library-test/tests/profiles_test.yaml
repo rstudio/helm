@@ -1,6 +1,8 @@
 suite: Profiles Helpers
 templates:
   - templates/test-profiles.yaml
+values:
+  - _base_values.yaml
 
 tests:
   # ========================================
@@ -14,20 +16,6 @@ tests:
             "*":
               default-cpus: 1
               default-mem-mb: 512
-        singleFile: null
-        collapseArray: null
-        advanced: null
-        jsonOverrides: null
-        applyEveryone: null
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -47,25 +35,11 @@ tests:
   - it: should render single INI file content
     set:
       testProfiles:
-        basicIni: null
         singleFile:
           "*":
             setting: value1
           testuser:
             setting: value2
-        collapseArray: null
-        advanced: null
-        jsonOverrides: null
-        applyEveryone: null
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -85,25 +59,11 @@ tests:
   - it: should collapse simple array with commas
     set:
       testProfiles:
-        basicIni: null
-        singleFile: null
         collapseArray:
           simple:
             - one
             - two
             - three
-        advanced: null
-        jsonOverrides: null
-        applyEveryone: null
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -117,8 +77,6 @@ tests:
   - it: should collapse target/file array with quotes and colons
     set:
       testProfiles:
-        basicIni: null
-        singleFile: null
         collapseArray:
           simple:
             - dummy
@@ -127,18 +85,6 @@ tests:
               file: /etc/pods.json
             - target: services
               file: /etc/svc.json
-        advanced: null
-        jsonOverrides: null
-        applyEveryone: null
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data.targetFile
@@ -153,9 +99,6 @@ tests:
   - it: should render advanced profiles with everyone section
     set:
       testProfiles:
-        basicIni: null
-        singleFile: null
-        collapseArray: null
         advanced:
           data:
             launcher.kubernetes.profiles.conf:
@@ -163,17 +106,6 @@ tests:
                 default-cpus: 2
           jobJsonDefaults: []
           filePath: /etc/rstudio/
-        jsonOverrides: null
-        applyEveryone: null
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -193,10 +125,6 @@ tests:
   - it: should generate JSON files from overrides config
     set:
       testProfiles:
-        basicIni: null
-        singleFile: null
-        collapseArray: null
-        advanced: null
         jsonOverrides:
           data:
             "*":
@@ -208,16 +136,6 @@ tests:
                       limits:
                         cpu: "2"
           default: []
-        applyEveryone: null
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -231,10 +149,6 @@ tests:
   - it: should fail when override missing required keys
     set:
       testProfiles:
-        basicIni: null
-        singleFile: null
-        collapseArray: null
-        advanced: null
         jsonOverrides:
           data:
             "*":
@@ -243,16 +157,6 @@ tests:
                   json:
                     data: value
           default: []
-        applyEveryone: null
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - failedTemplate:
           errorPattern: "must have keys 'name', 'json', and 'target'"
@@ -263,11 +167,6 @@ tests:
   - it: should apply everyone config to all sections
     set:
       testProfiles:
-        basicIni: null
-        singleFile: null
-        collapseArray: null
-        advanced: null
-        jsonOverrides: null
         applyEveryone:
           data:
             "*":
@@ -276,15 +175,6 @@ tests:
               user-setting: user1-value
           default: []
           filePath: ""
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap

@@ -1,6 +1,8 @@
 suite: tplvalues Helpers
 templates:
   - templates/test-tplvalues.yaml
+values:
+  - _base_values.yaml
 
 tests:
   # ========================================
@@ -11,15 +13,6 @@ tests:
       testTplvalues:
         staticValue: "static"
         templateValue: "{{ .Release.Name }}-suffix"
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testChronicle:
-        enabled: false
     release:
       name: my-release
     asserts:
@@ -37,15 +30,6 @@ tests:
       testTplvalues:
         staticValue: "plain-static-value"
         templateValue: "no-template-here"
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testChronicle:
-        enabled: false
     asserts:
       - equal:
           path: data.staticString
@@ -62,15 +46,6 @@ tests:
       testTplvalues:
         staticValue: "x"
         templateValue: "prefix-{{ .Release.Name }}"
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testChronicle:
-        enabled: false
     release:
       name: test-release
     asserts:
@@ -83,15 +58,6 @@ tests:
       testTplvalues:
         staticValue: "x"
         templateValue: "ns-{{ .Release.Namespace }}"
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testChronicle:
-        enabled: false
     release:
       name: test
       namespace: production
@@ -111,15 +77,6 @@ tests:
         objectValue:
           name: "{{ .Release.Name }}"
           namespace: "{{ .Release.Namespace }}"
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testChronicle:
-        enabled: false
     release:
       name: obj-release
       namespace: obj-namespace
@@ -139,15 +96,6 @@ tests:
       testTplvalues:
         staticValue: "x"
         templateValue: ""
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testChronicle:
-        enabled: false
     asserts:
       - equal:
           path: data.renderedString
@@ -158,15 +106,6 @@ tests:
       testTplvalues:
         staticValue: "x"
         templateValue: "{{ .Release.Name }}-{{ .Release.Namespace }}-app"
-      testConfig: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testChronicle:
-        enabled: false
     release:
       name: multi
       namespace: test

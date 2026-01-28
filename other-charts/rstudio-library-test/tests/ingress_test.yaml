@@ -1,6 +1,8 @@
 suite: Ingress Helpers
 templates:
   - templates/test-ingress.yaml
+values:
+  - _base_values.yaml
 
 tests:
   # ========================================
@@ -13,15 +15,6 @@ tests:
         servicePort: 80
         path: /
         pathType: Prefix
-      testConfig: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - equal:
           path: data.apiVersion
@@ -38,15 +31,6 @@ tests:
         servicePort: 80
         path: /
         pathType: Prefix
-      testConfig: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - equal:
           path: data.supportsIngressClassName
@@ -63,15 +47,6 @@ tests:
         servicePort: 80
         path: /
         pathType: Prefix
-      testConfig: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - equal:
           path: data.supportsPathType
@@ -88,15 +63,6 @@ tests:
         servicePort: 80
         path: /api
         pathType: Prefix
-      testConfig: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["path.yaml"]
@@ -114,15 +80,6 @@ tests:
         servicePort: 80
         path: /custom
         pathType: Exact
-      testConfig: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["path.yaml"]
@@ -143,15 +100,6 @@ tests:
         servicePort: 8080
         path: /
         pathType: Prefix
-      testConfig: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["backend.yaml"]
@@ -173,15 +121,6 @@ tests:
         servicePort: http
         path: /
         pathType: Prefix
-      testConfig: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["backend.yaml"]

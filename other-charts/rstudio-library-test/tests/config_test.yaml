@@ -1,6 +1,8 @@
 suite: Config Formatters
 templates:
   - templates/test-config.yaml
+values:
+  - _base_values.yaml
 
 tests:
   # ========================================
@@ -15,19 +17,6 @@ tests:
             Server:
               Host: localhost
               Port: 8080
-        ini: null
-        dcf: null
-        json: null
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -54,19 +43,6 @@ tests:
               Listen:
                 - ":8080"
                 - ":8443"
-        ini: null
-        dcf: null
-        json: null
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["test.gcfg"]
@@ -85,19 +61,6 @@ tests:
               Host: server1
             Database:
               Host: db1
-        ini: null
-        dcf: null
-        json: null
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["config.gcfg"]
@@ -115,19 +78,6 @@ tests:
             Settings:
               Enabled: true
               MaxConnections: 100
-        ini: null
-        dcf: null
-        json: null
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["test.gcfg"]
@@ -136,31 +86,30 @@ tests:
           path: data["test.gcfg"]
           pattern: "MaxConnections = 100"
 
+  - it: should handle empty config section in gcfg
+    set:
+      testConfig:
+        gcfg:
+          filename: empty.gcfg
+          config:
+            EmptySection: {}
+    asserts:
+      - matchRegex:
+          path: data["empty.gcfg"]
+          pattern: "\\[EmptySection\\]"
+
   # ========================================
   # INI Format Tests
   # ========================================
   - it: should render ini with basic section and key-value pairs
     set:
       testConfig:
-        gcfg: null
         ini:
           filename: test.ini
           config:
             section1:
               key1: value1
               key2: value2
-        dcf: null
-        json: null
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -180,25 +129,12 @@ tests:
   - it: should render ini with boolean and numeric values
     set:
       testConfig:
-        gcfg: null
         ini:
           filename: settings.ini
           config:
             options:
               enabled: true
               count: 42
-        dcf: null
-        json: null
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["settings.ini"]
@@ -213,24 +149,11 @@ tests:
   - it: should render dcf with basic key-value pairs
     set:
       testConfig:
-        gcfg: null
-        ini: null
         dcf:
           filename: test.dcf
           config:
             Package: mypackage
             Version: 1.0.0
-        json: null
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -250,24 +173,11 @@ tests:
   - it: should render json with simple object
     set:
       testConfig:
-        gcfg: null
-        ini: null
-        dcf: null
         json:
           filename: config.json
           config:
             name: test
             enabled: true
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
@@ -284,25 +194,12 @@ tests:
   - it: should render json with nested object
     set:
       testConfig:
-        gcfg: null
-        ini: null
-        dcf: null
         json:
           filename: nested.json
           config:
             server:
               host: localhost
               port: 8080
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["nested.json"]
@@ -314,25 +211,12 @@ tests:
   - it: should render json with array values
     set:
       testConfig:
-        gcfg: null
-        ini: null
-        dcf: null
         json:
           filename: array.json
           config:
             items:
               - first
               - second
-        txt: null
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - matchRegex:
           path: data["array.json"]
@@ -344,30 +228,30 @@ tests:
           path: data["array.json"]
           pattern: '"second"'
 
+  - it: should render json with empty object
+    set:
+      testConfig:
+        json:
+          filename: empty.json
+          config: {}
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-json
+
   # ========================================
   # TXT Format Tests
   # ========================================
   - it: should render txt with default comment delimiter
     set:
       testConfig:
-        gcfg: null
-        ini: null
-        dcf: null
-        json: null
         txt:
           filename: config.txt
           config:
             key1: value1
             key2: value2
-      testIngress: null
-      testLicense: null
-      testRbac: null
-      testProfiles: null
-      testDebug: null
-      testLauncherTemplates: null
-      testTplvalues: null
-      testChronicle:
-        enabled: false
     asserts:
       - isKind:
           of: ConfigMap
