@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.10.4](https://img.shields.io/badge/Version-0.10.4-informational?style=flat-square) ![AppVersion: 2026.01.0](https://img.shields.io/badge/AppVersion-2026.01.0-informational?style=flat-square)
+![Version: 0.10.5](https://img.shields.io/badge/Version-0.10.5-informational?style=flat-square) ![AppVersion: 2026.01.0](https://img.shields.io/badge/AppVersion-2026.01.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.10.4:
+To install the chart with the release name `my-release` at version 0.10.5:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.4
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.5
 ```
 
 To explore other chart versions, look at:
@@ -562,7 +562,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
 | chronicleAgent.image.repository | string | `"rstudio/chronicle-agent"` | The Chronicle agent image repository |
 | chronicleAgent.image.sha | string | `""` | The Chronicle agent image digest |
-| chronicleAgent.image.tag | string | `"2025.08.0"` | The Chronicle agent image tag |
+| chronicleAgent.image.tag | string | `"2026.01.0"` | The Chronicle agent image tag |
 | chronicleAgent.resources | object | `{}` | Defines resources for the posit-chronicle-agent container |
 | chronicleAgent.securityContext | object | `{"privileged":false,"runAsNonRoot":true}` | The container-level security context for the Chronicle agent container |
 | chronicleAgent.serverAddress | string | `""` | Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false` |

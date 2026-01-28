@@ -278,7 +278,7 @@ chronicleAgent:
     # -- The Chronicle agent image repository
     repository: rstudio/chronicle-agent
     # -- The Chronicle agent image tag
-    tag: 2025.08.0
+    tag: 2026.01.0
     # -- The Chronicle agent image digest
     sha: ""
     # -- The pull policy for the Chronicle agent image

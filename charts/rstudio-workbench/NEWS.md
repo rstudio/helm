@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.5
+
+- Bump Chronicle Agent version to 2026.01.0
+
 ## 0.10.4
 
 - Fix bug where `secureCookieKey.value`, `global.secureCookieKey.value`, and `launcherPem.value` were stored in the chart-managed secret but not mounted into pods at `/mnt/secret-configmap/rstudio/`
