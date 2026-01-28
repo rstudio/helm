@@ -1,6 +1,6 @@
 name: rstudio-pm
 description: Official Helm chart for Posit Package Manager
-version: 0.5.52
+version: 0.5.53
 apiVersion: v2
 appVersion: 2025.12.0
 icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
