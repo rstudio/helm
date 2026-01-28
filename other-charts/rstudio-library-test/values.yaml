@@ -1,0 +1,96 @@
+# Test values for rstudio-library-test harness
+# These values are used by test templates to exercise library functions
+
+# Config formatter test values
+testConfig:
+  gcfg:
+    filename: test.gcfg
+    config:
+      section1:
+        key1: value1
+        key2: value2
+      section2:
+        arrayKey:
+          - item1
+          - item2
+  ini:
+    filename: test.ini
+    config:
+      section1:
+        key1: value1
+        key2: 123
+  dcf:
+    filename: test.dcf
+    config:
+      key1: value1
+      nested:
+        subkey: subvalue
+  json:
+    filename: test.json
+    config:
+      stringKey: stringValue
+      numberKey: 42
+      boolKey: true
+      arrayKey:
+        - item1
+        - item2
+  txt:
+    filename: test.txt
+    config:
+      key1: value1
+      key2: value2
+
+# Ingress helper test values
+testIngress:
+  serviceName: test-service
+  servicePort: 8080
+  path: /test
+  pathType: Prefix
+
+# License helper test values
+testLicense:
+  # Test license key
+  licenseKey: "test-license-key"
+  # Test license server
+  licenseServer: "license.example.com"
+  # Test license file
+  licenseFile: |
+    LICENSE CONTENT HERE
+
+# RBAC test values
+testRbac:
+  serviceAccountCreate: true
+  serviceAccountName: test-sa
+  clusterRoleCreate: false
+  namespace: test-namespace
+  targetNamespace: test-target
+  labels: {}
+  annotations: {}
+
+# Profiles test values
+testProfiles:
+  launcherJobsConf:
+    "*":
+      job-name: "test-job"
+    testUser:
+      job-name: "user-job"
+
+# Launcher template test values
+testLauncherTemplates:
+  templateName: test-template
+  content:
+    key1: value1
+    key2: value2
+
+# Tplvalues test values
+testTplvalues:
+  staticValue: "static"
+  templateValue: "{{ .Release.Name }}-suffix"
+
+# Chronicle agent test values
+testChronicle:
+  enabled: false
+  serverAddress: ""
+  image:
+    repository: ghcr.io/rstudio/chronicle-agent
+    tag: ""
