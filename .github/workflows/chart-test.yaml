@@ -96,6 +96,13 @@ jobs:
             pushd $dir; helm dependencies update; popd
             helm unittest $dir
           done
+          # Run tests for charts in other-charts/ directory
+          for dir in $(ls -d other-charts/*/); do
+            if [ -d "$dir/tests" ]; then
+              pushd $dir; helm dependencies update; popd
+              helm unittest $dir
+            fi
+          done
         continue-on-error: true
 
       - name: Notify Slack of chart unittest failure if on main
