@@ -2,9 +2,9 @@ apiVersion: v2
 name: rstudio-launcher-rbac
 description: RBAC definition for the RStudio Job Launcher
 type: application
-version: 0.2.24
+version: 0.2.25
 appVersion: 0.2.21
-icon: https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png
+icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
 sources:
   - https://github.com/rstudio/helm
 maintainers:

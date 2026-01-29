@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.25
+
+- Update chart icon to Posit icon
+
 ## 0.2.24
 
 - Pin the rstudio-library version dependency so we can update the library chart without breaking all the charts that depend on it.
