@@ -741,6 +741,41 @@ entries:
         - name: RStudio Community
           url: https://community.rstudio.com/c/r-admin/5
     apiVersion: v2
+    created: "2026-01-29T18:51:38.624787278Z"
+    description: a daemonset to prepull images so they are cached
+    digest: e5bc845feb8b5d20353c8fa675d56f55f0db4780d248823d3d7371b167ec85a1
+    home: https://www.rstudio.com
+    icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
+    keywords:
+    - prepull
+    - bootstrap
+    - image-cache
+    - auto-scaling
+    - startup
+    - container
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: prepull-daemonset
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/prepull-daemonset-0.0.5/prepull-daemonset-0.0.5.tgz
+    version: 0.0.5
+  - annotations:
+      artifacthub.io/images: |
+        - name: ubuntu
+          image: ubuntu:bionic
+        - name: pause
+          image: gcr.io/google_containers/pause
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+    apiVersion: v2
     created: "2022-02-18T19:00:35.520460034Z"
     description: a daemonset to prepull images so they are cached
     digest: c6881a5443c2a7ef3a0838a3d7a7e77b23722b738f98bfb895d4289007aa8599
@@ -18402,4 +18437,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2026-01-29T18:51:35.197102175Z"
+generated: "2026-01-29T18:51:38.625468136Z"
