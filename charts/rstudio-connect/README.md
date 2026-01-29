@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.21:
+To install the chart with the release name `my-release` at version 0.8.22:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.21
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.22
 ```
 
 To explore other chart versions, look at:
