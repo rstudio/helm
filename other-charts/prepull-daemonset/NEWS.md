@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5
+
+- Update chart icon to Posit icon
+
 ## 0.0.4
 
 - Update docs

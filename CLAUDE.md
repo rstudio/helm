@@ -53,8 +53,10 @@ charts/<chart-name>/
 ## Critical Workflow Requirements
 
 1. **Version bumping is mandatory**: Any change (including README templates) requires bumping the chart version in `Chart.yaml`
-2. **CI runs only on local branches**: PRs from forks won't trigger full CI - contributors need branch access
-3. **Library chart changes propagate**: Changes to `rstudio-library` affect all dependent charts
+2. **NEWS update required**: All chart changes require an update to the chart's NEWS.md file
+3. **Run `make lint`**: Run `make lint` in the chart directory for all chart changes
+4. **CI runs only on local branches**: PRs from forks won't trigger full CI - contributors need branch access
+5. **Library chart changes propagate**: Changes to `rstudio-library` affect all dependent charts
 
 ## Testing
 
@@ -80,3 +82,20 @@ Template inheritance for Kubernetes job execution:
 - Chart-embedded: `charts/<chart>/files/`
 
 Template versions follow product versions, not launcher versions. Helm modifications use `vN` suffix.
+
+## Troubleshooting
+
+### `just` command not found
+Install [just](https://github.com/casey/just#installation) using your package manager.
+
+### `just lint` fails with missing dependencies
+The `just lint` command requires the following tools:
+- [helm](https://helm.sh/docs/intro/install/)
+- [chart-testing (ct)](https://github.com/helm/chart-testing#installation)
+- [yamllint](https://github.com/adrienverge/yamllint#installation)
+
+You also need to add the RStudio Helm repository:
+```bash
+helm repo add rstudio https://helm.rstudio.com
+helm repo update
+```

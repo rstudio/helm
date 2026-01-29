@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.6
+
+- Update chart icon to Posit icon
+
 ## 0.10.5
 
 - Bump Chronicle Agent version to 2026.01.0

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.36
+
+- Update chart icon to Posit icon
+
 # 0.1.35
 
 - Fix `rstudio-library.chronicle-agent.serverAddress` failure when lookup returns none.

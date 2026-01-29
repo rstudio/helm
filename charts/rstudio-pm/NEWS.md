@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.53
+
+- Update chart icon to Posit icon
+
 ## 0.5.52
 
 - Update default Posit Package Manager version to 2025.12.0-14
