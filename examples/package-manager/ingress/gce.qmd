@@ -5,7 +5,7 @@ category: "Ingress"
 # Configuring Posit Package Manager with a GCE Ingress
 
 This example deploys Posit Package Manager with an Ingress using the GKE Ingress Controller to create a GCP Application Load Balancer.
-This example is provided to show how to set annotations to redirect HTTP traffic to HTTPS and use GCP Certificate Manager if desired.
+This example shows how to set annotations to redirect HTTP traffic to HTTPS and use GCP Certificate Manager if desired.
 
 The GKE Ingress Controller has a variety of settings and modes of operation. Please visit the [GCP documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/load-balance-ingress) for more details specific to your use case.
 
