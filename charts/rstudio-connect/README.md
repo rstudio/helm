@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.21](https://img.shields.io/badge/Version-0.8.21-informational?style=flat-square) ![AppVersion: 2025.12.1](https://img.shields.io/badge/AppVersion-2025.12.1-informational?style=flat-square)
+![Version: 0.8.20](https://img.shields.io/badge/Version-0.8.22-informational?style=flat-square) ![AppVersion: 2026.01.0](https://img.shields.io/badge/AppVersion-2026.01.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
