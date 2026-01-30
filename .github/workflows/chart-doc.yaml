@@ -11,10 +11,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: r-lib/actions/pr-fetch@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
@@ -31,16 +27,11 @@ jobs:
         env:
           HELM_DOCS_VERSION: 1.13.1
 
-      - name: Commit results
+      # checks for uncommitted changes to any generated READMEs
+      - name: Git status check
         run: |
-          set -xe
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git commit other-charts/*/README.md charts/*/README.md -m 'Update helm-docs and README.md' || echo "No changes to commit"
-
-      - uses: r-lib/actions/pr-push@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          ./tools/dev/check-uncommitted-changes.sh || \
+          (echo "run 'just docs' and commit the result." && exit 1)
 
       - name: Notify Slack of chart documentation failure on main
         if: github.ref == 'refs/heads/main' && failure()
@@ -71,10 +62,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: r-lib/actions/pr-fetch@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
@@ -88,17 +75,11 @@ jobs:
         run: |
           just rbac
 
-      - name: Commit results
+      # checks for uncommitted changes to any generated RBAC docs
+      - name: Git status check
         run: |
-          set -xeo pipefail
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git add examples/rbac/rstudio-launcher-rbac*.yaml || echo "No files to add"
-          git commit examples/rbac/rstudio-launcher-rbac*.yaml -m 'Update rbac yaml' || echo "No changes to commit"
-
-      - uses: r-lib/actions/pr-push@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          ./tools/dev/check-uncommitted-changes.sh || \
+          (echo "run 'just rbac' and commit the result." && exit 1)
 
       - name: Notify Slack of chart documentation (rbac) failure on main
         if: github.ref == 'refs/heads/main' && failure()
