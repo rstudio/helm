@@ -22,15 +22,17 @@ We'll try to be as responsive as possible in reviewing and accepting pull reques
 
 ## Assumptions / Common Dev Workflows
 
+- Use `just docs` to generate the READMEs. READMEs are generated in CI by
+  [Go templating](./charts/_templates.gotmpl) and `helm-docs`.
+  - Run `just setup` to install `helm-doc`.
+- CI requires that the chart version get bumped for any change in the directory.
+- Use `just update-lock` to update all chart's lockfiles.
 - Changes to the `rstudio-library` chart will update all downstream charts at
   the same time (via the `file://` syntax in `Chart.yaml`)
 - CI only runs on local branches (i.e. not from forks). This can make
   evaluating code from contributors tricky. By creating a duplicate branch
   locally, we can "trick" CI into running on the same commits
-- CI requires that the chart version get bumped for any change in the directory
   (including README)
-- READMEs are generated in CI by [Go templating](./charts/_templates.gotmpl)
-  and `helm-docs`
 - If `index.yaml` gets out of date on the repository, see
   [`./scripts/`](./scripts) for a workflow to fix
 
