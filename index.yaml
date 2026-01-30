@@ -802,6 +802,50 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: rstudio-connect
+          image: rstudio/rstudio-connect:ubuntu2204-2026.01.1
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Docker Images
+          url: https://github.com/rstudio/rstudio-docker-products
+        - name: RStudio Community
+          url: https://community.rstudio.com/c/r-admin/5
+        - name: About Connect
+          url: https://www.rstudio.com/products/connect/
+        - name: About RStudio Team
+          url: https://www.rstudio.com/products/team/
+    apiVersion: v2
+    appVersion: 2026.01.1
+    created: "2026-01-30T20:27:23.078577175Z"
+    dependencies:
+    - name: rstudio-library
+      repository: https://helm.rstudio.com
+      version: 0.1.35
+    description: Official Helm chart for Posit Connect
+    digest: 19beb3aeb9e7534d64bcf78de8619a162698530441de49263a5eff855a90e83a
+    home: https://www.rstudio.com
+    icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - deploy
+    - rstudio
+    - posit
+    maintainers:
+    - email: docker@rstudio.com
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-connect
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-connect-0.8.23/rstudio-connect-0.8.23.tgz
+    version: 0.8.23
+  - annotations:
+      artifacthub.io/images: |
+        - name: rstudio-connect
           image: rstudio/rstudio-connect:ubuntu2204-2026.01.0
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -18437,4 +18481,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2026-01-29T18:51:38.625468136Z"
+generated: "2026-01-30T20:27:23.07947585Z"
