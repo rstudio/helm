@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.23
+
+- Bump Connect version to 2026.01.1
+
 ## 0.8.22
 
 - Update chart icon to Posit icon
