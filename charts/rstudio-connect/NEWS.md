@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.25
+
+- Fix bug in chart where sharedStorage.subPath did not propagate to launcher-managed job volumeMounts.
+
 ## 0.8.24
 
 - Fix bug in chart where launcher.templateValues.pod.securityContext did not respect configuration and complex mappings lead to launcher errors.

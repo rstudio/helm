@@ -378,6 +378,8 @@ launcher:
     job:
       annotations: {}
       labels: {}
+    sharedStorage:
+      subPath: ""
   # -- Image definition for the default Posit Connect Content InitContainer
   defaultInitContainer:
     # -- Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way.

@@ -57,6 +57,10 @@ data:
       {{- $volumeMountList := concat $sessionTemplate.pod.volumeMounts (list $rscVolumeMountR $rscVolumeMountPython $rscVolumeMountScripts $rscVolumeMountExt ) }}
       {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
     {{- end }}
+    {{- /* capture sharedStorage subPath for job volumeMounts */ -}}
+    {{- if .Values.sharedStorage.subPath }}
+      {{- $_ := set $sessionTemplate.sharedStorage "subPath" .Values.sharedStorage.subPath }}
+    {{- end }}
 {{- if not .Values.launcher.useTemplates }}
 ---
 apiVersion: v1
