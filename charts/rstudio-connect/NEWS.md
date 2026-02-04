@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.25
+
+- Fix bug in job.tpl where `supplementalGroups` was serialized as a string instead of an int64 array, causing launcher jobs to fail when `launcher.templateValues.pod.securityContext` is not set.
+
 ## 0.8.24
 
 - Fix bug in chart where launcher.templateValues.pod.securityContext did not respect configuration and complex mappings lead to launcher errors.
