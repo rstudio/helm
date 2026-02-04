@@ -283,7 +283,13 @@ spec:
           {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
           volumeMounts:
             {{- range .Job.volumeMounts }}
-            - {{ nindent 14 (toYaml .) | trim -}}
+            - {{- range $key, $value := . -}}
+              {{- if and (eq $key "subPath") ($templateData.sharedStorage.subPath) -}}
+                {{ nindent 14 $key }}: "{{ $templateData.sharedStorage.subPath }}/{{ $value }}"
+              {{- else -}}
+                {{ nindent 14 $key }}: {{ $value }}
+              {{- end -}}
+              {{- end -}}
             {{- end }}
             {{- range $templateData.pod.volumeMounts }}
             - {{ nindent 14 (toYaml .) | trim -}}
