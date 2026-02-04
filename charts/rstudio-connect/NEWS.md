@@ -2,7 +2,7 @@
 
 ## 0.8.25
 
-- Fix bug in job.tpl where `supplementalGroups` was serialized as a string instead of an int64 array, causing launcher jobs to fail when `launcher.templateValues.pod.securityContext` is not set.
+- Fix regression introduced in 0.8.24 where `supplementalGroups` was serialized as a string instead of an int64 array in job.tpl. This only affects users with runAs users that have supplementary groups configured.
 
 ## 0.8.24
 
