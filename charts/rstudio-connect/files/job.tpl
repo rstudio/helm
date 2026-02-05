@@ -131,11 +131,7 @@ spec:
         {{- $_ := set $securityContext "runAsGroup" .Job.container.runAsGroupId }}
       {{- end }}
       {{- if .Job.container.supplementalGroupIds }}
-        {{- $groupIds := list }}
-        {{- range .Job.container.supplementalGroupIds }}
-          {{- $groupIds = append $groupIds . }}
-        {{- end }}
-        {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
+        {{- $_ := set $securityContext "supplementalGroups" .Job.container.supplementalGroupIds }}
       {{- end }}
       {{- if $securityContext }}
       {{- $securityContext := mergeOverwrite $securityContext $templateData.pod.securityContext }}
