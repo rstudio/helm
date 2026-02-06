@@ -97,9 +97,9 @@ flowchart TB;
   id3-- "copy as-is" -->id4
 ```
 
-> **IMPORTANT NOTE**: The template version is _tied to the product version_, and may differ between 
-> products. Take care when updating a product's template versions, and ensure that you have tested
-> with a proper license to ensure that the product is functional.
+:::{.callout-important}
+The template version is tied to the product version, and may differ between products. Take care when updating a product's template versions, and ensure that you have tested with a proper license to ensure that the product is functional.
+:::
 
 At some point, we plan to push some (all?) of the `helm`-based features upstream into the original. However, for now
 we are evaluating and gathering feedback on the mechanism. In particular, we need to explore what "sub-templating" and
