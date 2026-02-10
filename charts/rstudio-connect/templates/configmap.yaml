@@ -57,6 +57,7 @@ data:
       {{- $volumeMountList := concat $sessionTemplate.pod.volumeMounts (list $rscVolumeMountR $rscVolumeMountPython $rscVolumeMountScripts $rscVolumeMountExt ) }}
       {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
     {{- end }}
+    {{- $_ := set $sessionTemplate.sharedStorage "name" (default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name) }}
     {{- /* capture sharedStorage subPath for job volumeMounts */ -}}
     {{- if .Values.sharedStorage.subPath }}
       {{- $_ := set $sessionTemplate.sharedStorage "subPath" .Values.sharedStorage.subPath }}

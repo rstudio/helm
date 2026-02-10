@@ -379,6 +379,7 @@ launcher:
       annotations: {}
       labels: {}
     sharedStorage:
+      name: ""
       subPath: ""
   # -- Image definition for the default Posit Connect Content InitContainer
   defaultInitContainer:
