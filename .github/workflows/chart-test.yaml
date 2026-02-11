@@ -84,7 +84,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
-          version: 'v3.19.2'
+          version: "v3.19.2"
 
       - name: Install helm unittest plugin
         run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.0.0
@@ -97,6 +97,12 @@ jobs:
             helm unittest $dir
           done
         continue-on-error: true
+
+      # checks for uncommitted changes to any Chart.lock files
+      - name: Git status check
+        run: |
+          ./tools/dev/check-uncommitted-changes.sh || \
+          (echo "run 'just update-lock' and commit the result." && exit 1)
 
       - name: Notify Slack of chart unittest failure if on main
         if: github.ref == 'refs/heads/main' && steps.unittest.outcome == 'failure'
