@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.26
+
+- Fix bug in chart where sharedStorage.subPath did not propagate to launcher-managed job volumeMounts.
+
 ## 0.8.25
 
 - Fix regression introduced in 0.8.24 where `supplementalGroups` was serialized as a string instead of an int64 array in job.tpl. This only affects users with runAs users that have supplementary groups configured.

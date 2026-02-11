@@ -277,9 +277,22 @@ spec:
             {{- end }}
           {{- end }}
           {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
+            {{- $sharedStorageVolumeName := "" }}
+            {{- range .Job.volumes }}
+              {{- if and (.persistentVolumeClaim) (eq .persistentVolumeClaim.claimName $templateData.sharedStorage.name) }}
+                {{- $sharedStorageVolumeName = .name }}
+              {{- end }}
+            {{- end }}
           volumeMounts:
             {{- range .Job.volumeMounts }}
-            - {{ nindent 14 (toYaml .) | trim -}}
+            {{- $volumeName := .name }}
+            - {{- range $key, $value := . -}}
+              {{- if and (eq $key "subPath") ($templateData.sharedStorage.subPath) (eq $volumeName $sharedStorageVolumeName) -}}
+                {{ nindent 14 $key }}: "{{ $templateData.sharedStorage.subPath }}/{{ $value }}"
+              {{- else -}}
+                {{ nindent 14 $key }}: {{ $value }}
+              {{- end -}}
+              {{- end -}}
             {{- end }}
             {{- range $templateData.pod.volumeMounts }}
             - {{ nindent 14 (toYaml .) | trim -}}
