@@ -92,9 +92,19 @@ jobs:
       - name: Run chart unit tests
         id: unittest
         run: |
-          for dir in $(ls -d charts/*/); do
-            pushd $dir; helm dependencies update; popd
-            helm unittest $dir
+          # Process charts directory
+          for dir in charts/*/; do
+            [ -d "$dir" ] || continue
+            (cd "$dir" && helm dependencies update)
+            helm unittest "$dir"
+          done
+          # Run tests for charts in other-charts/ directory
+          for dir in other-charts/*/; do
+            [ -d "$dir" ] || continue
+            if [ -d "$dir/tests" ]; then
+              (cd "$dir" && helm dependencies update)
+              helm unittest "$dir"
+            fi
           done
         continue-on-error: true
 
@@ -170,16 +180,15 @@ jobs:
         run: kubectl create namespace posit-test
 
       - name: Create License File Secrets
+        env:
+          PWB_LICENSE: ${{ secrets.PWB_LICENSE_FILE }}
+          PCT_LICENSE: ${{ secrets.PCT_LICENSE_FILE }}
+          PPM_LICENSE: ${{ secrets.PPM_LICENSE_FILE }}
         run: |
-          echo "${{ secrets.PWB_LICENSE_FILE }}" > pwb.lic
-          kubectl create secret generic pwb-license --from-file=pwb.lic --namespace posit-test
-          rm pwb.lic
-          echo "${{ secrets.PCT_LICENSE_FILE }}" > pct.lic
-          kubectl create secret generic pct-license --from-file=pct.lic --namespace posit-test
-          rm pct.lic
-          echo "${{ secrets.PPM_LICENSE_FILE }}" > ppm.lic
-          kubectl create secret generic ppm-license --from-file=ppm.lic --namespace posit-test
-          rm ppm.lic
+          # Use env vars and stdin to avoid secrets in temp files and command line args
+          printf '%s' "$PWB_LICENSE" | kubectl create secret generic pwb-license --from-file=pwb.lic=/dev/stdin --namespace posit-test
+          printf '%s' "$PCT_LICENSE" | kubectl create secret generic pct-license --from-file=pct.lic=/dev/stdin --namespace posit-test
+          printf '%s' "$PPM_LICENSE" | kubectl create secret generic ppm-license --from-file=ppm.lic=/dev/stdin --namespace posit-test
 
       - name: Create Workbench Secrets to test existingSecrets
         run: |
@@ -195,13 +204,13 @@ jobs:
       - name: Run chart-testing (install changed)
         id: ct-install
         if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
-        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library --namespace posit-test
+        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library,rstudio-library-test --namespace posit-test
         continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         id: ct-install-all
-        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library --namespace posit-test
+        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library,rstudio-library-test --namespace posit-test
         continue-on-error: true
 
       - name: Notify Slack of chart install failure if on main
