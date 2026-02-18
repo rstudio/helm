@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.27
+
+- Set `Server.Address` to match the Kubernetes Service
+
 ## 0.8.26
 
 - Fix bug in chart where sharedStorage.subPath did not propagate to launcher-managed job volumeMounts.

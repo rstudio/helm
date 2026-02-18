@@ -100,6 +100,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $defaultConfig = merge $defaultConfig (dict "Metrics" ( dict "PrometheusListen" (print ":" .Values.prometheus.port )))}}
     {{- end }}
   {{- end }}
+  {{- /* default Server.Address from the service name and port */}}
+  {{- $serverAddress := printf "http://%s:%v" (include "rstudio-connect.fullname" .) .Values.service.port }}
+  {{- $defaultConfig = merge $defaultConfig (dict "Server" (dict "Address" $serverAddress)) }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
 

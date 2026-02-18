@@ -19,7 +19,6 @@ config:
   'RPackageRepository "RSPM"':
     URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
   Server:
-    Address: http://localhost:3939
     DataDir: /var/lib/rstudio-connect
     RVersionScanning: false
     RVersion:

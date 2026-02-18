@@ -429,7 +429,8 @@ config:
   'RPackageRepository "RSPM"':
     URL: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
   Server:
-    Address: http://localhost:3939
+    # Address is auto-computed from the service name and port.
+    # Override here if you need a custom value.
     DataDir: /var/lib/rstudio-connect
   Python:
     Enabled: true

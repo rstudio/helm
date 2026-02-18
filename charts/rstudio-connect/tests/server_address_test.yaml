@@ -1,0 +1,31 @@
+suite: test Server.Address auto-computation
+templates:
+  - configmap.yaml
+tests:
+  - it: should auto-compute Server.Address from the service name and port
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "Address = http://RELEASE-NAME-rstudio-connect:80"
+
+  - it: should use explicit config.Server.Address when provided
+    documentIndex: 0
+    set:
+      config:
+        Server:
+          Address: https://connect.example.com
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "Address = https://connect.example.com"
+
+  - it: should reflect a custom service port in the computed address
+    documentIndex: 0
+    set:
+      service:
+        port: 8080
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "Address = http://RELEASE-NAME-rstudio-connect:8080"
