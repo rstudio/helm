@@ -3,7 +3,7 @@
 
 ## 0.10.7
 
-- Bump Workbench version to 2026.01.1+403
+- Bump Workbench version to 2026.01.1
 
 ## 0.10.6
 
