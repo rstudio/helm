@@ -1,0 +1,56 @@
+{{/*
+Test templates for rstudio-library license helpers.
+Outputs license configuration to ConfigMaps/Secrets for testing.
+*/}}
+
+{{- if .Values.testLicense }}
+{{- $licenseContext := dict
+    "product" "test-product"
+    "envVarPrefix" "TEST"
+    "license" (dict
+        "key" .Values.testLicense.licenseKey
+        "server" .Values.testLicense.licenseServer
+        "file" (dict
+            "contents" .Values.testLicense.licenseFile
+            "secret" ""
+            "mountPath" "/etc/license"
+            "secretKey" "license.lic"
+            "mountSubPath" false
+        )
+    )
+    "fullName" (printf "%s-license" .Release.Name)
+    "namespace" .Release.Namespace
+}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-license-env
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  env.yaml: |
+    {{- include "rstudio-library.license-env" $licenseContext | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-license-mount
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  mount.yaml: |
+    {{- include "rstudio-library.license-mount" $licenseContext | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-license-volume
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  volume.yaml: |
+    {{- include "rstudio-library.license-volume" $licenseContext | nindent 4 }}
+{{- /* License secret outputs its own --- separators, so no additional separator needed */}}
+{{ include "rstudio-library.license-secret" $licenseContext }}
+{{- end }}

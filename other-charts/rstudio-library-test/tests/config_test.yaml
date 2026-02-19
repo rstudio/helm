@@ -1,0 +1,297 @@
+suite: Config Formatters
+templates:
+  - templates/test-config.yaml
+values:
+  - _base_values.yaml
+
+tests:
+  # ========================================
+  # GCFG Format Tests
+  # ========================================
+  - it: should render gcfg with basic section and key-value pairs
+    set:
+      testConfig:
+        gcfg:
+          filename: test.gcfg
+          config:
+            Server:
+              Host: localhost
+              Port: 8080
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-gcfg
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "\\[Server\\]"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Host = localhost"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Port = 8080"
+
+  - it: should render gcfg with array values as repeated keys
+    set:
+      testConfig:
+        gcfg:
+          filename: test.gcfg
+          config:
+            Server:
+              Listen:
+                - ":8080"
+                - ":8443"
+    asserts:
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Listen = :8080"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Listen = :8443"
+
+  - it: should render gcfg with multiple sections
+    set:
+      testConfig:
+        gcfg:
+          filename: config.gcfg
+          config:
+            Server:
+              Host: server1
+            Database:
+              Host: db1
+    asserts:
+      - matchRegex:
+          path: data["config.gcfg"]
+          pattern: "\\[Server\\]"
+      - matchRegex:
+          path: data["config.gcfg"]
+          pattern: "\\[Database\\]"
+
+  - it: should handle boolean and numeric values in gcfg
+    set:
+      testConfig:
+        gcfg:
+          filename: test.gcfg
+          config:
+            Settings:
+              Enabled: true
+              MaxConnections: 100
+    asserts:
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "Enabled = true"
+      - matchRegex:
+          path: data["test.gcfg"]
+          pattern: "MaxConnections = 100"
+
+  - it: should handle empty config section in gcfg
+    set:
+      testConfig:
+        gcfg:
+          filename: empty.gcfg
+          config:
+            EmptySection: {}
+    asserts:
+      - matchRegex:
+          path: data["empty.gcfg"]
+          pattern: "\\[EmptySection\\]"
+
+  # ========================================
+  # INI Format Tests
+  # ========================================
+  - it: should render ini with basic section and key-value pairs
+    set:
+      testConfig:
+        ini:
+          filename: test.ini
+          config:
+            section1:
+              key1: value1
+              key2: value2
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-ini
+      - matchRegex:
+          path: data["test.ini"]
+          pattern: "\\[section1\\]"
+      - matchRegex:
+          path: data["test.ini"]
+          pattern: "key1=value1"
+      - matchRegex:
+          path: data["test.ini"]
+          pattern: "key2=value2"
+
+  - it: should render ini with boolean and numeric values
+    set:
+      testConfig:
+        ini:
+          filename: settings.ini
+          config:
+            options:
+              enabled: true
+              count: 42
+    asserts:
+      - matchRegex:
+          path: data["settings.ini"]
+          pattern: "enabled=true"
+      - matchRegex:
+          path: data["settings.ini"]
+          pattern: "count=42"
+
+  # ========================================
+  # DCF Format Tests
+  # ========================================
+  - it: should render dcf with basic key-value pairs
+    set:
+      testConfig:
+        dcf:
+          filename: test.dcf
+          config:
+            Package: mypackage
+            Version: 1.0.0
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-dcf
+      - matchRegex:
+          path: data["test.dcf"]
+          pattern: "Package: mypackage"
+      - matchRegex:
+          path: data["test.dcf"]
+          pattern: "Version: 1.0.0"
+
+  # ========================================
+  # JSON Format Tests
+  # ========================================
+  - it: should render json with simple object
+    set:
+      testConfig:
+        json:
+          filename: config.json
+          config:
+            name: test
+            enabled: true
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-json
+      - matchRegex:
+          path: data["config.json"]
+          pattern: '"name": "test"'
+      - matchRegex:
+          path: data["config.json"]
+          pattern: '"enabled": true'
+
+  - it: should render json with nested object
+    set:
+      testConfig:
+        json:
+          filename: nested.json
+          config:
+            server:
+              host: localhost
+              port: 8080
+    asserts:
+      - matchRegex:
+          path: data["nested.json"]
+          pattern: '"server":'
+      - matchRegex:
+          path: data["nested.json"]
+          pattern: '"host": "localhost"'
+
+  - it: should render json with array values
+    set:
+      testConfig:
+        json:
+          filename: array.json
+          config:
+            items:
+              - first
+              - second
+    asserts:
+      - matchRegex:
+          path: data["array.json"]
+          pattern: '"items":'
+      - matchRegex:
+          path: data["array.json"]
+          pattern: '"first"'
+      - matchRegex:
+          path: data["array.json"]
+          pattern: '"second"'
+
+  - it: should render json with empty object
+    set:
+      testConfig:
+        json:
+          filename: empty.json
+          config: {}
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-json
+
+  # ========================================
+  # TXT Format Tests
+  # ========================================
+  - it: should render txt with default comment delimiter
+    set:
+      testConfig:
+        txt:
+          filename: config.txt
+          config:
+            key1: value1
+            key2: value2
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-config-txt
+      - matchRegex:
+          path: data["config.txt"]
+          pattern: "# key1"
+      - matchRegex:
+          path: data["config.txt"]
+          pattern: "value1"
+
+  # ========================================
+  # Empty/Null Value Tests
+  # ========================================
+  - it: should render gcfg with empty config section
+    set:
+      testConfig:
+        gcfg:
+          filename: empty.gcfg
+          config:
+            EmptySection: {}
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: data["empty.gcfg"]
+          pattern: "\\[EmptySection\\]"
+
+  - it: should render ini with empty section
+    set:
+      testConfig:
+        ini:
+          filename: empty.ini
+          config:
+            empty_section: {}
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: data["empty.ini"]
+          pattern: "\\[empty_section\\]"

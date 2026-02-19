@@ -1,0 +1,161 @@
+# Test values for rstudio-library-test harness
+# These values are used by test templates to exercise library functions
+#
+# Each testXxx block corresponds to a test template in templates/test-xxx.yaml
+# Tests use _base_values.yaml to null out all categories, then override
+# only the specific category being tested
+
+# Config formatter test values
+# Exercises: config.gcfg, config.ini, config.dcf, config.json, config.txt
+testConfig:
+  gcfg:
+    filename: test.gcfg
+    config:
+      section1:
+        key1: value1
+        key2: value2
+      section2:
+        arrayKey:
+          - item1
+          - item2
+  ini:
+    filename: test.ini
+    config:
+      section1:
+        key1: value1
+        key2: 123
+  dcf:
+    filename: test.dcf
+    config:
+      key1: value1
+      nested:
+        subkey: subvalue
+  json:
+    filename: test.json
+    config:
+      stringKey: stringValue
+      numberKey: 42
+      boolKey: true
+      arrayKey:
+        - item1
+        - item2
+  txt:
+    filename: test.txt
+    config:
+      key1: value1
+      key2: value2
+
+# Ingress helper test values
+# Exercises: ingress.apiVersion, ingress.path, ingress.backend,
+#            ingress.supportsIngressClassName, ingress.supportsPathType
+testIngress:
+  serviceName: test-service
+  servicePort: 8080
+  path: /test
+  pathType: Prefix
+
+# License helper test values
+# Exercises: license-env, license-mount, license-volume, license-secret
+testLicense:
+  licenseKey: "test-license-key"
+  licenseServer: "license.example.com"
+  licenseFile: |
+    LICENSE CONTENT HERE
+
+# RBAC test values
+# Exercises: rbac (ServiceAccount, Role, RoleBinding, ClusterRole)
+testRbac:
+  serviceAccountCreate: true
+  serviceAccountName: test-sa
+  clusterRoleCreate: false
+  namespace: test-namespace
+  targetNamespace: test-target
+  removeNamespaceReferences: false
+  labels: {}
+  annotations: {}
+
+# Profiles test values
+# Exercises: profiles.ini, profiles.ini.singleFile, profiles.ini.collapse-array,
+#            profiles.ini.advanced, profiles.json-from-overrides-config,
+#            profiles.apply-everyone-and-default-to-others
+testProfiles:
+  # Basic INI test
+  basicIni:
+    launcher.kubernetes.profiles.conf:
+      "*":
+        default-cpus: 1
+        default-mem-mb: 512
+      testuser:
+        default-cpus: 2
+  # Single file test
+  singleFile:
+    "*":
+      job-name: default-job
+    testuser:
+      job-name: user-job
+  # Collapse array test
+  collapseArray:
+    simple:
+      - one
+      - two
+      - three
+    targetFile:
+      - target: pods
+        file: /etc/config/pods.json
+      - target: services
+        file: /etc/config/services.json
+  # Advanced profiles test
+  advanced:
+    data:
+      launcher.kubernetes.profiles.conf:
+        "*":
+          default-cpus: 1
+        testuser:
+          default-cpus: 4
+    jobJsonDefaults: []
+    filePath: /etc/rstudio/
+  # JSON overrides test (optional - tests set this explicitly)
+  # jsonOverrides: ...
+  # Apply everyone test (optional - tests set this explicitly)
+  # applyEveryone: ...
+
+# Debug helper test values
+# Exercises: debug.type-check
+testDebug:
+  mapValue:
+    key: value
+  sliceValue:
+    - item1
+    - item2
+  stringValue: "test string"
+  boolValue: true
+
+# Launcher template test values
+# Exercises: templates.skeleton, templates.dataOutput, templates.dataOutputPretty
+testLauncherTemplates:
+  templateName: test-template
+  content:
+    key1: value1
+    key2: value2
+    nested:
+      subkey: subvalue
+
+# Tplvalues test values
+# Exercises: tplvalues.render
+testTplvalues:
+  staticValue: "static"
+  templateValue: "{{ .Release.Name }}-suffix"
+  objectValue:
+    name: "{{ .Release.Name }}"
+    namespace: "{{ .Release.Namespace }}"
+
+# Chronicle agent test values
+# Exercises: chronicle-agent.image, chronicle-agent.serverAddress
+testChronicle:
+  enabled: true
+  serverAddress: "http://chronicle-server.default:8080"
+  serverNamespace: ""
+  image:
+    registry: ghcr.io
+    repository: rstudio/chronicle-agent
+    tag: "1.0.0"

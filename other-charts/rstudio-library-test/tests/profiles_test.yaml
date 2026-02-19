@@ -1,0 +1,237 @@
+suite: Profiles Helpers
+templates:
+  - templates/test-profiles.yaml
+values:
+  - _base_values.yaml
+
+tests:
+  # ========================================
+  # Basic profiles.ini Tests
+  # ========================================
+  - it: should render basic profiles.ini with sections
+    set:
+      testProfiles:
+        basicIni:
+          launcher.kubernetes.profiles.conf:
+            "*":
+              default-cpus: 1
+              default-mem-mb: 512
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-profiles-ini
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[\\*\\]"
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "default-cpus=1"
+
+  # ========================================
+  # profiles.ini.singleFile Tests
+  # ========================================
+  - it: should render single INI file content
+    set:
+      testProfiles:
+        singleFile:
+          "*":
+            setting: value1
+          testuser:
+            setting: value2
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-profiles-single-file
+      - matchRegex:
+          path: data["profiles.conf"]
+          pattern: "\\[\\*\\]"
+      - matchRegex:
+          path: data["profiles.conf"]
+          pattern: "\\[testuser\\]"
+
+  # ========================================
+  # profiles.ini.collapse-array Tests
+  # ========================================
+  - it: should collapse simple array with commas
+    set:
+      testProfiles:
+        collapseArray:
+          simple:
+            - one
+            - two
+            - three
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-profiles-collapse-array
+      - equal:
+          path: data.simple
+          value: "one,two,three"
+
+  - it: should collapse target/file array with quotes and colons
+    set:
+      testProfiles:
+        collapseArray:
+          simple:
+            - dummy
+          targetFile:
+            - target: pods
+              file: /etc/pods.json
+            - target: services
+              file: /etc/svc.json
+    asserts:
+      - matchRegex:
+          path: data.targetFile
+          pattern: '"pods":"/etc/pods.json"'
+      - matchRegex:
+          path: data.targetFile
+          pattern: '"services":"/etc/svc.json"'
+
+  # ========================================
+  # profiles.ini.advanced Tests
+  # ========================================
+  - it: should render advanced profiles with everyone section
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              "*":
+                default-cpus: 2
+          jobJsonDefaults: []
+          filePath: /etc/rstudio/
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-profiles-advanced
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[\\*\\]"
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "default-cpus=2"
+
+  # ========================================
+  # profiles.json-from-overrides-config Tests
+  # ========================================
+  - it: should generate JSON files from overrides config
+    set:
+      testProfiles:
+        jsonOverrides:
+          data:
+            "*":
+              job-json-overrides:
+                - name: default-limits
+                  target: pods
+                  json:
+                    resources:
+                      limits:
+                        cpu: "2"
+          default: []
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-profiles-json-overrides
+      - matchRegex:
+          path: data["default-limits.json"]
+          pattern: '"resources"'
+
+  - it: should fail when override missing required keys
+    set:
+      testProfiles:
+        jsonOverrides:
+          data:
+            "*":
+              job-json-overrides:
+                - name: incomplete
+                  json:
+                    data: value
+          default: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "must have keys 'name', 'json', and 'target'"
+
+  # ========================================
+  # profiles.apply-everyone-and-default-to-others Tests
+  # ========================================
+  - it: should apply everyone config to all sections
+    set:
+      testProfiles:
+        applyEveryone:
+          data:
+            "*":
+              shared-setting: everyone-value
+            user1:
+              user-setting: user1-value
+          default: []
+          filePath: ""
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-profiles-apply-everyone
+      - matchRegex:
+          path: data["profiles.conf"]
+          pattern: "shared-setting=everyone-value"
+
+  # ========================================
+  # Type Safety Tests
+  # ========================================
+  - it: should not render basicIni when value is a string instead of map
+    set:
+      testProfiles:
+        basicIni: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render singleFile when value is a string instead of map
+    set:
+      testProfiles:
+        singleFile: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render collapseArray when value is a string instead of map
+    set:
+      testProfiles:
+        collapseArray: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render advanced when value is a string instead of map
+    set:
+      testProfiles:
+        advanced: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render jsonOverrides when value is a string instead of map
+    set:
+      testProfiles:
+        jsonOverrides: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render applyEveryone when value is a string instead of map
+    set:
+      testProfiles:
+        applyEveryone: "not-a-map"
+    asserts:
+      - hasDocuments:
+          count: 0

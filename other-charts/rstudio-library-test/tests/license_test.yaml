@@ -1,0 +1,93 @@
+suite: License Helpers
+templates:
+  - templates/test-license.yaml
+values:
+  - _base_values.yaml
+
+# Note: License templates output multiple document types.
+# Document order: 0=ConfigMap (env), 1=ConfigMap (mount), 2=ConfigMap (volume), 3+=Secrets
+
+tests:
+  # ========================================
+  # License Key Configuration Tests
+  # ========================================
+  - it: should create license secret with key configured
+    set:
+      testLicense:
+        licenseKey: "SECRET-KEY-12345"
+        licenseServer: ""
+        licenseFile: ""
+    asserts:
+      - hasDocuments:
+          count: 4
+      - isKind:
+          of: Secret
+        documentIndex: 3
+      - equal:
+          path: stringData["test-product"]
+          value: "SECRET-KEY-12345"
+        documentIndex: 3
+
+  - it: should create env ConfigMap with license environment variable
+    set:
+      testLicense:
+        licenseKey: "SECRET-KEY-12345"
+        licenseServer: ""
+        licenseFile: ""
+    asserts:
+      - isKind:
+          of: ConfigMap
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: test-license-env
+        documentIndex: 0
+      - matchRegex:
+          path: data["env.yaml"]
+          pattern: "TEST_LICENSE"
+        documentIndex: 0
+
+  # ========================================
+  # License File Configuration Tests
+  # ========================================
+  - it: should render license template with file configured
+    set:
+      testLicense:
+        licenseKey: ""
+        licenseServer: ""
+        licenseFile: |
+          LICENSE CONTENT
+    asserts:
+      - hasDocuments:
+          count: 4
+
+  # ========================================
+  # Full Configuration Tests
+  # ========================================
+  - it: should render all documents with all options configured
+    set:
+      testLicense:
+        licenseKey: "KEY"
+        licenseServer: "server.example.com"
+        licenseFile: |
+          LICENSE
+    asserts:
+      - hasDocuments:
+          count: 5
+
+  # ========================================
+  # Release Context Tests
+  # ========================================
+  - it: should include release name in secret name
+    set:
+      testLicense:
+        licenseKey: "TEST-KEY"
+        licenseServer: ""
+        licenseFile: ""
+    release:
+      name: my-app
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: "my-app-license"
+        documentIndex: 3

@@ -1,0 +1,135 @@
+suite: Launcher Templates Helpers
+templates:
+  - templates/test-launcher-templates.yaml
+values:
+  - _base_values.yaml
+
+tests:
+  # ========================================
+  # templates.skeleton Tests
+  # ========================================
+  - it: should output valid YAML wrapped in define block
+    set:
+      testLauncherTemplates:
+        templateName: my-template
+        content:
+          key1: value1
+          key2: value2
+    asserts:
+      - isKind:
+          of: ConfigMap
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: test-launcher-skeleton
+        documentIndex: 0
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: 'define "my-template"'
+        documentIndex: 0
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: "key1: value1"
+        documentIndex: 0
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: "key2: value2"
+        documentIndex: 0
+
+  - it: should render nested values correctly in skeleton
+    set:
+      testLauncherTemplates:
+        templateName: nested-template
+        content:
+          parent:
+            child1: value1
+            child2:
+              grandchild: deep-value
+    asserts:
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: "parent:"
+        documentIndex: 0
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: "child1: value1"
+        documentIndex: 0
+
+  # ========================================
+  # templates.dataOutput Tests
+  # ========================================
+  - it: should output JSON wrapped in define block
+    set:
+      testLauncherTemplates:
+        templateName: json-template
+        content:
+          key1: value1
+          key2: value2
+    asserts:
+      - isKind:
+          of: ConfigMap
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: test-launcher-data-output
+        documentIndex: 1
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: 'define "json-template"'
+        documentIndex: 1
+
+  # ========================================
+  # templates.dataOutputPretty Tests
+  # ========================================
+  - it: should output pretty JSON wrapped in define block
+    set:
+      testLauncherTemplates:
+        templateName: pretty-json-template
+        content:
+          key1: value1
+          key2: value2
+    asserts:
+      - isKind:
+          of: ConfigMap
+        documentIndex: 2
+      - equal:
+          path: metadata.name
+          value: test-launcher-data-output-pretty
+        documentIndex: 2
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: 'define "pretty-json-template"'
+        documentIndex: 2
+
+  # ========================================
+  # trailingDash Parameter Tests
+  # ========================================
+  - it: should not include trailing dash when trailingDash is false
+    set:
+      testLauncherTemplates:
+        templateName: no-dash-template
+        content:
+          key: value
+    asserts:
+      - isKind:
+          of: ConfigMap
+        documentIndex: 3
+      - equal:
+          path: metadata.name
+          value: test-launcher-no-trailing-dash
+        documentIndex: 3
+
+  # ========================================
+  # Template Name Tests
+  # ========================================
+  - it: should handle template names with dots
+    set:
+      testLauncherTemplates:
+        templateName: my.namespaced.template
+        content:
+          data: value
+    asserts:
+      - matchRegex:
+          path: data["template.tpl"]
+          pattern: 'define "my.namespaced.template"'
+        documentIndex: 0

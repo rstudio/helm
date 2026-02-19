@@ -1,0 +1,67 @@
+{{/*
+Test templates for rstudio-library config formatters.
+Each ConfigMap exercises a different config format template.
+*/}}
+
+{{- if .Values.testConfig }}
+{{- if .Values.testConfig.gcfg }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config-gcfg
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{ .Values.testConfig.gcfg.filename }}: |
+    {{- include "rstudio-library.config.gcfg" .Values.testConfig.gcfg.config | nindent 4 }}
+{{- end }}
+
+{{- if .Values.testConfig.ini }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config-ini
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.config.ini" (dict .Values.testConfig.ini.filename .Values.testConfig.ini.config) | nindent 2 }}
+{{- end }}
+
+{{- if .Values.testConfig.dcf }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config-dcf
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.config.dcf" (dict .Values.testConfig.dcf.filename .Values.testConfig.dcf.config) | nindent 2 }}
+{{- end }}
+
+{{- if .Values.testConfig.json }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config-json
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.config.json" (dict .Values.testConfig.json.filename .Values.testConfig.json.config) | nindent 2 }}
+{{- end }}
+
+{{- if .Values.testConfig.txt }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config-txt
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.config.txt" (dict "data" (dict .Values.testConfig.txt.filename .Values.testConfig.txt.config)) | nindent 2 }}
+{{- end }}
+{{- end }}

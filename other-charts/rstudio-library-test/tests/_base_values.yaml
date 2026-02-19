@@ -1,0 +1,33 @@
+# Base values that null out all test categories
+# Each test suite should include this file and then override only what it needs
+# This reduces boilerplate and makes adding new test categories easier
+
+testConfig:
+  gcfg: null
+  ini: null
+  dcf: null
+  json: null
+  txt: null
+
+testIngress: null
+
+testLicense: null
+
+testRbac: null
+
+testProfiles:
+  basicIni: null
+  singleFile: null
+  collapseArray: null
+  advanced: null
+  jsonOverrides: null
+  applyEveryone: null
+
+testDebug: null
+
+testLauncherTemplates: null
+
+testTplvalues: null
+
+testChronicle:
+  enabled: false
