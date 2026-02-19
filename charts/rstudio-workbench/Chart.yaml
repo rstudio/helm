@@ -3,7 +3,7 @@ description: Official Helm chart for Posit Workbench
 version: 0.10.7
 apiVersion: v2
 appVersion: 2026.01.1+403
-icon: 
+icon:
   https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
 home: https://www.rstudio.com
 sources:
