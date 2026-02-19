@@ -725,7 +725,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | userPassword.value | string | `"rstudio"` | userPassword determines the password of the created user. Will only be used if `userPassword.existingSecret` is not set. |
 | userUid | string | `"10000"` | userUid determines the UID of the created user |
 | versionOverride | string | `""` | A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194 |
-| xdgConfigDirs | string | `"/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"` | The XDG config dirs (directories where configuration will be read from). Do not change without good reason. |
+| xdgConfigDirs | string | `"/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/:/etc"` | The XDG config dirs (directories where configuration will be read from). Do not change without good reason. |
 | xdgConfigDirsExtra | list | `[]` | A list of additional XDG config dir paths |
 
 ----------------------------------------------
