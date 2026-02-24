@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.37
+
+- Update rbac role rules to include endpointslice list/watch permissions
+
 ## 0.1.36
 
 - Update chart icon to Posit icon

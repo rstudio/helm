@@ -76,6 +76,33 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
     {{- $defaultConfig = merge $defaultConfig $launcherDict }}
   {{- end }}
+  {{- if .Values.kubernetes.enabled }}
+    {{- $namespace := default $.Release.Namespace .Values.kubernetes.namespace }}
+    {{- $kubernetesSettingsDict := dict "Enabled" ("true") "Namespace" ($namespace) }}
+    {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
+      {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
+      {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
+    {{- end }}
+    {{- if .Values.kubernetes.defaultJobOverlay }}
+      {{- if and .Values.kubernetes.defaultInitContainer.enabled }}
+        {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+        {{- $initContainerImageTag := .Values.kubernetes.defaultInitContainer.tag | default (printf "%s%s" .Values.kubernetes.defaultInitContainer.tagPrefix $defaultVersion )}}
+        {{- $initContainerImage := print .Values.kubernetes.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
+        {{- range (.Values.kubernetes.defaultJobOverlay.spec.template.spec).initContainers | default list }}
+            {{- if eq .name "connect-content-init" }}
+                {{- $_ := set . "image" $initContainerImage }}
+                {{- break }}
+            {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- $_ := set $kubernetesSettingsDict "DefaultJobOverlay" (default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultJobOverlay) }}
+    {{- end }}
+    {{- if .Values.kubernetes.defaultServiceOverlay }}
+      {{- $_ = set $kubernetesSettingsDict "DefaultServiceOverlay" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultServiceOverlay) }}
+    {{- end }}
+    {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
+    {{- $defaultConfig = merge $defaultConfig $kubernetesDict }}
+  {{- end }}
   {{- /* default licensing configuration */}}
   {{- if .Values.license.server }}
     {{- $licenseDict := dict "Licensing" ( dict "LicenseType" ("Remote") ) }}

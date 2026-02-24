@@ -1,0 +1,266 @@
+suite: test kubernetes configuration
+templates:
+  - NOTES.txt
+  - configmap-prestart.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - rbac.yaml
+tests:
+  # Test validation: launcher.enabled and kubernetes.enabled cannot both be true
+  - it: should fail when both launcher.enabled and kubernetes.enabled are true
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: true
+      kubernetes:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "`launcher.enabled` and `kubernetes.enabled` cannot both be true"
+
+  # Test kubernetes.enabled creates configmap entries for job overlay
+  - it: should create job.yaml in configmap when kubernetes.enabled and defaultJobOverlay is set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - exists:
+          path: data["job.yaml"]
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "apiVersion: batch/v1"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "kind: Job"
+
+  - it: should not create job.yaml when kubernetes.enabled is false
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: false
+    asserts:
+      - notExists:
+          path: data["job.yaml"]
+
+  # Test deployment volumeMounts for kubernetes overlays
+  - it: should mount job.yaml when kubernetes.enabled and defaultJobOverlay is set
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
+  - it: should not mount job.yaml when kubernetes.enabled is false
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
+  # Test RBAC resources are created when kubernetes.enabled
+  - it: should create RBAC resources when kubernetes.enabled and rbac.create are true
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+      rbac:
+        create: true
+    asserts:
+      - hasDocuments:
+          count: 3 # ServiceAccount, Role, RoleBinding
+
+  - it: should not create RBAC resources when kubernetes.enabled is false and launcher.enabled is false
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: false
+      rbac:
+        create: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test kubernetes namespace configuration
+  - it: should use custom namespace when kubernetes.namespace is specified
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+        namespace: custom-namespace
+      rbac:
+        create: true
+    documentIndex: 1 # Role document
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+
+  - it: should use release namespace when kubernetes.namespace is not specified
+    template: rbac.yaml
+    release:
+      namespace: test-namespace
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+      rbac:
+        create: true
+    documentIndex: 1 # Role document
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+
+  # Test serviceAccount configuration with kubernetes.enabled
+  - it: should set serviceAccountName when kubernetes.enabled and rbac.create are true
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+      rbac:
+        create: true
+        serviceAccount:
+          create: true
+          name: custom-sa
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: custom-sa
+
+  # Test that sharedStorage.mountContent propagates to kubernetes config
+  - it: should configure DataDirPVCName when sharedStorage is enabled and mountContent is true
+    template: configmap.yaml
+    release:
+      name: my-connect
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        mountContent: true
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DataDirPVCName = my-connect-rstudio-connect-shared-storage"
+
+  - it: should not configure DataDirPVCName when sharedStorage.mountContent is false
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        mountContent: false
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DataDirPVCName"
+
+  # Test kubernetes config section in rstudio-connect.gcfg
+  - it: should configure Kubernetes.Enabled in gcfg when kubernetes.enabled is true
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+        namespace: k8s-namespace
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "\\[Kubernetes\\]"
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "Enabled = true"
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "Namespace = k8s-namespace"
+
+  - it: should configure DefaultJobOverlay path when defaultJobOverlay is set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DefaultJobOverlay = /etc/rstudio-connect/job.yaml"
+
+  # Test with both launcher disabled and kubernetes enabled
+  - it: should work correctly with launcher disabled and kubernetes enabled
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+      rbac:
+        create: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-rstudio-connect
+
+  # Test serviceAccount is set correctly when kubernetes.enabled
+  - it: should generate default serviceAccountName when kubernetes.enabled
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+      rbac:
+        create: true
+        serviceAccount:
+          create: true
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-rstudio-connect
+
+  # Test that config includes Kubernetes section
+  - it: should include Kubernetes config section when enabled
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      kubernetes:
+        enabled: true
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "\\[Kubernetes\\]"

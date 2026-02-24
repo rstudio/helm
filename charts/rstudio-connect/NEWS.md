@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.27
+
+- Adds support for a native-Go implementation of Off-Host Execution (OHE) mode. Set `kubernetes.enabled = true` to switch to the new implementation. See the [migration guide](<todo: insert migration guide docs link>) in the Connect admin documentation for guidance on migrating existing configurations.  
+
 ## 0.8.26
 
 - Fix bug in chart where sharedStorage.subPath did not propagate to launcher-managed job volumeMounts.
