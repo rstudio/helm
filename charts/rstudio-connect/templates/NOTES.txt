@@ -34,6 +34,10 @@ Please consider removing this configuration value.
 
 {{- /* chart deprecations and misconfiguration warnings */ -}}
 
+{{- if and .Values.launcher.enabled .Values.kubernetes.enabled }}
+  {{- fail "\n\n`launcher.enabled` and `kubernetes.enabled` cannot both be true"}}
+{{- end }}
+
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
   {{- range $k,$v :=  .Values.launcher.launcherKubernetesProfilesConf }}
     {{- if hasKey $v "job-json-overrides" }}

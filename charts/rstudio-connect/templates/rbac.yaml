@@ -1,6 +1,11 @@
-{{- if and (.Values.rbac.create) (.Values.launcher.enabled) }}
+{{- if and (.Values.rbac.create) (or .Values.launcher.enabled .Values.kubernetes.enabled) }}
 {{ $namespace := $.Release.Namespace }}
-{{ $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
+{{ $targetNamespace := $.Release.Namespace }}
+{{- if .Values.launcher.enabled }}
+{{ $targetNamespace = default $targetNamespace .Values.launcher.namespace }}
+{{- else }}
+{{ $targetNamespace = default $targetNamespace .Values.kubernetes.namespace }}
+{{- end }}
 {{ $serviceAccountName := default (include "rstudio-connect.fullname" .) .Values.rbac.serviceAccount.name }}
 {{ $serviceAccountCreate := .Values.rbac.serviceAccount.create }}
 {{ $serviceAccountAnnotations := .Values.rbac.serviceAccount.annotations }}

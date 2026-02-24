@@ -24,7 +24,7 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if .Values.launcher.enabled }}
+        {{- if or .Values.launcher.enabled .Values.kubernetes.enabled }}
         checksum/config-prestart: {{ include (print $.Template.BasePath "/configmap-prestart.yaml") . | sha256sum }}
         {{- end }}
       {{- if .Values.prometheus }}
@@ -73,7 +73,7 @@ spec:
          * and also the "Note" callout at the end of this section:
          * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
          */}}
-      {{- if and .Values.rbac.create .Values.launcher.enabled }}
+      {{- if and .Values.rbac.create (or .Values.launcher.enabled .Values.kubernetes.enabled) }}
       {{ $serviceAccountName := default (include "rstudio-connect.fullname" .) .Values.rbac.serviceAccount.name }}
       serviceAccountName: {{ $serviceAccountName }}
       {{- else }}
@@ -167,7 +167,7 @@ spec:
         {{- if .Values.command }}
         command:
 {{ toYaml .Values.command | indent 10 }}
-        {{- else if .Values.launcher.enabled }}
+        {{- else if (or .Values.launcher.enabled .Values.kubernetes.enabled) }}
         command:
           - tini
           - -s
@@ -176,7 +176,7 @@ spec:
         {{- if .Values.args }}
         args:
 {{ toYaml .Values.args | indent 10 }}
-        {{- else if .Values.launcher.enabled }}
+        {{- else if (or .Values.launcher.enabled .Values.kubernetes.enabled) }}
         args:
           - /scripts/prestart.bash
           - /usr/local/bin/startup.sh
@@ -197,6 +197,18 @@ spec:
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/rstudio-connect.gcfg"
             subPath: "rstudio-connect.gcfg"
+          {{- if .Values.kubernetes.enabled }}
+          {{- if .Values.kubernetes.defaultJobOverlay }}
+          - name: rstudio-connect-config
+            mountPath: "/etc/rstudio-connect/job.yaml"
+            subPath: "job.yaml"
+          {{- end }}
+          {{- if .Values.kubernetes.defaultServiceOverlay }}
+          - name: rstudio-connect-config
+            mountPath: "/etc/rstudio-connect/service.yaml"
+            subPath: "service.yaml"
+          {{- end }}
+          {{- end }}
           {{- if .Values.launcher.enabled }}
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/runtime.yaml"
@@ -313,6 +325,8 @@ spec:
           name: {{ include "rstudio-connect.fullname" . }}-overrides
           defaultMode: 0644
       {{- end }}
+      {{- end }}
+      {{- if or .Values.launcher.enabled .Values.kubernetes.enabled }}
       - name: rstudio-connect-prestart
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-prestart

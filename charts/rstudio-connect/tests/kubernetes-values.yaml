@@ -1,0 +1,24 @@
+launcher:
+  enabled: false
+
+kubernetes:
+  enabled: true
+  defaultJobOverlay:
+    apiVersion: batch/v1
+    kind: Job
+    spec:
+      template:
+        spec:
+          containers:
+            - name: connect-content
+              volumeMounts:
+                - mountPath: /opt/rstudio-connect
+                  name: rsc-volume
+          initContainers:
+            - name: connect-content-init
+              volumeMounts:
+                - mountPath: /mnt/rstudio-connect-runtime/
+                  name: rsc-volume
+          volumes:
+            - emptyDir: {}
+              name: rsc-volume
