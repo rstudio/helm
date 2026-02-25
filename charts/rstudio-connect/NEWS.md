@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.27
+
+- Bump Connect version to 2026.02.0
+
 ## 0.8.26
 
 - Fix bug in chart where sharedStorage.subPath did not propagate to launcher-managed job volumeMounts.
