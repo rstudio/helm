@@ -88,12 +88,13 @@ test chart='all':
 
 test-connect-interpreter-versions:
   #!/usr/bin/env bash
-  set -xe
+  set -euxo pipefail
   cd ./charts/rstudio-connect && helm dependency build && cd -
 
   # find the default image
   image=$(
     helm template ./charts/rstudio-connect \
+    --set launcher.enabled=false \
     --show-only templates/deployment.yaml | \
     grep "image\:.*rstudio-connect.*" | \
     awk -F": " '{print $2}' | \
@@ -105,7 +106,7 @@ test-connect-interpreter-versions:
     # print the section and grep for the Executables to find each interpreter
     executables=$(
       helm template ./charts/rstudio-connect \
-      --set config.Launcher.Enabled=false \
+      --set launcher.enabled=false \
       --show-only templates/configmap.yaml | \
       sed -n -e "/\[$lang\]/,/\[*\]/ p" | \
       grep Executable | awk -F= '{print $2}' | \
