@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.29
+
+- Re-enable TensorFlow serving and remove executable path from Connect configuration
+
 ## 0.8.28
 
 - Disable TensorFlow serving by default in Connect configuration
