@@ -393,7 +393,7 @@ launcher:
     tag: ""
     # -- The imagePullPolicy for the default initContainer
     imagePullPolicy: ""
-  # -- Optional resources for the default initContainer
+    # -- Optional resources for the default initContainer
     resources: {}
       # requests:
       #   cpu: "128m"
@@ -447,14 +447,17 @@ config:
     Executable: "/opt/quarto/1.4.557/bin/quarto"
   TensorFlow:
     Enabled: true
+    # For off-host Execution, TensorFlow versions are defined by the set of Execution Environments https://docs.posit.co/connect/admin/tensorflow/
+    # When using TensorFlow with local execution, define an executable path corresponding to the TensorFlow serving binary within your Connect container.
+    # Executable: "/usr/bin/tensorflow_model_server"
   Scheduler:
     InitTimeout: 5m
   Logging:
     ServiceLog: STDOUT
-    ServiceLogLevel: INFO    # INFO, WARNING or ERROR
-    ServiceLogFormat: TEXT   # TEXT or JSON
+    ServiceLogLevel: INFO # INFO, WARNING or ERROR
+    ServiceLogFormat: TEXT # TEXT or JSON
     AccessLog: STDOUT
-    AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
+    AccessLogFormat: COMMON # COMMON, COMBINED, or JSON
   Metrics:
     Enabled: true
   Launcher: {}
