@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.28
+
+- Disable TensorFlow serving by default in Connect configuration
+
 ## 0.8.27
 
 - Bump Connect version to 2026.02.0
