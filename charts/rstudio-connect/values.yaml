@@ -85,6 +85,10 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 
+deployment:
+  # -- Additional annotations to add to the rstudio-connect deployment
+  annotations: {}
+
 service:
   # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}

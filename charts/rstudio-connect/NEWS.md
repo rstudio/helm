@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.30
+
+- Add `deployment.annotations` to support user-defined annotations on the Deployment resource
+
 ## 0.8.29
 
 - Re-enable TensorFlow serving and remove executable path from Connect configuration
