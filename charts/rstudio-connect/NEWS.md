@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.30
+
+- Fix connect-version-check in CI 
+
 ## 0.8.29
 
 - Re-enable TensorFlow serving and remove executable path from Connect configuration
