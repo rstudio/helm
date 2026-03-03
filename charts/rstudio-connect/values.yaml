@@ -438,13 +438,13 @@ config:
     # https://docs.posit.co/connect/admin/python/
     Executable:
       - /opt/python/3.12.11/bin/python
-      - /opt/python/3.11.13/bin/python
+      - /opt/python/3.13.9/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.
     # For Off-Host Execution, Quarto versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/quarto/
-    Executable: "/opt/quarto/1.4.557/bin/quarto"
+    Executable: "/opt/quarto/1.8.25/bin/quarto"
   TensorFlow:
     Enabled: true
     # For off-host Execution, TensorFlow versions are defined by the set of Execution Environments https://docs.posit.co/connect/admin/tensorflow/
