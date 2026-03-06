@@ -7,7 +7,11 @@ main() {
   local dyn_dir='/mnt/dynamic/rstudio'
 
   local cacert='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-  local k8s_url="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+  local host="${KUBERNETES_SERVICE_HOST}"
+  if [[ "${host}" == *:* ]]; then
+    host="[${host}]"
+  fi
+  local k8s_url="https://${host}:${KUBERNETES_SERVICE_PORT}"
 
   _logf 'Loading service account token'
   local sa_token
