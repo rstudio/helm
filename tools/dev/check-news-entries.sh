@@ -31,8 +31,17 @@ for chart_dir in charts/*/  other-charts/*/; do
   fi
 
   if ! grep -q "^## ${current_version}$" "$news_md"; then
-    echo "Error: ${chart_dir}NEWS.md is missing an entry for version ${current_version}."
-    echo "  Add a '## ${current_version}' section to ${news_md}."
+    echo "Error: ${news_md} is missing an entry for version ${current_version}."
+    echo ""
+    echo "  Chart version was bumped from ${base_version} to ${current_version},"
+    echo "  but NEWS.md has no '## ${current_version}' heading."
+    echo ""
+    echo "  To fix, add a section like this to ${news_md}:"
+    echo ""
+    echo "    ## ${current_version}"
+    echo ""
+    echo "    - Description of what changed"
+    echo ""
     exit_code=1
   fi
 done
