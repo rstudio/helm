@@ -7,3 +7,4 @@ Makefile
 ci/
 lint/
 tests/
+NEWS.md

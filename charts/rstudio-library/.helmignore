@@ -27,3 +27,4 @@
 ci/
 lint/
 tests/
+NEWS.md

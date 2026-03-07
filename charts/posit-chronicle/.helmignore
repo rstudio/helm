@@ -30,3 +30,4 @@ tests/
 
 # helm unittest debug files
 .debug/
+NEWS.md
