@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.10.9
+
+- Add missing NEWS.md entry for 0.10.8
+
 ## 0.10.8
 
 - Fix session launch failure for projects with long names caused by Go YAML marshal wrapping `name` and `service_ports` annotations in `job.tpl` at 80 characters, producing invalid YAML
