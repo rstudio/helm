@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.10.8
+
+- Fix session launch failure for projects with long names caused by Go YAML marshal wrapping `name` and `service_ports` annotations in `job.tpl` at 80 characters, producing invalid YAML
+
 ## 0.10.7
 
 - Bump Workbench version to 2026.01.1
