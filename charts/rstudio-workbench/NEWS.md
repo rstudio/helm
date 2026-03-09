@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.10.10
+
+- Fix IPv6 address handling in `prestart-launcher.bash` to properly bracket IPv6 `KUBERNETES_SERVICE_HOST` addresses
+
 ## 0.10.9
 
 - Add missing NEWS.md entry for 0.10.8
