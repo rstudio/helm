@@ -318,6 +318,7 @@ kubernetes:
   # on-top of the overlay base to produce a final job definition before submitting the Job to Kubernetes.
   # https://docs.posit.co/connect/__unreleased__/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html
   # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays
+  # https://kubernetes.io/docs/concepts/workloads/controllers/job/
   defaultJobOverlay:
     apiVersion: batch/v1
     kind: Job
