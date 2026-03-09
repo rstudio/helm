@@ -349,6 +349,7 @@ kubernetes:
   # Service in Kubernetes. Conceptually this is a similar to a Kustomize base. Connect then applies any required Service configuration
   # on-top of the overlay base to produce a final Service definition.
   # https://docs.posit.co/connect/__unreleased__/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html
+  # https://kubernetes.io/docs/concepts/services-networking/service/
   # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays
   defaultServiceOverlay: {}
     # apiVersion: v1
