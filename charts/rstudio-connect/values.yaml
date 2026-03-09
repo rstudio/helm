@@ -305,7 +305,11 @@ kubernetes:
   # -- The namespace to launch connect-content jobs into. Uses the Release namespace by default
   namespace: ""
   defaultInitContainer:
-    # -- Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way.
+    # -- Whether to enable the defaultInitContainer. If disabled, you must ensure 
+    # that the session components are available another way. Changing the default 
+    # setting is an advanced option and not recommended. For more information on 
+    # how Connect uses the session init container refer to
+    # https://docs.posit.co/connect/admin/appendix/off-host/arch-overview/#runtime-init-container
     enabled: true
     # -- The repository to use for the Content InitContainer image
     repository: ghcr.io/rstudio/rstudio-connect-content-init
