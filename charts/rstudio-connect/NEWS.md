@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.32
+
+- Add `executionEnvironments` value for declarative management of execution environments. Unlike `launcher.customRuntimeYaml`, changes take effect on every `helm upgrade` without requiring a pod restart or database reset. Requires Connect version 2026.03.0 or later.
+
 ## 0.8.31
 
 - Add `deployment.annotations` to support user-defined annotations on the Deployment resource
