@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.8.30
+## 0.8.31
 
 - Add `deployment.annotations` to support user-defined annotations on the Deployment resource
+
+## 0.8.30
+
+- Fix connect-version-check in CI
 
 ## 0.8.29
 
@@ -411,8 +415,8 @@
 
 - Bump Connect version to 2023.01.1
 
-
 ## 0.3.16
+
 - Bump rstudio-library to `0.1.24`
   - Update RBAC definition to support listing of service accounts
 
@@ -423,7 +427,6 @@
   - resource requests and limits calculations in `job.tpl`
   - sets `serviceAccountName` in `job.tpl` for content jobs
   - `launcher.templateValues.pod.serviceAccountName` to set the default service account for content pods
-
 
 ## 0.3.14
 
@@ -488,6 +491,7 @@
 - Bump Connect version to 2022.08.1
 
 ## 0.3.1
+
 - Bump Connect version to 2022.08.0
 
 ## 0.3.0
@@ -687,6 +691,7 @@
 - Update docs
 
 ## 0.2.0
+
 - BREAKING: Licensing configuration now uses a `license` section. For example,
   `license: my-key` should be changed to
   ```yaml
