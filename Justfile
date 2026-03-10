@@ -88,12 +88,13 @@ test chart='all':
 
 test-connect-interpreter-versions:
   #!/usr/bin/env bash
-  set -xe
+  set -euo pipefail
   cd ./charts/rstudio-connect && helm dependency build && cd -
 
   # find the default image
   image=$(
     helm template ./charts/rstudio-connect \
+    --set launcher.enabled=false \
     --show-only templates/deployment.yaml | \
     grep "image\:.*rstudio-connect.*" | \
     awk -F": " '{print $2}' | \
@@ -101,18 +102,21 @@ test-connect-interpreter-versions:
 
   for lang in "Python" "Quarto" "R"
   do
+    echo "Testing $lang"
+    
     # print the default connect config file for local execution in ini format
     # print the section and grep for the Executables to find each interpreter
     executables=$(
       helm template ./charts/rstudio-connect \
-      --set config.Launcher.Enabled=false \
+      --set launcher.enabled=false \
       --show-only templates/configmap.yaml | \
       sed -n -e "/\[$lang\]/,/\[*\]/ p" | \
       grep Executable | awk -F= '{print $2}' | \
-      xargs)
+      xargs || echo "")
 
     for ex in $executables
     do
+      echo "Checking $ex"
       docker run --rm $image /bin/bash -c "command -v $ex"
     done
   done

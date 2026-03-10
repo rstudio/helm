@@ -49,8 +49,8 @@ spec:
         {{- end }}
         stdin: {{ toYaml .Job.stdin | indent 8 | trimPrefix (repeat 8 " ") }}
         user: {{ toYaml .Job.user }}
-        name: {{ toYaml .Job.name }}
-        service_ports: {{ toYaml .Job.servicePortsJson }}
+        name: {{ toYaml .Job.name | indent 8 | trimPrefix (repeat 8 " ") }}
+        service_ports: {{ toYaml .Job.servicePortsJson | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- if .Job.metadata }}
         user_metadata: {{ toJson .Job.metadata | toYaml | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- end }}
