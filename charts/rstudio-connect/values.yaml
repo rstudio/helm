@@ -408,6 +408,36 @@ launcher:
     # -- The securityContext for the default initContainer
     securityContext: {}
 
+# -- Optional list of execution environments to manage declaratively.
+# Requires Connect version 2026.03.0 or later.
+# When set, the chart renders these into a ConfigMap, mounts it into the Connect pod,
+# and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration.
+# Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade
+# without requiring a pod restart or database reset.
+# @default -- `[]` (disabled)
+executionEnvironments: []
+  # - name: ghcr.io/my-org/connect-runtime:ubuntu22
+  #   title: "Default Runtime"
+  #   description: "Runtime with R and Python"
+  #   matching: any
+  #   supervisor: ""
+  #   python:
+  #     installations:
+  #       - version: "3.11.3"
+  #         path: /opt/python/3.11.3/bin/python3
+  #   r:
+  #     installations:
+  #       - version: "4.4.0"
+  #         path: /opt/R/4.4.0/bin/R
+  #   quarto:
+  #     installations:
+  #       - version: "1.4.557"
+  #         path: /opt/quarto/1.4.557/bin/quarto
+  #   tensorflow:
+  #     installations:
+  #       - version: "2.17.1"
+  #         path: /usr/bin/tensorflow_model_server
+
 # -- Nameservice configuration for current user execution (RunAsCurrentUser).
 # This can only be enabled if using an SSO authentication provider (OAuth2, SAML, or LDAP).
 nameservice:

@@ -1,0 +1,18 @@
+---
+{{- if .Values.executionEnvironments }}
+{{- range $i, $env := .Values.executionEnvironments }}
+{{- if not $env.name }}
+{{- fail (printf "executionEnvironments[%d].name is required" $i) }}
+{{- end }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-connect.fullname" . }}-execution-environments
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "rstudio-connect.labels" . | nindent 4 }}
+data:
+  environments.yaml: |
+    {{- toYaml .Values.executionEnvironments | nindent 4 }}
+{{- end }}

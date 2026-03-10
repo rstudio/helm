@@ -229,6 +229,11 @@ spec:
             subPath: "libnss_connect.conf"
             readOnly: true
           {{- end }}
+          {{- if .Values.executionEnvironments }}
+          - name: execution-environments
+            mountPath: {{ dir (default "/etc/rstudio-connect/execution-environments/environments.yaml" (dig "ExecutionEnvironments" "ConfigFilePath" "" .Values.config)) | quote }}
+            readOnly: true
+          {{- end }}
       {{- if .Values.pod.volumeMounts }}
           {{- toYaml .Values.pod.volumeMounts | nindent 10 }}
       {{- end }}
@@ -307,6 +312,11 @@ spec:
           items:
           - key: libnss_connect.conf
             path: libnss_connect.conf
+      {{- end }}
+      {{- if .Values.executionEnvironments }}
+      - name: execution-environments
+        configMap:
+          name: {{ include "rstudio-connect.fullname" . }}-execution-environments
       {{- end }}
       {{- if .Values.launcher.enabled }}
       {{- if .Values.launcher.useTemplates }}
