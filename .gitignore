@@ -18,3 +18,8 @@ _publish.yml
 
 # helm packages
 *.tgz
+
+# Claude
+.claude/settings.local.json
+.claude/worktrees/
+.claude/plans/
