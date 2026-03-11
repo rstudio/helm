@@ -33,10 +33,10 @@ sharedStorage:
 
 image:
   # -- the repository to use for the main pod image
-  repository: rstudio/rstudio-package-manager
-  # -- A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined
-  tagPrefix: ubuntu2204-
-  # -- the tag to use for the main pod image
+  repository: ghcr.io/posit-dev/package-manager
+  # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+  os: "ubuntu-24.04"
+  # -- the tag to use for the main pod image. Overrides os and appVersion
   tag: ""
   # -- the imagePullPolicy for the main pod image
   imagePullPolicy: IfNotPresent

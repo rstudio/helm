@@ -209,9 +209,9 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-package-manager"` | the repository to use for the main pod image |
-| image.tag | string | `""` | the tag to use for the main pod image |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"ghcr.io/posit-dev/package-manager"` | the repository to use for the main pod image |
+| image.tag | string | `""` | the tag to use for the main pod image. Overrides os and appVersion |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
