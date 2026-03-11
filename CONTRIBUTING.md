@@ -26,6 +26,8 @@ We'll try to be as responsive as possible in reviewing and accepting pull reques
   [Go templating](./charts/_templates.gotmpl) and `helm-docs`.
   - Run `just setup` to install `helm-doc`.
 - CI requires that the chart version get bumped for any change in the directory.
+- When bumping a chart version, add a `## X.Y.Z` entry to the chart's `NEWS.md`
+  describing what changed. CI will check for this.
 - Use `just update-lock` to update all chart's lockfiles.
 - Changes to the `rstudio-library` chart will update all downstream charts at
   the same time (via the `file://` syntax in `Chart.yaml`)

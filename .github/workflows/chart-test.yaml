@@ -104,6 +104,11 @@ jobs:
           ./tools/dev/check-uncommitted-changes.sh || \
           (echo "run 'just update-lock' and commit the result." && exit 1)
 
+      # checks that bumped chart versions have a corresponding NEWS.md entry
+      - name: Check NEWS.md entries
+        if: github.ref != 'refs/heads/main'
+        run: ./tools/dev/check-news-entries.sh main
+
       - name: Notify Slack of chart unittest failure if on main
         if: github.ref == 'refs/heads/main' && steps.unittest.outcome == 'failure'
         uses: slackapi/slack-github-action@v1.27.0
