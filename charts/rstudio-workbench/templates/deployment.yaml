@@ -4,6 +4,10 @@ kind: Deployment
 metadata:
   name: {{ include "rstudio-workbench.fullname" . }}
   namespace: {{ $.Release.Namespace }}
+  {{- with .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   strategy:
     type: {{ .Values.strategy.type }}

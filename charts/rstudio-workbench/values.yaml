@@ -250,6 +250,9 @@ service:
   # -- The port to forward to on the Workbench pod. Also see pod.port
   targetPort: 8787
 
+deployment:
+  # -- Additional annotations to add to the rstudio-workbench deployment
+  annotations: {}
 
 # -- resources define requests and limits for the rstudio-server pod
 resources:

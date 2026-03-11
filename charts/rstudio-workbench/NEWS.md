@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.10.11
+
+- Add ability to set custom annotations on the Deployment resource via `deployment.annotations`
+
 ## 0.10.10
 
 - Fix IPv6 address handling in `prestart-launcher.bash` to properly bracket IPv6 `KUBERNETES_SERVICE_HOST` addresses

@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.10.10](https://img.shields.io/badge/Version-0.10.10-informational?style=flat-square) ![AppVersion: 2026.01.1](https://img.shields.io/badge/AppVersion-2026.01.1-informational?style=flat-square)
+![Version: 0.10.11](https://img.shields.io/badge/Version-0.10.11-informational?style=flat-square) ![AppVersion: 2026.01.1](https://img.shields.io/badge/AppVersion-2026.01.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.10.10:
+To install the chart with the release name `my-release` at version 0.10.11:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.10
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.11
 ```
 
 To explore other chart versions, look at:
@@ -596,6 +596,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | config.startupUserProvisioning | object | `{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/ |
 | config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
+| deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench deployment |
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
