@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.31
+
+- Fix IPv6 address handling in `prestart.bash` to properly bracket IPv6 `KUBERNETES_SERVICE_HOST` addresses
+
 ## 0.8.30
 
 - Fix connect-version-check in CI 
