@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.32
+
+- Fix IPv6 address handling in `prestart.bash` to properly bracket IPv6 `KUBERNETES_SERVICE_HOST` addresses
+
 ## 0.8.31
 
 - Add `deployment.annotations` to support user-defined annotations on the Deployment resource
