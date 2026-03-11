@@ -2,7 +2,7 @@ apiVersion: v2
 name: rstudio-library
 description: Helm library helpers for use by official RStudio charts
 type: library
-version: 0.1.36
+version: 0.2.0
 appVersion: 0.1.35
 
 icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
