@@ -21,12 +21,32 @@ session:
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
-    # -- A tag prefix for session images (common selections: ubuntu2204-, centos7-). Only used if tag is not defined
-    tagPrefix: ubuntu2204-
+    # -- The OS version for the session image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+    os: "ubuntu-24.04"
+    # -- The R version for the session image tag. Only used if tag is not defined
+    rVersion: "4.5.2"
+    # -- The Python version for the session image tag. Only used if tag is not defined
+    pythonVersion: "3.14.3"
     # -- The repository to use for the session image
-    repository: "rstudio/r-session-complete"
-    # -- A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}`
+    repository: "ghcr.io/posit-dev/workbench-session"
+    # -- A tag override for the session image. Overrides rVersion, pythonVersion, and os. Default tag is `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}`
     tag: ""
+  # -- Image definition for the default Workbench Session InitContainer
+  defaultInitContainer:
+    # -- Whether to enable the defaultInitContainer. Copies session runtime components into a shared volume for the session container.
+    enabled: true
+    # -- The repository to use for the Session InitContainer image
+    repository: "ghcr.io/posit-dev/workbench-session-init"
+    # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+    os: "ubuntu-24.04"
+    # -- Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+    # -- The imagePullPolicy for the default initContainer
+    imagePullPolicy: ""
+    # -- Optional resources for the default initContainer
+    resources: {}
+    # -- The securityContext for the default initContainer
+    securityContext: {}
 
 sharedStorage:
   # -- whether to create the persistentVolumeClaim for shared storage
@@ -193,9 +213,9 @@ homeStorage:
 
 image:
   # -- the repository to use for the main pod image
-  repository: rstudio/rstudio-workbench
-  # -- A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined
-  tagPrefix: ubuntu2204-
+  repository: ghcr.io/posit-dev/workbench
+  # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+  os: "ubuntu-24.04"
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- the imagePullPolicy for the main pod image

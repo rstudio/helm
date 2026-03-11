@@ -18,10 +18,10 @@ dependencies:
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |
-    - name: rstudio-workbench
-      image: rstudio/rstudio-workbench:ubuntu2204-2026.01.1
-    - name: r-session-complete
-      image: rstudio/r-session-complete:ubuntu2204-2026.01.1
+    - name: workbench
+      image: ghcr.io/posit-dev/workbench:2026.01.1-ubuntu-24.04
+    - name: workbench-session
+      image: ghcr.io/posit-dev/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images

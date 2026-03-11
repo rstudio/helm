@@ -1,0 +1,46 @@
+suite: Workbench ConfigMap
+templates:
+  - configmap-general.yaml
+  - configmap-prestart.yaml
+  - configmap-secret.yaml
+  - configmap-session.yaml
+tests:
+  - it: should include session-init container in template data by default
+    template: configmap-general.yaml
+    documentIndex: 1
+    asserts:
+      - matchRegex:
+          path: data["rstudio-library-templates-data.tpl"]
+          pattern: "workbench-session-init"
+      - matchRegex:
+          path: data["rstudio-library-templates-data.tpl"]
+          pattern: "ghcr.io/posit-dev/workbench-session-init:2026.01.1-ubuntu-24.04"
+      - matchRegex:
+          path: data["rstudio-library-templates-data.tpl"]
+          pattern: "session-components"
+
+  - it: should use custom session-init image when tag is overridden
+    template: configmap-general.yaml
+    documentIndex: 1
+    set:
+      session:
+        defaultInitContainer:
+          enabled: true
+          repository: "custom-repo/session-init"
+          tag: "custom-tag"
+    asserts:
+      - matchRegex:
+          path: data["rstudio-library-templates-data.tpl"]
+          pattern: "custom-repo/session-init:custom-tag"
+
+  - it: should not include session-init container when disabled
+    template: configmap-general.yaml
+    documentIndex: 1
+    set:
+      session:
+        defaultInitContainer:
+          enabled: false
+    asserts:
+      - notMatchRegex:
+          path: data["rstudio-library-templates-data.tpl"]
+          pattern: "workbench-session-init"

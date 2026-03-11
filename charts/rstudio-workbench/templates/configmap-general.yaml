@@ -1,6 +1,6 @@
 {{- /* Define the default values that will be merged over */}}
 {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-{{- $sessionTag := .Values.session.image.tag | default (printf "%s%s" .Values.session.image.tagPrefix $defaultVersion ) }}
+{{- $sessionTag := .Values.session.image.tag | default (printf "R%s-python%s-%s" .Values.session.image.rVersion .Values.session.image.pythonVersion .Values.session.image.os ) }}
 {{- $defaultImages := list (printf "%s:%s" .Values.session.image.repository $sessionTag) }}
 {{- $defaultOverrides := list }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
@@ -37,6 +37,29 @@
       {{- $volumeMountList2 := append $sessionTemplate.pod.volumeMounts $sessionSecretVolumeMount }}
       {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList2 }}
     {{- end }}
+  {{- end }}
+{{- end }}
+{{- if .Values.session.defaultInitContainer.enabled }}
+  {{- /* session-init container: copies session runtime components into a shared volume */ -}}
+  {{- $initTag := .Values.session.defaultInitContainer.tag | default (printf "%s-%s" $defaultVersion .Values.session.defaultInitContainer.os) }}
+  {{- $initImage := printf "%s:%s" .Values.session.defaultInitContainer.repository $initTag }}
+  {{- $initPullPolicy := default "IfNotPresent" .Values.session.defaultInitContainer.imagePullPolicy }}
+  {{- $sessionComponentsVolume := dict "name" "session-components" "emptyDir" (dict) }}
+  {{- $sessionComponentsMount := dict "name" "session-components" "mountPath" "/opt/session-components" }}
+  {{- $initContainerJson := dict "name" "workbench-session-init" "image" $initImage "imagePullPolicy" $initPullPolicy "resources" .Values.session.defaultInitContainer.resources "securityContext" .Values.session.defaultInitContainer.securityContext "volumeMounts" (list $sessionComponentsMount) }}
+  {{- /* for non-template path (job-json-overrides) */ -}}
+  {{- $initOverride := dict "name" "defaultSessionInitContainer" "target" "/spec/template/spec/initContainers/0" "json" $initContainerJson }}
+  {{- $volumeOverride := dict "name" "defaultSessionComponentsVolume" "target" "/spec/template/spec/volumes/-" "json" $sessionComponentsVolume }}
+  {{- $mountOverride := dict "name" "defaultSessionComponentsMount" "target" "/spec/template/spec/containers/0/volumeMounts/-" "json" $sessionComponentsMount }}
+  {{- $defaultOverrides = concat $defaultOverrides (list $initOverride $volumeOverride $mountOverride) }}
+  {{- /* for template path */ -}}
+  {{- if .Values.launcher.useTemplates }}
+    {{- $initList := append $sessionTemplate.pod.initContainers $initContainerJson }}
+    {{- $_ := set $sessionTemplate.pod "initContainers" $initList }}
+    {{- $volumeList3 := append $sessionTemplate.pod.volumes $sessionComponentsVolume }}
+    {{- $_ := set $sessionTemplate.pod "volumes" $volumeList3 }}
+    {{- $mountList3 := append $sessionTemplate.pod.volumeMounts $sessionComponentsMount }}
+    {{- $_ := set $sessionTemplate.pod "volumeMounts" $mountList3 }}
   {{- end }}
 {{- end }}
 {{- if .Values.launcher.useTemplates }}
