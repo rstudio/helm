@@ -17,8 +17,8 @@ dependencies:
     repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |
-    - name: rstudio-connect
-      image: rstudio/rstudio-connect:ubuntu2204-2026.02.0
+    - name: connect
+      image: ghcr.io/posit-dev/connect:2026.02.0-ubuntu-24.04
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: Docker Images

@@ -1,98 +1,194 @@
 name: Kubernetes
 images:
   -
-    name: ghcr.io/rstudio/content-pro:r3.6.3-py3.8.19-ubuntu2204
-    python:
-      installations:
-        -
-          path: /opt/python/3.8.19/bin/python3
-          version: 3.8.19
+    name: ghcr.io/posit-dev/connect-content:R4.5.2-python3.14.3-ubuntu-24.04-pro
     r:
       installations:
         -
-          path: /opt/R/3.6.3/bin/R
-          version: 3.6.3
-    quarto:
-      installations:
-        - path: /opt/quarto/1.3.450/bin/quarto
-          version: 1.3.450
-  -
-    name: ghcr.io/rstudio/content-pro:r4.0.5-py3.9.19-ubuntu2204
+          path: /opt/R/4.5.2/bin/R
+          version: 4.5.2
     python:
       installations:
         -
-          path: /opt/python/3.9.19/bin/python3
-          version: 3.9.19
+          path: /opt/python/3.14.3/bin/python3
+          version: 3.14.3
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.5.2-python3.13.12-ubuntu-24.04-pro
     r:
       installations:
         -
-          path: /opt/R/4.0.5/bin/R
-          version: 4.0.5
-    quarto:
-      installations:
-        - path: /opt/quarto/1.3.450/bin/quarto
-          version: 1.3.450
-  -
-    name: ghcr.io/rstudio/content-pro:r4.1.3-py3.10.14-ubuntu2204
+          path: /opt/R/4.5.2/bin/R
+          version: 4.5.2
     python:
       installations:
         -
-          path: /opt/python/3.10.14/bin/python3
-          version: 3.10.14
+          path: /opt/python/3.13.12/bin/python3
+          version: 3.13.12
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.5.2-python3.12.12-ubuntu-24.04-pro
     r:
       installations:
         -
-          path: /opt/R/4.1.3/bin/R
-          version: 4.1.3
-    quarto:
-      installations:
-        - path: /opt/quarto/1.3.450/bin/quarto
-          version: 1.3.450
-  -
-    name: ghcr.io/rstudio/content-pro:r4.2.3-py3.11.9-ubuntu2204
+          path: /opt/R/4.5.2/bin/R
+          version: 4.5.2
     python:
       installations:
         -
-          path: /opt/python/3.11.9/bin/python3
-          version: 3.11.9
+          path: /opt/python/3.12.12/bin/python3
+          version: 3.12.12
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.5.2-python3.11.14-ubuntu-24.04-pro
     r:
       installations:
         -
-          path: /opt/R/4.2.3/bin/R
-          version: 4.2.3
-    quarto:
-      installations:
-        - path: /opt/quarto/1.3.450/bin/quarto
-          version: 1.3.450
-  -
-    name: ghcr.io/rstudio/content-pro:r4.3.3-py3.12.3-ubuntu2204
+          path: /opt/R/4.5.2/bin/R
+          version: 4.5.2
     python:
       installations:
         -
-          path: /opt/python/3.12.3/bin/python3
-          version: 3.12.3
+          path: /opt/python/3.11.14/bin/python3
+          version: 3.11.14
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.4.3-python3.14.3-ubuntu-24.04-pro
+    r:
+      installations:
+        -
+          path: /opt/R/4.4.3/bin/R
+          version: 4.4.3
+    python:
+      installations:
+        -
+          path: /opt/python/3.14.3/bin/python3
+          version: 3.14.3
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.4.3-python3.13.12-ubuntu-24.04-pro
+    r:
+      installations:
+        -
+          path: /opt/R/4.4.3/bin/R
+          version: 4.4.3
+    python:
+      installations:
+        -
+          path: /opt/python/3.13.12/bin/python3
+          version: 3.13.12
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.4.3-python3.12.12-ubuntu-24.04-pro
+    r:
+      installations:
+        -
+          path: /opt/R/4.4.3/bin/R
+          version: 4.4.3
+    python:
+      installations:
+        -
+          path: /opt/python/3.12.12/bin/python3
+          version: 3.12.12
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.4.3-python3.11.14-ubuntu-24.04-pro
+    r:
+      installations:
+        -
+          path: /opt/R/4.4.3/bin/R
+          version: 4.4.3
+    python:
+      installations:
+        -
+          path: /opt/python/3.11.14/bin/python3
+          version: 3.11.14
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.3.3-python3.14.3-ubuntu-24.04-pro
     r:
       installations:
         -
           path: /opt/R/4.3.3/bin/R
           version: 4.3.3
-    quarto:
-      installations:
-        - path: /opt/quarto/1.4.553/bin/quarto
-          version: 1.4.553
-  -
-    name: ghcr.io/rstudio/content-pro:r4.4.0-py3.12.3-ubuntu2204
     python:
       installations:
         -
-          path: /opt/python/3.12.3/bin/python3
-          version: 3.12.3
+          path: /opt/python/3.14.3/bin/python3
+          version: 3.14.3
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.3.3-python3.13.12-ubuntu-24.04-pro
     r:
       installations:
         -
-          path: /opt/R/4.4.0/bin/R
-          version: 4.4.0
+          path: /opt/R/4.3.3/bin/R
+          version: 4.3.3
+    python:
+      installations:
+        -
+          path: /opt/python/3.13.12/bin/python3
+          version: 3.13.12
     quarto:
       installations:
-        - path: /opt/quarto/1.4.553/bin/quarto
-          version: 1.4.553
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.3.3-python3.12.12-ubuntu-24.04-pro
+    r:
+      installations:
+        -
+          path: /opt/R/4.3.3/bin/R
+          version: 4.3.3
+    python:
+      installations:
+        -
+          path: /opt/python/3.12.12/bin/python3
+          version: 3.12.12
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
+  -
+    name: ghcr.io/posit-dev/connect-content:R4.3.3-python3.11.14-ubuntu-24.04-pro
+    r:
+      installations:
+        -
+          path: /opt/R/4.3.3/bin/R
+          version: 4.3.3
+    python:
+      installations:
+        -
+          path: /opt/python/3.11.14/bin/python3
+          version: 3.11.14
+    quarto:
+      installations:
+        - path: /opt/quarto/1.8.27/bin/quarto
+          version: 1.8.27
