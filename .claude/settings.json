@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "../images-shared",
+      "../images",
+      "../images-examples",
+      "../images-connect",
+      "../images-package-manager",
+      "../images-workbench"
+    ]
+  }
+}
