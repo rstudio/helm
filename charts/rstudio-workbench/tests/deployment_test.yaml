@@ -141,6 +141,19 @@ tests:
       - equal:
           path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
           value: "true"
+  - it: should set the POSITRON_VERSION env var when positronVersion is set
+    template: deployment.yaml
+    set:
+      positronVersion: "2026.03.0-213"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="POSITRON_VERSION")].value'
+          value: "2026.03.0-213"
+  - it: should not set the POSITRON_VERSION env var when positronVersion is not set
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="POSITRON_VERSION")]'
   - it: should specify a volumeMount and a volume for sharedStorage if sharedStorage.create is true
     template: deployment.yaml
     set:
