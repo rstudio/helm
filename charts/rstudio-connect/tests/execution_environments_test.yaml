@@ -1,0 +1,272 @@
+suite: Connect Execution Environments
+templates:
+  - configmap-execution-environments.yaml
+  - deployment.yaml
+  - configmap.yaml
+  - configmap-prestart.yaml
+tests:
+  # =============================================================================
+  # configmap-execution-environments.yaml
+  # =============================================================================
+
+  - it: should not create ConfigMap when executionEnvironments is empty (default)
+    template: configmap-execution-environments.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create ConfigMap with correct content when executionEnvironments is set
+    template: configmap-execution-environments.yaml
+    set:
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+          python:
+            installations:
+              - version: "3.11.3"
+                path: /opt/python/3.11.3/bin/python3
+          r:
+            installations:
+              - version: "4.4.0"
+                path: /opt/R/4.4.0/bin/R
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-rstudio-connect-execution-environments
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: rstudio-connect
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: RELEASE-NAME
+      - exists:
+          path: data["environments.yaml"]
+
+  # =============================================================================
+  # deployment.yaml - volumeMount
+  # =============================================================================
+
+  - it: should not have execution-environments volumeMount when executionEnvironments is empty
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: execution-environments
+            mountPath: "/etc/rstudio-connect/execution-environments"
+            readOnly: true
+
+  - it: should have execution-environments volumeMount when executionEnvironments is set
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: execution-environments
+            mountPath: "/etc/rstudio-connect/execution-environments"
+            readOnly: true
+
+  # =============================================================================
+  # deployment.yaml - volume
+  # =============================================================================
+
+  - it: should not have execution-environments volume when executionEnvironments is empty
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: execution-environments
+            configMap:
+              name: RELEASE-NAME-rstudio-connect-execution-environments
+
+  - it: should have execution-environments volume when executionEnvironments is set
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: execution-environments
+            configMap:
+              name: RELEASE-NAME-rstudio-connect-execution-environments
+
+  # =============================================================================
+  # configmap.yaml - gcfg config injection
+  # =============================================================================
+
+  - it: should not include ExecutionEnvironments in gcfg when executionEnvironments is empty
+    template: configmap.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "ExecutionEnvironments"
+
+  - it: should include ExecutionEnvironments.ConfigFilePath in gcfg when executionEnvironments is set
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: false
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "\\[ExecutionEnvironments\\]"
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "ConfigFilePath = /etc/rstudio-connect/execution-environments/environments.yaml"
+
+  # =============================================================================
+  # deployment.yaml - no checksum annotation for execution-environments ConfigMap
+  # =============================================================================
+
+  - it: should not have a checksum annotation for execution-environments ConfigMap
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/config-execution-environments"]
+
+  # =============================================================================
+  # gcfg injection works alongside launcher configuration
+  # =============================================================================
+
+  - it: should include ExecutionEnvironments.ConfigFilePath alongside Launcher config when both are enabled
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: "pro"
+      sharedStorage:
+        create: true
+        mount: true
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "\\[ExecutionEnvironments\\]"
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "ConfigFilePath = /etc/rstudio-connect/execution-environments/environments.yaml"
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "\\[Launcher\\]"
+
+  # =============================================================================
+  # User can override ExecutionEnvironments.ConfigFilePath via config
+  # =============================================================================
+
+  - it: should allow user to override ConfigFilePath via config
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: false
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+      config:
+        ExecutionEnvironments:
+          ConfigFilePath: /custom/path/environments.yaml
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "ConfigFilePath = /custom/path/environments.yaml"
+
+  - it: should mount at custom directory when ConfigFilePath is overridden
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+      executionEnvironments:
+        - name: ghcr.io/rstudio/content-base:r4.4.0-py3.11.3-jammy
+          title: "Test Runtime"
+          matching: any
+      config:
+        ExecutionEnvironments:
+          ConfigFilePath: /custom/path/environments.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: execution-environments
+            mountPath: "/custom/path"
+            readOnly: true
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: execution-environments
+            mountPath: "/etc/rstudio-connect/execution-environments"
+            readOnly: true
+
+  # =============================================================================
+  # Validation
+  # =============================================================================
+
+  - it: should fail when an execution environment is missing a name
+    template: configmap-execution-environments.yaml
+    set:
+      executionEnvironments:
+        - title: "Missing Name"
+          matching: any
+    asserts:
+      - failedTemplate:
+          errorMessage: "executionEnvironments[0].name is required"

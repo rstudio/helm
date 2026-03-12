@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.31](https://img.shields.io/badge/Version-0.8.31-informational?style=flat-square) ![AppVersion: 2026.02.0](https://img.shields.io/badge/AppVersion-2026.02.0-informational?style=flat-square)
+![Version: 0.8.32](https://img.shields.io/badge/Version-0.8.32-informational?style=flat-square) ![AppVersion: 2026.02.0](https://img.shields.io/badge/AppVersion-2026.02.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.31:
+To install the chart with the release name `my-release` at version 0.8.32:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.31
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.32
 ```
 
 To explore other chart versions, look at:
@@ -191,6 +191,44 @@ the API key unset for the Chronicle agent, deploy the chart, create an administr
 secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
 can be set and the release can be upgraded to include the new value.
 
+## Execution environments
+
+This chart supports declarative management of execution environments via
+`ExecutionEnvironments.ConfigFilePath`. Requires Connect version 2026.03.0 or later.
+Unlike the legacy `launcher.customRuntimeYaml`, changes to `executionEnvironments`
+take effect on every `helm upgrade` without requiring a pod restart or database reset.
+
+When `executionEnvironments` is set, the chart renders the list into a dedicated
+ConfigMap and mounts it into the Connect pod.
+
+By default, the chart sets `ExecutionEnvironments.ConfigFilePath` to
+`/etc/rstudio-connect/execution-environments/environments.yaml` and mounts the
+ConfigMap at `/etc/rstudio-connect/execution-environments/`. If you set
+`config.ExecutionEnvironments.ConfigFilePath` to a custom path, the chart uses
+that path instead and mounts the ConfigMap at its parent directory.
+
+The chart deliberately excludes this ConfigMap from the pod's checksum annotations,
+so changes do not trigger a pod restart. The kubelet updates the mounted file
+automatically when the ConfigMap changes (typically within 60-120 seconds), and
+Connect detects the update automatically.
+
+Example `values.yaml`:
+
+```yaml
+executionEnvironments:
+  - name: ghcr.io/my-org/connect-runtime:ubuntu22
+    title: "Default Runtime"
+    matching: any
+    python:
+      installations:
+        - version: "3.11.3"
+          path: /opt/python/3.11.3/bin/python3
+    r:
+      installations:
+        - version: "4.4.0"
+          path: /opt/R/4.4.0/bin/R
+```
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
@@ -235,6 +273,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-connect deployment |
+| executionEnvironments | list | `[]` (disabled) | Optional list of execution environments to manage declaratively. Requires Connect version 2026.03.0 or later. When set, the chart renders these into a ConfigMap, mounts it into the Connect pod, and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration. Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade without requiring a pod restart or database reset. |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"ubuntu2204-"}` | Defines the Posit Connect image to deploy |
