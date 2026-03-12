@@ -129,6 +129,11 @@ containers:
       mountPath: "/etc/pip.conf"
       subPath: "pip.conf"
     {{- end }}
+    {{- if hasKey .Values.config.session "uv.toml" }}
+    - name: rstudio-session-config
+      mountPath: "/etc/uv/uv.toml"
+      subPath: "uv.toml"
+    {{- end }}
     {{- if .Values.config.sessionSecret }}
     - name: rstudio-session-secret
       mountPath: {{ .Values.session.defaultSecretMountPath }}

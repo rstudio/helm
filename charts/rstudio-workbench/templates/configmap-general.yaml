@@ -21,6 +21,10 @@
       {{- $pipVolumeMount := dict "mountPath" "/etc/pip.conf" "subPath" "pip.conf" "name" "session-config" }}
       {{- $volumeMountList = append $volumeMountList $pipVolumeMount }}
     {{- end }}
+    {{- if hasKey .Values.config.session "uv.toml" }}
+      {{- $uvVolumeMount := dict "mountPath" "/etc/uv/uv.toml" "subPath" "uv.toml" "name" "session-config" }}
+      {{- $volumeMountList = append $volumeMountList $uvVolumeMount }}
+    {{- end }}
     {{- $_ := set $sessionTemplate.pod "volumeMounts" $volumeMountList }}
   {{- end }}
   {{- if .Values.config.sessionSecret}}
