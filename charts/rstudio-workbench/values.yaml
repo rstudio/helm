@@ -6,6 +6,12 @@ fullnameOverride: ""
 # -- A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
+# -- When set, injects a `POSITRON_VERSION` environment variable into the Workbench server pod.
+# Workbench uses this to install the specified Positron version on startup and to configure the
+# Positron session init container image tag. Intended for use when the Positron version you want
+# to use does not match the default version bundled with the chart.
+positronVersion: ""
+
 # -- Settings for enabling server diagnostics
 diagnostics:
   enabled: false
