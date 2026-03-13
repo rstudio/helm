@@ -4,9 +4,9 @@ category: Authentication
 
 # Configuring Posit Workbench with OpenID Connect
 
-This example deploys Posit Workbench using OpenID Connect (OIDC) SSO for authentication and `sssd` for user provisioning.
+This example deploys Posit Workbench using OpenID Connect (OIDC) Single Sign-On (SSO) for authentication and `sssd` for user provisioning.
 
-Users will be authenticated via SSO (using OIDC) and Workbench will match a claim (`preferred_username` by default) to a Linux user account in the Workbench container. 
+Users authenticate via SSO (using OIDC) and Workbench matches a claim (`preferred_username` by default) to a Linux user account in the Workbench container. 
 `sssd` is already running in the Workbench container and can be used to automatically provision local user accounts using LDAP or Active Directory.
 
 See the [OpenID Connect Authentication](https://docs.posit.co/ide/server-pro/authenticating_users/openid_connect_authentication.html) section of the Workbench Admin Guide for more details.
