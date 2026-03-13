@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.10.11
+
+- Add `positronVersion` value to inject `POSITRON_VERSION` environment variable into the Workbench server pod
+
 ## 0.10.10
 
 - Fix IPv6 address handling in `prestart-launcher.bash` to properly bracket IPv6 `KUBERNETES_SERVICE_HOST` addresses
