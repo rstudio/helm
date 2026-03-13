@@ -1,6 +1,6 @@
 dependencies:
 - name: rstudio-library
-  repository: https://helm.rstudio.com
-  version: 0.1.35
-digest: sha256:59fe5e712690610495d2ff32c6c78cc136e9685a785151d4cdba4b914d110f87
-generated: "2025-10-09T13:37:20.639004-05:00"
+  repository: file://../rstudio-library
+  version: 0.2.0
+digest: sha256:06829a1c2381005211a2016b8fb2d4057f046b51b99222fd62f9d641b7c1a6e2
+generated: "2026-03-13T09:11:43.524289863-05:00"

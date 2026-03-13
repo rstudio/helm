@@ -15,7 +15,7 @@ maintainers:
 dependencies:
   - name: rstudio-library
     version: 0.2.0
-    repository: https://helm.rstudio.com
+    repository: file://../rstudio-library
 annotations:
   artifacthub.io/images: |
     - name: rstudio-workbench
