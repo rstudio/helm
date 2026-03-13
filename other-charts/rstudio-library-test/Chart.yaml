@@ -1,0 +1,11 @@
+apiVersion: v2
+name: rstudio-library-test
+description: Test harness for rstudio-library templates
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+dependencies:
+  - name: rstudio-library
+    version: "0.1.35"
+    repository: "file://../../charts/rstudio-library"
