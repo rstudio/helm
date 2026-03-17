@@ -102,7 +102,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- end }}
   {{- /* default OpenTelemetry configuration */}}
   {{- if (dig "OpenTelemetry" "Enabled" false $configCopy) }}
-    {{- $otelDict := dict "OpenTelemetry" (dict "CollectorHost" (printf "%s.%s.svc.cluster.local" (include "rstudio-connect.fullname" .) .Release.Namespace)) }}
+    {{- $otelDict := dict "OpenTelemetry" (dict "CollectorAdvertiseHost" (printf "%s.%s.svc.cluster.local" (include "rstudio-connect.fullname" .) .Release.Namespace)) }}
     {{- $defaultConfig = merge $defaultConfig $otelDict }}
   {{- end }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
