@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.34
+
+- Bump Connect version to 2026.03.0
+- Default `OpenTelemetry.CollectorAdvertiseHost` to the Connect service's cluster-internal DNS name when `config.OpenTelemetry.Enabled` is `true`
+
 ## 0.8.33
 
 - Fix indentation for `chronicleAgent` environment variables in deployment template
