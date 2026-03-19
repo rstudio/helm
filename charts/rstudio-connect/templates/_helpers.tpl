@@ -100,6 +100,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $defaultConfig = merge $defaultConfig (dict "Metrics" ( dict "PrometheusListen" (print ":" .Values.prometheus.port )))}}
     {{- end }}
   {{- end }}
+  {{- /* default OpenTelemetry configuration */}}
+  {{- if (dig "OpenTelemetry" "Enabled" false $configCopy) }}
+    {{- $otelDict := dict "OpenTelemetry" (dict "CollectorAdvertiseHost" (printf "%s.%s.svc.cluster.local" (include "rstudio-connect.fullname" .) .Release.Namespace)) }}
+    {{- $defaultConfig = merge $defaultConfig $otelDict }}
+  {{- end }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
 
