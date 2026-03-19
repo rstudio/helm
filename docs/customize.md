@@ -29,7 +29,9 @@ The `rstudio-library` chart will ensure that:
   - the array is aggregated into the required comma-separated list
   - the `target` part of the job spec will be modified by the Job Launcher
 
-**IMPORTANT:** `name` is arbitrary, but must be unique! (And should contain no spaces)
+:::{.callout-important}
+`name` is arbitrary, but must be unique (and should contain no spaces).
+:::
 
 See examples below.
 
