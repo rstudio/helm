@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.33
+
+- Fix indentation for `chronicleAgent` environment variables in deployment template
+
 ## 0.8.32
 
 - Fix IPv6 address handling in `prestart.bash` to properly bracket IPv6 `KUBERNETES_SERVICE_HOST` addresses

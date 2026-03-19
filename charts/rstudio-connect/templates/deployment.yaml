@@ -139,7 +139,7 @@ spec:
             value: {{ . | quote }}
           {{- end }}
           {{- with .Values.chronicleAgent.env }}
-          {{ toYaml . | indent 10 }}
+          {{ toYaml . | nindent 10 }}
           {{- end }}
       {{- end }}
       {{- end }}
