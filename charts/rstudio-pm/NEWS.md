@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.54
+
+- Add `deployment.annotations` to support user-defined annotations on the Deployment resource
+
 ## 0.5.53
 
 - Update chart icon to Posit icon
