@@ -76,6 +76,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $launcherDict := dict "Launcher" ( $launcherSettingsDict ) }}
     {{- $defaultConfig = merge $defaultConfig $launcherDict }}
   {{- end }}
+  {{- /* declarative execution environments configuration */}}
+  {{- if .Values.executionEnvironments }}
+    {{- $eeDict := dict "ExecutionEnvironments" (dict "ConfigFilePath" "/etc/rstudio-connect/execution-environments/environments.yaml") }}
+    {{- $defaultConfig = merge $defaultConfig $eeDict }}
+  {{- end }}
   {{- /* default licensing configuration */}}
   {{- if .Values.license.server }}
     {{- $licenseDict := dict "Licensing" ( dict "LicenseType" ("Remote") ) }}

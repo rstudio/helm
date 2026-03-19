@@ -131,6 +131,46 @@ the API key unset for the Chronicle agent, deploy the chart, create an administr
 secret with the API key. Once the secret is created, the value of `chronicleAgent.connectApiKey.secretKeyRef`
 can be set and the release can be upgraded to include the new value.
 
+## Execution environments
+
+This chart supports [declarative management of execution environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management)
+via `ExecutionEnvironments.ConfigFilePath`. Requires Connect version 2026.03.0 or later.
+Unlike the legacy `launcher.customRuntimeYaml`, changes to `executionEnvironments`
+take effect on every `helm upgrade` without requiring a pod restart or database reset.
+
+When `executionEnvironments` is set, the chart renders the list into a dedicated
+ConfigMap and mounts it into the Connect pod. Connect only manages the execution
+environments defined in this file. You can still create and manage additional
+execution environments separately through the Connect UI or API.
+
+By default, the chart sets `ExecutionEnvironments.ConfigFilePath` to
+`/etc/rstudio-connect/execution-environments/environments.yaml` and mounts the
+ConfigMap at `/etc/rstudio-connect/execution-environments/`. If you set
+`config.ExecutionEnvironments.ConfigFilePath` to a custom path, the chart uses
+that path instead and mounts the ConfigMap at its parent directory.
+
+The chart deliberately excludes this ConfigMap from the pod's checksum annotations,
+so changes do not trigger a pod restart. The kubelet updates the mounted file
+automatically when the ConfigMap changes (typically within 60-120 seconds), and
+Connect detects the update automatically.
+
+Example `values.yaml`:
+
+```yaml
+executionEnvironments:
+  - name: ghcr.io/my-org/connect-runtime:ubuntu22
+    title: "Default Runtime"
+    matching: any
+    python:
+      installations:
+        - version: "3.11.3"
+          path: /opt/python/3.11.3/bin/python3
+    r:
+      installations:
+        - version: "4.4.0"
+          path: /opt/R/4.4.0/bin/R
+```
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format

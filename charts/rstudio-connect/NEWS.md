@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.35
+
+- Add `executionEnvironments` value for [declarative management of execution environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management). Unlike `launcher.customRuntimeYaml`, changes take effect on every `helm upgrade` without requiring a pod restart or database reset. Requires Connect version 2026.03.0 or later.
+
 ## 0.8.34
 
 - Bump Connect version to 2026.03.0
