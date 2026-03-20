@@ -20,3 +20,99 @@ title: Posit Helm Charts
    ```{.bash}
    helm search repo rstudio
    ```
+
+## Installing Charts
+
+Example instructions to install a chart for each product are below. For full installation details, see the overview page for each product.
+
+::: {.panel-tabset}
+
+### Posit Workbench
+
+```{.bash}
+kubectl create secret generic rstudio-workbench-license \
+  --from-file=licenses/rstudio-workbench.lic
+helm install workbench rstudio/rstudio-workbench \
+  --set license.file.secret=rstudio-workbench-license \
+  --set license.file.secretKey=rstudio-workbench.lic \
+  --values workbench-values.yaml
+```
+
+### Posit Connect
+
+```{.bash}
+kubectl create secret generic rstudio-connect-license \
+  --from-file=licenses/rstudio-connect.lic
+helm install connect rstudio/rstudio-connect \
+  --set license.file.secret=rstudio-connect-license \
+  --set license.file.secretKey=rstudio-connect.lic \
+  --values connect-values.yaml
+```
+
+### Posit Package Manager
+
+```{.bash}
+kubectl create secret generic rstudio-pm-license \
+  --from-file=licenses/rstudio-pm.lic
+helm install packagemanager rstudio/rstudio-pm \
+  --set license.file.secret=rstudio-pm-license \
+  --set license.file.secretKey=rstudio-pm.lic \
+  --values pm-values.yaml
+```
+
+### Posit Chronicle
+
+```{.bash}
+helm install chronicle rstudio/posit-chronicle \
+  --values chronicle-values.yaml
+```
+
+:::
+
+You can also provide a license via `license.server` (for a license server). See each chart's values reference for details.
+
+## Upgrading a Release
+
+```{.bash}
+helm upgrade <release-name> rstudio/<chart-name> \
+  --values <values-file>.yaml
+```
+
+## Uninstalling a Release
+
+```{.bash}
+helm uninstall <release-name> --namespace posit
+```
+
+## Troubleshooting
+
+List running pods:
+
+```{.bash}
+kubectl get pods 
+```
+
+View application logs:
+
+```{.bash}
+kubectl logs <pod-name> 
+```
+
+View pod events and status:
+
+```{.bash}
+kubectl describe pod <pod-name> 
+```
+
+For troubleshooting pods themselves, and testing the installation of new packages/services, 
+open a shell in a pod:
+
+```{.bash}
+kubectl exec -it <pod-name> -- /bin/bash
+```
+
+Restart a deployment:
+
+```{.bash}
+kubectl rollout restart deployment/<deployment-name>
+```
