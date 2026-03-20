@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.10.12
+
+- Fix invalid JSON in default `positron-user-settings.json`
+
 ## 0.10.11
 
 - Add ability to set custom annotations on the Deployment resource via `deployment.annotations`
