@@ -1,0 +1,128 @@
+suite: Ingress Helpers
+templates:
+  - templates/test-ingress.yaml
+values:
+  - _base_values.yaml
+
+tests:
+  # ========================================
+  # API Version Detection Tests (default K8s version)
+  # ========================================
+  - it: should return networking.k8s.io/v1 for default K8s version
+    set:
+      testIngress:
+        serviceName: test-svc
+        servicePort: 80
+        path: /
+        pathType: Prefix
+    asserts:
+      - equal:
+          path: data.apiVersion
+          value: networking.k8s.io/v1
+        documentIndex: 0
+
+  # ========================================
+  # supportsIngressClassName Tests
+  # ========================================
+  - it: should return true for supportsIngressClassName on default K8s version
+    set:
+      testIngress:
+        serviceName: test-svc
+        servicePort: 80
+        path: /
+        pathType: Prefix
+    asserts:
+      - equal:
+          path: data.supportsIngressClassName
+          value: true
+        documentIndex: 0
+
+  # ========================================
+  # supportsPathType Tests
+  # ========================================
+  - it: should return true for supportsPathType on default K8s version
+    set:
+      testIngress:
+        serviceName: test-svc
+        servicePort: 80
+        path: /
+        pathType: Prefix
+    asserts:
+      - equal:
+          path: data.supportsPathType
+          value: true
+        documentIndex: 0
+
+  # ========================================
+  # Path Rendering Tests
+  # ========================================
+  - it: should render path with string input
+    set:
+      testIngress:
+        serviceName: test-svc
+        servicePort: 80
+        path: /api
+        pathType: Prefix
+    asserts:
+      - matchRegex:
+          path: data["path.yaml"]
+          pattern: "path: /api"
+        documentIndex: 1
+      - matchRegex:
+          path: data["path.yaml"]
+          pattern: "pathType: Prefix"
+        documentIndex: 1
+
+  - it: should render path with object input
+    set:
+      testIngress:
+        serviceName: test-svc
+        servicePort: 80
+        path: /custom
+        pathType: Exact
+    asserts:
+      - matchRegex:
+          path: data["path.yaml"]
+          pattern: "path: /custom"
+        documentIndex: 2
+      - matchRegex:
+          path: data["path.yaml"]
+          pattern: "pathType: Exact"
+        documentIndex: 2
+
+  # ========================================
+  # Backend Rendering Tests (v1 API)
+  # ========================================
+  - it: should render backend for v1 API with numeric port
+    set:
+      testIngress:
+        serviceName: my-service
+        servicePort: 8080
+        path: /
+        pathType: Prefix
+    asserts:
+      - matchRegex:
+          path: data["backend.yaml"]
+          pattern: "service:"
+        documentIndex: 3
+      - matchRegex:
+          path: data["backend.yaml"]
+          pattern: "name: my-service"
+        documentIndex: 3
+      - matchRegex:
+          path: data["backend.yaml"]
+          pattern: "number: 8080"
+        documentIndex: 3
+
+  - it: should render backend for v1 API with named port
+    set:
+      testIngress:
+        serviceName: my-service
+        servicePort: http
+        path: /
+        pathType: Prefix
+    asserts:
+      - matchRegex:
+          path: data["backend.yaml"]
+          pattern: "name: http"
+        documentIndex: 3

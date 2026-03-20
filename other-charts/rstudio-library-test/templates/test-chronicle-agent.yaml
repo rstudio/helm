@@ -1,0 +1,26 @@
+{{/*
+Test templates for rstudio-library chronicle-agent helpers.
+Note: These templates use `lookup` which requires cluster access.
+Tests with kubernetesProvider mock can only test static paths.
+*/}}
+
+{{- if .Values.testChronicle }}
+{{- if .Values.testChronicle.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-chronicle-agent
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- /* Test image template - only when tag is specified to avoid lookup */}}
+  {{- if .Values.testChronicle.image.tag }}
+  image: {{ include "rstudio-library.chronicle-agent.image" (dict "chronicleAgent" .Values.testChronicle "Release" .Release) | quote }}
+  {{- end }}
+  {{- /* Test serverAddress template - only when serverAddress is specified to avoid lookup */}}
+  {{- if .Values.testChronicle.serverAddress }}
+  serverAddress: {{ include "rstudio-library.chronicle-agent.serverAddress" (dict "chronicleAgent" .Values.testChronicle "Release" .Release) | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}
