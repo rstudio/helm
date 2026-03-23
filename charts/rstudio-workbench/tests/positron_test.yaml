@@ -1,0 +1,30 @@
+suite: Workbench Positron configuration
+templates:
+  - configmap-general.yaml
+  - configmap-prestart.yaml
+  - configmap-secret.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+tests:
+  - it: should set positron init container rserver.conf values when positronVersion is set
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      positronVersion: "2026.03.0-213"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-enabled=1"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-name=posit/workbench-positron-init"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-tag=2026.03.0-213"
+  - it: should not set positron init container rserver.conf values when positronVersion is not set
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-enabled"

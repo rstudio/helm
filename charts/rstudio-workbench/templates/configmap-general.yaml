@@ -69,6 +69,11 @@ data:
   {{- $licenseServerConf := dict "rserver.conf" $licenseParam}}
   {{- $overrideDict = mergeOverwrite $licenseServerConf $overrideDict }}
 {{- end }}
+{{- if .Values.positronVersion }}
+  {{- $positronConf := dict "launcher-positron-init-container-enabled" 1 "launcher-positron-init-container-image-name" .Values.positronInitContainer.image.repository "launcher-positron-init-container-image-tag" .Values.positronVersion }}
+  {{- $positronServerConf := dict "rserver.conf" $positronConf }}
+  {{- $overrideDict = mergeOverwrite $positronServerConf $overrideDict }}
+{{- end }}
 {{- $overrideDict = mergeOverwrite $defaultRServerConfig $overrideDict }}
 {{- /* default metrics / prometheus configuration */}}
   {{- if .Values.prometheus.enabled }}
