@@ -23,53 +23,19 @@ title: Posit Helm Charts
 
 ## Installing Charts
 
-Example instructions to install a chart for each product are below. For full installation details, see the overview page for each product.
-
-::: {.panel-tabset}
-
-### Posit Workbench
+The general pattern for installing a Posit Helm chart:
 
 ```{.bash}
-kubectl create secret generic rstudio-workbench-license \
-  --from-file=licenses/rstudio-workbench.lic
-helm install workbench rstudio/rstudio-workbench \
-  --set license.file.secret=rstudio-workbench-license \
-  --set license.file.secretKey=rstudio-workbench.lic \
-  --values workbench-values.yaml
+helm install <release-name> rstudio/<chart-name> \
+  --values values.yaml
 ```
 
-### Posit Connect
+For product-specific installation instructions, including license configuration, see each chart's overview:
 
-```{.bash}
-kubectl create secret generic rstudio-connect-license \
-  --from-file=licenses/rstudio-connect.lic
-helm install connect rstudio/rstudio-connect \
-  --set license.file.secret=rstudio-connect-license \
-  --set license.file.secretKey=rstudio-connect.lic \
-  --values connect-values.yaml
-```
-
-### Posit Package Manager
-
-```{.bash}
-kubectl create secret generic rstudio-pm-license \
-  --from-file=licenses/rstudio-pm.lic
-helm install packagemanager rstudio/rstudio-pm \
-  --set license.file.secret=rstudio-pm-license \
-  --set license.file.secretKey=rstudio-pm.lic \
-  --values pm-values.yaml
-```
-
-### Posit Chronicle
-
-```{.bash}
-helm install chronicle rstudio/posit-chronicle \
-  --values chronicle-values.yaml
-```
-
-:::
-
-You can also provide a license via `license.server` (for a license server). See each chart's values reference for details.
+- [Posit Workbench](charts/rstudio-workbench/README.md#installing-the-chart)
+- [Posit Connect](charts/rstudio-connect/README.md#installing-the-chart)
+- [Posit Package Manager](charts/rstudio-pm/README.md#installing-the-chart)
+- [Posit Chronicle](charts/posit-chronicle/README.md#installing-the-chart)
 
 ## Upgrading a Release
 
