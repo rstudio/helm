@@ -188,6 +188,10 @@ containers:
       mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
       subPath: "service.tpl"
     {{- end }}
+    {{- if .Values.positronVersion }}
+    - name: positron-components
+      mountPath: {{ printf "/usr/lib/rstudio-server/bin/positron-server/%s" .Values.positronVersion | quote }}
+    {{- end }}
     {{- if .Values.pod.volumeMounts }}
     {{- toYaml .Values.pod.volumeMounts | nindent 4 }}
     {{- end }}
@@ -415,6 +419,10 @@ volumes:
   configMap:
     name: {{ include "rstudio-workbench.fullname" .}}-templates
     defaultMode: {{ .Values.config.defaultMode.server }}
+{{- end }}
+{{- if .Values.positronVersion }}
+- name: positron-components
+  emptyDir: {}
 {{- end }}
 {{- if .Values.pod.volumes }}
 {{ toYaml .Values.pod.volumes }}

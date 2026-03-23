@@ -28,3 +28,33 @@ tests:
       - notMatchRegex:
           path: data["rserver.conf"]
           pattern: "launcher-positron-init-container-enabled"
+  - it: should add positron-init initContainer when positronVersion is set
+    template: deployment.yaml
+    set:
+      positronVersion: "2026.03.0-213"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].image'
+          value: "posit/workbench-positron-init:2026.03.0-213"
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].env[?(@.name=="PWB_POSITRON_TARGET")].value'
+          value: "positron,positron-docs"
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].volumeMounts[?(@.name=="positron-components")].mountPath'
+          value: "/mnt/init"
+  - it: should not add positron-init initContainer when positronVersion is not set
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")]'
+  - it: should add positron-components volume and mount when positronVersion is set
+    template: deployment.yaml
+    set:
+      positronVersion: "2026.03.0-213"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.volumes[?(@.name=="positron-components")].emptyDir'
+          value: {}
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="positron-components")].mountPath'
+          value: "/usr/lib/rstudio-server/bin/positron-server/2026.03.0-213"

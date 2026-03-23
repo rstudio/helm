@@ -97,7 +97,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
-      {{- if or .Values.initContainers .Values.chronicleAgent.enabled }}
+      {{- if or .Values.initContainers .Values.chronicleAgent.enabled .Values.positronVersion }}
       initContainers:
         {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}
@@ -144,6 +144,16 @@ spec:
             {{- with .Values.chronicleAgent.env }}
             {{ toYaml . | indent 12 }}
             {{- end }}
+        {{- end }}
+        {{- if .Values.positronVersion }}
+        - name: positron-init
+          image: "{{ .Values.positronInitContainer.image.repository }}:{{ .Values.positronVersion }}"
+          env:
+            - name: PWB_POSITRON_TARGET
+              value: "positron,positron-docs"
+          volumeMounts:
+            - name: positron-components
+              mountPath: /mnt/init
         {{- end }}
       {{- end }}
 {{- /*
