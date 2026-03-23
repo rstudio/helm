@@ -80,10 +80,6 @@ containers:
   - name: RSW_LOAD_BALANCING
     value: "true"
   {{- end }}
-  {{- if .Values.positronVersion }}
-  - name: POSITRON_VERSION
-    value: {{ .Values.positronVersion | quote }}
-  {{- end }}
   - name: XDG_CONFIG_DIRS
     value: "{{ template "rstudio-workbench.xdg-config-dirs" .}}"
   {{- if .Values.pod.env }}
