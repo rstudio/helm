@@ -492,6 +492,4 @@ config:
     ServiceLogFormat: TEXT   # TEXT or JSON
     AccessLog: STDOUT
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
-  OpenTelemetry:
-    Enabled: true
   Launcher: {}

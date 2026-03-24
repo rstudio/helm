@@ -2,7 +2,7 @@
 
 ## 0.8.36
 
-- Replace deprecated default value for `Metrics.Enabled` with `OpenTelemetry.Enabled`
+- Remove deprecated default value `Metrics.Enabled = true`
 
 ## 0.8.35
 
