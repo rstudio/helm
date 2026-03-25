@@ -6,11 +6,11 @@ version: 0.1.0
 appVersion: "0.1.0"
 
 maintainers:
-  - name: sol-eng
-    email: docker@rstudio.com
+  - name: rstudio
+    email: docker@posit.co
     url: https://github.com/rstudio/helm
 
 dependencies:
   - name: rstudio-library
-    version: "0.1.36"
+    version: ">= 0.1.0, < 1.0.0"
     repository: "file://../../charts/rstudio-library"

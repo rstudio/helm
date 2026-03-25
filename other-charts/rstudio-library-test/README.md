@@ -10,13 +10,13 @@ Test harness for rstudio-library templates
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| sol-eng | <docker@rstudio.com> | <https://github.com/rstudio/helm> |
+| rstudio | <docker@posit.co> | <https://github.com/rstudio/helm> |
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../charts/rstudio-library | rstudio-library | 0.1.36 |
+| file://../../charts/rstudio-library | rstudio-library | >= 0.1.0, < 1.0.0 |
 
 ## Values
 
