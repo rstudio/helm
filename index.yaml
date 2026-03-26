@@ -9075,6 +9075,25 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-library-0.1.13-rc01/rstudio-library-0.1.13-rc01.tgz
     version: 0.1.13-rc01
+  rstudio-library-test:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-03-26T11:38:03.158180433Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../../charts/rstudio-library
+      version: '>= 0.1.0, < 1.0.0'
+    description: Test harness for rstudio-library templates
+    digest: da0f847dbeb0651299c85e56a9c87a4e5748eb82675e9fcd33f49c94b9ccbdd3
+    maintainers:
+    - email: docker@posit.co
+      name: rstudio
+      url: https://github.com/rstudio/helm
+    name: rstudio-library-test
+    type: application
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-library-test-0.1.0/rstudio-library-test-0.1.0.tgz
+    version: 0.1.0
   rstudio-pm:
   - annotations:
       artifacthub.io/images: |
@@ -19297,4 +19316,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2026-03-20T18:02:27.898036143Z"
+generated: "2026-03-26T11:38:03.15899685Z"
