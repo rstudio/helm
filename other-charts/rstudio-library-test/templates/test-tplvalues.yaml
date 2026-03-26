@@ -1,0 +1,24 @@
+{{/*
+Test templates for rstudio-library tplvalues helper.
+Tests template rendering within values.
+*/}}
+
+{{- if .Values.testTplvalues }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-tplvalues
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- /* Test string value with template expression */}}
+  renderedString: {{ include "rstudio-library.tplvalues.render" (dict "value" .Values.testTplvalues.templateValue "context" $) | quote }}
+  {{- /* Test static value passthrough */}}
+  staticString: {{ include "rstudio-library.tplvalues.render" (dict "value" .Values.testTplvalues.staticValue "context" $) | quote }}
+  {{- /* Test object value with template expression */}}
+  {{- if .Values.testTplvalues.objectValue }}
+  renderedObject: |
+    {{- include "rstudio-library.tplvalues.render" (dict "value" .Values.testTplvalues.objectValue "context" $) | nindent 4 }}
+  {{- end }}
+{{- end }}
