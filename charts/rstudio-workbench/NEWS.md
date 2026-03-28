@@ -1,6 +1,11 @@
 # Changelog
 
 
+## 0.10.13
+
+- Bump Workbench version to 2026.01.2
+
+
 ## 0.10.12
 
 - Fix invalid JSON in default `positron-user-settings.json`
