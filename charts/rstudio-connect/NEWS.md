@@ -4,6 +4,7 @@
 
 - Remove deprecated default value `Metrics.Enabled = true`
 - Remove legacy Graphite exporter sidecar (`prometheus.legacy`, `prometheusExporter.*`, and `configmap-graphite-exporter.yaml`). The built-in Prometheus `/metrics` endpoint is now the only supported metrics path. Use OpenTelemetry for richer instrumentation.
+- Fix OTel collector advertise host in direct Kubernetes mode: inject `status.podIP` via Downward API as `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` when `config.OpenTelemetry.Enabled` is `true`, replacing the Service DNS default that caused content job pods to time out on the unexposed ephemeral collector port
 
 ## 0.8.35
 

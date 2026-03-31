@@ -1,0 +1,37 @@
+suite: test OpenTelemetry configuration
+templates:
+  - configmap.yaml
+  - deployment.yaml
+tests:
+  - it: should inject pod IP env var when OpenTelemetry is enabled
+    template: deployment.yaml
+    set:
+      config.OpenTelemetry.Enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+
+  - it: should not inject pod IP env var when OpenTelemetry is disabled
+    template: deployment.yaml
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+
+  - it: should not hardcode CollectorAdvertiseHost in gcfg when OpenTelemetry is enabled
+    template: configmap.yaml
+    set:
+      config.OpenTelemetry.Enabled: true
+    asserts:
+      - notMatchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: CollectorAdvertiseHost
