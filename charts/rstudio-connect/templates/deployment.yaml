@@ -148,10 +148,18 @@ spec:
         {{- end }}
 {{ include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-connect") "envVarPrefix" ("RSC") "fullName" (include "rstudio-connect.fullname" .)) | indent 8 }}
         {{- if (dig "OpenTelemetry" "Enabled" false .Values.config) }}
+        {{- $hasAdvertiseHost := false }}
+        {{- range .Values.pod.env }}
+        {{- if eq .name "CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST" }}
+        {{- $hasAdvertiseHost = true }}
+        {{- end }}
+        {{- end }}
+        {{- if not $hasAdvertiseHost }}
         - name: CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        {{- end }}
         {{- end }}
         {{- if .Values.pod.env }}
 {{ toYaml .Values.pod.env | indent 8 }}

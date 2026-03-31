@@ -16,6 +16,22 @@ tests:
               fieldRef:
                 fieldPath: status.podIP
 
+  - it: should not inject pod IP env var when already set in pod.env
+    template: deployment.yaml
+    set:
+      config.OpenTelemetry.Enabled: true
+      pod.env:
+        - name: CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST
+          value: "10.0.0.1"
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+
   - it: should not inject pod IP env var when OpenTelemetry is disabled
     template: deployment.yaml
     asserts:
