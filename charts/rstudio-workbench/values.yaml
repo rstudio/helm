@@ -42,6 +42,16 @@ components:
       repository: "rstudio/workbench-session-init"
       # -- A tag override for the session init container. Default tag is the chart appVersion (or versionOverride)
       tag: ""
+  positron:
+    # -- A Positron version to enable the Positron init container for session pods.
+    # When set, configures rserver.conf with the Positron init container settings
+    # and attaches a Positron init container to the Workbench server pod.
+    version: ""
+    image:
+      # -- The image repository for the Positron init container
+      repository: "posit/workbench-positron-init"
+      # -- A tag override for the Positron init container image. Defaults to the positron version
+      tag: ""
 
 sharedStorage:
   # -- whether to create the persistentVolumeClaim for shared storage

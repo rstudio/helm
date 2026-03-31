@@ -134,6 +134,19 @@ components:
   enabled: false
 ```
 
+### Positron
+
+To enable Positron IDE support, set a Positron version under `components.positron`:
+
+```yaml
+components:
+  positron:
+    version: "2026.03.0"
+```
+
+This configures an init container that delivers Positron binaries and documentation to
+session pods. The version determines both the image tag and the server-side mount path.
+
 ## General principles
 
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the

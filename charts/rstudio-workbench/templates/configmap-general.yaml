@@ -54,6 +54,12 @@
   {{- $_ := set $defaultRServerConfigValues "launcher-sessions-auto-update" 1 }}
   {{- $_ := set $defaultRServerConfigValues "launcher-sessions-init-container-image-name" .Values.components.sessionInit.image.repository }}
   {{- $_ := set $defaultRServerConfigValues "launcher-sessions-init-container-image-tag" $initTag }}
+  {{- if .Values.components.positron.version }}
+    {{- $positronTag := .Values.components.positron.image.tag | default .Values.components.positron.version }}
+    {{- $_ := set $defaultRServerConfigValues "launcher-positron-init-container-enabled" 1 }}
+    {{- $_ := set $defaultRServerConfigValues "launcher-positron-init-container-image-name" .Values.components.positron.image.repository }}
+    {{- $_ := set $defaultRServerConfigValues "launcher-positron-init-container-image-tag" $positronTag }}
+  {{- end }}
 {{- end }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
 {{- $defaultLauncherK8sConfigValues := dict "kubernetes-namespace" (default $.Release.Namespace .Values.launcher.namespace) }}

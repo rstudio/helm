@@ -6,6 +6,10 @@
 - **BREAKING**: Change default session image from `rstudio/r-session-complete` to `rstudio/workbench-session` and enable session component delivery via init containers by default.
   Set `components.enabled: false` and `session.image.repository: rstudio/r-session-complete` to restore the previous behavior
 - Add top-level `components` key for configuring session component init containers
+- Add `components.positron` for updating the Positron IDE version independently
+  of a Workbench release. A default Positron version is already delivered by the
+  `workbench-session-init` container. Set `components.positron.version` to
+  override it with a specific version
 
 ## 0.10.13
 

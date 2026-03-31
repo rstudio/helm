@@ -106,3 +106,85 @@ tests:
       - notMatchRegex:
           path: data["rserver.conf"]
           pattern: "launcher-sessions-init-container"
+
+  # -- Positron: rserver.conf settings
+  - it: should include positron init container settings when version is set
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        positron:
+          version: "2026.03.0-213"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-enabled=1"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-name=posit/workbench-positron-init"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-tag=2026.03.0-213"
+
+  - it: should not include positron settings when version is empty
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container"
+
+  - it: should use custom positron image repository when overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+          image:
+            repository: "my-registry/positron-init"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-name=my-registry/positron-init"
+
+  - it: should use custom positron image tag when overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+          image:
+            tag: "custom-build-abc123"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-tag=custom-build-abc123"
+
+  - it: should not include positron settings when components are disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        enabled: false
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container"
+
+  - it: should not include positron settings when launcher is disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: false
+      components:
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container"
