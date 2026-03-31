@@ -167,25 +167,8 @@ securityContext: {}
 prometheus:
   # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
   enabled: true
-  # -- The port that prometheus will listen on. If legacy=true, then this will be hard-coded to 9108
+  # -- The port that prometheus will listen on
   port: 3232
-  # -- Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. If you change this to
-  # `true`, please let us know why! Requires prometheusExporter.enabled=true too
-  legacy: false
-
-prometheusExporter:
-  # -- DEPRECATED. Whether the  prometheus exporter sidecar should be enabled. See prometheus.enabled instead.
-  enabled: true
-  # -- Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file
-  mappingYaml: null
-  # -- securityContext for the prometheus exporter sidecar
-  securityContext: {}
-  # -- resource specification for the prometheus exporter sidecar
-  resources: {}
-  image:
-    repository: "prom/graphite-exporter"
-    tag: "v0.9.0"
-    imagePullPolicy: IfNotPresent
 
 serviceMonitor:
   # -- Whether to create a ServiceMonitor CRD for use with a Prometheus Operator

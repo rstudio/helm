@@ -3,6 +3,7 @@
 ## 0.8.36
 
 - Remove deprecated default value `Metrics.Enabled = true`
+- Remove legacy Graphite exporter sidecar (`prometheus.legacy`, `prometheusExporter.*`, and `configmap-graphite-exporter.yaml`). The built-in Prometheus `/metrics` endpoint is now the only supported metrics path. Use OpenTelemetry for richer instrumentation.
 
 ## 0.8.35
 
