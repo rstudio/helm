@@ -118,6 +118,22 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
 
+## Session images
+
+By default, session pods use the `rstudio/workbench-session` image with an init container
+(`rstudio/workbench-session-init`) that delivers Workbench session components at pod startup.
+
+To use the classic all-in-one `r-session-complete` image instead (which bundles all components
+into a single image), disable session components and change the session image:
+
+```yaml
+session:
+  image:
+    repository: "rstudio/r-session-complete"
+components:
+  enabled: false
+```
+
 ## General principles
 
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the

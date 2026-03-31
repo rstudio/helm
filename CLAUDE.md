@@ -48,7 +48,7 @@ charts/<chart-name>/
 ### Documentation Generation
 - READMEs are auto-generated using helm-docs from `README.md.gotmpl` templates
 - Never edit `README.md` directly - edit the `.gotmpl` template
-- CI auto-generates and commits docs back to PRs
+- Run `just docs` locally before committing — CI will reject uncommitted changes
 
 ## Critical Workflow Requirements
 

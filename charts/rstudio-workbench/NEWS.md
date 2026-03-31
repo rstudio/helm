@@ -1,10 +1,15 @@
 # Changelog
 
 
+## 0.11.0
+
+- **BREAKING**: Change default session image from `rstudio/r-session-complete` to `rstudio/workbench-session` and enable session component delivery via init containers by default.
+  Set `components.enabled: false` and `session.image.repository: rstudio/r-session-complete` to restore the previous behavior
+- Add top-level `components` key for configuring session component init containers
+
 ## 0.10.13
 
 - Bump Workbench version to 2026.01.2
-
 
 ## 0.10.12
 

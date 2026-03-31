@@ -49,6 +49,12 @@
 {{- $defaultIDEServiceName := include "rstudio-workbench.fullname" . }}
 {{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
 {{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
+{{- if and .Values.launcher.enabled .Values.components.enabled }}
+  {{- $initTag := .Values.components.sessionInit.image.tag | default $defaultVersion }}
+  {{- $_ := set $defaultRServerConfigValues "launcher-sessions-auto-update" 1 }}
+  {{- $_ := set $defaultRServerConfigValues "launcher-sessions-init-container-image-name" .Values.components.sessionInit.image.repository }}
+  {{- $_ := set $defaultRServerConfigValues "launcher-sessions-init-container-image-tag" $initTag }}
+{{- end }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
 {{- $defaultLauncherK8sConfigValues := dict "kubernetes-namespace" (default $.Release.Namespace .Values.launcher.namespace) }}
 {{- if .Values.launcher.useTemplates }}
