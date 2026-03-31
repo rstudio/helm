@@ -188,6 +188,19 @@ components:
   enabled: false
 ```
 
+### Positron
+
+To enable Positron IDE support, set a Positron version under `components.positron`:
+
+```yaml
+components:
+  positron:
+    version: "2026.03.0"
+```
+
+This configures an init container that delivers Positron binaries and documentation to
+session pods. The version determines both the image tag and the server-side mount path.
+
 ## General principles
 
 - In most places, we opt to pass Helm values directly into ConfigMaps. We automatically translate these into the
@@ -588,8 +601,11 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
-| components | object | `{"enabled":true,"sessionInit":{"image":{"repository":"rstudio/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
+| components | object | `{"enabled":true,"positron":{"image":{"repository":"posit/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"rstudio/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
 | components.enabled | bool | `true` | Enable session component delivery via init containers. When false, no init containers are configured and session.image must be a self-contained image like r-session-complete. |
+| components.positron.image.repository | string | `"posit/workbench-positron-init"` | The image repository for the Positron init container |
+| components.positron.image.tag | string | `""` | A tag override for the Positron init container image. Defaults to the positron version |
+| components.positron.version | string | `""` | A Positron version to enable the Positron init container for session pods. When set, configures rserver.conf with the Positron init container settings and attaches a Positron init container to the Workbench server pod. |
 | components.sessionInit.image.repository | string | `"rstudio/workbench-session-init"` | The repository for the session init container image |
 | components.sessionInit.image.tag | string | `""` | A tag override for the session init container. Default tag is the chart appVersion (or versionOverride) |
 | config.database | object | `{"conf":{"existingSecret":"","value":""}}` | a map of database connection config files. Mounted to `/mnt/secret-configmap/rstudio/database.conf` with 0600 permissions |
