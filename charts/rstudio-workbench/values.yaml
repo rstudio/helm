@@ -21,12 +21,27 @@ session:
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
-    # -- A tag prefix for session images (common selections: ubuntu2204-, centos7-). Only used if tag is not defined
+    # -- A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined
     tagPrefix: ubuntu2204-
     # -- The repository to use for the session image
-    repository: "rstudio/r-session-complete"
+    repository: "rstudio/workbench-session"
     # -- A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}`
     tag: ""
+
+# -- Session component delivery via init containers. When enabled (default), the chart
+# configures rserver.conf so the launcher injects init containers into session pods at startup.
+# Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete`
+# to use the classic all-in-one session image instead.
+components:
+  # -- Enable session component delivery via init containers. When false, no init containers
+  # are configured and session.image must be a self-contained image like r-session-complete.
+  enabled: true
+  sessionInit:
+    image:
+      # -- The repository for the session init container image
+      repository: "rstudio/workbench-session-init"
+      # -- A tag override for the session init container. Default tag is the chart appVersion (or versionOverride)
+      tag: ""
 
 sharedStorage:
   # -- whether to create the persistentVolumeClaim for shared storage
