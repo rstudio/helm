@@ -8,10 +8,8 @@ data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
 {{- if .Values.backends.kubernetes.enabled }}
-{{- if .Values.backends.kubernetes.defaultResourceJobBase }}
   job.yaml: |
-{{- .Values.backends.kubernetes.defaultResourceJobBase | toYaml | nindent 4 }}
-{{- end }}
+{{- include "rstudio-connect.jobBase" . | nindent 4 }}
 {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
   service.yaml: |
 {{- .Values.backends.kubernetes.defaultResourceServiceBase | toYaml | nindent 4 }}
