@@ -198,11 +198,9 @@ spec:
             mountPath: "/etc/rstudio-connect/rstudio-connect.gcfg"
             subPath: "rstudio-connect.gcfg"
           {{- if .Values.backends.kubernetes.enabled }}
-          {{- if .Values.backends.kubernetes.defaultResourceJobBase }}
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/job.yaml"
             subPath: "job.yaml"
-          {{- end }}
           {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/service.yaml"
