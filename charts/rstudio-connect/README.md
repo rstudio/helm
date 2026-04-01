@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.35](https://img.shields.io/badge/Version-0.8.35-informational?style=flat-square) ![AppVersion: 2026.03.0](https://img.shields.io/badge/AppVersion-2026.03.0-informational?style=flat-square)
+![Version: 0.8.36](https://img.shields.io/badge/Version-0.8.36-informational?style=flat-square) ![AppVersion: 2026.03.0](https://img.shields.io/badge/AppVersion-2026.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.35:
+To install the chart with the release name `my-release` at version 0.8.36:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.35
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.36
 ```
 
 To explore other chart versions, look at:
@@ -235,8 +235,7 @@ executionEnvironments:
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
 required by rstudio-connect.
-- rstudio-connect does not export many prometheus metrics on its own. Instead, we run a sidecar graphite exporter
-  [as described here](https://support.rstudio.com/hc/en-us/articles/360044800273-Monitoring-RStudio-Team-Using-Prometheus-and-Graphite)
+- rstudio-connect exposes Prometheus metrics via its built-in `/metrics` endpoint
 
 ## Configuration file
 
@@ -341,15 +340,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
 | priorityClassName | string | `""` | The pod's priorityClassName |
 | prometheus.enabled | bool | `true` | The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter |
-| prometheus.legacy | bool | `false` | Whether to enable the legacy prometheusExporter INSTEAD OF the built-in product exporter. If you change this to `true`, please let us know why! Requires prometheusExporter.enabled=true too |
-| prometheus.port | int | `3232` | The port that prometheus will listen on. If legacy=true, then this will be hard-coded to 9108 |
-| prometheusExporter.enabled | bool | `true` | DEPRECATED. Whether the  prometheus exporter sidecar should be enabled. See prometheus.enabled instead. |
-| prometheusExporter.image.imagePullPolicy | string | `"IfNotPresent"` |  |
-| prometheusExporter.image.repository | string | `"prom/graphite-exporter"` |  |
-| prometheusExporter.image.tag | string | `"v0.9.0"` |  |
-| prometheusExporter.mappingYaml | string | `nil` | Yaml that defines the graphite exporter mapping. null by default, which uses the embedded / default mapping yaml file |
-| prometheusExporter.resources | object | `{}` | resource specification for the prometheus exporter sidecar |
-| prometheusExporter.securityContext | object | `{}` | securityContext for the prometheus exporter sidecar |
+| prometheus.port | int | `3232` | The port that prometheus will listen on |
 | rbac.clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
 | rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
 | rbac.serviceAccount | object | `{"annotations":{},"create":true,"labels":{},"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
