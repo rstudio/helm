@@ -81,19 +81,19 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $eeDict := dict "ExecutionEnvironments" (dict "ConfigFilePath" "/etc/rstudio-connect/execution-environments/environments.yaml") }}
     {{- $defaultConfig = merge $defaultConfig $eeDict }}
   {{- end }}
-  {{- if .Values.kubernetes.enabled }}
-    {{- $namespace := default $.Release.Namespace .Values.kubernetes.namespace }}
+  {{- if .Values.backends.kubernetes.enabled }}
+    {{- $namespace := default $.Release.Namespace .Values.backends.kubernetes.namespace }}
     {{- $kubernetesSettingsDict := dict "Enabled" ("true") "Namespace" ($namespace) }}
     {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
     {{- end }}
-    {{- if .Values.kubernetes.defaultJobOverlay }}
-      {{- if and .Values.kubernetes.defaultInitContainer.enabled }}
+    {{- if .Values.backends.kubernetes.defaultJobOverlay }}
+      {{- if and .Values.backends.kubernetes.defaultInitContainer.enabled }}
         {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-        {{- $initContainerImageTag := .Values.kubernetes.defaultInitContainer.tag | default (printf "%s%s" .Values.kubernetes.defaultInitContainer.tagPrefix $defaultVersion )}}
-        {{- $initContainerImage := print .Values.kubernetes.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
-        {{- range (.Values.kubernetes.defaultJobOverlay.spec.template.spec).initContainers | default list }}
+        {{- $initContainerImageTag := .Values.backends.kubernetes.defaultInitContainer.tag | default (printf "%s%s" .Values.backends.kubernetes.defaultInitContainer.tagPrefix $defaultVersion )}}
+        {{- $initContainerImage := print .Values.backends.kubernetes.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
+        {{- range (.Values.backends.kubernetes.defaultJobOverlay.spec.template.spec).initContainers | default list }}
             {{- if eq .name "connect-content-init" }}
                 {{- $_ := set . "image" $initContainerImage }}
                 {{- break }}
@@ -102,7 +102,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- end }}
       {{- $_ := set $kubernetesSettingsDict "DefaultJobOverlay" (default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultJobOverlay) }}
     {{- end }}
-    {{- if .Values.kubernetes.defaultServiceOverlay }}
+    {{- if .Values.backends.kubernetes.defaultServiceOverlay }}
       {{- $_ := set $kubernetesSettingsDict "DefaultServiceOverlay" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultServiceOverlay) }}
     {{- end }}
     {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
