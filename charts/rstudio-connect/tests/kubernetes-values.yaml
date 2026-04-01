@@ -4,7 +4,7 @@ launcher:
 backends:
   kubernetes:
     enabled: true
-    defaultJobOverlay:
+    defaultResourceJobBase:
       apiVersion: batch/v1
       kind: Job
       spec:
