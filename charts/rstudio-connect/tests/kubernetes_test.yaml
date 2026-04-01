@@ -6,20 +6,21 @@ templates:
   - deployment.yaml
   - rbac.yaml
 tests:
-  # Test validation: launcher.enabled and kubernetes.enabled cannot both be true
-  - it: should fail when both launcher.enabled and kubernetes.enabled are true
+  # Test validation: launcher.enabled and backends.kubernetes.enabled cannot both be true
+  - it: should fail when both launcher.enabled and backends.kubernetes.enabled are true
     template: NOTES.txt
     set:
       launcher:
         enabled: true
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
     asserts:
       - failedTemplate:
-          errorPattern: "launcher.enabled.*and.*kubernetes.enabled.*cannot both be true"
+          errorPattern: "launcher.enabled.*and.*backends.kubernetes.enabled.*cannot both be true"
 
-  # Test kubernetes.enabled creates configmap entries for job overlay
-  - it: should create job.yaml in configmap when kubernetes.enabled and defaultJobOverlay is set
+  # Test backends.kubernetes.enabled creates configmap entries for job overlay
+  - it: should create job.yaml in configmap when backends.kubernetes.enabled and defaultJobOverlay is set
     template: configmap.yaml
     values:
       - kubernetes-values.yaml
@@ -33,19 +34,20 @@ tests:
           path: data["job.yaml"]
           pattern: "kind: Job"
 
-  - it: should not create job.yaml when kubernetes.enabled is false
+  - it: should not create job.yaml when backends.kubernetes.enabled is false
     template: configmap.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
     asserts:
       - notExists:
           path: data["job.yaml"]
 
   # Test deployment volumeMounts for kubernetes overlays
-  - it: should mount job.yaml when kubernetes.enabled and defaultJobOverlay is set
+  - it: should mount job.yaml when backends.kubernetes.enabled and defaultJobOverlay is set
     template: deployment.yaml
     values:
       - kubernetes-values.yaml
@@ -57,13 +59,14 @@ tests:
             mountPath: /etc/rstudio-connect/job.yaml
             subPath: job.yaml
 
-  - it: should not mount job.yaml when kubernetes.enabled is false
+  - it: should not mount job.yaml when backends.kubernetes.enabled is false
     template: deployment.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].volumeMounts
@@ -72,27 +75,29 @@ tests:
             mountPath: /etc/rstudio-connect/job.yaml
             subPath: job.yaml
 
-  # Test RBAC resources are created when kubernetes.enabled
-  - it: should create RBAC resources when kubernetes.enabled and rbac.create are true
+  # Test RBAC resources are created when backends.kubernetes.enabled
+  - it: should create RBAC resources when backends.kubernetes.enabled and rbac.create are true
     template: rbac.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
       rbac:
         create: true
     asserts:
       - hasDocuments:
           count: 3 # ServiceAccount, Role, RoleBinding
 
-  - it: should not create RBAC resources when kubernetes.enabled is false and launcher.enabled is false
+  - it: should not create RBAC resources when backends.kubernetes.enabled is false and launcher.enabled is false
     template: rbac.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
       rbac:
         create: true
     asserts:
@@ -100,14 +105,15 @@ tests:
           count: 0
 
   # Test kubernetes namespace configuration
-  - it: should use custom namespace when kubernetes.namespace is specified
+  - it: should use custom namespace when backends.kubernetes.namespace is specified
     template: rbac.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
-        namespace: custom-namespace
+      backends:
+        kubernetes:
+          enabled: true
+          namespace: custom-namespace
       rbac:
         create: true
     documentIndex: 1 # Role document
@@ -116,15 +122,16 @@ tests:
           path: metadata.namespace
           value: custom-namespace
 
-  - it: should use release namespace when kubernetes.namespace is not specified
+  - it: should use release namespace when backends.kubernetes.namespace is not specified
     template: rbac.yaml
     release:
       namespace: test-namespace
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
       rbac:
         create: true
     documentIndex: 1 # Role document
@@ -133,14 +140,15 @@ tests:
           path: metadata.namespace
           value: test-namespace
 
-  # Test serviceAccount configuration with kubernetes.enabled
-  - it: should set serviceAccountName when kubernetes.enabled and rbac.create are true
+  # Test serviceAccount configuration with backends.kubernetes.enabled
+  - it: should set serviceAccountName when backends.kubernetes.enabled and rbac.create are true
     template: deployment.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
       rbac:
         create: true
         serviceAccount:
@@ -159,8 +167,9 @@ tests:
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
       sharedStorage:
         create: true
         mount: true
@@ -176,8 +185,9 @@ tests:
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
       sharedStorage:
         create: true
         mount: true
@@ -189,14 +199,15 @@ tests:
           pattern: "DataDirPVCName"
 
   # Test kubernetes config section in rstudio-connect.gcfg
-  - it: should configure Kubernetes.Enabled in gcfg when kubernetes.enabled is true
+  - it: should configure Kubernetes.Enabled in gcfg when backends.kubernetes.enabled is true
     template: configmap.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
-        namespace: k8s-namespace
+      backends:
+        kubernetes:
+          enabled: true
+          namespace: k8s-namespace
     asserts:
       - matchRegex:
           path: data["rstudio-connect.gcfg"]
@@ -223,8 +234,9 @@ tests:
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
       rbac:
         create: true
     asserts:
@@ -234,14 +246,15 @@ tests:
           path: spec.template.spec.serviceAccountName
           value: RELEASE-NAME-rstudio-connect
 
-  # Test serviceAccount is set correctly when kubernetes.enabled
-  - it: should generate default serviceAccountName when kubernetes.enabled
+  # Test serviceAccount is set correctly when backends.kubernetes.enabled
+  - it: should generate default serviceAccountName when backends.kubernetes.enabled
     template: deployment.yaml
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
       rbac:
         create: true
         serviceAccount:
@@ -257,8 +270,9 @@ tests:
     set:
       launcher:
         enabled: false
-      kubernetes:
-        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
     documentIndex: 0
     asserts:
       - matchRegex:
