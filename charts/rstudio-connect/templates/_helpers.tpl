@@ -103,7 +103,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $_ := set $kubernetesSettingsDict "DefaultJobOverlay" (default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultJobOverlay) }}
     {{- end }}
     {{- if .Values.kubernetes.defaultServiceOverlay }}
-      {{- $_ = set $kubernetesSettingsDict "DefaultServiceOverlay" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultServiceOverlay) }}
+      {{- $_ := set $kubernetesSettingsDict "DefaultServiceOverlay" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultServiceOverlay) }}
     {{- end }}
     {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
     {{- $defaultConfig = merge $defaultConfig $kubernetesDict }}
