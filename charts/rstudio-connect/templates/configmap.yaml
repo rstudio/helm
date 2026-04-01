@@ -8,13 +8,13 @@ data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
 {{- if .Values.backends.kubernetes.enabled }}
-{{- if .Values.backends.kubernetes.defaultJobOverlay }}
+{{- if .Values.backends.kubernetes.defaultResourceJobBase }}
   job.yaml: |
-{{- .Values.backends.kubernetes.defaultJobOverlay | toYaml | nindent 4 }}
+{{- .Values.backends.kubernetes.defaultResourceJobBase | toYaml | nindent 4 }}
 {{- end }}
-{{- if .Values.backends.kubernetes.defaultServiceOverlay }}
+{{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
   service.yaml: |
-{{- .Values.backends.kubernetes.defaultServiceOverlay | toYaml | nindent 4 }}
+{{- .Values.backends.kubernetes.defaultResourceServiceBase | toYaml | nindent 4 }}
 {{- end }}
 {{- end }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}

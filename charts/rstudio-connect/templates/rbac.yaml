@@ -20,7 +20,7 @@
 {{ include "rstudio-library.rbac" $rbacValues }}
 {{- else if .Values.backends.kubernetes.enabled }}
 {{- /* Native runner mode: dedicated RBAC with only the permissions Connect needs */}}
-{{- $clusterRoleCreate := or .Values.rbac.clusterRoleCreate (eq (dig "spec" "type" "ClusterIP" .Values.backends.kubernetes.defaultServiceOverlay) "NodePort") }}
+{{- $clusterRoleCreate := or .Values.rbac.clusterRoleCreate (eq (dig "spec" "type" "ClusterIP" .Values.backends.kubernetes.defaultResourceServiceBase) "NodePort") }}
 {{- if $clusterRoleCreate }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1

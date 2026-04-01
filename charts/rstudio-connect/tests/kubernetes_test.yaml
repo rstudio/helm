@@ -20,7 +20,7 @@ tests:
           errorPattern: "launcher.enabled.*and.*backends.kubernetes.enabled.*cannot both be true"
 
   # Test backends.kubernetes.enabled creates configmap entries for job overlay
-  - it: should create job.yaml in configmap when backends.kubernetes.enabled and defaultJobOverlay is set
+  - it: should create job.yaml in configmap when backends.kubernetes.enabled and defaultResourceJobBase is set
     template: configmap.yaml
     values:
       - kubernetes-values.yaml
@@ -47,7 +47,7 @@ tests:
           path: data["job.yaml"]
 
   # Test deployment volumeMounts for kubernetes overlays
-  - it: should mount job.yaml when backends.kubernetes.enabled and defaultJobOverlay is set
+  - it: should mount job.yaml when backends.kubernetes.enabled and defaultResourceJobBase is set
     template: deployment.yaml
     values:
       - kubernetes-values.yaml
@@ -219,14 +219,14 @@ tests:
           path: data["rstudio-connect.gcfg"]
           pattern: "Namespace = k8s-namespace"
 
-  - it: should configure DefaultJobOverlay path when defaultJobOverlay is set
+  - it: should configure DefaultResourceJobBase path when defaultResourceJobBase is set
     template: configmap.yaml
     values:
       - kubernetes-values.yaml
     asserts:
       - matchRegex:
           path: data["rstudio-connect.gcfg"]
-          pattern: "DefaultJobOverlay = /etc/rstudio-connect/job.yaml"
+          pattern: "DefaultResourceJobBase = /etc/rstudio-connect/job.yaml"
 
   # Test with both launcher disabled and kubernetes enabled
   - it: should work correctly with launcher disabled and kubernetes enabled

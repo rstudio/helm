@@ -88,22 +88,22 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
     {{- end }}
-    {{- if .Values.backends.kubernetes.defaultJobOverlay }}
+    {{- if .Values.backends.kubernetes.defaultResourceJobBase }}
       {{- if and .Values.backends.kubernetes.defaultInitContainer.enabled }}
         {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
         {{- $initContainerImageTag := .Values.backends.kubernetes.defaultInitContainer.tag | default (printf "%s%s" .Values.backends.kubernetes.defaultInitContainer.tagPrefix $defaultVersion )}}
         {{- $initContainerImage := print .Values.backends.kubernetes.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
-        {{- range (.Values.backends.kubernetes.defaultJobOverlay.spec.template.spec).initContainers | default list }}
+        {{- range (.Values.backends.kubernetes.defaultResourceJobBase.spec.template.spec).initContainers | default list }}
             {{- if eq .name "connect-content-init" }}
                 {{- $_ := set . "image" $initContainerImage }}
                 {{- break }}
             {{- end }}
         {{- end }}
       {{- end }}
-      {{- $_ := set $kubernetesSettingsDict "DefaultJobOverlay" (default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultJobOverlay) }}
+      {{- $_ := set $kubernetesSettingsDict "DefaultResourceJobBase" (default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultResourceJobBase) }}
     {{- end }}
-    {{- if .Values.backends.kubernetes.defaultServiceOverlay }}
-      {{- $_ := set $kubernetesSettingsDict "DefaultServiceOverlay" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultServiceOverlay) }}
+    {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
+      {{- $_ := set $kubernetesSettingsDict "DefaultResourceServiceBase" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultResourceServiceBase) }}
     {{- end }}
     {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
     {{- $defaultConfig = merge $defaultConfig $kubernetesDict }}

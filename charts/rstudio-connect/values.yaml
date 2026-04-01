@@ -318,25 +318,25 @@ backends:
       tagPrefix: ubuntu2204-
       # -- Overrides the image tag whose default is the chart appVersion.
       tag: ""
-    # -- defaultJobOverlay contains the Kubernetes Job definition which is used as an overlay "base" when launching a content job
+    # -- defaultResourceJobBase contains the Kubernetes Job definition which is used as an overlay "base" when launching a content job
     # in Kubernetes. Conceptually this is a similar to a Kustomize base. Connect then applies any required job configuration
     # on-top of the overlay base to produce a final job definition before submitting the Job to Kubernetes.
     # https://docs.posit.co/connect/__unreleased__/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html
     # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays
     # https://kubernetes.io/docs/concepts/workloads/controllers/job/
-    defaultJobOverlay:
+    defaultResourceJobBase:
       apiVersion: batch/v1
       kind: Job
       spec:
         template:
           spec:
             containers:
-              - name: "connect-content" # well-known name
+              - name: "connect-content"  # well-known name
                 volumeMounts:
                   - mountPath: /opt/rstudio-connect
                     name: rsc-volume
             initContainers:
-              - name: connect-content-init # well-known name
+              - name: connect-content-init  # well-known name
                 # Note: Image is set dynamically by backends.kubernetes.defaultInitContainer
                 # because the selected image must match the Connect server version
                 # image: ""
@@ -346,13 +346,13 @@ backends:
             volumes:
               - emptyDir: {}
                 name: rsc-volume
-    # -- defaultServiceOverlay contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's
+    # -- defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's
     # Service in Kubernetes. Conceptually this is a similar to a Kustomize base. Connect then applies any required Service configuration
     # on-top of the overlay base to produce a final Service definition.
     # https://docs.posit.co/connect/__unreleased__/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html
     # https://kubernetes.io/docs/concepts/services-networking/service/
     # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays
-    defaultServiceOverlay: {}
+    defaultResourceServiceBase: {}
       # apiVersion: v1
       # kind: Service
       # spec:
@@ -530,9 +530,9 @@ config:
     InitTimeout: 5m
   Logging:
     ServiceLog: STDOUT
-    ServiceLogLevel: INFO # INFO, WARNING or ERROR
-    ServiceLogFormat: TEXT # TEXT or JSON
+    ServiceLogLevel: INFO  # INFO, WARNING or ERROR
+    ServiceLogFormat: TEXT  # TEXT or JSON
     AccessLog: STDOUT
-    AccessLogFormat: COMMON # COMMON, COMBINED, or JSON
+    AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Launcher: {}
   Kubernetes: {}
