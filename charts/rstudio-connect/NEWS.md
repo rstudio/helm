@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0
+
+- TODO
+
 ## 0.8.38
 
 - Bump Connect version to 2026.03.1
@@ -12,8 +16,6 @@
 
 - Remove deprecated default value `Metrics.Enabled = true`
 - Remove legacy Graphite exporter sidecar (`prometheus.legacy`, `prometheusExporter.*`, and `configmap-graphite-exporter.yaml`). The built-in Prometheus `/metrics` endpoint is now the only supported metrics path. Use OpenTelemetry for richer instrumentation.
-- Adds support for a native-Go implementation of Off-Host Execution (OHE) mode. Set `kubernetes.enabled = true` to switch to the new implementation. See the [migration guide](<todo: insert migration guide docs link>) in the Connect admin documentation for guidance on migrating existing configurations.
-- Use dedicated RBAC for the native runner with least-privilege permissions instead of the shared `rstudio-library` RBAC template. The launcher path continues to use the shared template.
 
 ## 0.8.35
 
