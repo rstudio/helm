@@ -142,16 +142,6 @@ rules:
       - "pods"
     verbs:
       - "get"
-    rules:
-  {{/* Connect's native-Go implementation of off-host execution requires permissions to watch endpointslices */}}
-  - apiGroups:
-    - "discovery.k8s.io"
-    resources:
-    - "endpointslices"
-    verbs:
-    - "get"
-    - "list"
-    - "watch"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

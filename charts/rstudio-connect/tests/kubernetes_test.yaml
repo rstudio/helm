@@ -16,7 +16,7 @@ tests:
         enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "`launcher.enabled` and `kubernetes.enabled` cannot both be true"
+          errorPattern: "launcher.enabled.*and.*kubernetes.enabled.*cannot both be true"
 
   # Test kubernetes.enabled creates configmap entries for job overlay
   - it: should create job.yaml in configmap when kubernetes.enabled and defaultJobOverlay is set
