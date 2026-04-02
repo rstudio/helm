@@ -231,6 +231,16 @@ executionEnvironments:
           path: /opt/R/4.4.0/bin/R
 ```
 
+## OpenTelemetry
+
+When `config.OpenTelemetry.Enabled` is `true`, the chart automatically injects the pod's IP address
+as `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` via the Kubernetes Downward API. This allows content
+job pods to reach Connect's embedded OTel collector directly (pod-to-pod), which is required in direct
+Kubernetes execution mode (`launcher.enabled: false`, `Kubernetes.Enabled: true`) because the ephemeral
+collector port is not exposed on the Kubernetes Service.
+
+To override the advertise host, set `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` explicitly in `pod.env`.
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
