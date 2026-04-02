@@ -229,9 +229,9 @@ spec:
           - name: overrides
             mountPath: "/mnt/job-json-overrides/"
           {{- end }}
+          {{- end }}
           - name: rstudio-connect-prestart
             mountPath: "/scripts/"
-          {{- end }}
           {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-connect-data
             mountPath: "{{ .Values.sharedStorage.path }}"
