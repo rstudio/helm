@@ -18,3 +18,6 @@ _publish.yml
 
 # helm packages
 *.tgz
+
+# local working notes
+notes.md
