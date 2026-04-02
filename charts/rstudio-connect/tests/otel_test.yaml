@@ -1,6 +1,7 @@
 suite: test OpenTelemetry configuration
 templates:
   - configmap.yaml
+  - configmap-prestart.yaml
   - deployment.yaml
 tests:
   - it: should inject pod IP env var when OpenTelemetry is enabled
