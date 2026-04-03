@@ -1,0 +1,99 @@
+# Original Launcher-based values with templateValues customizations.
+# Each field is annotated with its equivalent path after migrating to the native Kubernetes runner.
+# See rstudio-connect-customized-migration.yaml for the migrated version.
+
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx
+  requests:
+    storage: 100G
+
+launcher:
+  enabled: true
+  templateValues:
+    job:
+      labels: # Moves to: backends.kubernetes.defaultResourceJobBase.metadata.labels
+        app.example.com/managed-by: connect
+      annotations: # Moves to: backends.kubernetes.defaultResourceJobBase.metadata.annotations
+        app.example.com/team: data-science
+    pod:
+      labels: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.metadata.labels
+        app.example.com/content: "true"
+      annotations: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.metadata.annotations
+        app.example.com/tier: compute
+      nodeSelector: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.nodeSelector
+        workload: content
+      tolerations: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.tolerations
+        - key: "dedicated"
+          operator: "Equal"
+          value: "content"
+          effect: "NoSchedule"
+      affinity: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.affinity
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.example.com/content: "true"
+                topologyKey: kubernetes.io/hostname
+      securityContext: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.securityContext
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      serviceAccountName: connect-content-sa # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.serviceAccountName
+      imagePullSecrets: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.imagePullSecrets
+        - name: registry-credentials
+      priorityClassName: "" # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.priorityClassName
+      hostAliases: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.hostAliases
+        - ip: "10.0.0.50"
+          hostnames:
+            - "internal-api.example.com"
+      volumes: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.volumes
+        - name: extra-config
+          configMap:
+            name: content-config
+      initContainers: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.initContainers
+        - name: wait-for-db
+          image: busybox:latest
+          command: ["sh", "-c", "echo waiting for dependencies"]
+      extraContainers: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers (as a named container)
+        - name: log-forwarder
+          image: fluent/fluent-bit:latest
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+      env: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].env
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
+      resources: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].resources
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "4Gi"
+          cpu: "2"
+      imagePullPolicy: IfNotPresent # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].imagePullPolicy
+      containerSecurityContext: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].securityContext
+        allowPrivilegeEscalation: false
+      volumeMounts: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].volumeMounts
+        - name: extra-config
+          mountPath: /etc/content-config
+          readOnly: true
+    service:
+      labels: # Moves to: backends.kubernetes.defaultResourceServiceBase.metadata.labels
+        app.example.com/service: content
+      annotations: # Moves to: backends.kubernetes.defaultResourceServiceBase.metadata.annotations
+        app.example.com/tier: compute
+      type: ClusterIP # Moves to: backends.kubernetes.defaultResourceServiceBase.spec.type
+
+config:
+  # ... your existing config ...
+
+  Launcher: # Moves to: config.Kubernetes
+    DataDirPVCName: connect-shared-storage

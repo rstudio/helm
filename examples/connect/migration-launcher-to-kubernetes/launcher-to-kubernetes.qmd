@@ -23,9 +23,16 @@ If you haven't customized `launcher.templateValues`, the migration requires thre
 
 If you customized `launcher.templateValues`, those settings move into `backends.kubernetes.defaultResourceJobBase` and `backends.kubernetes.defaultResourceServiceBase`. These are standard Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) and [Service](https://kubernetes.io/docs/concepts/services-networking/service/) specs, so Kubernetes documentation applies directly.
 
-The following example migrates every supported `templateValues` field. Each field is annotated with a `# Was:` comment showing its original path:
+The following examples show the same customizations before and after migration. Each field is annotated with a comment pointing to its equivalent in the other file.
 
-```{.yaml include="rstudio-connect-customized-migration.yaml" filename="values.yaml"}
+**Before** (Launcher-based):
+
+```{.yaml include="rstudio-connect-customized-launcher.yaml" filename="values.yaml (launcher)"}
+```
+
+**After** (native Kubernetes runner):
+
+```{.yaml include="rstudio-connect-customized-migration.yaml" filename="values.yaml (kubernetes)"}
 ```
 
 ## Values with no direct equivalent
