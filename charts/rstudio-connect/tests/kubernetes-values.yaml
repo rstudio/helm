@@ -1,0 +1,6 @@
+launcher:
+  enabled: false
+
+backends:
+  kubernetes:
+    enabled: true

@@ -36,13 +36,13 @@ sharedStorage:
   subPath: ""
 
 rbac:
-  # -- Whether to create rbac. (also depends on launcher.enabled = true)
+  # -- Whether to create rbac. (also depends on launcher.enabled = true or backends.kubernetes.enabled = true)
   create: true
   # -- Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher
   # to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can
   # be disabled as the node's internal address is sufficient to allow proper functionality.
   clusterRoleCreate: false
-  # -- The serviceAccount to be associated with rbac (also depends on launcher.enabled = true)
+  # -- The serviceAccount to be associated with rbac (also depends on launcher.enabled = true or backends.kubernetes.enabled = true)
   serviceAccount:
     create: true
     name: ""
@@ -299,6 +299,43 @@ chronicleAgent:
   #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment))
   agentEnvironment: ""
 
+backends:
+  kubernetes:
+    # -- Whether to enable the native Go implementation of off-host execution for running content-jobs in remote Kubernetes pods.
+    enabled: false
+    # -- The namespace to launch connect-content jobs into. Uses the Release namespace by default
+    namespace: ""
+    defaultInitContainer:
+      # -- Whether to enable the defaultInitContainer. If disabled, you must ensure
+      # that the session components are available another way. Changing the default
+      # setting is an advanced option and not recommended. For more information on
+      # how Connect uses the session init container refer to
+      # https://docs.posit.co/connect/admin/appendix/off-host/arch-overview/#runtime-init-container
+      enabled: true
+      # -- The repository to use for the Content InitContainer image
+      repository: ghcr.io/rstudio/rstudio-connect-content-init
+      # -- A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
+      tagPrefix: ubuntu2204-
+      # -- Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+    # -- defaultResourceJobBase is an optional Kubernetes Job definition used as the base
+    # when launching content jobs. The chart automatically adds the init container and
+    # runtime volume when backends.kubernetes.defaultInitContainer.enabled is true.
+    # Only set this if you need to customize the job (e.g., add sidecars, node selectors, tolerations).
+    # https://kubernetes.io/docs/concepts/workloads/controllers/job/
+    defaultResourceJobBase: {}
+    # -- defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's
+    # Service in Kubernetes. Conceptually this is a similar to a Kustomize base. Connect then applies any required Service configuration
+    # on-top of the overlay base to produce a final Service definition.
+    # https://docs.posit.co/connect/__unreleased__/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html
+    # https://kubernetes.io/docs/concepts/services-networking/service/
+    # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays
+    defaultResourceServiceBase: {}
+      # apiVersion: v1
+      # kind: Service
+      # spec:
+      #   type: NodePort
+
 launcher:
   # -- Whether to enable the launcher
   enabled: true
@@ -471,8 +508,9 @@ config:
     InitTimeout: 5m
   Logging:
     ServiceLog: STDOUT
-    ServiceLogLevel: INFO    # INFO, WARNING or ERROR
-    ServiceLogFormat: TEXT   # TEXT or JSON
+    ServiceLogLevel: INFO  # INFO, WARNING or ERROR
+    ServiceLogFormat: TEXT  # TEXT or JSON
     AccessLog: STDOUT
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Launcher: {}
+  Kubernetes: {}

@@ -81,6 +81,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $eeDict := dict "ExecutionEnvironments" (dict "ConfigFilePath" "/etc/rstudio-connect/execution-environments/environments.yaml") }}
     {{- $defaultConfig = merge $defaultConfig $eeDict }}
   {{- end }}
+  {{- if .Values.backends.kubernetes.enabled }}
+    {{- $namespace := default $.Release.Namespace .Values.backends.kubernetes.namespace }}
+    {{- $kubernetesSettingsDict := dict "Enabled" ("true") "Namespace" ($namespace) }}
+    {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
+      {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
+      {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
+    {{- end }}
+    {{- $_ := set $kubernetesSettingsDict "DefaultResourceJobBase" (default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultResourceJobBase) }}
+    {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
+      {{- $_ := set $kubernetesSettingsDict "DefaultResourceServiceBase" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultResourceServiceBase) }}
+    {{- end }}
+    {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
+    {{- $defaultConfig = merge $defaultConfig $kubernetesDict }}
+  {{- end }}
   {{- /* default licensing configuration */}}
   {{- if .Values.license.server }}
     {{- $licenseDict := dict "Licensing" ( dict "LicenseType" ("Remote") ) }}
@@ -154,4 +168,103 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- range $key,$value := $.Values.pod.annotations -}}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
+{{- end -}}
+
+{{/*
+  Build the job resource base for the native Kubernetes runner.
+  Starts with the user-provided defaultResourceJobBase (or empty dict),
+  then adds the init container, content container, and shared volume
+  when defaultInitContainer.enabled is true.
+*/}}
+{{- define "rstudio-connect.jobBase" -}}
+  {{- $jobBase := deepCopy (default (dict) .Values.backends.kubernetes.defaultResourceJobBase) }}
+  {{- /* ensure top-level fields */}}
+  {{- if not (hasKey $jobBase "apiVersion") }}
+    {{- $_ := set $jobBase "apiVersion" "batch/v1" }}
+  {{- end }}
+  {{- if not (hasKey $jobBase "kind") }}
+    {{- $_ := set $jobBase "kind" "Job" }}
+  {{- end }}
+  {{- if .Values.backends.kubernetes.defaultInitContainer.enabled }}
+    {{- /* build init container image tag */}}
+    {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+    {{- $tag := .Values.backends.kubernetes.defaultInitContainer.tag | default (printf "%s%s" .Values.backends.kubernetes.defaultInitContainer.tagPrefix $defaultVersion) }}
+    {{- $image := printf "%s:%s" .Values.backends.kubernetes.defaultInitContainer.repository $tag }}
+    {{- /* build the init container */}}
+    {{- $initVolumeMount := dict "name" "rsc-volume" "mountPath" "/mnt/rstudio-connect-runtime/" }}
+    {{- $initContainer := dict "name" "connect-content-init" "image" $image "volumeMounts" (list $initVolumeMount) }}
+    {{- /* build the content container */}}
+    {{- $contentVolumeMount := dict "name" "rsc-volume" "mountPath" "/opt/rstudio-connect" }}
+    {{- $contentContainer := dict "name" "connect-content" "volumeMounts" (list $contentVolumeMount) }}
+    {{- /* build the shared volume */}}
+    {{- $rscVolume := dict "name" "rsc-volume" "emptyDir" (dict) }}
+    {{- /* ensure spec.template.spec exists */}}
+    {{- if not (hasKey $jobBase "spec") }}
+      {{- $_ := set $jobBase "spec" (dict) }}
+    {{- end }}
+    {{- if not (hasKey $jobBase.spec "template") }}
+      {{- $_ := set $jobBase.spec "template" (dict) }}
+    {{- end }}
+    {{- if not (hasKey $jobBase.spec.template "spec") }}
+      {{- $_ := set $jobBase.spec.template "spec" (dict) }}
+    {{- end }}
+    {{- $podSpec := $jobBase.spec.template.spec }}
+    {{- /* add init container if not already present */}}
+    {{- $existingInits := default list $podSpec.initContainers }}
+    {{- $hasInit := false }}
+    {{- range $existingInits }}
+      {{- if eq .name "connect-content-init" }}
+        {{- $_ := set . "image" $image }}
+        {{- $hasInit = true }}
+        {{- $mounts := default list .volumeMounts }}
+        {{- $hasMount := false }}
+        {{- range $mounts }}
+          {{- if and (eq .name "rsc-volume") (eq .mountPath "/mnt/rstudio-connect-runtime/") }}
+            {{- $hasMount = true }}
+          {{- end }}
+        {{- end }}
+        {{- if not $hasMount }}
+          {{- $_ := set . "volumeMounts" (append $mounts $initVolumeMount) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- if not $hasInit }}
+      {{- $_ := set $podSpec "initContainers" (append $existingInits $initContainer) }}
+    {{- else }}
+      {{- $_ := set $podSpec "initContainers" $existingInits }}
+    {{- end }}
+    {{- /* add content container if not already present, or ensure volume mount if it is */}}
+    {{- $existingContainers := default list $podSpec.containers }}
+    {{- $hasContent := false }}
+    {{- range $existingContainers }}
+      {{- if eq .name "connect-content" }}
+        {{- $hasContent = true }}
+        {{- $mounts := default list .volumeMounts }}
+        {{- $hasMount := false }}
+        {{- range $mounts }}
+          {{- if eq .mountPath "/opt/rstudio-connect" }}
+            {{- $hasMount = true }}
+          {{- end }}
+        {{- end }}
+        {{- if not $hasMount }}
+          {{- $_ := set . "volumeMounts" (append $mounts $contentVolumeMount) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- if not $hasContent }}
+      {{- $_ := set $podSpec "containers" (append $existingContainers $contentContainer) }}
+    {{- end }}
+    {{- /* add rsc-volume if not already present */}}
+    {{- $existingVolumes := default list $podSpec.volumes }}
+    {{- $hasVolume := false }}
+    {{- range $existingVolumes }}
+      {{- if eq .name "rsc-volume" }}
+        {{- $hasVolume = true }}
+      {{- end }}
+    {{- end }}
+    {{- if not $hasVolume }}
+      {{- $_ := set $podSpec "volumes" (append $existingVolumes $rscVolume) }}
+    {{- end }}
+  {{- end }}
+  {{- toYaml $jobBase }}
 {{- end -}}

@@ -7,6 +7,14 @@ metadata:
 data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
+{{- if .Values.backends.kubernetes.enabled }}
+  job.yaml: |
+{{- include "rstudio-connect.jobBase" . | nindent 4 }}
+{{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
+  service.yaml: |
+{{- .Values.backends.kubernetes.defaultResourceServiceBase | toYaml | nindent 4 }}
+{{- end }}
+{{- end }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
 {{- if .Values.launcher.enabled }}
   runtime.yaml: |

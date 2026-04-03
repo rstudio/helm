@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.38](https://img.shields.io/badge/Version-0.8.38-informational?style=flat-square) ![AppVersion: 2026.03.1](https://img.shields.io/badge/AppVersion-2026.03.1-informational?style=flat-square)
+![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![AppVersion: 2026.03.1](https://img.shields.io/badge/AppVersion-2026.03.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.38:
+To install the chart with the release name `my-release` at version 0.9.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.38
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.9.0
 ```
 
 To explore other chart versions, look at:
@@ -48,7 +48,7 @@ helm search repo rstudio/rstudio-connect -l
 ### 0.8.0
 
 - When upgrading to version 0.8.0 or later, Connect now runs in [Off-Host Execution mode](https://docs.posit.co/connect/admin/getting-started/off-host-install/) by default
-- If you desire to run Connect not in Off-Host Execution mode, then set `securityContext.privileged: true` and `launcher.enabled: false`
+- If you desire to run Connect in Local Execution mode, then set `securityContext.privileged: true` and `launcher.enabled: false`
 
 ## Required configuration
 
@@ -262,6 +262,14 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
+| backends.kubernetes.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. Changing the default setting is an advanced option and not recommended. For more information on how Connect uses the session init container refer to https://docs.posit.co/connect/admin/appendix/off-host/arch-overview/#runtime-init-container |
+| backends.kubernetes.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
+| backends.kubernetes.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
+| backends.kubernetes.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
+| backends.kubernetes.defaultResourceJobBase | object | `{}` | defaultResourceJobBase is an optional Kubernetes Job definition used as the base when launching content jobs. The chart automatically adds the init container and runtime volume when backends.kubernetes.defaultInitContainer.enabled is true. Only set this if you need to customize the job (e.g., add sidecars, node selectors, tolerations). https://kubernetes.io/docs/concepts/workloads/controllers/job/ |
+| backends.kubernetes.defaultResourceServiceBase | object | `{}` | defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's Service in Kubernetes. Conceptually this is a similar to a Kustomize base. Connect then applies any required Service configuration on-top of the overlay base to produce a final Service definition. https://docs.posit.co/connect/__unreleased__/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html https://kubernetes.io/docs/concepts/services-networking/service/ https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays |
+| backends.kubernetes.enabled | bool | `false` | Whether to enable the native Go implementation of off-host execution for running content-jobs in remote Kubernetes pods. |
+| backends.kubernetes.namespace | string | `""` | The namespace to launch connect-content jobs into. Uses the Release namespace by default |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
@@ -350,8 +358,8 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | prometheus.enabled | bool | `true` | The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter |
 | prometheus.port | int | `3232` | The port that prometheus will listen on |
 | rbac.clusterRoleCreate | bool | `false` | Whether to create the ClusterRole that grants access to the Kubernetes nodes API. This is used by the Launcher to get all of the IP addresses associated with the node that is running a particular job. In most cases, this can be disabled as the node's internal address is sufficient to allow proper functionality. |
-| rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true) |
-| rbac.serviceAccount | object | `{"annotations":{},"create":true,"labels":{},"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true) |
+| rbac.create | bool | `true` | Whether to create rbac. (also depends on launcher.enabled = true or backends.kubernetes.enabled = true) |
+| rbac.serviceAccount | object | `{"annotations":{},"create":true,"labels":{},"name":""}` | The serviceAccount to be associated with rbac (also depends on launcher.enabled = true or backends.kubernetes.enabled = true) |
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | Used to configure the container's readinessProbe. Only included if enabled = true |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources | object | `{}` | Defines resources for the rstudio-connect container |

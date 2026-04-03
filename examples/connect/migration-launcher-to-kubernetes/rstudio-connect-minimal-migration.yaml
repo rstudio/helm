@@ -1,0 +1,26 @@
+# Minimal migration from Launcher to native Kubernetes runner.
+# Only three changes are needed if you haven't customized templateValues.
+
+# sharedStorage values remain unchanged
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to your RWX StorageClass
+  requests:
+    storage: 100G
+
+# 1. Disable the Launcher
+launcher:
+  enabled: false
+
+# 2. Enable the native Kubernetes runner
+backends:
+  kubernetes:
+    enabled: true
+
+config:
+  # ... your existing config ...
+
+  # 3. Rename config.Launcher to config.Kubernetes
+  Kubernetes:
+    DataDirPVCName: connect-shared-storage # TODO: Change if you use a custom sharedStorage.name

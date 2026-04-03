@@ -1,14 +1,147 @@
-{{- if and (.Values.rbac.create) (.Values.launcher.enabled) }}
-{{ $namespace := $.Release.Namespace }}
-{{ $targetNamespace := default $.Release.Namespace .Values.launcher.namespace }}
-{{ $serviceAccountName := default (include "rstudio-connect.fullname" .) .Values.rbac.serviceAccount.name }}
-{{ $serviceAccountCreate := .Values.rbac.serviceAccount.create }}
-{{ $serviceAccountAnnotations := .Values.rbac.serviceAccount.annotations }}
-{{ $serviceAccountLabels := .Values.rbac.serviceAccount.labels }}
-{{ $clusterRoleCreate := .Values.rbac.clusterRoleCreate }}
-{{ $rbacValues1 := dict "namespace" $namespace "serviceAccountName" $serviceAccountName "targetNamespace" $targetNamespace }}
-{{ $rbacValues2 := dict "serviceAccountCreate" $serviceAccountCreate "serviceAccountAnnotations" $serviceAccountAnnotations "serviceAccountLabels" $serviceAccountLabels }}
-{{ $rbacValues3 := dict "clusterRoleCreate" $clusterRoleCreate }}
-{{ $rbacValues := merge $rbacValues1 $rbacValues2 $rbacValues3 }}
+{{- if and (.Values.rbac.create) (or .Values.launcher.enabled .Values.backends.kubernetes.enabled) }}
+{{- $namespace := $.Release.Namespace }}
+{{- $targetNamespace := $.Release.Namespace }}
+{{- if .Values.launcher.enabled }}
+{{- $targetNamespace = default $targetNamespace .Values.launcher.namespace }}
+{{- else }}
+{{- $targetNamespace = default $targetNamespace .Values.backends.kubernetes.namespace }}
+{{- end }}
+{{- $serviceAccountName := default (include "rstudio-connect.fullname" .) .Values.rbac.serviceAccount.name }}
+{{- $serviceAccountCreate := .Values.rbac.serviceAccount.create }}
+{{- $serviceAccountAnnotations := .Values.rbac.serviceAccount.annotations }}
+{{- $serviceAccountLabels := .Values.rbac.serviceAccount.labels }}
+{{- if .Values.launcher.enabled }}
+{{- /* Launcher mode: use the shared rstudio-library RBAC template */}}
+{{- $clusterRoleCreate := .Values.rbac.clusterRoleCreate }}
+{{- $rbacValues1 := dict "namespace" $namespace "serviceAccountName" $serviceAccountName "targetNamespace" $targetNamespace }}
+{{- $rbacValues2 := dict "serviceAccountCreate" $serviceAccountCreate "serviceAccountAnnotations" $serviceAccountAnnotations "serviceAccountLabels" $serviceAccountLabels }}
+{{- $rbacValues3 := dict "clusterRoleCreate" $clusterRoleCreate }}
+{{- $rbacValues := merge $rbacValues1 $rbacValues2 $rbacValues3 }}
 {{ include "rstudio-library.rbac" $rbacValues }}
+{{- else if .Values.backends.kubernetes.enabled }}
+{{- /* Native runner mode: dedicated RBAC with only the permissions Connect needs */}}
+{{- $clusterRoleCreate := or .Values.rbac.clusterRoleCreate (eq (dig "spec" "type" "ClusterIP" .Values.backends.kubernetes.defaultResourceServiceBase) "NodePort") }}
+{{- if $clusterRoleCreate }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ $serviceAccountName }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "nodes"
+    verbs:
+      - "get"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ $serviceAccountName }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ $serviceAccountName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $serviceAccountName }}
+    namespace: {{ $namespace }}
+{{- end }}
+{{- if $serviceAccountCreate }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $serviceAccountName }}
+  namespace: {{ $namespace }}
+  {{- with $serviceAccountAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $serviceAccountLabels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $serviceAccountName }}
+  namespace: {{ $targetNamespace }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "serviceaccounts"
+    verbs:
+      - "list"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods/log"
+    verbs:
+      - "get"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods/attach"
+    verbs:
+      - "create"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods/exec"
+    verbs:
+      - "create"
+  - apiGroups:
+      - ""
+    resources:
+      - "services"
+    verbs:
+      - "create"
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "batch"
+    resources:
+      - "jobs"
+    verbs:
+      - "create"
+      - "get"
+      - "delete"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "discovery.k8s.io"
+    resources:
+      - "endpointslices"
+    verbs:
+      - "list"
+      - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $serviceAccountName }}
+  namespace: {{ $targetNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $serviceAccountName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $serviceAccountName }}
+    namespace: {{ $namespace }}
+{{- end }}
 {{- end }}

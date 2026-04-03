@@ -1,0 +1,61 @@
+---
+category: "Migration"
+---
+
+# Migrating from Launcher to native Kubernetes runner
+
+This guide covers migrating Posit Connect helm values from the Launcher (`launcher.enabled: true`) to the native Kubernetes runner (`backends.kubernetes.enabled: true`).
+
+The native runner manages content Jobs and Services directly using standard Kubernetes manifests, replacing the Launcher's template system.
+
+## Minimal migration
+
+If you haven't customized `launcher.templateValues`, the migration requires three changes:
+
+1. Set `launcher.enabled: false` and `backends.kubernetes.enabled: true`.
+1. Rename `config.Launcher` to `config.Kubernetes`.
+1. Keep `sharedStorage` values as-is.
+
+```{.yaml include="rstudio-connect-minimal-migration.yaml" filename="values.yaml"}
+```
+
+## Migrating templateValues customizations
+
+If you customized `launcher.templateValues`, those settings move into `backends.kubernetes.defaultResourceJobBase` and `backends.kubernetes.defaultResourceServiceBase`. These are standard Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) and [Service](https://kubernetes.io/docs/concepts/services-networking/service/) specs, so Kubernetes documentation applies directly.
+
+The following examples show the same customizations before and after migration. Each field is annotated with a comment pointing to its equivalent in the other file.
+
+**Before** (Launcher-based):
+
+```{.yaml include="rstudio-connect-customized-launcher.yaml" filename="values.yaml (launcher)"}
+```
+
+**After** (native Kubernetes runner):
+
+```{.yaml include="rstudio-connect-customized-migration.yaml" filename="values.yaml (kubernetes)"}
+```
+
+## Values with no direct equivalent
+
+| Launcher value | Migration path |
+| --- | --- |
+| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution Environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/). |
+| `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
+| `launcher.launcherKubernetesProfilesConf` | No equivalent. The native runner does not use profiles. |
+| `launcher.useTemplates`, `extraTemplates`, `includeDefaultTemplates`, `includeTemplateValues` | N/A. The native runner uses resource bases instead of templates. |
+
+## Important notes
+
+:::{.callout-important}
+If you set `serviceAccountName` in the job base, you must label the service account for Connect to use it. Without this label, Connect falls back to the namespace default:
+
+```bash
+kubectl label sa <service-account-name> connect.posit.co/service-account=true -n <namespace>
+```
+:::
+
+**Init container** -- The chart auto-generates a `connect-content-init` init container from `backends.kubernetes.defaultInitContainer`. Do not include it in `defaultResourceJobBase`. Custom init containers run alongside the auto-generated one.
+
+**Shared storage** -- `sharedStorage.*` values (`create`, `mount`, `mountContent`, `name`, `subPath`, `storageClassName`) work identically for both modes. No changes needed.
+
+**Rollback** -- Set `launcher.enabled: true`, remove `backends.kubernetes`, and rename `config.Kubernetes` back to `config.Launcher`. Previously published content continues to work.
