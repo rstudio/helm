@@ -416,6 +416,31 @@ tests:
           path: data["job.yaml"]
           pattern: "name: rsc-volume"
 
+  - it: should add rsc-volume mount to connect-content even if another volume uses same mountPath
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: connect-content
+                      volumeMounts:
+                        - name: other-volume
+                          mountPath: /opt/rstudio-connect
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: rsc-volume"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: other-volume"
+
   - it: should not include init container when defaultInitContainer.enabled is false
     template: configmap.yaml
     set:

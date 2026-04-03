@@ -242,7 +242,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         {{- $mounts := default list .volumeMounts }}
         {{- $hasMount := false }}
         {{- range $mounts }}
-          {{- if eq .mountPath "/opt/rstudio-connect" }}
+          {{- if and (eq .name "rsc-volume") (eq .mountPath "/opt/rstudio-connect") }}
             {{- $hasMount = true }}
           {{- end }}
         {{- end }}
