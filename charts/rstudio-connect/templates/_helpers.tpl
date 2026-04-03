@@ -221,6 +221,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         {{- range $mounts }}
           {{- if and (eq .name "rsc-volume") (eq .mountPath "/mnt/rstudio-connect-runtime/") }}
             {{- $hasMount = true }}
+          {{- else if eq .mountPath "/mnt/rstudio-connect-runtime/" }}
+            {{- fail "backends.kubernetes.defaultResourceJobBase: connect-content-init container has a volumeMount at /mnt/rstudio-connect-runtime/ using a volume other than rsc-volume. This mountPath is reserved for the runtime volume." }}
           {{- end }}
         {{- end }}
         {{- if not $hasMount }}
@@ -244,6 +246,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         {{- range $mounts }}
           {{- if and (eq .name "rsc-volume") (eq .mountPath "/opt/rstudio-connect") }}
             {{- $hasMount = true }}
+          {{- else if eq .mountPath "/opt/rstudio-connect" }}
+            {{- fail "backends.kubernetes.defaultResourceJobBase: connect-content container has a volumeMount at /opt/rstudio-connect using a volume other than rsc-volume. This mountPath is reserved for the runtime volume shared with the init container." }}
           {{- end }}
         {{- end }}
         {{- if not $hasMount }}
