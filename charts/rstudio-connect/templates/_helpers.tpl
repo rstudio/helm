@@ -216,6 +216,16 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- if eq .name "connect-content-init" }}
         {{- $_ := set . "image" $image }}
         {{- $hasInit = true }}
+        {{- $mounts := default list .volumeMounts }}
+        {{- $hasMount := false }}
+        {{- range $mounts }}
+          {{- if and (eq .name "rsc-volume") (eq .mountPath "/mnt/rstudio-connect-runtime/") }}
+            {{- $hasMount = true }}
+          {{- end }}
+        {{- end }}
+        {{- if not $hasMount }}
+          {{- $_ := set . "volumeMounts" (append $mounts $initVolumeMount) }}
+        {{- end }}
       {{- end }}
     {{- end }}
     {{- if not $hasInit }}

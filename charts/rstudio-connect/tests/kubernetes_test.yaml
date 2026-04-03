@@ -390,6 +390,32 @@ tests:
           path: data["job.yaml"]
           pattern: "name: rsc-volume"
 
+  - it: should ensure rsc-volume mount on user-provided connect-content-init
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+                      image: custom-image:latest
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: connect-content-init"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "/mnt/rstudio-connect-runtime/"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: rsc-volume"
+
   - it: should not include init container when defaultInitContainer.enabled is false
     template: configmap.yaml
     set:
