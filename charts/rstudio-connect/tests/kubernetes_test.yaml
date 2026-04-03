@@ -460,9 +460,9 @@ tests:
           path: rules[0].resources
           value: ["nodes"]
         documentIndex: 0
-      - contains:
+      - equal:
           path: rules[0].verbs
-          content: "get"
+          value: ["get"]
         documentIndex: 0
 
   # Test 2: Explicit rbac.clusterRoleCreate=true creates ClusterRole even without NodePort
@@ -578,6 +578,21 @@ tests:
       - exists:
           path: spec.template.metadata.annotations["checksum/config-prestart"]
 
+  - it: should include checksum/config-prestart annotation when launcher.enabled only
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: false
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations["checksum/config-prestart"]
+
   - it: should not include checksum/config-prestart annotation when neither is enabled
     template: deployment.yaml
     set:
@@ -619,7 +634,7 @@ tests:
     asserts:
       - matchRegex:
           path: data["job.yaml"]
-          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:jammy-"
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:jammy-\\d+\\.\\d+\\.\\d+"
 
   - it: should preserve user-provided sidecar and nodeSelector in job base
     template: configmap.yaml
