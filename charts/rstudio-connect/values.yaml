@@ -301,7 +301,7 @@ chronicleAgent:
 
 backends:
   kubernetes:
-    # -- Whether to enable the native Go implementation of off-host execution for running content-jobs in remote Kubernetes pods.
+    # -- Whether to enable the native Kubernetes implementation of off-host execution for running content-jobs in remote Kubernetes pods.
     enabled: false
     # -- The namespace to launch connect-content jobs into. Uses the Release namespace by default
     namespace: ""

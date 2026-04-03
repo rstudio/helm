@@ -2,7 +2,10 @@
 
 ## 0.9.0
 
-- TODO
+- Add support for native Kubernetes off-host execution via `backends.kubernetes.enabled`. Requires Connect version 2026.04.0 or later. This replaces the Launcher's template system with standard Kubernetes Job and Service manifests configured through `defaultResourceJobBase` and `defaultResourceServiceBase`.
+- Add mutual-exclusion validation: `launcher.enabled` and `backends.kubernetes.enabled` cannot both be true.
+- Add dedicated RBAC for the native runner with least-privilege permissions, including automatic ClusterRole creation for NodePort service types.
+- Add migration examples in `examples/connect/migration-launcher-to-kubernetes/`.
 
 ## 0.8.38
 

@@ -437,6 +437,27 @@ tests:
       - failedTemplate:
           errorPattern: "mountPath is reserved for the runtime volume"
 
+  - it: should fail when connect-content-init has /mnt/rstudio-connect-runtime/ mounted from a non-rsc-volume
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+                      volumeMounts:
+                        - name: other-volume
+                          mountPath: /mnt/rstudio-connect-runtime/
+    asserts:
+      - failedTemplate:
+          errorPattern: "mountPath is reserved for the runtime volume"
+
   - it: should not include init container when defaultInitContainer.enabled is false
     template: configmap.yaml
     set:
