@@ -75,6 +75,94 @@ tests:
             mountPath: /etc/rstudio-connect/job.yaml
             subPath: job.yaml
 
+  # Test prestart volumeMount is only present when launcher or kubernetes is enabled
+  - it: should mount prestart scripts when backends.kubernetes.enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: /scripts/
+
+  - it: should mount prestart scripts when launcher.enabled only
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: false
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: /scripts/
+
+  - it: should not mount prestart scripts when neither launcher nor kubernetes is enabled
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: /scripts/
+
+  # Test custom mount paths for job.yaml and service.yaml
+  - it: should use custom DefaultResourceJobBase path for job.yaml mount
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes:
+          DefaultResourceJobBase: /custom/path/job.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /custom/path/job.yaml
+            subPath: job.yaml
+
+  - it: should use custom DefaultResourceServiceBase path for service.yaml mount
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            metadata:
+              labels:
+                test: value
+      config:
+        Kubernetes:
+          DefaultResourceServiceBase: /custom/path/service.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /custom/path/service.yaml
+            subPath: service.yaml
+
   # Test RBAC resources are created when backends.kubernetes.enabled
   - it: should create RBAC resources when backends.kubernetes.enabled and rbac.create are true
     template: rbac.yaml
