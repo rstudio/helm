@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.37
+
+- Fix OTel collector advertise host in OHE mode: inject `status.podIP` via Downward API as `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` when `config.OpenTelemetry.Enabled` is `true`, replacing the Service DNS default that caused content job pods to time out on the unexposed ephemeral collector port
+
 ## 0.8.36
 
 - Remove deprecated default value `Metrics.Enabled = true`

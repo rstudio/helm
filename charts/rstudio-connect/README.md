@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.8.36](https://img.shields.io/badge/Version-0.8.36-informational?style=flat-square) ![AppVersion: 2026.03.0](https://img.shields.io/badge/AppVersion-2026.03.0-informational?style=flat-square)
+![Version: 0.8.37](https://img.shields.io/badge/Version-0.8.37-informational?style=flat-square) ![AppVersion: 2026.03.0](https://img.shields.io/badge/AppVersion-2026.03.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.8.36:
+To install the chart with the release name `my-release` at version 0.8.37:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.36
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.8.37
 ```
 
 To explore other chart versions, look at:
@@ -230,6 +230,14 @@ executionEnvironments:
         - version: "4.4.0"
           path: /opt/R/4.4.0/bin/R
 ```
+
+## OpenTelemetry
+
+When `config.OpenTelemetry.Enabled` is `true`, the chart automatically injects the pod's IP address
+as `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` via the Kubernetes Downward API. This allows content
+job pods to reach Connect's embedded OTel collector directly (pod-to-pod).
+
+To override the advertise host, set `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` explicitly in `pod.env`.
 
 ## General principles
 
