@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.38
+
+- Bump Connect version to 2026.03.1
+
 ## 0.8.37
 
 - Fix OTel collector advertise host in OHE mode: inject `status.podIP` via Downward API as `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` when `config.OpenTelemetry.Enabled` is `true`, replacing the Service DNS default that caused content job pods to time out on the unexposed ephemeral collector port
