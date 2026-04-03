@@ -433,6 +433,194 @@ tests:
           path: data["job.yaml"]
           pattern: "connect-content-init"
 
+  # Test 1: NodePort triggers ClusterRole auto-create
+  # Template order: ClusterRole(0), ClusterRoleBinding(1), SA(2), Role(3), RoleBinding(4)
+  - it: should create ClusterRole with nodes/get when service type is NodePort
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            spec:
+              type: NodePort
+      rbac:
+        create: true
+        clusterRoleCreate: false
+    asserts:
+      - isKind:
+          of: ClusterRole
+        documentIndex: 0
+      - isKind:
+          of: ClusterRoleBinding
+        documentIndex: 1
+      - equal:
+          path: rules[0].resources
+          value: ["nodes"]
+        documentIndex: 0
+      - contains:
+          path: rules[0].verbs
+          content: "get"
+        documentIndex: 0
+
+  # Test 2: Explicit rbac.clusterRoleCreate=true creates ClusterRole even without NodePort
+  # Template order: ClusterRole(0), ClusterRoleBinding(1), SA(2), Role(3), RoleBinding(4)
+  - it: should create ClusterRole when rbac.clusterRoleCreate is true regardless of service type
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+        clusterRoleCreate: true
+    asserts:
+      - isKind:
+          of: ClusterRole
+        documentIndex: 0
+      - isKind:
+          of: ClusterRoleBinding
+        documentIndex: 1
+
+  # Test 3: rbac.serviceAccount.create=false skips SA but Role/RoleBinding reference configured name
+  # Renders: Role(0), RoleBinding(1)
+  - it: should not create ServiceAccount when rbac.serviceAccount.create is false
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+        clusterRoleCreate: false
+        serviceAccount:
+          create: false
+          name: custom-sa
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Role
+        documentIndex: 0
+      - isKind:
+          of: RoleBinding
+        documentIndex: 1
+      - equal:
+          path: subjects[0].name
+          value: custom-sa
+        documentIndex: 1
+
+  # Test 4: rbac.create=false with native runner enabled renders no RBAC docs
+  - it: should not create any RBAC resources when rbac.create is false
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test 5: configmap-prestart gating
+  - it: should create configmap-prestart when backends.kubernetes.enabled
+    template: configmap-prestart.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ConfigMap
+
+  - it: should create configmap-prestart when launcher.enabled
+    template: configmap-prestart.yaml
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: false
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should not create configmap-prestart when neither is enabled
+    template: configmap-prestart.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test 6: checksum/config-prestart annotation gating
+  - it: should include checksum/config-prestart annotation when backends.kubernetes.enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations["checksum/config-prestart"]
+
+  - it: should not include checksum/config-prestart annotation when neither is enabled
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/config-prestart"]
+
+  # Test 7: Init image tag precedence — explicit tag overrides tagPrefix+appVersion
+  - it: should use explicit defaultInitContainer.tag when set
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            tag: "custom-tag-1.2.3"
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:custom-tag-1.2.3"
+
+  - it: should use tagPrefix plus appVersion when tag is not set
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            tagPrefix: "jammy-"
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:jammy-"
+
   - it: should preserve user-provided sidecar and nodeSelector in job base
     template: configmap.yaml
     set:
