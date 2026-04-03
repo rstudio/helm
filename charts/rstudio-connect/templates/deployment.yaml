@@ -199,11 +199,11 @@ spec:
             subPath: "rstudio-connect.gcfg"
           {{- if .Values.backends.kubernetes.enabled }}
           - name: rstudio-connect-config
-            mountPath: "/etc/rstudio-connect/job.yaml"
+            mountPath: {{ default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultResourceJobBase | quote }}
             subPath: "job.yaml"
           {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
           - name: rstudio-connect-config
-            mountPath: "/etc/rstudio-connect/service.yaml"
+            mountPath: {{ default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultResourceServiceBase | quote }}
             subPath: "service.yaml"
           {{- end }}
           {{- end }}
@@ -230,8 +230,10 @@ spec:
             mountPath: "/mnt/job-json-overrides/"
           {{- end }}
           {{- end }}
+          {{- if or .Values.launcher.enabled .Values.backends.kubernetes.enabled }}
           - name: rstudio-connect-prestart
             mountPath: "/scripts/"
+          {{- end }}
           {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
           - name: rstudio-connect-data
             mountPath: "{{ .Values.sharedStorage.path }}"
