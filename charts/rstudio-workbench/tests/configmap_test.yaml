@@ -1,0 +1,190 @@
+suite: Workbench ConfigMap
+templates:
+  - configmap-general.yaml
+  - configmap-prestart.yaml
+  - configmap-secret.yaml
+  - configmap-session.yaml
+tests:
+  # -- Default behavior: components enabled
+  - it: should include session-init settings by default
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-auto-update=1"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-init-container-image-name=rstudio/workbench-session-init"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-init-container-image-tag=\\d+\\.\\d+\\.\\d+"
+
+  - it: should use workbench-session as default session image
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "default-container-image=rstudio/workbench-session:"
+
+  # -- Components disabled (classic mode)
+  - it: should not include session-init settings when components are disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        enabled: false
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-auto-update"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-init-container"
+
+  - it: should use r-session-complete when configured for classic mode
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      session:
+        image:
+          repository: "rstudio/r-session-complete"
+      components:
+        enabled: false
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "default-container-image=rstudio/r-session-complete:"
+
+  # -- Custom session init container
+  - it: should use custom session init repository when overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        sessionInit:
+          image:
+            repository: "custom-registry/session-init"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-init-container-image-name=custom-registry/session-init"
+
+  - it: should use custom session init tag when overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        sessionInit:
+          image:
+            tag: "jammy-2025.01.0"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-init-container-image-tag=jammy-2025.01.0"
+
+  # -- versionOverride propagates to init container tag
+  - it: should use versionOverride for init container tag
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      versionOverride: "2025.06.0"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-init-container-image-tag=2025.06.0"
+
+  # -- Launcher disabled: components silently ignored
+  - it: should not include session-init settings when launcher is disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: false
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-init-container"
+
+  # -- Positron: rserver.conf settings
+  - it: should include positron init container settings when version is set
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        positron:
+          version: "2026.03.0-213"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-enabled=1"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-name=posit/workbench-positron-init"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-tag=2026.03.0-213"
+
+  - it: should not include positron settings when version is empty
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container"
+
+  - it: should use custom positron image repository when overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+          image:
+            repository: "my-registry/positron-init"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-name=my-registry/positron-init"
+
+  - it: should use custom positron image tag when overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+          image:
+            tag: "custom-build-abc123"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container-image-tag=custom-build-abc123"
+
+  - it: should not include positron settings when components are disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        enabled: false
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container"
+
+  - it: should not include positron settings when launcher is disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: false
+      components:
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container"
