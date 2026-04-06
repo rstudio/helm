@@ -163,6 +163,25 @@ tests:
             mountPath: /custom/path/service.yaml
             subPath: service.yaml
 
+  # Test default mount paths when config.Kubernetes is not set
+  - it: should use default job.yaml mount path when config.Kubernetes is absent
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes: null
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
   # Test RBAC resources are created when backends.kubernetes.enabled
   - it: should create RBAC resources when backends.kubernetes.enabled and rbac.create are true
     template: rbac.yaml

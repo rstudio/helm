@@ -88,9 +88,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
     {{- end }}
-    {{- $_ := set $kubernetesSettingsDict "DefaultResourceJobBase" (default "/etc/rstudio-connect/job.yaml" .Values.config.Kubernetes.DefaultResourceJobBase) }}
+    {{- $_ := set $kubernetesSettingsDict "DefaultResourceJobBase" (default "/etc/rstudio-connect/job.yaml" (dig "Kubernetes" "DefaultResourceJobBase" "" .Values.config)) }}
     {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
-      {{- $_ := set $kubernetesSettingsDict "DefaultResourceServiceBase" (default "/etc/rstudio-connect/service.yaml" .Values.config.Kubernetes.DefaultResourceServiceBase) }}
+      {{- $_ := set $kubernetesSettingsDict "DefaultResourceServiceBase" (default "/etc/rstudio-connect/service.yaml" (dig "Kubernetes" "DefaultResourceServiceBase" "" .Values.config)) }}
     {{- end }}
     {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
     {{- $defaultConfig = merge $defaultConfig $kubernetesDict }}
