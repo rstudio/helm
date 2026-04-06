@@ -104,6 +104,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- if .Values.prometheus.enabled }}
     {{- $defaultConfig = merge $defaultConfig (dict "Metrics" ( dict "PrometheusListen" (print ":" .Values.prometheus.port )))}}
   {{- end }}
+  {{- /* remove empty DefaultResource*Base keys so they don't overwrite chart defaults */}}
+  {{- if hasKey $configCopy "Kubernetes" }}
+    {{- if not (dig "Kubernetes" "DefaultResourceJobBase" "" $configCopy) }}
+      {{- $_ := unset (index $configCopy "Kubernetes") "DefaultResourceJobBase" }}
+    {{- end }}
+    {{- if not (dig "Kubernetes" "DefaultResourceServiceBase" "" $configCopy) }}
+      {{- $_ := unset (index $configCopy "Kubernetes") "DefaultResourceServiceBase" }}
+    {{- end }}
+  {{- end }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
 

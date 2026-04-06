@@ -182,6 +182,84 @@ tests:
             mountPath: /etc/rstudio-connect/job.yaml
             subPath: job.yaml
 
+  - it: should fall back to default paths when DefaultResourceJobBase is empty string
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes:
+          DefaultResourceJobBase: ""
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
+  - it: should write default path in gcfg when DefaultResourceJobBase is empty string
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes:
+          DefaultResourceJobBase: ""
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DefaultResourceJobBase = /etc/rstudio-connect/job.yaml"
+
+  - it: should fall back to default paths when DefaultResourceServiceBase is empty string
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            metadata:
+              labels:
+                test: value
+      config:
+        Kubernetes:
+          DefaultResourceServiceBase: ""
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/service.yaml
+            subPath: service.yaml
+
+  - it: should write default path in gcfg when DefaultResourceServiceBase is empty string
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            metadata:
+              labels:
+                test: value
+      config:
+        Kubernetes:
+          DefaultResourceServiceBase: ""
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DefaultResourceServiceBase = /etc/rstudio-connect/service.yaml"
+
   # Test RBAC resources are created when backends.kubernetes.enabled
   - it: should create RBAC resources when backends.kubernetes.enabled and rbac.create are true
     template: rbac.yaml
