@@ -16,6 +16,8 @@ If you haven't customized `launcher.templateValues`, the migration requires thre
 1. Rename `config.Launcher` to `config.Kubernetes`.
 1. Keep `sharedStorage` values as-is.
 
+If you customized `launcher.namespace`, move it to `backends.kubernetes.namespace`. If you customized `launcher.defaultInitContainer.*`, the `enabled`, `repository`, `tagPrefix`, and `tag` fields map directly to `backends.kubernetes.defaultInitContainer.*`. The launcher-only fields `imagePullPolicy`, `resources`, and `securityContext` should be set in `defaultResourceJobBase` on the init container spec instead.
+
 ```{.yaml include="rstudio-connect-minimal-migration.yaml" filename="values.yaml"}
 ```
 

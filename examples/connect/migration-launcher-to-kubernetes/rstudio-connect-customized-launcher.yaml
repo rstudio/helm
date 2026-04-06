@@ -99,4 +99,4 @@ config:
   # ... your existing config ...
 
   Launcher: # Moves to: config.Kubernetes
-    DataDirPVCName: connect-shared-storage
+    DataDirPVCName: my-release-rstudio-connect-shared-storage # Your actual PVC name
