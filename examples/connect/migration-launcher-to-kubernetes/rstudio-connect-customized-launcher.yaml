@@ -42,6 +42,8 @@ launcher:
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
+      # defaultSecurityContext is also supported and maps to the same spec.template.spec.securityContext.
+      # Both fields are merged by the launcher; the native runner uses a single securityContext field.
       serviceAccountName: connect-content-sa # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.serviceAccountName
       imagePullSecrets: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.imagePullSecrets
         - name: registry-credentials
@@ -81,6 +83,7 @@ launcher:
       imagePullPolicy: IfNotPresent # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].imagePullPolicy
       containerSecurityContext: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].securityContext
         allowPrivilegeEscalation: false
+      command: [] # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].command
       volumeMounts: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].volumeMounts
         - name: extra-config
           mountPath: /etc/content-config

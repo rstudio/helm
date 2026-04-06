@@ -75,6 +75,7 @@ backends:
                     cpu: "50m"
                     memory: "64Mi"
               - name: connect-content # Must use this exact name for the content container
+                command: [] # Was: templateValues.pod.command (empty = Connect default)
                 env: # Was: templateValues.pod.env
                   - name: DATABASE_URL
                     valueFrom:
