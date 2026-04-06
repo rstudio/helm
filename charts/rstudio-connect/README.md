@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.9.2](https://img.shields.io/badge/Version-0.9.2-informational?style=flat-square) ![AppVersion: 2026.03.1](https://img.shields.io/badge/AppVersion-2026.03.1-informational?style=flat-square)
+![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: 2026.03.1](https://img.shields.io/badge/AppVersion-2026.03.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.9.2:
+To install the chart with the release name `my-release` at version 0.20.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.9.2
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.0
 ```
 
 To explore other chart versions, look at:
@@ -300,12 +300,12 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | executionEnvironments | list | `[]` (disabled) | Optional list of execution environments to manage declaratively. Requires Connect version 2026.03.0 or later. When set, the chart renders these into a ConfigMap, mounts it into the Connect pod, and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration. Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade without requiring a pod restart or database reset. |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
-| image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"ubuntu2204-"}` | Defines the Posit Connect image to deploy |
+| image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"os":"ubuntu-24.04","repository":"posit/connect","tag":""}` | Defines the Posit Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"ghcr.io/rstudio/rstudio-connect"` | The repository to use for the main pod image |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"posit/connect"` | The repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -314,14 +314,14 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
 | launcher.additionalRuntimeImages | list | `[]` | Deprecated, use `executionEnvironments` instead. Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key). If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list". |
 | launcher.customRuntimeYaml | string | `""` | Deprecated, use `executionEnvironments` instead. Optional. The runtime.yaml definition of Kubernetes runtime containers. If set to "base", will pull in the default runtime.yaml file. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments the first time the server starts. If any execution environments already exist in the database, these values are ignored; execution environments are not created or modified during subsequent restarts. |
-| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","resources":{},"securityContext":{},"tag":"","tagPrefix":"ubuntu2204-"}` | Image definition for the default Posit Connect Content InitContainer |
+| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","os":"ubuntu-24.04","repository":"posit/connect-content-init","resources":{},"securityContext":{},"tag":""}` | Image definition for the default Posit Connect Content InitContainer |
 | launcher.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. |
 | launcher.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
-| launcher.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
+| launcher.defaultInitContainer.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| launcher.defaultInitContainer.repository | string | `"posit/connect-content-init"` | The repository to use for the Content InitContainer image |
 | launcher.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
 | launcher.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| launcher.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
 | launcher.enabled | bool | `true` | Whether to enable the launcher |
 | launcher.extraTemplates | object | `{}` | extra templates to render in the template directory. |
 | launcher.includeDefaultTemplates | bool | `true` | whether to include the default `job.tpl` and `service.tpl` files included with the chart |

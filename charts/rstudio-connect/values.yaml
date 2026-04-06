@@ -69,9 +69,9 @@ podDisruptionBudget: {}
 # -- Defines the Posit Connect image to deploy
 image:
   # -- The repository to use for the main pod image
-  repository: ghcr.io/rstudio/rstudio-connect
-  # -- A tag prefix for the server image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-  tagPrefix: ubuntu2204-
+  repository: posit/connect
+  # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+  os: "ubuntu-24.04"
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- The imagePullPolicy for the main pod image
@@ -418,9 +418,9 @@ launcher:
     # -- Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way.
     enabled: true
     # -- The repository to use for the Content InitContainer image
-    repository: ghcr.io/rstudio/rstudio-connect-content-init
-    # -- A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-    tagPrefix: ubuntu2204-
+    repository: posit/connect-content-init
+    # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+    os: "ubuntu-24.04"
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     # -- The imagePullPolicy for the default initContainer
