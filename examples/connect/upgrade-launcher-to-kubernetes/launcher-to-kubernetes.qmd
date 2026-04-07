@@ -43,7 +43,7 @@ The following examples show the same customizations before and after the upgrade
 | --- | --- |
 | `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
 | `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
-| `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. |
+| `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
 | `launcher.templateValues.pod.command` | No direct equivalent override. The direct Kubernetes runner manages `connect-content` command/args at runtime. |
 | `launcher.templateValues.pod.securityContext.runAsUser`, `runAsGroup`, `supplementalGroups`; `launcher.templateValues.pod.containerSecurityContext.runAsUser`, `runAsGroup` | No direct equivalent override. The direct Kubernetes runner manages these from Connect's RunAs user/group configuration. |
 | `launcher.useTemplates`, `extraTemplates`, `includeDefaultTemplates`, `includeTemplateValues` | N/A. The direct Kubernetes runner uses resource bases instead of templates. |
