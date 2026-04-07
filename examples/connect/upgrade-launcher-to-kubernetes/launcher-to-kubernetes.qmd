@@ -18,7 +18,7 @@ Set `DataDirPVCName` explicitly only when you need to override that default beha
 
 If you customized `launcher.namespace`, move it to `backends.kubernetes.namespace`. If you customized `launcher.defaultInitContainer.*`, the `enabled`, `repository`, `tagPrefix`, and `tag` fields map directly to `backends.kubernetes.defaultInitContainer.*`. The launcher-only fields `imagePullPolicy`, `resources`, and `securityContext` should be set in `defaultResourceJobBase` on the init container spec instead.
 
-```{.yaml include="rstudio-connect-minimal-migration.yaml" filename="values.yaml"}
+```{.yaml include="rstudio-connect-minimal-upgrade.yaml" filename="values.yaml"}
 ```
 
 ## Upgrading templateValues customizations
@@ -34,7 +34,7 @@ The following examples show the same customizations before and after the upgrade
 
 **After** (direct Kubernetes runner):
 
-```{.yaml include="rstudio-connect-customized-migration.yaml" filename="values.yaml (kubernetes)"}
+```{.yaml include="rstudio-connect-customized-upgrade.yaml" filename="values.yaml (kubernetes)"}
 ```
 
 ## Values with no direct equivalent

@@ -1,6 +1,6 @@
 # Original Launcher-based values with templateValues customizations.
 # Each field is annotated with its equivalent path after upgrading to the direct Kubernetes runner.
-# See rstudio-connect-customized-migration.yaml for the upgraded version.
+# See rstudio-connect-customized-upgrade.yaml for the upgraded version.
 
 sharedStorage:
   create: true
