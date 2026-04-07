@@ -2,11 +2,11 @@
 category: "Migration"
 ---
 
-# Migrating from Launcher to native Kubernetes runner
+# Transitioning to the direct Kubernetes runner
 
-This guide covers migrating Posit Connect helm values from the Launcher (`launcher.enabled: true`) to the native Kubernetes runner (`backends.kubernetes.enabled: true`).
+This guide covers migrating Posit Connect helm values from the Launcher (`launcher.enabled: true`) to the direct Kubernetes runner (`backends.kubernetes.enabled: true`).
 
-The native runner manages content Jobs and Services directly using standard Kubernetes manifests, replacing the Launcher's template system.
+The direct Kubernetes runner manages content Jobs and Services using standard Kubernetes manifests, replacing the Launcher's template system.
 
 ## Minimal migration
 
@@ -32,7 +32,7 @@ The following examples show the same customizations before and after migration. 
 ```{.yaml include="rstudio-connect-customized-launcher.yaml" filename="values.yaml (launcher)"}
 ```
 
-**After** (native Kubernetes runner):
+**After** (direct Kubernetes runner):
 
 ```{.yaml include="rstudio-connect-customized-migration.yaml" filename="values.yaml (kubernetes)"}
 ```
@@ -43,10 +43,10 @@ The following examples show the same customizations before and after migration. 
 | --- | --- |
 | `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
 | `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
-| `launcher.launcherKubernetesProfilesConf` | No equivalent. The native runner does not use profiles. |
-| `launcher.templateValues.pod.command` | No direct equivalent override. The native runner manages `connect-content` command/args at runtime. |
-| `launcher.templateValues.pod.securityContext.runAsUser`, `runAsGroup`, `supplementalGroups`; `launcher.templateValues.pod.containerSecurityContext.runAsUser`, `runAsGroup` | No direct equivalent override. The native runner manages these from Connect's RunAs user/group configuration. |
-| `launcher.useTemplates`, `extraTemplates`, `includeDefaultTemplates`, `includeTemplateValues` | N/A. The native runner uses resource bases instead of templates. |
+| `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. |
+| `launcher.templateValues.pod.command` | No direct equivalent override. The direct Kubernetes runner manages `connect-content` command/args at runtime. |
+| `launcher.templateValues.pod.securityContext.runAsUser`, `runAsGroup`, `supplementalGroups`; `launcher.templateValues.pod.containerSecurityContext.runAsUser`, `runAsGroup` | No direct equivalent override. The direct Kubernetes runner manages these from Connect's RunAs user/group configuration. |
+| `launcher.useTemplates`, `extraTemplates`, `includeDefaultTemplates`, `includeTemplateValues` | N/A. The direct Kubernetes runner uses resource bases instead of templates. |
 
 For complete field-level behavior (`cannot-override`, `merged`, `appended`), see [Kubernetes job overlays](https://docs.posit.co/connect/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html).
 

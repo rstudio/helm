@@ -19,7 +19,7 @@
 {{- $rbacValues := merge $rbacValues1 $rbacValues2 $rbacValues3 }}
 {{ include "rstudio-library.rbac" $rbacValues }}
 {{- else if .Values.backends.kubernetes.enabled }}
-{{- /* Native runner mode: dedicated RBAC with only the permissions Connect needs */}}
+{{- /* Direct Kubernetes runner mode: dedicated RBAC with only the permissions Connect needs */}}
 {{- $clusterRoleCreate := or .Values.rbac.clusterRoleCreate (eq (dig "spec" "type" "ClusterIP" .Values.backends.kubernetes.defaultResourceServiceBase) "NodePort") }}
 {{- if $clusterRoleCreate }}
 ---

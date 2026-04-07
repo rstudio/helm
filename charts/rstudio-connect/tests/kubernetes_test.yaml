@@ -655,7 +655,7 @@ tests:
           value: custom-sa
         documentIndex: 1
 
-  # Test 4: rbac.create=false with native runner enabled renders no RBAC docs
+  # Test 4: rbac.create=false with direct runner enabled renders no RBAC docs
   - it: should not create any RBAC resources when rbac.create is false
     template: rbac.yaml
     set:

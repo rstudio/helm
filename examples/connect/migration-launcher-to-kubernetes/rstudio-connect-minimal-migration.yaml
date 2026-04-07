@@ -1,4 +1,4 @@
-# Minimal migration from Launcher to native Kubernetes runner.
+# Minimal migration from Launcher to direct Kubernetes runner.
 # One required change if you haven't customized templateValues.
 
 # sharedStorage values remain unchanged
@@ -13,7 +13,7 @@ sharedStorage:
 launcher:
   enabled: false
 
-# 2. Enable the native Kubernetes runner
+# 2. Enable the direct Kubernetes runner
 backends:
   kubernetes:
     enabled: true

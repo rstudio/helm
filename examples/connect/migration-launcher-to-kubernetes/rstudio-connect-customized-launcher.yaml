@@ -1,5 +1,5 @@
 # Original Launcher-based values with templateValues customizations.
-# Each field is annotated with its equivalent path after migrating to the native Kubernetes runner.
+# Each field is annotated with its equivalent path after migrating to the direct Kubernetes runner.
 # See rstudio-connect-customized-migration.yaml for the migrated version.
 
 sharedStorage:
@@ -42,7 +42,7 @@ launcher:
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
-      # defaultSecurityContext is also supported and maps to the same pod securityContext field in native mode.
+      # defaultSecurityContext is also supported and maps to the same pod securityContext field in direct mode.
       # In the direct runner, runAsUser/runAsGroup/supplementalGroups are managed by Connect and are not user-overridable.
       serviceAccountName: connect-content-sa # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.serviceAccountName
       imagePullSecrets: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.imagePullSecrets
@@ -83,7 +83,7 @@ launcher:
       imagePullPolicy: IfNotPresent # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].imagePullPolicy
       containerSecurityContext: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].securityContext (except runAsUser/runAsGroup)
         allowPrivilegeEscalation: false
-      command: [] # No direct equivalent override in native mode (connect-content command is managed by Connect)
+      command: [] # No direct equivalent override (connect-content command is managed by Connect)
       volumeMounts: # Moves to: backends.kubernetes.defaultResourceJobBase.spec.template.spec.containers[name=connect-content].volumeMounts
         - name: extra-config
           mountPath: /etc/content-config

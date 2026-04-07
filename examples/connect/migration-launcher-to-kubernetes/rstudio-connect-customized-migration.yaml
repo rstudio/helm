@@ -1,4 +1,4 @@
-# Migrated values: native Kubernetes runner with templateValues customizations.
+# Migrated values: direct Kubernetes runner with templateValues customizations.
 # Each field is annotated with its original launcher.templateValues path.
 # See rstudio-connect-customized-launcher.yaml for the original Launcher-based version.
 

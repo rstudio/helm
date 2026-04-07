@@ -180,7 +180,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/*
-  Build the job resource base for the native Kubernetes runner.
+  Build the job resource base for the direct Kubernetes runner.
   Starts with the user-provided defaultResourceJobBase (or empty dict),
   then adds the init container, content container, and shared volume
   when defaultInitContainer.enabled is true.
