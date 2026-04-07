@@ -41,7 +41,7 @@ The following examples show the same customizations before and after migration. 
 
 | Launcher value | Migration path |
 | --- | --- |
-| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution Environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/). |
+| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
 | `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
 | `launcher.launcherKubernetesProfilesConf` | No equivalent. The native runner does not use profiles. |
 | `launcher.useTemplates`, `extraTemplates`, `includeDefaultTemplates`, `includeTemplateValues` | N/A. The native runner uses resource bases instead of templates. |
