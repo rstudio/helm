@@ -63,5 +63,3 @@ kubectl label sa <service-account-name> connect.posit.co/service-account=true -n
 **Init container** -- The chart auto-generates a `connect-content-init` init container from `backends.kubernetes.defaultInitContainer`. You do not need to include it in `defaultResourceJobBase` unless you need to override fields not available in `defaultInitContainer` (such as `imagePullPolicy`, `resources`, or `securityContext`). If you do include it, the chart updates its image and ensures the required volume mount. Custom init containers run alongside the auto-generated one.
 
 **Shared storage** -- `sharedStorage.*` values (`create`, `mount`, `mountContent`, `name`, `subPath`, `storageClassName`) work identically for both modes. No changes needed.
-
-**Rollback** -- Set `launcher.enabled: true`, remove `backends.kubernetes`, and rename `config.Kubernetes` back to `config.Launcher`. Previously published content continues to work.
