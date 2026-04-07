@@ -1,16 +1,16 @@
 ---
-category: "Migration"
+category: "Upgrade"
 ---
 
 # Transitioning to the direct Kubernetes runner
 
-This guide covers migrating Posit Connect helm values from the Launcher (`launcher.enabled: true`) to the direct Kubernetes runner (`backends.kubernetes.enabled: true`).
+This guide covers upgrading Posit Connect helm values from the Launcher (`launcher.enabled: true`) to the direct Kubernetes runner (`backends.kubernetes.enabled: true`).
 
 The direct Kubernetes runner manages content Jobs and Services using standard Kubernetes manifests, replacing the Launcher's template system.
 
-## Minimal migration
+## Minimal upgrade
 
-If you haven't customized `launcher.templateValues`, the minimal migration is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`. Your `sharedStorage` values remain unchanged.
+If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`. Your `sharedStorage` values remain unchanged.
 
 If you customized `config.Launcher`, move those settings to `config.Kubernetes`.
 In most cases, you do not need to set `config.Kubernetes.DataDirPVCName` manually: the chart sets it automatically when shared storage is mounted for content (`sharedStorage.create` or `sharedStorage.mount`) and `sharedStorage.mountContent: true`.
@@ -21,11 +21,11 @@ If you customized `launcher.namespace`, move it to `backends.kubernetes.namespac
 ```{.yaml include="rstudio-connect-minimal-migration.yaml" filename="values.yaml"}
 ```
 
-## Migrating templateValues customizations
+## Upgrading templateValues customizations
 
 If you customized `launcher.templateValues`, those settings move into `backends.kubernetes.defaultResourceJobBase` and `backends.kubernetes.defaultResourceServiceBase`. These are standard Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) and [Service](https://kubernetes.io/docs/concepts/services-networking/service/) specs, so Kubernetes documentation applies directly.
 
-The following examples show the same customizations before and after migration. Each field is annotated with a comment pointing to its equivalent in the other file.
+The following examples show the same customizations before and after the upgrade. Each field is annotated with a comment pointing to its equivalent in the other file.
 
 **Before** (Launcher-based):
 
@@ -39,7 +39,7 @@ The following examples show the same customizations before and after migration. 
 
 ## Values with no direct equivalent
 
-| Launcher value | Migration path |
+| Launcher value | Upgrade path |
 | --- | --- |
 | `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
 | `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |

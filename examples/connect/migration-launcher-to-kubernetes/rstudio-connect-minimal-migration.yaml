@@ -1,4 +1,4 @@
-# Minimal migration from Launcher to direct Kubernetes runner.
+# Minimal upgrade from Launcher to direct Kubernetes runner.
 # One required change if you haven't customized templateValues.
 
 # sharedStorage values remain unchanged
