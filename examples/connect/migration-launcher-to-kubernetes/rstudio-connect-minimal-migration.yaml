@@ -1,5 +1,5 @@
 # Minimal migration from Launcher to native Kubernetes runner.
-# Only three changes are needed if you haven't customized templateValues.
+# One required change if you haven't customized templateValues.
 
 # sharedStorage values remain unchanged
 sharedStorage:
@@ -18,11 +18,6 @@ backends:
   kubernetes:
     enabled: true
 
-config:
-  # ... your existing config ...
-
-  # 3. Rename config.Launcher to config.Kubernetes
-  Kubernetes:
-    # DataDirPVCName must match your existing PVC name (typically <release>-rstudio-connect-shared-storage).
-    # Alternatively, remove this and set sharedStorage.mountContent: true to let the chart set it automatically.
-    DataDirPVCName: my-release-rstudio-connect-shared-storage # TODO: Change to your actual PVC name
+# Optional: if you had custom config.Launcher settings, move them to config.Kubernetes.
+# DataDirPVCName is auto-configured when sharedStorage.create or sharedStorage.mount is true
+# and sharedStorage.mountContent is true.

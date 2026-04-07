@@ -10,11 +10,11 @@ The native runner manages content Jobs and Services directly using standard Kube
 
 ## Minimal migration
 
-If you haven't customized `launcher.templateValues`, the migration requires three changes:
+If you haven't customized `launcher.templateValues`, the minimal migration is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`. Your `sharedStorage` values remain unchanged.
 
-1. Set `launcher.enabled: false` and `backends.kubernetes.enabled: true`.
-1. Rename `config.Launcher` to `config.Kubernetes`.
-1. Keep `sharedStorage` values as-is.
+If you customized `config.Launcher`, move those settings to `config.Kubernetes`.
+In most cases, you do not need to set `config.Kubernetes.DataDirPVCName` manually: the chart sets it automatically when shared storage is mounted for content (`sharedStorage.create` or `sharedStorage.mount`) and `sharedStorage.mountContent: true`.
+Set `DataDirPVCName` explicitly only when you need to override that default behavior (for example, custom PVC naming or `mountContent: false`).
 
 If you customized `launcher.namespace`, move it to `backends.kubernetes.namespace`. If you customized `launcher.defaultInitContainer.*`, the `enabled`, `repository`, `tagPrefix`, and `tag` fields map directly to `backends.kubernetes.defaultInitContainer.*`. The launcher-only fields `imagePullPolicy`, `resources`, and `securityContext` should be set in `defaultResourceJobBase` on the init container spec instead.
 
