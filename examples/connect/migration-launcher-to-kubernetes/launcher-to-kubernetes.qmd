@@ -44,7 +44,11 @@ The following examples show the same customizations before and after migration. 
 | `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
 | `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
 | `launcher.launcherKubernetesProfilesConf` | No equivalent. The native runner does not use profiles. |
+| `launcher.templateValues.pod.command` | No direct equivalent override. The native runner manages `connect-content` command/args at runtime. |
+| `launcher.templateValues.pod.securityContext.runAsUser`, `runAsGroup`, `supplementalGroups`; `launcher.templateValues.pod.containerSecurityContext.runAsUser`, `runAsGroup` | No direct equivalent override. The native runner manages these from Connect's RunAs user/group configuration. |
 | `launcher.useTemplates`, `extraTemplates`, `includeDefaultTemplates`, `includeTemplateValues` | N/A. The native runner uses resource bases instead of templates. |
+
+For complete field-level behavior (`cannot-override`, `merged`, `appended`), see [Kubernetes job overlays](https://docs.posit.co/connect/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html).
 
 ## Important notes
 

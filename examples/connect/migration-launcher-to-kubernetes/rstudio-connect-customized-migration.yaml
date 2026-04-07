@@ -46,8 +46,8 @@ backends:
                           app.example.com/content: "true"
                       topologyKey: kubernetes.io/hostname
             securityContext: # Was: templateValues.pod.securityContext and pod.defaultSecurityContext
-              runAsUser: 999
-              runAsGroup: 999
+              # Direct runner manages runAsUser/runAsGroup/supplementalGroups from Connect RunAs config.
+              # Keep only user-overridable pod securityContext fields here.
               fsGroup: 999
             serviceAccountName: connect-content-sa # Was: templateValues.pod.serviceAccountName
             # NOTE: SA must be labeled: kubectl label sa connect-content-sa connect.posit.co/service-account=true
@@ -75,7 +75,7 @@ backends:
                     cpu: "50m"
                     memory: "64Mi"
               - name: connect-content # Must use this exact name for the content container
-                command: [] # Was: templateValues.pod.command (empty = Connect default)
+                # templateValues.pod.command has no direct equivalent; connect-content command is runner-managed.
                 env: # Was: templateValues.pod.env
                   - name: DATABASE_URL
                     valueFrom:
@@ -91,6 +91,7 @@ backends:
                     cpu: "2"
                 imagePullPolicy: IfNotPresent # Was: templateValues.pod.imagePullPolicy
                 securityContext: # Was: templateValues.pod.containerSecurityContext
+                  # runAsUser/runAsGroup are managed by Connect and cannot be overridden for connect-content.
                   allowPrivilegeEscalation: false
                 volumeMounts: # Was: templateValues.pod.volumeMounts
                   - name: extra-config
