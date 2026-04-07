@@ -38,6 +38,23 @@ Please consider removing this configuration value.
   {{- fail "\n\n`launcher.enabled` and `backends.kubernetes.enabled` cannot both be true"}}
 {{- end }}
 
+{{- $effectiveVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+{{- if .Values.launcher.enabled }}
+{{- $parts := splitList "." $effectiveVersion }}
+{{- if ge (len $parts) 2 }}
+{{- $year := index $parts 0 | atoi }}
+{{- $month := index $parts 1 | atoi }}
+{{- if or (gt $year 2026) (and (eq $year 2026) (ge $month 4)) }}
+
+NOTE: Connect {{ $effectiveVersion }} supports the direct Kubernetes runner (`backends.kubernetes.enabled`),
+which replaces the Launcher with standard Kubernetes Job and Service manifests.
+Consider upgrading from `launcher.enabled` to `backends.kubernetes.enabled`.
+See https://github.com/rstudio/helm/tree/main/examples/connect/upgrade-launcher-to-kubernetes for an upgrade guide.
+
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
   {{- range $k,$v :=  .Values.launcher.launcherKubernetesProfilesConf }}
     {{- if hasKey $v "job-json-overrides" }}
