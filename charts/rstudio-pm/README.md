@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.53](https://img.shields.io/badge/Version-0.5.53-informational?style=flat-square) ![AppVersion: 2025.12.0](https://img.shields.io/badge/AppVersion-2025.12.0-informational?style=flat-square)
+![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: 2025.12.0](https://img.shields.io/badge/AppVersion-2025.12.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.53:
+To install the chart with the release name `my-release` at version 0.20.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.53
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.20.0
 ```
 
 To explore other chart versions, look at:
@@ -209,9 +209,9 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-package-manager"` | the repository to use for the main pod image |
-| image.tag | string | `""` | the tag to use for the main pod image |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"posit/package-manager"` | the repository to use for the main pod image |
+| image.tag | string | `""` | the tag to use for the main pod image. Overrides os and appVersion |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |

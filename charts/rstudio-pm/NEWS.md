@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.0
+
+- BREAKING: Default images now use `posit/package-manager` instead of `rstudio/rstudio-package-manager`
+- BREAKING: Image tag format changed from `{os}{version}` (e.g. `ubuntu2204-2025.12.0`) to `{version}-{os}` (e.g. `2025.12.0-ubuntu-24.04`)
+- BREAKING: `image.tagPrefix` replaced by `image.os`
+
 ## 0.5.53
 
 - Update chart icon to Posit icon
