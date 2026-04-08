@@ -8,6 +8,20 @@ This guide covers upgrading Posit Connect helm values from the Launcher (`launch
 
 The direct Kubernetes runner manages content Jobs and Services using standard Kubernetes manifests, replacing the Launcher's template system.
 
+## Important notes
+
+:::{.callout-important}
+If you set `serviceAccountName` in the job base, you must label the service account for Connect to use it. Without this label, Connect falls back to the namespace default:
+
+```bash
+kubectl label sa <service-account-name> connect.posit.co/service-account=true -n <namespace>
+```
+:::
+
+**Init container** -- The chart auto-generates a `connect-content-init` init container from `backends.kubernetes.defaultInitContainer`. You do not need to include it in `defaultResourceJobBase` unless you need to override fields not available in `defaultInitContainer` (such as `imagePullPolicy`, `resources`, or `securityContext`). If you do include it, the chart updates its image and ensures the required volume mount. Custom init containers run alongside the auto-generated one.
+
+**Shared storage** -- `sharedStorage.*` values (`create`, `mount`, `mountContent`, `name`, `subPath`, `storageClassName`) work identically for both modes. No changes needed.
+
 ## Minimal upgrade
 
 If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`. Your `sharedStorage` values remain unchanged.
@@ -49,17 +63,3 @@ The following examples show the same customizations before and after the upgrade
 | `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
 
 For complete field-level behavior (`cannot-override`, `merged`, `appended`), see [Kubernetes job overlays](https://docs.posit.co/connect/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html).
-
-## Important notes
-
-:::{.callout-important}
-If you set `serviceAccountName` in the job base, you must label the service account for Connect to use it. Without this label, Connect falls back to the namespace default:
-
-```bash
-kubectl label sa <service-account-name> connect.posit.co/service-account=true -n <namespace>
-```
-:::
-
-**Init container** -- The chart auto-generates a `connect-content-init` init container from `backends.kubernetes.defaultInitContainer`. You do not need to include it in `defaultResourceJobBase` unless you need to override fields not available in `defaultInitContainer` (such as `imagePullPolicy`, `resources`, or `securityContext`). If you do include it, the chart updates its image and ensures the required volume mount. Custom init containers run alongside the auto-generated one.
-
-**Shared storage** -- `sharedStorage.*` values (`create`, `mount`, `mountContent`, `name`, `subPath`, `storageClassName`) work identically for both modes. No changes needed.
