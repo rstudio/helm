@@ -171,6 +171,10 @@ spec:
         {{- if .Values.args }}
         args:
 {{ toYaml .Values.args | indent 10 }}
+        {{- else if .Values.launcher.enabled }}
+        args:
+          - /scripts/prestart.bash
+          - /usr/local/bin/startup.sh
         {{- end }}
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
         ports:
