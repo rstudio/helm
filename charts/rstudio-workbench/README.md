@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.11.0](https://img.shields.io/badge/Version-0.11.0-informational?style=flat-square) ![AppVersion: 2026.01.2](https://img.shields.io/badge/AppVersion-2026.01.2-informational?style=flat-square)
+![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: 2026.01.2](https://img.shields.io/badge/AppVersion-2026.01.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.11.0:
+To install the chart with the release name `my-release` at version 0.20.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.11.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.20.0
 ```
 
 To explore other chart versions, look at:
@@ -651,9 +651,9 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | homeStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-workbench"` | the repository to use for the main pod image |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"posit/workbench"` | the repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -734,10 +734,20 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |
 | session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.defaultHomeMount | bool | `true` | Whether to automatically add the homeStorage PVC to the session (i.e. via the `launcher-mounts` file) |
+| session.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","os":"ubuntu-24.04","repository":"posit/workbench-session-init","resources":{},"securityContext":{},"tag":""}` | Image definition for the default Workbench Session InitContainer |
+| session.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. Copies session runtime components into a shared volume for the session container. |
+| session.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
+| session.defaultInitContainer.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| session.defaultInitContainer.repository | string | `"posit/workbench-session-init"` | The repository to use for the Session InitContainer image |
+| session.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
+| session.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
+| session.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
-| session.image.repository | string | `"rstudio/workbench-session"` | The repository to use for the session image |
-| session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |
-| session.image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined |
+| session.image.os | string | `"ubuntu-24.04"` | The OS version for the session image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| session.image.pythonVersion | string | `"3.14.3"` | The Python version for the session image tag. Only used if tag is not defined |
+| session.image.rVersion | string | `"4.5.2"` | The R version for the session image tag. Only used if tag is not defined |
+| session.image.repository | string | `"posit/workbench-session"` | The repository to use for the session image |
+| session.image.tag | string | `""` | A tag override for the session image. Overrides rVersion, pythonVersion, and os. Default tag is `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}` |
 | shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |
