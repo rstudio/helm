@@ -53,7 +53,7 @@ components:
     version: ""
     image:
       # -- The image repository for the Positron init container
-      repository: "rstudio/workbench-positron-init"
+      repository: "posit/workbench-positron-init"
       # -- A tag override for the Positron init container image. Defaults to the positron version
       tag: ""
 
