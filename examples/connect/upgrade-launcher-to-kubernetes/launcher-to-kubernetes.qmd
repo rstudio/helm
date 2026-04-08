@@ -280,7 +280,7 @@ launcher:
   templateValues:
     pod:
       securityContext:
-        fsGroup: 999
+        runAsNonRoot: true
 
 # After
 backends:
@@ -290,7 +290,7 @@ backends:
         template:
           spec:
             securityContext:
-              fsGroup: 999
+              runAsNonRoot: true
 ```
 
 ### Service configuration
