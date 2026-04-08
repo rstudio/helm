@@ -35,7 +35,7 @@ jobs:
 
       - name: Notify Slack of chart documentation failure on main
         if: github.ref == 'refs/heads/main' && failure()
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@v3
         with:
           payload-delimiter: "_"
           payload: |
@@ -83,7 +83,7 @@ jobs:
 
       - name: Notify Slack of chart documentation (rbac) failure on main
         if: github.ref == 'refs/heads/main' && failure()
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@v3
         with:
           payload-delimiter: "_"
           payload: |

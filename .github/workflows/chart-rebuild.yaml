@@ -61,7 +61,7 @@ jobs:
 
       - name: Notify Slack of index.yaml rebuild failure
         if: failure()
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@v3
         with:
           payload-delimiter: "_"
           payload: |

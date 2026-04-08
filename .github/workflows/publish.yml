@@ -30,15 +30,15 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: pre-release
-          
+
       - name: Render Quarto Project
         uses: quarto-dev/quarto-actions/render@v2
-      
+
       - run: just push-docs
 
       - name: Notify Slack of publishing chart documentation failure
         if: failure()
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@v3
         with:
           payload-delimiter: "_"
           payload: |

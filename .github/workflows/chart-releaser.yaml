@@ -44,7 +44,7 @@ jobs:
 
       - name: Notify Slack of chart release failure
         if: failure()
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@v3
         with:
           payload-delimiter: "_"
           payload: |
