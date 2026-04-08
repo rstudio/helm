@@ -50,39 +50,119 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 
 If you customized `launcher.templateValues`, those settings move into `backends.kubernetes.defaultResourceJobBase` and `backends.kubernetes.defaultResourceServiceBase`. These are standard Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) and [Service](https://kubernetes.io/docs/concepts/services-networking/service/) specs, so Kubernetes documentation applies directly.
 
-### Labels and annotations
+### Volumes and volume mounts
+
+Note that `volumeMounts` moves from a pod-level setting to the `connect-content` container spec.
 
 ```yaml
 # Before
 launcher:
   templateValues:
-    job:
-      labels:
-        app.example.com/managed-by: connect
-      annotations:
-        app.example.com/team: data-science
     pod:
-      labels:
-        app.example.com/content: "true"
-      annotations:
-        app.example.com/tier: compute
+      volumes:
+        - name: extra-config
+          configMap:
+            name: content-config
+      volumeMounts:
+        - name: extra-config
+          mountPath: /etc/content-config
+          readOnly: true
 
 # After
 backends:
   kubernetes:
     defaultResourceJobBase:
-      metadata:
-        labels:
-          app.example.com/managed-by: connect
-        annotations:
-          app.example.com/team: data-science
       spec:
         template:
-          metadata:
-            labels:
-              app.example.com/content: "true"
-            annotations:
-              app.example.com/tier: compute
+          spec:
+            volumes:
+              - name: extra-config
+                configMap:
+                  name: content-config
+            containers:
+              - name: connect-content
+                volumeMounts:
+                  - name: extra-config
+                    mountPath: /etc/content-config
+                    readOnly: true
+```
+
+### Init containers and sidecar containers
+
+Custom `initContainers` run alongside the chart's auto-generated `connect-content-init`. `extraContainers` becomes a named entry in `containers`.
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      initContainers:
+        - name: wait-for-db
+          image: busybox:latest
+          command: ["sh", "-c", "echo waiting"]
+      extraContainers:
+        - name: log-forwarder
+          image: fluent/fluent-bit:latest
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            initContainers:
+              - name: wait-for-db
+                image: busybox:latest
+                command: ["sh", "-c", "echo waiting"]
+            containers:
+              - name: log-forwarder
+                image: fluent/fluent-bit:latest
+```
+
+### Environment variables and resources
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "4Gi"
+          cpu: "2"
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: connect-content
+                env:
+                  - name: DATABASE_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: app-secrets
+                        key: database-url
+                resources:
+                  requests:
+                    memory: "1Gi"
+                    cpu: "500m"
+                  limits:
+                    memory: "4Gi"
+                    cpu: "2"
 ```
 
 ### Node scheduling (nodeSelector, tolerations, affinity)
@@ -134,29 +214,39 @@ backends:
                       topologyKey: kubernetes.io/hostname
 ```
 
-### Pod security context
-
-The direct Kubernetes runner manages `runAsUser`, `runAsGroup`, and `supplementalGroups` from Connect's RunAs configuration. Only set fields that are not runner-managed (e.g., `fsGroup`).
+### Labels and annotations
 
 ```yaml
 # Before
 launcher:
   templateValues:
+    job:
+      labels:
+        app.example.com/managed-by: connect
+      annotations:
+        app.example.com/team: data-science
     pod:
-      securityContext:
-        runAsUser: 999
-        runAsGroup: 999
-        fsGroup: 999
+      labels:
+        app.example.com/content: "true"
+      annotations:
+        app.example.com/tier: compute
 
 # After
 backends:
   kubernetes:
     defaultResourceJobBase:
+      metadata:
+        labels:
+          app.example.com/managed-by: connect
+        annotations:
+          app.example.com/team: data-science
       spec:
         template:
-          spec:
-            securityContext:
-              fsGroup: 999
+          metadata:
+            labels:
+              app.example.com/content: "true"
+            annotations:
+              app.example.com/tier: compute
 ```
 
 ### Service account and image pull secrets
@@ -182,21 +272,19 @@ backends:
               - name: registry-credentials
 ```
 
-### Volumes and volume mounts
+### Pod security context
+
+The direct Kubernetes runner manages `runAsUser`, `runAsGroup`, and `supplementalGroups` from Connect's RunAs configuration. Only set fields that are not runner-managed (e.g., `fsGroup`).
 
 ```yaml
 # Before
 launcher:
   templateValues:
     pod:
-      volumes:
-        - name: extra-config
-          configMap:
-            name: content-config
-      volumeMounts:
-        - name: extra-config
-          mountPath: /etc/content-config
-          readOnly: true
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
 
 # After
 backends:
@@ -205,94 +293,8 @@ backends:
       spec:
         template:
           spec:
-            volumes:
-              - name: extra-config
-                configMap:
-                  name: content-config
-            containers:
-              - name: connect-content
-                volumeMounts:
-                  - name: extra-config
-                    mountPath: /etc/content-config
-                    readOnly: true
-```
-
-### Environment variables and resources
-
-```yaml
-# Before
-launcher:
-  templateValues:
-    pod:
-      env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: database-url
-      resources:
-        requests:
-          memory: "1Gi"
-          cpu: "500m"
-        limits:
-          memory: "4Gi"
-          cpu: "2"
-
-# After
-backends:
-  kubernetes:
-    defaultResourceJobBase:
-      spec:
-        template:
-          spec:
-            containers:
-              - name: connect-content
-                env:
-                  - name: DATABASE_URL
-                    valueFrom:
-                      secretKeyRef:
-                        name: app-secrets
-                        key: database-url
-                resources:
-                  requests:
-                    memory: "1Gi"
-                    cpu: "500m"
-                  limits:
-                    memory: "4Gi"
-                    cpu: "2"
-```
-
-### Sidecar containers and init containers
-
-`extraContainers` becomes a named entry in `containers`. Custom `initContainers` are added alongside the chart's auto-generated `connect-content-init`.
-
-```yaml
-# Before
-launcher:
-  templateValues:
-    pod:
-      extraContainers:
-        - name: log-forwarder
-          image: fluent/fluent-bit:latest
-      initContainers:
-        - name: wait-for-db
-          image: busybox:latest
-          command: ["sh", "-c", "echo waiting"]
-
-# After
-backends:
-  kubernetes:
-    defaultResourceJobBase:
-      spec:
-        template:
-          spec:
-            containers:
-              - name: log-forwarder
-                image: fluent/fluent-bit:latest
-            initContainers:
-              - name: wait-for-db
-                image: busybox:latest
-                command: ["sh", "-c", "echo waiting"]
+            securityContext:
+              fsGroup: 999
 ```
 
 ### Service configuration
