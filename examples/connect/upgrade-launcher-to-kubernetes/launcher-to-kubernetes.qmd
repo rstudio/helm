@@ -12,11 +12,14 @@ The direct Kubernetes runner manages content Jobs and Services using standard Ku
 
 If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`. Your `sharedStorage` values remain unchanged.
 
-If you customized `config.Launcher`, move those settings to `config.Kubernetes`.
-In most cases, you do not need to set `config.Kubernetes.DataDirPVCName` manually: the chart sets it automatically when shared storage is mounted for content (`sharedStorage.create` or `sharedStorage.mount`) and `sharedStorage.mountContent: true`.
-Set `DataDirPVCName` explicitly only when you need to override that default behavior (for example, custom PVC naming or `mountContent: false`).
-
-If you customized `launcher.namespace`, move it to `backends.kubernetes.namespace`. If you customized `launcher.defaultInitContainer.*`, the `enabled`, `repository`, `tagPrefix`, and `tag` fields map directly to `backends.kubernetes.defaultInitContainer.*`. The launcher-only fields `imagePullPolicy`, `resources`, and `securityContext` should be set in `defaultResourceJobBase` on the init container spec instead.
+| Launcher setting | Action |
+| --- | --- |
+| `launcher.enabled` | Set to `false` and set `backends.kubernetes.enabled: true` |
+| `config.Launcher` | Move to `config.Kubernetes`. You do not need to set `DataDirPVCName` manually — the chart sets it automatically when shared storage is enabled (`sharedStorage.create` or `sharedStorage.mount`) and `sharedStorage.mountContent: true` (the default). Set it explicitly only for custom PVC naming or when `mountContent: false`. |
+| `launcher.namespace` | Move to `backends.kubernetes.namespace` |
+| `launcher.defaultInitContainer.enabled`, `.repository`, `.tagPrefix`, `.tag` | Move to `backends.kubernetes.defaultInitContainer.*` (same structure) |
+| `launcher.defaultInitContainer.imagePullPolicy`, `.resources`, `.securityContext` | Set in `defaultResourceJobBase` on the init container spec instead |
+| `sharedStorage.*` | No changes needed |
 
 ```{.yaml include="rstudio-connect-minimal-upgrade.yaml" filename="values.yaml"}
 ```
