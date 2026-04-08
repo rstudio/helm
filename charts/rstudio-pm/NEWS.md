@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.54
+
+- Bump Package Manager version to 2038.01.19
+
 ## 0.5.53
 
 - Update chart icon to Posit icon
