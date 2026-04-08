@@ -319,6 +319,12 @@ backends:
       tagPrefix: ubuntu2204-
       # -- Overrides the image tag whose default is the chart appVersion.
       tag: ""
+      # -- The imagePullPolicy for the default initContainer
+      imagePullPolicy: ""
+      # -- Optional resources for the default initContainer
+      resources: {}
+      # -- The securityContext for the default initContainer
+      securityContext: {}
     # -- defaultResourceJobBase is an optional Kubernetes Job definition used as the base
     # when launching content jobs. The chart automatically adds the init container and
     # runtime volume when backends.kubernetes.defaultInitContainer.enabled is true.

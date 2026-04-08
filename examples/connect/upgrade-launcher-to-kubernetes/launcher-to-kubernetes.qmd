@@ -18,9 +18,19 @@ kubectl label sa <service-account-name> connect.posit.co/service-account=true -n
 ```
 :::
 
-**Init container** -- The chart auto-generates a `connect-content-init` init container from `backends.kubernetes.defaultInitContainer`. You do not need to include it in `defaultResourceJobBase` unless you need to override fields not available in `defaultInitContainer` (such as `imagePullPolicy`, `resources`, or `securityContext`). If you do include it, the chart updates its image and ensures the required volume mount. Custom init containers run alongside the auto-generated one.
+**Init container** -- The chart auto-generates a `connect-content-init` init container from `backends.kubernetes.defaultInitContainer`. You do not need to include it in `defaultResourceJobBase`. If you do include it, the chart updates its image, applies `defaultInitContainer` settings, and ensures the required volume mount. Custom init containers run alongside the auto-generated one.
 
 **Shared storage** -- `sharedStorage.*` values (`create`, `mount`, `mountContent`, `name`, `subPath`, `storageClassName`) work identically for both modes. No changes needed.
+
+## Values with no direct equivalent
+
+| Launcher value | Upgrade path |
+| --- | --- |
+| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
+| `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
+| `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
+
+For complete field-level behavior (`cannot-override`, `merged`, `appended`), see [Kubernetes job overlays](https://docs.posit.co/connect/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html).
 
 ## Minimal upgrade
 
@@ -29,11 +39,9 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 | Launcher setting | Action |
 | --- | --- |
 | `launcher.enabled` | Set to `false` and set `backends.kubernetes.enabled: true` |
-| `config.Launcher` | Move to `config.Kubernetes`. You do not need to set `DataDirPVCName` manually — the chart sets it automatically when shared storage is enabled (`sharedStorage.create` or `sharedStorage.mount`) and `sharedStorage.mountContent: true` (the default). Set it explicitly only for custom PVC naming or when `mountContent: false`. |
+| `config.Launcher` | Move to [`config.Kubernetes`](https://docs.posit.co/connect/admin/appendix/configuration/#Kubernetes). You do not need to set `DataDirPVCName` manually — the chart sets it automatically when shared storage is enabled (`sharedStorage.create` or `sharedStorage.mount`) and `sharedStorage.mountContent: true` (the default). Set it explicitly only for custom PVC naming or when `mountContent: false`. |
 | `launcher.namespace` | Move to `backends.kubernetes.namespace` |
-| `launcher.defaultInitContainer.enabled`, `.repository`, `.tagPrefix`, `.tag` | Move to `backends.kubernetes.defaultInitContainer.*` (same structure) |
-| `launcher.defaultInitContainer.imagePullPolicy`, `.resources`, `.securityContext` | Set in `defaultResourceJobBase` on the init container spec instead |
-| `sharedStorage.*` | No changes needed |
+| `launcher.defaultInitContainer.*` | Move to `backends.kubernetes.defaultInitContainer.*` (same structure) |
 
 ```{.yaml include="rstudio-connect-minimal-upgrade.yaml" filename="values.yaml"}
 ```
@@ -53,13 +61,3 @@ The following examples show the same customizations before and after the upgrade
 
 ```{.yaml include="rstudio-connect-customized-upgrade.yaml" filename="values.yaml (kubernetes)"}
 ```
-
-## Values with no direct equivalent
-
-| Launcher value | Upgrade path |
-| --- | --- |
-| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
-| `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
-| `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
-
-For complete field-level behavior (`cannot-override`, `merged`, `appended`), see [Kubernetes job overlays](https://docs.posit.co/connect/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html).

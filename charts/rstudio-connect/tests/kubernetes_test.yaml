@@ -440,6 +440,107 @@ tests:
           path: data["rstudio-connect.gcfg"]
           pattern: "DataDirPVCName"
 
+  # Test defaultInitContainer fields render on auto-generated init container
+  - it: should apply imagePullPolicy, resources, and securityContext to init container
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "128Mi"
+            securityContext:
+              runAsNonRoot: true
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: Always"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "cpu: 100m"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "runAsNonRoot: true"
+
+  - it: should apply defaultInitContainer fields to user-provided connect-content-init
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: "100m"
+            securityContext:
+              runAsNonRoot: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: Always"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "cpu: 100m"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "runAsNonRoot: true"
+
+  - it: should preserve user-provided init container fields over defaultInitContainer
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: "100m"
+            securityContext:
+              runAsNonRoot: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+                      imagePullPolicy: IfNotPresent
+                      resources:
+                        requests:
+                          cpu: "200m"
+                      securityContext:
+                        runAsUser: 1000
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: IfNotPresent"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "cpu: 200m"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "runAsUser: 1000"
+      - notMatchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: Always"
+
   # Test kubernetes config section in rstudio-connect.gcfg
   - it: should configure Kubernetes.Enabled in gcfg when backends.kubernetes.enabled is true
     template: configmap.yaml

@@ -9,11 +9,11 @@ sharedStorage:
   requests:
     storage: 100G
 
-# 1. Disable the Launcher
+# Disable the Launcher
 launcher:
   enabled: false
 
-# 2. Enable the direct Kubernetes runner
+# Enable the direct Kubernetes runner
 backends:
   kubernetes:
     enabled: true

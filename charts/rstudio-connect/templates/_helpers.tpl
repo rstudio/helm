@@ -202,6 +202,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- /* build the init container */}}
     {{- $initVolumeMount := dict "name" "rsc-volume" "mountPath" "/mnt/rstudio-connect-runtime/" }}
     {{- $initContainer := dict "name" "connect-content-init" "image" $image "volumeMounts" (list $initVolumeMount) }}
+    {{- if .Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+      {{- $_ := set $initContainer "imagePullPolicy" .Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+    {{- end }}
+    {{- if .Values.backends.kubernetes.defaultInitContainer.resources }}
+      {{- $_ := set $initContainer "resources" .Values.backends.kubernetes.defaultInitContainer.resources }}
+    {{- end }}
+    {{- if .Values.backends.kubernetes.defaultInitContainer.securityContext }}
+      {{- $_ := set $initContainer "securityContext" .Values.backends.kubernetes.defaultInitContainer.securityContext }}
+    {{- end }}
     {{- /* build the content container */}}
     {{- $contentVolumeMount := dict "name" "rsc-volume" "mountPath" "/opt/rstudio-connect" }}
     {{- $contentContainer := dict "name" "connect-content" "volumeMounts" (list $contentVolumeMount) }}
@@ -225,6 +234,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- if eq .name "connect-content-init" }}
         {{- $_ := set . "image" $image }}
         {{- $hasInit = true }}
+        {{- if and (not (hasKey . "imagePullPolicy")) $.Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+          {{- $_ := set . "imagePullPolicy" $.Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+        {{- end }}
+        {{- if and (not (hasKey . "resources")) $.Values.backends.kubernetes.defaultInitContainer.resources }}
+          {{- $_ := set . "resources" $.Values.backends.kubernetes.defaultInitContainer.resources }}
+        {{- end }}
+        {{- if and (not (hasKey . "securityContext")) $.Values.backends.kubernetes.defaultInitContainer.securityContext }}
+          {{- $_ := set . "securityContext" $.Values.backends.kubernetes.defaultInitContainer.securityContext }}
+        {{- end }}
         {{- $mounts := default list .volumeMounts }}
         {{- $hasMount := false }}
         {{- range $mounts }}

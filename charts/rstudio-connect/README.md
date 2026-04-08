@@ -263,7 +263,10 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
 | backends.kubernetes.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. Changing the default setting is an advanced option and not recommended. For more information on how Connect uses the session init container refer to https://docs.posit.co/connect/admin/appendix/off-host/arch-overview/#runtime-init-container |
+| backends.kubernetes.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
 | backends.kubernetes.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
+| backends.kubernetes.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
+| backends.kubernetes.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | backends.kubernetes.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | backends.kubernetes.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
 | backends.kubernetes.defaultResourceJobBase | object | `{}` | defaultResourceJobBase is an optional Kubernetes Job definition used as the base when launching content jobs. The chart automatically adds the init container and runtime volume when backends.kubernetes.defaultInitContainer.enabled is true. Only set this if you need to customize the job (e.g., add sidecars, node selectors, tolerations). https://kubernetes.io/docs/concepts/workloads/controllers/job/ |
