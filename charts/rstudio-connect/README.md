@@ -381,7 +381,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Annotations for the Persistent Volume Claim |
 | sharedStorage.create | bool | `false` | Whether to create the persistentVolumeClaim for shared storage |
 | sharedStorage.mount | bool | `false` | Whether the persistentVolumeClaim should be mounted (even if not created) |
-| sharedStorage.mountContent | bool | `true` | Whether the persistentVolumeClaim should be mounted to the content pods created by the Launcher |
+| sharedStorage.mountContent | bool | `true` | Whether the persistentVolumeClaim should be mounted to content pods. When true, the chart automatically configures DataDirPVCName for both Launcher and backends.kubernetes modes. |
 | sharedStorage.name | string | `""` | The name of the pvc. By default, computes a value from the release name |
 | sharedStorage.path | string | `"/var/lib/rstudio-connect"` | The path to mount the sharedStorage claim within the Connect pod |
 | sharedStorage.requests.storage | string | `"10Gi"` | The volume of storage to request for this persistent volume claim |
