@@ -39,7 +39,7 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 | Launcher setting | Action |
 | --- | --- |
 | `launcher.enabled` | Set to `false` and set `backends.kubernetes.enabled: true` |
-| `config.Launcher` | Move to [`config.Kubernetes`](https://docs.posit.co/connect/admin/appendix/configuration/#Kubernetes). You do not need to set `DataDirPVCName` manually — the chart sets it automatically when shared storage is enabled (`sharedStorage.create` or `sharedStorage.mount`) and `sharedStorage.mountContent: true` (the default). Set it explicitly only for custom PVC naming or when `mountContent: false`. |
+| `config.Launcher` | Move to [`config.Kubernetes`](https://docs.posit.co/connect/admin/appendix/configuration/#Kubernetes) |
 | `launcher.namespace` | Move to `backends.kubernetes.namespace` |
 | `launcher.defaultInitContainer.*` | Move to `backends.kubernetes.defaultInitContainer.*` (same structure) |
 
