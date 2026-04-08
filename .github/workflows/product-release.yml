@@ -1,0 +1,175 @@
+name: Product Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      product:
+        description: "Product name"
+        required: true
+        type: choice
+        options:
+          - connect
+          - workbench
+          - package-manager
+      version:
+        description: "Product version to set as appVersion (e.g. 2026.03.0)"
+        required: true
+        type: string
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  update:
+    name: Update ${{ inputs.product }} to ${{ inputs.version }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Map product to chart
+        id: chart
+        env:
+          PRODUCT: ${{ inputs.product }}
+        run: |
+          case "$PRODUCT" in
+            connect)
+              echo "name=rstudio-connect" >> "$GITHUB_OUTPUT"
+              echo "image=rstudio/rstudio-connect" >> "$GITHUB_OUTPUT"
+              ;;
+            workbench)
+              echo "name=rstudio-workbench" >> "$GITHUB_OUTPUT"
+              echo "image=rstudio/rstudio-workbench" >> "$GITHUB_OUTPUT"
+              echo "session-image=rstudio/r-session-complete" >> "$GITHUB_OUTPUT"
+              ;;
+            package-manager)
+              echo "name=rstudio-pm" >> "$GITHUB_OUTPUT"
+              echo "image=rstudio/rstudio-package-manager" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::error::Unknown product: $PRODUCT"
+              exit 1
+              ;;
+          esac
+
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Validate and normalize app version
+        id: app-version
+        env:
+          APP_VERSION: ${{ inputs.version }}
+        run: |
+          # Strip pre-release/build metadata
+          APP_VERSION="${APP_VERSION%%[+-]*}"
+
+          if [[ ! "$APP_VERSION" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: $APP_VERSION (expected YYYY.MM.PATCH)"
+            exit 1
+          fi
+
+          echo "value=$APP_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check current appVersion
+        id: current
+        env:
+          CHART_NAME: ${{ steps.chart.outputs.name }}
+        run: |
+          CURRENT=$(yq '.appVersion' "charts/${CHART_NAME}/Chart.yaml")
+          echo "app-version=$CURRENT" >> "$GITHUB_OUTPUT"
+
+      - name: Skip (already up to date)
+        if: steps.current.outputs.app-version == steps.app-version.outputs.value
+        env:
+          APP_VERSION: ${{ steps.app-version.outputs.value }}
+        run: echo "::notice::appVersion is already ${APP_VERSION}, nothing to do"
+
+      - name: Update Chart.yaml
+        if: steps.current.outputs.app-version != steps.app-version.outputs.value
+        id: update
+        env:
+          APP_VERSION: ${{ steps.app-version.outputs.value }}
+          CHART_NAME: ${{ steps.chart.outputs.name }}
+          IMAGE: ${{ steps.chart.outputs.image }}
+          SESSION_IMAGE: ${{ steps.chart.outputs.session-image }}
+        run: |
+          CHART="charts/${CHART_NAME}/Chart.yaml"
+
+          # Bump appVersion
+          yq -i ".appVersion = \"$APP_VERSION\"" "$CHART"
+
+          # Bump chart patch version
+          CURRENT_VERSION=$(yq '.version' "$CHART")
+          MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
+          MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
+          PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
+          NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+          yq -i ".version = \"$NEW_VERSION\"" "$CHART"
+
+          # Update image annotations (ubuntu2204-{version} format)
+          yq -i "(.annotations.\"artifacthub.io/images\" | select(. != null)) |= sub(\"${IMAGE}:[^\n]*\", \"${IMAGE}:ubuntu2204-${APP_VERSION}\")" "$CHART"
+
+          # Workbench has a second image (r-session-complete)
+          if [ -n "$SESSION_IMAGE" ]; then
+            yq -i "(.annotations.\"artifacthub.io/images\" | select(. != null)) |= sub(\"${SESSION_IMAGE}:[^\n]*\", \"${SESSION_IMAGE}:ubuntu2204-${APP_VERSION}\")" "$CHART"
+          fi
+
+          echo "chart-version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Add NEWS.md entry
+        if: steps.current.outputs.app-version != steps.app-version.outputs.value
+        env:
+          APP_VERSION: ${{ steps.app-version.outputs.value }}
+          PRODUCT: ${{ inputs.product }}
+          CHART_NAME: ${{ steps.chart.outputs.name }}
+          CHART_VERSION: ${{ steps.update.outputs.chart-version }}
+        run: |
+          NEWS="charts/${CHART_NAME}/NEWS.md"
+
+          # Capitalize product name for changelog
+          DISPLAY_NAME=$(echo "$PRODUCT" | sed 's/connect/Connect/;s/workbench/Workbench/;s/package-manager/Package Manager/')
+
+          # Build the new entry and prepend it after the heading line
+          {
+            head -1 "$NEWS"
+            echo ""
+            echo "## ${CHART_VERSION}"
+            echo ""
+            echo "- Bump ${DISPLAY_NAME} version to ${APP_VERSION}"
+            echo ""
+            tail -n +3 "$NEWS"
+          } > "${NEWS}.tmp" && mv "${NEWS}.tmp" "$NEWS"
+
+      - name: Install Just
+        if: steps.current.outputs.app-version != steps.app-version.outputs.value
+        uses: extractions/setup-just@v4
+
+      - name: Generate docs
+        if: steps.current.outputs.app-version != steps.app-version.outputs.value
+        run: |
+          just setup
+          just docs
+
+      - name: Create Pull Request
+        if: steps.current.outputs.app-version != steps.app-version.outputs.value
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          branch: update-${{ inputs.product }}-${{ steps.app-version.outputs.value }}
+          delete-branch: true
+          title: "Update ${{ inputs.product }} to ${{ steps.app-version.outputs.value }}"
+          body: |
+            Automated update from `posit-dev/images-${{ inputs.product }}` production build.
+
+            - Chart: `${{ steps.chart.outputs.name }}`
+            - appVersion: `${{ steps.current.outputs.app-version }}` → `${{ steps.app-version.outputs.value }}`
+          commit-message: "Update ${{ inputs.product }} appVersion to ${{ steps.app-version.outputs.value }}"
+          base: main
