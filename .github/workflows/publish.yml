@@ -21,10 +21,10 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: install Just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@v4
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
@@ -38,7 +38,7 @@ jobs:
 
       - name: Notify Slack of publishing chart documentation failure
         if: failure()
-        uses: slackapi/slack-github-action@v1.27.0
+        uses: slackapi/slack-github-action@v3.0.1
         with:
           payload-delimiter: "_"
           payload: |
