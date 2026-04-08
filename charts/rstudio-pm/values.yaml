@@ -88,6 +88,10 @@ service:
   # -- The port to forward to on the Package Manager pod. Also see pod.port
   targetPort: 4242
 
+deployment:
+  # -- Additional annotations to add to the rstudio-pm deployment
+  annotations: {}
+
 # -- replicas is the number of replica pods to maintain for this service
 replicas: 1
 # -- awsAccessKeyId is the access key id for s3 access, used also to gate file creation

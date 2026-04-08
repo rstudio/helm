@@ -1,0 +1,24 @@
+suite: test deployment annotations
+templates:
+  - configmap.yaml
+  - secret-aws-creds.yaml
+  - secret-rstudio-pm-key.yaml
+  - deployment.yaml
+tests:
+  - it: should not have annotations by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: metadata.annotations
+  - it: should apply annotations when deployment.annotations is set
+    template: deployment.yaml
+    set:
+      deployment.annotations:
+        example.com/owner: "my-team"
+        example.com/environment: "production"
+    asserts:
+      - isSubset:
+          path: metadata.annotations
+          content:
+            example.com/owner: "my-team"
+            example.com/environment: "production"
