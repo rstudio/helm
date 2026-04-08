@@ -50,7 +50,280 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 
 If you customized `launcher.templateValues`, those settings move into `backends.kubernetes.defaultResourceJobBase` and `backends.kubernetes.defaultResourceServiceBase`. These are standard Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) and [Service](https://kubernetes.io/docs/concepts/services-networking/service/) specs, so Kubernetes documentation applies directly.
 
-The following examples show the same customizations before and after the upgrade. Each field is annotated with a comment pointing to its equivalent in the other file.
+### Labels and annotations
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    job:
+      labels:
+        app.example.com/managed-by: connect
+      annotations:
+        app.example.com/team: data-science
+    pod:
+      labels:
+        app.example.com/content: "true"
+      annotations:
+        app.example.com/tier: compute
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      metadata:
+        labels:
+          app.example.com/managed-by: connect
+        annotations:
+          app.example.com/team: data-science
+      spec:
+        template:
+          metadata:
+            labels:
+              app.example.com/content: "true"
+            annotations:
+              app.example.com/tier: compute
+```
+
+### Node scheduling (nodeSelector, tolerations, affinity)
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      nodeSelector:
+        workload: content
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: "content"
+          effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.example.com/content: "true"
+                topologyKey: kubernetes.io/hostname
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              workload: content
+            tolerations:
+              - key: "dedicated"
+                operator: "Equal"
+                value: "content"
+                effect: "NoSchedule"
+            affinity:
+              podAntiAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchLabels:
+                          app.example.com/content: "true"
+                      topologyKey: kubernetes.io/hostname
+```
+
+### Pod security context
+
+The direct Kubernetes runner manages `runAsUser`, `runAsGroup`, and `supplementalGroups` from Connect's RunAs configuration. Only set fields that are not runner-managed (e.g., `fsGroup`).
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            securityContext:
+              fsGroup: 999
+```
+
+### Service account and image pull secrets
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      serviceAccountName: connect-content-sa
+      imagePullSecrets:
+        - name: registry-credentials
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            serviceAccountName: connect-content-sa
+            imagePullSecrets:
+              - name: registry-credentials
+```
+
+### Volumes and volume mounts
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      volumes:
+        - name: extra-config
+          configMap:
+            name: content-config
+      volumeMounts:
+        - name: extra-config
+          mountPath: /etc/content-config
+          readOnly: true
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            volumes:
+              - name: extra-config
+                configMap:
+                  name: content-config
+            containers:
+              - name: connect-content
+                volumeMounts:
+                  - name: extra-config
+                    mountPath: /etc/content-config
+                    readOnly: true
+```
+
+### Environment variables and resources
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "4Gi"
+          cpu: "2"
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: connect-content
+                env:
+                  - name: DATABASE_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: app-secrets
+                        key: database-url
+                resources:
+                  requests:
+                    memory: "1Gi"
+                    cpu: "500m"
+                  limits:
+                    memory: "4Gi"
+                    cpu: "2"
+```
+
+### Sidecar containers and init containers
+
+`extraContainers` becomes a named entry in `containers`. Custom `initContainers` are added alongside the chart's auto-generated `connect-content-init`.
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      extraContainers:
+        - name: log-forwarder
+          image: fluent/fluent-bit:latest
+      initContainers:
+        - name: wait-for-db
+          image: busybox:latest
+          command: ["sh", "-c", "echo waiting"]
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: log-forwarder
+                image: fluent/fluent-bit:latest
+            initContainers:
+              - name: wait-for-db
+                image: busybox:latest
+                command: ["sh", "-c", "echo waiting"]
+```
+
+### Service configuration
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    service:
+      labels:
+        app.example.com/service: content
+      annotations:
+        app.example.com/tier: compute
+      type: ClusterIP
+
+# After
+backends:
+  kubernetes:
+    defaultResourceServiceBase:
+      metadata:
+        labels:
+          app.example.com/service: content
+        annotations:
+          app.example.com/tier: compute
+      spec:
+        type: ClusterIP
+```
+
+### Complete before/after reference
+
+For a complete example with all fields, see the full before/after files:
 
 **Before** (Launcher-based):
 
