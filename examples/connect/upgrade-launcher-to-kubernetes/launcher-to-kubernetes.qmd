@@ -274,16 +274,12 @@ backends:
 
 ### Pod security context
 
-The direct Kubernetes runner manages `runAsUser`, `runAsGroup`, and `supplementalGroups` from Connect's RunAs configuration. Only set fields that are not runner-managed (e.g., `fsGroup`).
-
 ```yaml
 # Before
 launcher:
   templateValues:
     pod:
       securityContext:
-        runAsUser: 999
-        runAsGroup: 999
         fsGroup: 999
 
 # After
