@@ -24,7 +24,7 @@ kubectl label sa <service-account-name> connect.posit.co/service-account=true -n
 
 ## Minimal upgrade
 
-If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`. Your `sharedStorage` values remain unchanged.
+If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`.
 
 | Launcher setting | Action |
 | --- | --- |
