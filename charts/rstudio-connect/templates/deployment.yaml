@@ -167,19 +167,10 @@ spec:
         {{- if .Values.command }}
         command:
 {{ toYaml .Values.command | indent 10 }}
-        {{- else if (include "rstudio-connect.oheEnabled" .) }}
-        command:
-          - tini
-          - -s
-          - --
         {{- end }}
         {{- if .Values.args }}
         args:
 {{ toYaml .Values.args | indent 10 }}
-        {{- else if (include "rstudio-connect.oheEnabled" .) }}
-        args:
-          - /scripts/prestart.bash
-          - /usr/local/bin/startup.sh
         {{- end }}
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
         ports:
