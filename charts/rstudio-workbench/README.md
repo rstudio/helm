@@ -601,12 +601,12 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
-| components | object | `{"enabled":true,"positron":{"image":{"repository":"rstudio/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"rstudio/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
+| components | object | `{"enabled":true,"positron":{"image":{"repository":"rstudio/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"posit/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
 | components.enabled | bool | `true` | Enable session component delivery via init containers. When false, no init containers are configured and session.image must be a self-contained image like r-session-complete. |
 | components.positron.image.repository | string | `"rstudio/workbench-positron-init"` | The image repository for the Positron init container |
 | components.positron.image.tag | string | `""` | A tag override for the Positron init container image. Defaults to the positron version |
 | components.positron.version | string | `""` | A Positron version to enable the Positron init container for session pods. When set, configures rserver.conf with the Positron init container settings and attaches a Positron init container to the Workbench server pod. |
-| components.sessionInit.image.repository | string | `"rstudio/workbench-session-init"` | The repository for the session init container image |
+| components.sessionInit.image.repository | string | `"posit/workbench-session-init"` | The repository for the session init container image |
 | components.sessionInit.image.tag | string | `""` | A tag override for the session init container. Default tag is the chart appVersion (or versionOverride) |
 | config.database | object | `{"conf":{"existingSecret":"","value":""}}` | a map of database connection config files. Mounted to `/mnt/secret-configmap/rstudio/database.conf` with 0600 permissions |
 | config.database.conf.existingSecret | string | `""` | Secret for database connection config. Will take precedence over `config.database.conf.value`.  Key: 'database.conf' |
@@ -734,14 +734,6 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |
 | session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.defaultHomeMount | bool | `true` | Whether to automatically add the homeStorage PVC to the session (i.e. via the `launcher-mounts` file) |
-| session.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","os":"ubuntu-24.04","repository":"posit/workbench-session-init","resources":{},"securityContext":{},"tag":""}` | Image definition for the default Workbench Session InitContainer |
-| session.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. Copies session runtime components into a shared volume for the session container. |
-| session.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
-| session.defaultInitContainer.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
-| session.defaultInitContainer.repository | string | `"posit/workbench-session-init"` | The repository to use for the Session InitContainer image |
-| session.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
-| session.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
-| session.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
 | session.image.os | string | `"ubuntu-24.04"` | The OS version for the session image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
 | session.image.pythonVersion | string | `"3.14.3"` | The Python version for the session image tag. Only used if tag is not defined |
