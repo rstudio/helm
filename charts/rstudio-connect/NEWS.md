@@ -2,7 +2,7 @@
 
 ## 0.9.0
 
-- Add support for an alternative Kubernetes backend via `backends.kubernetes.enabled`, which replaces the Launcher's template system with standard Kubernetes Job and Service manifests configured through `defaultResourceJobBase` and `defaultResourceServiceBase`. Requires Connect version 2026.04.0 or later.
+- Add support for an alternative Kubernetes backend via `backends.kubernetes.enabled`, which replaces the Launcher's template system with standard Kubernetes Job and Service manifests configured through `defaultResourceJobBase` and `defaultResourceServiceBase`. This backend will be available starting with Connect 2026.04.0.
 - Add mutual-exclusion validation: `launcher.enabled` and `backends.kubernetes.enabled` cannot both be true.
 - Add dedicated RBAC for the direct Kubernetes runner with least-privilege permissions, including automatic ClusterRole creation for NodePort service types.
 - Add upgrade guide and examples in `examples/connect/upgrade-launcher-to-kubernetes/`.

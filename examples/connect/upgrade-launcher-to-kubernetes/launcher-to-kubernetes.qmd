@@ -30,8 +30,6 @@ kubectl label sa <service-account-name> connect.posit.co/service-account=true -n
 | `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
 | `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
 
-For complete field-level behavior (`cannot-override`, `merged`, `appended`), see [Kubernetes job overlays](https://docs.posit.co/connect/admin/appendix/off-host/direct-runner/kubernetes-job-overlays.html).
-
 ## Minimal upgrade
 
 If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`.
@@ -39,7 +37,7 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 | Launcher setting | Action |
 | --- | --- |
 | `launcher.enabled` | Set to `false` and set `backends.kubernetes.enabled: true` |
-| `config.Launcher` | Move to [`config.Kubernetes`](https://docs.posit.co/connect/admin/appendix/configuration/#Kubernetes) |
+| `config.Launcher` | Move to `config.Kubernetes` |
 | `launcher.namespace` | Move to `backends.kubernetes.namespace` |
 | `launcher.defaultInitContainer.*` | Move to `backends.kubernetes.defaultInitContainer.*` (same structure) |
 
