@@ -45,7 +45,7 @@ jobs:
 
       - name: Run chart-testing (lint all)
         id: ct-lint-all
-        run: ct lint --target-branch main --all --chart-dirs charts --chart-dirs other-charts
+        run: ct lint --use-helmignore --target-branch main --all --chart-dirs charts --chart-dirs other-charts
         continue-on-error: true
 
       - name: Notify Slack of chart linting failure if on main
