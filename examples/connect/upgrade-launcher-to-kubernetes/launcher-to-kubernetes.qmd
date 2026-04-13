@@ -2,7 +2,7 @@
 category: "Upgrade"
 ---
 
-# Transitioning to the direct Kubernetes runner
+# Upgrading to the direct Kubernetes runner
 
 This guide covers upgrading Posit Connect helm values from the Launcher (`launcher.enabled: true`) to the direct Kubernetes runner (`backends.kubernetes.enabled: true`).
 

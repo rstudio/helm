@@ -66,7 +66,7 @@ website:
             file: charts/rstudio-connect/README.md
           - text: Changelog
             file: charts/rstudio-connect/NEWS.md
-          - text: Upgrade to direct Kubernetes runner
+          - text: Upgrading to the direct Kubernetes runner
             file: examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.qmd
           - text: Examples
             file: examples/connect/index.qmd
