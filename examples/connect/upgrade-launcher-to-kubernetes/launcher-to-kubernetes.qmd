@@ -8,28 +8,6 @@ This guide covers upgrading Posit Connect helm values from the Launcher (`launch
 
 The direct Kubernetes runner manages content Jobs and Services using standard Kubernetes manifests, replacing the Launcher's template system.
 
-## Important notes
-
-:::{.callout-important}
-If you set `serviceAccountName` in the job base, you must label the service account for Connect to use it. Without this label, Connect falls back to the namespace default:
-
-```bash
-kubectl label sa <service-account-name> connect.posit.co/service-account=true -n <namespace>
-```
-:::
-
-**Init container** -- The chart auto-generates a `connect-content-init` init container from `backends.kubernetes.defaultInitContainer`. You do not need to include it in `defaultResourceJobBase`. If you do include it, the chart updates its image, applies `defaultInitContainer` settings, and ensures the required volume mount. Custom init containers run alongside the auto-generated one.
-
-**Shared storage** -- `sharedStorage.*` values (`create`, `mount`, `mountContent`, `name`, `subPath`, `storageClassName`) work identically for both modes. No changes needed.
-
-## Values with no direct equivalent
-
-| Launcher value | Upgrade path |
-| --- | --- |
-| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
-| `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
-| `launcher.launcherKubernetesProfilesConf` | No equivalent. The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
-
 ## Minimal upgrade
 
 If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`.
@@ -37,16 +15,42 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 | Launcher setting | Action |
 | --- | --- |
 | `launcher.enabled` | Set to `false` and set `backends.kubernetes.enabled: true` |
-| `config.Launcher` | Move to `config.Kubernetes` |
-| `launcher.namespace` | Move to `backends.kubernetes.namespace` |
-| `launcher.defaultInitContainer.*` | Move to `backends.kubernetes.defaultInitContainer.*` (same structure) |
+| `config.Launcher` | Move to `config.Kubernetes` (optional — only if you customized it) |
+| `launcher.namespace` | Move to `backends.kubernetes.namespace` (optional — only if you customized it) |
+| `launcher.defaultInitContainer.*` | Move to `backends.kubernetes.defaultInitContainer.*` (optional — same structure) |
 
 ```{.yaml include="rstudio-connect-minimal-upgrade.yaml" filename="values.yaml"}
 ```
 
+## Important notes
+
+:::{.callout-important}
+The direct Kubernetes runner requires content service accounts to have the `connect.posit.co/service-account=true` label. Apply this label to any service account that content should be allowed to use, including the default and any custom service accounts set via `serviceAccountName` in the job base:
+
+```bash
+kubectl label sa <service-account-name> connect.posit.co/service-account=true -n <namespace>
+```
+:::
+
+**Init container** -- The chart auto-generates a `connect-content-init` init container. You do not need to configure it unless you want to customize the init container image or behavior via `backends.kubernetes.defaultInitContainer`. Custom init containers run alongside the auto-generated one.
+
+**Shared storage** -- `sharedStorage.*` values work identically for both modes. No changes needed.
+
+## Values with alternatives
+
+These values do not have a direct equivalent but have alternative approaches in the direct Kubernetes runner.
+
+| Launcher value | Alternative |
+| --- | --- |
+| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
+| `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
+| `launcher.launcherKubernetesProfilesConf` | The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
+
 ## Upgrading templateValues customizations
 
 If you customized `launcher.templateValues`, those settings move into `backends.kubernetes.defaultResourceJobBase` and `backends.kubernetes.defaultResourceServiceBase`. These are standard Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) and [Service](https://kubernetes.io/docs/concepts/services-networking/service/) specs, so Kubernetes documentation applies directly.
+
+Any field supported by the Kubernetes Job or Service spec can be set in the resource base, not just the fields shown below.
 
 ### Volumes and volume mounts
 
