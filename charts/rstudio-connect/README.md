@@ -366,7 +366,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | Used to configure the container's readinessProbe. Only included if enabled = true |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources | object | `{}` | Defines resources for the rstudio-connect container |
-| securityContext | object | `{}` | Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when launcher is not enabled. If launcher is enabled, this can be removed with `securityContext: {}` |
+| securityContext | object | `{}` | Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when running in local execution mode. If launcher or backends.kubernetes is enabled, this can be removed with `securityContext: {}` |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
 | service.loadBalancerIP | string | `""` | The external IP to use with `service.type` LoadBalancer, when supported by the cloud provider |
