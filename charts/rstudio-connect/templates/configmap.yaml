@@ -11,8 +11,15 @@ data:
   job.yaml: |
 {{- include "rstudio-connect.jobBase" . | nindent 4 }}
 {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
+  {{- $serviceBase := deepCopy .Values.backends.kubernetes.defaultResourceServiceBase }}
+  {{- if not (hasKey $serviceBase "apiVersion") }}
+    {{- $_ := set $serviceBase "apiVersion" "v1" }}
+  {{- end }}
+  {{- if not (hasKey $serviceBase "kind") }}
+    {{- $_ := set $serviceBase "kind" "Service" }}
+  {{- end }}
   service.yaml: |
-{{- .Values.backends.kubernetes.defaultResourceServiceBase | toYaml | nindent 4 }}
+{{- $serviceBase | toYaml | nindent 4 }}
 {{- end }}
 {{- end }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}

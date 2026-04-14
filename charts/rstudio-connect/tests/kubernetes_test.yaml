@@ -103,6 +103,12 @@ tests:
           path: data["service.yaml"]
       - matchRegex:
           path: data["service.yaml"]
+          pattern: "apiVersion: v1"
+      - matchRegex:
+          path: data["service.yaml"]
+          pattern: "kind: Service"
+      - matchRegex:
+          path: data["service.yaml"]
           pattern: "type: ClusterIP"
 
   - it: should not create service.yaml when defaultResourceServiceBase is not set
