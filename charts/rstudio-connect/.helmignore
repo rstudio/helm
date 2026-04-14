@@ -23,6 +23,11 @@
 *.tmproj
 .vscode/
 
+# documentation changes should not require a version bump
+README.md
+*.gotmpl
+NEWS.md
+
 # chart tests
 ci/
 lint/
