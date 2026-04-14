@@ -202,6 +202,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- end }}
   {{- if not (hasKey $jobBase "kind") }}
     {{- $_ := set $jobBase "kind" "Job" }}
+  {{- else if ne $jobBase.kind "Job" }}
+    {{- fail (printf "\n\nbackends.kubernetes.defaultResourceJobBase.kind must be \"Job\", got \"%s\"." $jobBase.kind) }}
   {{- end }}
   {{- if .Values.backends.kubernetes.defaultInitContainer.enabled }}
     {{- /* build init container image tag */}}

@@ -17,6 +17,8 @@ data:
   {{- end }}
   {{- if not (hasKey $serviceBase "kind") }}
     {{- $_ := set $serviceBase "kind" "Service" }}
+  {{- else if ne $serviceBase.kind "Service" }}
+    {{- fail (printf "\n\nbackends.kubernetes.defaultResourceServiceBase.kind must be \"Service\", got \"%s\"." $serviceBase.kind) }}
   {{- end }}
   service.yaml: |
 {{- $serviceBase | toYaml | nindent 4 }}
