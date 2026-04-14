@@ -58,6 +58,21 @@ tests:
       - failedTemplate:
           errorPattern: "config.Kubernetes.Namespace.*conflicts with.*backends.kubernetes.namespace"
 
+  - it: should fail when backends.kubernetes.enabled without shared storage
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: false
+        mount: false
+    asserts:
+      - failedTemplate:
+          errorPattern: "backends.kubernetes is enabled, persistent storage must be provided"
+
   # Test backends.kubernetes.enabled creates configmap entries for job base
   - it: should create job.yaml in configmap when backends.kubernetes.enabled
     template: configmap.yaml
