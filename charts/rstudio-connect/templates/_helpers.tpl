@@ -55,6 +55,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   Generate the configuration
     - set remote licensing if applicable
     - set launcher parameters if applicable
+    - set backends.kubernetes parameters if applicable
 */}}
 {{- define "rstudio-connect.config" -}}
   {{- $configCopy := deepCopy .Values.config }}
