@@ -4,3 +4,7 @@ launcher:
 backends:
   kubernetes:
     enabled: true
+
+sharedStorage:
+  create: true
+  mount: true

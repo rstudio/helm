@@ -9,6 +9,8 @@ tests:
   # Test validation: launcher.enabled and backends.kubernetes.enabled cannot both be true
   - it: should fail when both launcher.enabled and backends.kubernetes.enabled are true
     template: NOTES.txt
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: true
@@ -18,6 +20,43 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "launcher.enabled.*and.*backends.kubernetes.enabled.*cannot both be true"
+
+  - it: should fail when config.Kubernetes.Enabled conflicts with backends.kubernetes.enabled
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+      config:
+        Kubernetes:
+          Enabled: "false"
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.Kubernetes.Enabled.*is set to false.*backends.kubernetes.enabled.*is true"
+
+  - it: should fail when config.Kubernetes.Namespace conflicts with backends.kubernetes.namespace
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          namespace: correct-ns
+      sharedStorage:
+        create: true
+        mount: true
+      config:
+        Kubernetes:
+          Namespace: wrong-ns
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.Kubernetes.Namespace.*conflicts with.*backends.kubernetes.namespace"
 
   # Test backends.kubernetes.enabled creates configmap entries for job base
   - it: should create job.yaml in configmap when backends.kubernetes.enabled
@@ -123,6 +162,8 @@ tests:
   # Test custom mount paths for job.yaml and service.yaml
   - it: should use custom DefaultResourceJobBase path for job.yaml mount
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -142,6 +183,8 @@ tests:
 
   - it: should use custom DefaultResourceServiceBase path for service.yaml mount
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -166,6 +209,8 @@ tests:
   # Test default mount paths when config.Kubernetes is not set
   - it: should use default job.yaml mount path when config.Kubernetes is absent
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -184,6 +229,8 @@ tests:
 
   - it: should fall back to default paths when DefaultResourceJobBase is empty string
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -203,6 +250,8 @@ tests:
 
   - it: should write default path in gcfg when DefaultResourceJobBase is empty string
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -219,6 +268,8 @@ tests:
 
   - it: should fall back to default paths when DefaultResourceServiceBase is empty string
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -242,6 +293,8 @@ tests:
 
   - it: should write default path in gcfg when DefaultResourceServiceBase is empty string
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -263,6 +316,8 @@ tests:
   # Test RBAC resources are created when backends.kubernetes.enabled
   - it: should create RBAC resources when backends.kubernetes.enabled and rbac.create are true
     template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -292,6 +347,8 @@ tests:
   # Test kubernetes namespace configuration
   - it: should use custom namespace when backends.kubernetes.namespace is specified
     template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -311,6 +368,8 @@ tests:
     template: rbac.yaml
     release:
       namespace: test-namespace
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -328,6 +387,8 @@ tests:
   # Test serviceAccount configuration with backends.kubernetes.enabled
   - it: should set serviceAccountName when backends.kubernetes.enabled and rbac.create are true
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -386,6 +447,8 @@ tests:
   # Test defaultInitContainer fields render on auto-generated init container
   - it: should apply imagePullPolicy, resources, and securityContext to init container
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -413,6 +476,8 @@ tests:
 
   - it: should apply defaultInitContainer fields to user-provided connect-content-init
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -445,6 +510,8 @@ tests:
 
   - it: should preserve user-provided init container fields over defaultInitContainer
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -487,6 +554,8 @@ tests:
   # Test kubernetes config section in rstudio-connect.gcfg
   - it: should configure Kubernetes.Enabled in gcfg when backends.kubernetes.enabled is true
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -517,6 +586,8 @@ tests:
   # Test with both launcher disabled and kubernetes enabled
   - it: should work correctly with launcher disabled and kubernetes enabled
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -535,6 +606,8 @@ tests:
   # Test serviceAccount is set correctly when backends.kubernetes.enabled
   - it: should generate default serviceAccountName when backends.kubernetes.enabled
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -553,6 +626,8 @@ tests:
   # Test that config includes Kubernetes section
   - it: should include Kubernetes config section when enabled
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -568,6 +643,8 @@ tests:
   # Test auto-generated job base contains init container
   - it: should auto-generate job.yaml with init container and correct image
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -590,6 +667,8 @@ tests:
 
   - it: should ensure rsc-volume mount on user-provided connect-content-init
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -616,6 +695,8 @@ tests:
 
   - it: should fail when connect-content has /opt/rstudio-connect mounted from a non-rsc-volume
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -637,6 +718,8 @@ tests:
 
   - it: should fail when connect-content-init has /mnt/rstudio-connect-runtime/ mounted from a non-rsc-volume
     template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -658,6 +741,8 @@ tests:
 
   - it: should not include init container when defaultInitContainer.enabled is false
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -677,6 +762,8 @@ tests:
   # Template order: ClusterRole(0), ClusterRoleBinding(1), SA(2), Role(3), RoleBinding(4)
   - it: should create ClusterRole with nodes/get when service type is NodePort
     template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -709,6 +796,8 @@ tests:
   # Template order: ClusterRole(0), ClusterRoleBinding(1), SA(2), Role(3), RoleBinding(4)
   - it: should create ClusterRole when rbac.clusterRoleCreate is true regardless of service type
     template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -730,6 +819,8 @@ tests:
   # Renders: Role(0), RoleBinding(1)
   - it: should not create ServiceAccount when rbac.serviceAccount.create is false
     template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -759,6 +850,8 @@ tests:
   # Test 4: rbac.create=false with direct runner enabled renders no RBAC docs
   - it: should not create any RBAC resources when rbac.create is false
     template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -848,6 +941,8 @@ tests:
   # Test 7: Init image tag precedence — explicit tag overrides tagPrefix+appVersion
   - it: should use explicit defaultInitContainer.tag when set
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -863,6 +958,8 @@ tests:
 
   - it: should use tagPrefix plus appVersion when tag is not set
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
@@ -878,6 +975,8 @@ tests:
 
   - it: should preserve user-provided sidecar and nodeSelector in job base
     template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
     set:
       launcher:
         enabled: false
