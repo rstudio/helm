@@ -232,7 +232,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $hasInit := false }}
     {{- range $existingInits }}
       {{- if eq .name "connect-content-init" }}
-        {{- $_ := set . "image" $image }}
+        {{- if not (hasKey . "image") }}
+          {{- $_ := set . "image" $image }}
+        {{- end }}
         {{- $hasInit = true }}
         {{- if and (not (hasKey . "imagePullPolicy")) $.Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
           {{- $_ := set . "imagePullPolicy" $.Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
