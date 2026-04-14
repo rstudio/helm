@@ -345,6 +345,48 @@ tests:
       - hasDocuments:
           count: 3 # ServiceAccount, Role, RoleBinding
 
+  - it: should render correct Role rules for direct Kubernetes runner
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      rbac:
+        create: true
+    documentIndex: 1 # Role
+    asserts:
+      - isKind:
+          of: Role
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["serviceaccounts"]
+            verbs: ["list"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["get", "list", "watch"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["services"]
+            verbs: ["create", "get", "list", "watch"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["batch"]
+            resources: ["jobs"]
+            verbs: ["create", "get", "delete", "list", "watch"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["discovery.k8s.io"]
+            resources: ["endpointslices"]
+            verbs: ["list", "watch"]
+
   - it: should not create RBAC resources when backends.kubernetes.enabled is false and launcher.enabled is false
     template: rbac.yaml
     set:
