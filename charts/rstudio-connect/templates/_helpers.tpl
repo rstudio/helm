@@ -52,9 +52,18 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+  Whether off-host execution is enabled (via launcher or direct Kubernetes runner).
+  Returns "true" or empty string (for use in conditionals).
+*/}}
+{{- define "rstudio-connect.oheEnabled" -}}
+{{- if or .Values.launcher.enabled .Values.backends.kubernetes.enabled -}}true{{- end -}}
+{{- end -}}
+
+{{/*
   Generate the configuration
     - set remote licensing if applicable
     - set launcher parameters if applicable
+    - set backends.kubernetes parameters if applicable
 */}}
 {{- define "rstudio-connect.config" -}}
   {{- $configCopy := deepCopy .Values.config }}
@@ -81,6 +90,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $eeDict := dict "ExecutionEnvironments" (dict "ConfigFilePath" "/etc/rstudio-connect/execution-environments/environments.yaml") }}
     {{- $defaultConfig = merge $defaultConfig $eeDict }}
   {{- end }}
+  {{- if .Values.backends.kubernetes.enabled }}
+    {{- $namespace := default $.Release.Namespace .Values.backends.kubernetes.namespace }}
+    {{- $kubernetesSettingsDict := dict "Enabled" ("true") "Namespace" ($namespace) }}
+    {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
+      {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
+      {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
+    {{- end }}
+    {{- $_ := set $kubernetesSettingsDict "DefaultResourceJobBase" (default "/etc/rstudio-connect/job.yaml" (dig "Kubernetes" "DefaultResourceJobBase" "" .Values.config)) }}
+    {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
+      {{- $_ := set $kubernetesSettingsDict "DefaultResourceServiceBase" (default "/etc/rstudio-connect/service.yaml" (dig "Kubernetes" "DefaultResourceServiceBase" "" .Values.config)) }}
+    {{- end }}
+    {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
+    {{- $defaultConfig = merge $defaultConfig $kubernetesDict }}
+  {{- end }}
   {{- /* default licensing configuration */}}
   {{- if .Values.license.server }}
     {{- $licenseDict := dict "Licensing" ( dict "LicenseType" ("Remote") ) }}
@@ -89,6 +112,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- /* default metrics / prometheus configuration */}}
   {{- if .Values.prometheus.enabled }}
     {{- $defaultConfig = merge $defaultConfig (dict "Metrics" ( dict "PrometheusListen" (print ":" .Values.prometheus.port )))}}
+  {{- end }}
+  {{- /* remove empty DefaultResource*Base keys so they don't overwrite chart defaults */}}
+  {{- if hasKey $configCopy "Kubernetes" }}
+    {{- if not (dig "Kubernetes" "DefaultResourceJobBase" "" $configCopy) }}
+      {{- $_ := unset (index $configCopy "Kubernetes") "DefaultResourceJobBase" }}
+    {{- end }}
+    {{- if not (dig "Kubernetes" "DefaultResourceServiceBase" "" $configCopy) }}
+      {{- $_ := unset (index $configCopy "Kubernetes") "DefaultResourceServiceBase" }}
+    {{- end }}
   {{- end }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
@@ -154,4 +186,129 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- range $key,$value := $.Values.pod.annotations -}}
 {{ $key }}: {{ $value | quote }}
 {{ end }}
+{{- end -}}
+
+{{/*
+  Build the job resource base for the direct Kubernetes runner.
+  Starts with the user-provided defaultResourceJobBase (or empty dict),
+  then adds the init container, content container, and shared volume
+  when defaultInitContainer.enabled is true.
+*/}}
+{{- define "rstudio-connect.jobBase" -}}
+  {{- $jobBase := deepCopy (default (dict) .Values.backends.kubernetes.defaultResourceJobBase) }}
+  {{- /* ensure top-level fields */}}
+  {{- if not (hasKey $jobBase "apiVersion") }}
+    {{- $_ := set $jobBase "apiVersion" "batch/v1" }}
+  {{- end }}
+  {{- if not (hasKey $jobBase "kind") }}
+    {{- $_ := set $jobBase "kind" "Job" }}
+  {{- else if ne $jobBase.kind "Job" }}
+    {{- fail (printf "\n\nbackends.kubernetes.defaultResourceJobBase.kind must be \"Job\", got \"%s\"." $jobBase.kind) }}
+  {{- end }}
+  {{- if .Values.backends.kubernetes.defaultInitContainer.enabled }}
+    {{- /* build init container image tag */}}
+    {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+    {{- $tag := .Values.backends.kubernetes.defaultInitContainer.tag | default (printf "%s%s" .Values.backends.kubernetes.defaultInitContainer.tagPrefix $defaultVersion) }}
+    {{- $image := printf "%s:%s" .Values.backends.kubernetes.defaultInitContainer.repository $tag }}
+    {{- /* build the init container */}}
+    {{- $initVolumeMount := dict "name" "rsc-volume" "mountPath" "/mnt/rstudio-connect-runtime/" }}
+    {{- $initContainer := dict "name" "connect-content-init" "image" $image "volumeMounts" (list $initVolumeMount) }}
+    {{- if .Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+      {{- $_ := set $initContainer "imagePullPolicy" .Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+    {{- end }}
+    {{- if .Values.backends.kubernetes.defaultInitContainer.resources }}
+      {{- $_ := set $initContainer "resources" .Values.backends.kubernetes.defaultInitContainer.resources }}
+    {{- end }}
+    {{- if .Values.backends.kubernetes.defaultInitContainer.securityContext }}
+      {{- $_ := set $initContainer "securityContext" .Values.backends.kubernetes.defaultInitContainer.securityContext }}
+    {{- end }}
+    {{- /* build the content container */}}
+    {{- $contentVolumeMount := dict "name" "rsc-volume" "mountPath" "/opt/rstudio-connect" }}
+    {{- $contentContainer := dict "name" "connect-content" "volumeMounts" (list $contentVolumeMount) }}
+    {{- /* build the shared volume */}}
+    {{- $rscVolume := dict "name" "rsc-volume" "emptyDir" (dict) }}
+    {{- /* ensure spec.template.spec exists */}}
+    {{- if not (hasKey $jobBase "spec") }}
+      {{- $_ := set $jobBase "spec" (dict) }}
+    {{- end }}
+    {{- if not (hasKey $jobBase.spec "template") }}
+      {{- $_ := set $jobBase.spec "template" (dict) }}
+    {{- end }}
+    {{- if not (hasKey $jobBase.spec.template "spec") }}
+      {{- $_ := set $jobBase.spec.template "spec" (dict) }}
+    {{- end }}
+    {{- $podSpec := $jobBase.spec.template.spec }}
+    {{- /* add init container if not already present */}}
+    {{- $existingInits := default list $podSpec.initContainers }}
+    {{- $hasInit := false }}
+    {{- range $existingInits }}
+      {{- if eq .name "connect-content-init" }}
+        {{- if not (hasKey . "image") }}
+          {{- $_ := set . "image" $image }}
+        {{- end }}
+        {{- $hasInit = true }}
+        {{- if and (not (hasKey . "imagePullPolicy")) $.Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+          {{- $_ := set . "imagePullPolicy" $.Values.backends.kubernetes.defaultInitContainer.imagePullPolicy }}
+        {{- end }}
+        {{- if and (not (hasKey . "resources")) $.Values.backends.kubernetes.defaultInitContainer.resources }}
+          {{- $_ := set . "resources" $.Values.backends.kubernetes.defaultInitContainer.resources }}
+        {{- end }}
+        {{- if and (not (hasKey . "securityContext")) $.Values.backends.kubernetes.defaultInitContainer.securityContext }}
+          {{- $_ := set . "securityContext" $.Values.backends.kubernetes.defaultInitContainer.securityContext }}
+        {{- end }}
+        {{- $mounts := default list .volumeMounts }}
+        {{- $hasMount := false }}
+        {{- range $mounts }}
+          {{- if and (eq .name "rsc-volume") (eq .mountPath "/mnt/rstudio-connect-runtime/") }}
+            {{- $hasMount = true }}
+          {{- else if eq .mountPath "/mnt/rstudio-connect-runtime/" }}
+            {{- fail "backends.kubernetes.defaultResourceJobBase: connect-content-init container has a volumeMount at /mnt/rstudio-connect-runtime/ using a volume other than rsc-volume. This mountPath is reserved for the runtime volume." }}
+          {{- end }}
+        {{- end }}
+        {{- if not $hasMount }}
+          {{- $_ := set . "volumeMounts" (append $mounts $initVolumeMount) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- if not $hasInit }}
+      {{- $_ := set $podSpec "initContainers" (append $existingInits $initContainer) }}
+    {{- else }}
+      {{- $_ := set $podSpec "initContainers" $existingInits }}
+    {{- end }}
+    {{- /* add content container if not already present, or ensure volume mount if it is */}}
+    {{- $existingContainers := default list $podSpec.containers }}
+    {{- $hasContent := false }}
+    {{- range $existingContainers }}
+      {{- if eq .name "connect-content" }}
+        {{- $hasContent = true }}
+        {{- $mounts := default list .volumeMounts }}
+        {{- $hasMount := false }}
+        {{- range $mounts }}
+          {{- if and (eq .name "rsc-volume") (eq .mountPath "/opt/rstudio-connect") }}
+            {{- $hasMount = true }}
+          {{- else if eq .mountPath "/opt/rstudio-connect" }}
+            {{- fail "backends.kubernetes.defaultResourceJobBase: connect-content container has a volumeMount at /opt/rstudio-connect using a volume other than rsc-volume. This mountPath is reserved for the runtime volume shared with the init container." }}
+          {{- end }}
+        {{- end }}
+        {{- if not $hasMount }}
+          {{- $_ := set . "volumeMounts" (append $mounts $contentVolumeMount) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- if not $hasContent }}
+      {{- $_ := set $podSpec "containers" (append $existingContainers $contentContainer) }}
+    {{- end }}
+    {{- /* add rsc-volume if not already present */}}
+    {{- $existingVolumes := default list $podSpec.volumes }}
+    {{- $hasVolume := false }}
+    {{- range $existingVolumes }}
+      {{- if eq .name "rsc-volume" }}
+        {{- $hasVolume = true }}
+      {{- end }}
+    {{- end }}
+    {{- if not $hasVolume }}
+      {{- $_ := set $podSpec "volumes" (append $existingVolumes $rscVolume) }}
+    {{- end }}
+  {{- end }}
+  {{- toYaml $jobBase }}
 {{- end -}}

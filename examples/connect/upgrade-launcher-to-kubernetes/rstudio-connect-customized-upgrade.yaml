@@ -1,0 +1,116 @@
+# Upgraded values: direct Kubernetes runner with templateValues customizations.
+# Each field is annotated with its original launcher.templateValues path.
+# See rstudio-connect-customized-launcher.yaml for the original Launcher-based version.
+
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to your RWX StorageClass
+  requests:
+    storage: 100G
+
+launcher:
+  enabled: false
+
+backends:
+  kubernetes:
+    enabled: true
+    defaultResourceJobBase:
+      metadata:
+        labels: # Was: templateValues.job.labels
+          app.example.com/managed-by: connect
+        annotations: # Was: templateValues.job.annotations
+          app.example.com/team: data-science
+      spec:
+        template:
+          metadata:
+            labels: # Was: templateValues.pod.labels
+              app.example.com/content: "true"
+            annotations: # Was: templateValues.pod.annotations
+              app.example.com/tier: compute
+          spec:
+            nodeSelector: # Was: templateValues.pod.nodeSelector
+              workload: content
+            tolerations: # Was: templateValues.pod.tolerations
+              - key: "dedicated"
+                operator: "Equal"
+                value: "content"
+                effect: "NoSchedule"
+            affinity: # Was: templateValues.pod.affinity
+              podAntiAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchLabels:
+                          app.example.com/content: "true"
+                      topologyKey: kubernetes.io/hostname
+            securityContext: # Was: templateValues.pod.securityContext and pod.defaultSecurityContext
+              # Direct runner manages runAsUser/runAsGroup/supplementalGroups from Connect RunAs config.
+              # Keep only user-overridable pod securityContext fields here.
+              fsGroup: 999
+            serviceAccountName: connect-content-sa # Was: templateValues.pod.serviceAccountName
+            # NOTE: SA must be labeled: kubectl label sa connect-content-sa connect.posit.co/service-account=true
+            imagePullSecrets: # Was: templateValues.pod.imagePullSecrets
+              - name: registry-credentials # TODO: Change to your image pull secret
+            priorityClassName: "" # Was: templateValues.pod.priorityClassName
+            hostAliases: # Was: templateValues.pod.hostAliases
+              - ip: "10.0.0.50"
+                hostnames:
+                  - "internal-api.example.com"
+            volumes: # Was: templateValues.pod.volumes
+              - name: extra-config
+                configMap:
+                  name: content-config
+            initContainers: # Was: templateValues.pod.initContainers
+              # The chart auto-generates connect-content-init; custom init containers run alongside it.
+              - name: wait-for-db
+                image: busybox:latest
+                command: ["sh", "-c", "echo waiting for dependencies"]
+            containers:
+              - name: log-forwarder # Was: templateValues.pod.extraContainers
+                image: fluent/fluent-bit:latest
+                resources:
+                  requests:
+                    cpu: "50m"
+                    memory: "64Mi"
+              - name: connect-content # Must use this exact name for the content container
+                # templateValues.pod.command has no direct equivalent; connect-content command is runner-managed.
+                env: # Was: templateValues.pod.env
+                  - name: DATABASE_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: app-secrets
+                        key: database-url
+                resources: # Was: templateValues.pod.resources
+                  requests:
+                    memory: "1Gi"
+                    cpu: "500m"
+                  limits:
+                    memory: "4Gi"
+                    cpu: "2"
+                imagePullPolicy: IfNotPresent # Was: templateValues.pod.imagePullPolicy
+                securityContext: # Was: templateValues.pod.containerSecurityContext
+                  # runAsUser/runAsGroup are managed by Connect and cannot be overridden for connect-content.
+                  allowPrivilegeEscalation: false
+                volumeMounts: # Was: templateValues.pod.volumeMounts
+                  - name: extra-config
+                    mountPath: /etc/content-config
+                    readOnly: true
+
+    defaultResourceServiceBase:
+      metadata:
+        labels: # Was: templateValues.service.labels
+          app.example.com/service: content
+        annotations: # Was: templateValues.service.annotations
+          app.example.com/tier: compute
+      spec:
+        type: ClusterIP # Was: templateValues.service.type
+
+config:
+  # ... your existing config ...
+
+  Kubernetes: # Was: config.Launcher
+    # DataDirPVCName must match your existing PVC name (typically <release>-rstudio-connect-shared-storage).
+    # Alternatively, remove this and set sharedStorage.mountContent: true to let the chart set it automatically.
+    DataDirPVCName: my-release-rstudio-connect-shared-storage # TODO: Change to your actual PVC name

@@ -7,6 +7,23 @@ metadata:
 data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
+{{- if .Values.backends.kubernetes.enabled }}
+  job.yaml: |
+{{- include "rstudio-connect.jobBase" . | nindent 4 }}
+{{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
+  {{- $serviceBase := deepCopy .Values.backends.kubernetes.defaultResourceServiceBase }}
+  {{- if not (hasKey $serviceBase "apiVersion") }}
+    {{- $_ := set $serviceBase "apiVersion" "v1" }}
+  {{- end }}
+  {{- if not (hasKey $serviceBase "kind") }}
+    {{- $_ := set $serviceBase "kind" "Service" }}
+  {{- else if ne $serviceBase.kind "Service" }}
+    {{- fail (printf "\n\nbackends.kubernetes.defaultResourceServiceBase.kind must be \"Service\", got \"%s\"." $serviceBase.kind) }}
+  {{- end }}
+  service.yaml: |
+{{- $serviceBase | toYaml | nindent 4 }}
+{{- end }}
+{{- end }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
 {{- if .Values.launcher.enabled }}
   runtime.yaml: |

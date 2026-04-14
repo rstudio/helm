@@ -1,0 +1,340 @@
+---
+category: "Upgrade"
+---
+
+# Upgrading to the direct Kubernetes runner
+
+This guide covers upgrading Posit Connect helm values from the Launcher (`launcher.enabled: true`) to the direct Kubernetes runner (`backends.kubernetes.enabled: true`).
+
+The direct Kubernetes runner manages content Jobs and Services using standard Kubernetes manifests, replacing the Launcher's template system.
+
+:::{.callout-important}
+The direct Kubernetes runner requires Posit Connect version 2026.04.0 or later.
+:::
+
+## Minimal upgrade
+
+If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`.
+
+| Launcher setting | Action |
+| --- | --- |
+| `launcher.enabled` | Set to `false` and set `backends.kubernetes.enabled: true` |
+| `config.Launcher` | Move to `config.Kubernetes` (optional — only if you customized it) |
+| `launcher.namespace` | Move to `backends.kubernetes.namespace` (optional — only if you customized it) |
+| `launcher.defaultInitContainer.*` | Move to `backends.kubernetes.defaultInitContainer.*` (optional — same structure) |
+
+```{.yaml include="rstudio-connect-minimal-upgrade.yaml" filename="values.yaml"}
+```
+
+## Important notes
+
+:::{.callout-important}
+The direct Kubernetes runner requires content service accounts to have the `connect.posit.co/service-account=true` label. Apply this label to any service account that content should be allowed to use, including the default and any custom service accounts set via `serviceAccountName` in the job base:
+
+```bash
+kubectl label sa <service-account-name> connect.posit.co/service-account=true -n <namespace>
+```
+:::
+
+**Init container** -- The chart auto-generates a `connect-content-init` init container. You do not need to configure it unless you want to customize the init container image or behavior via `backends.kubernetes.defaultInitContainer`. Custom init containers run alongside the auto-generated one.
+
+**Shared storage** -- `sharedStorage.*` values work identically for both modes. No changes needed.
+
+## Values with alternatives
+
+These values do not have a direct equivalent but have alternative approaches in the direct Kubernetes runner.
+
+| Launcher value | Alternative |
+| --- | --- |
+| `launcher.customRuntimeYaml` | Use `executionEnvironments` instead. See [Execution environments](/charts/rstudio-connect/README.md#execution-environments). |
+| `launcher.additionalRuntimeImages` | Use `executionEnvironments` instead. |
+| `launcher.launcherKubernetesProfilesConf` | The direct Kubernetes runner does not use profiles. Similar customization can be achieved using `defaultResourceJobBase`. |
+
+## Upgrading templateValues customizations
+
+If you customized `launcher.templateValues`, those settings move into `backends.kubernetes.defaultResourceJobBase` and `backends.kubernetes.defaultResourceServiceBase`. These are standard Kubernetes [Job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) and [Service](https://kubernetes.io/docs/concepts/services-networking/service/) specs, so Kubernetes documentation applies directly.
+
+Any field supported by the Kubernetes Job or Service spec can be set in the resource base, not just the fields shown below.
+
+### Volumes and volume mounts
+
+Note that `volumeMounts` moves from a pod-level setting to the `connect-content` container spec.
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      volumes:
+        - name: extra-config
+          configMap:
+            name: content-config
+      volumeMounts:
+        - name: extra-config
+          mountPath: /etc/content-config
+          readOnly: true
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            volumes:
+              - name: extra-config
+                configMap:
+                  name: content-config
+            containers:
+              - name: connect-content
+                volumeMounts:
+                  - name: extra-config
+                    mountPath: /etc/content-config
+                    readOnly: true
+```
+
+### Init containers and sidecar containers
+
+Custom `initContainers` run alongside the chart's auto-generated `connect-content-init`. `extraContainers` becomes a named entry in `containers`.
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      initContainers:
+        - name: wait-for-db
+          image: busybox:latest
+          command: ["sh", "-c", "echo waiting"]
+      extraContainers:
+        - name: log-forwarder
+          image: fluent/fluent-bit:latest
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            initContainers:
+              - name: wait-for-db
+                image: busybox:latest
+                command: ["sh", "-c", "echo waiting"]
+            containers:
+              - name: log-forwarder
+                image: fluent/fluent-bit:latest
+```
+
+### Environment variables and resources
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "4Gi"
+          cpu: "2"
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: connect-content
+                env:
+                  - name: DATABASE_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: app-secrets
+                        key: database-url
+                resources:
+                  requests:
+                    memory: "1Gi"
+                    cpu: "500m"
+                  limits:
+                    memory: "4Gi"
+                    cpu: "2"
+```
+
+### Node scheduling (nodeSelector, tolerations, affinity)
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      nodeSelector:
+        workload: content
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: "content"
+          effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.example.com/content: "true"
+                topologyKey: kubernetes.io/hostname
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              workload: content
+            tolerations:
+              - key: "dedicated"
+                operator: "Equal"
+                value: "content"
+                effect: "NoSchedule"
+            affinity:
+              podAntiAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchLabels:
+                          app.example.com/content: "true"
+                      topologyKey: kubernetes.io/hostname
+```
+
+### Labels and annotations
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    job:
+      labels:
+        app.example.com/managed-by: connect
+      annotations:
+        app.example.com/team: data-science
+    pod:
+      labels:
+        app.example.com/content: "true"
+      annotations:
+        app.example.com/tier: compute
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      metadata:
+        labels:
+          app.example.com/managed-by: connect
+        annotations:
+          app.example.com/team: data-science
+      spec:
+        template:
+          metadata:
+            labels:
+              app.example.com/content: "true"
+            annotations:
+              app.example.com/tier: compute
+```
+
+### Service account and image pull secrets
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      serviceAccountName: connect-content-sa
+      imagePullSecrets:
+        - name: registry-credentials
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            serviceAccountName: connect-content-sa
+            imagePullSecrets:
+              - name: registry-credentials
+```
+
+### Pod security context
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    pod:
+      securityContext:
+        runAsNonRoot: true
+
+# After
+backends:
+  kubernetes:
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            securityContext:
+              runAsNonRoot: true
+```
+
+### Service configuration
+
+```yaml
+# Before
+launcher:
+  templateValues:
+    service:
+      labels:
+        app.example.com/service: content
+      annotations:
+        app.example.com/tier: compute
+      type: ClusterIP
+
+# After
+backends:
+  kubernetes:
+    defaultResourceServiceBase:
+      metadata:
+        labels:
+          app.example.com/service: content
+        annotations:
+          app.example.com/tier: compute
+      spec:
+        type: ClusterIP
+```
+
+### Complete before/after reference
+
+For a complete example with all fields, see the full before/after files:
+
+**Before** (Launcher-based):
+
+```{.yaml include="rstudio-connect-customized-launcher.yaml" filename="values.yaml (launcher)"}
+```
+
+**After** (direct Kubernetes runner):
+
+```{.yaml include="rstudio-connect-customized-upgrade.yaml" filename="values.yaml (kubernetes)"}
+```

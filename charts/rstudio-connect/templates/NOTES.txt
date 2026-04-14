@@ -34,6 +34,22 @@ Please consider removing this configuration value.
 
 {{- /* chart deprecations and misconfiguration warnings */ -}}
 
+{{- if and .Values.launcher.enabled .Values.backends.kubernetes.enabled }}
+  {{- fail "\n\n`launcher.enabled` and `backends.kubernetes.enabled` cannot both be true"}}
+{{- end }}
+
+{{- if .Values.backends.kubernetes.enabled }}
+  {{- $configEnabled := dig "Kubernetes" "Enabled" "" .Values.config | printf "%v" | lower }}
+  {{- if or (eq $configEnabled "false") (eq $configEnabled "0") }}
+    {{- fail "\n\n`config.Kubernetes.Enabled` is set to false but `backends.kubernetes.enabled` is true. Remove `config.Kubernetes.Enabled` because the chart sets it automatically." }}
+  {{- end }}
+  {{- $configNs := dig "Kubernetes" "Namespace" "" .Values.config }}
+  {{- $chartNs := default $.Release.Namespace .Values.backends.kubernetes.namespace }}
+  {{- if and $configNs (ne $configNs $chartNs) }}
+    {{- fail (printf "\n\n`config.Kubernetes.Namespace` (%s) conflicts with `backends.kubernetes.namespace` (%s). Remove `config.Kubernetes.Namespace` because the chart sets it automatically from `backends.kubernetes.namespace`." $configNs $chartNs) }}
+  {{- end }}
+{{- end }}
+
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
   {{- range $k,$v :=  .Values.launcher.launcherKubernetesProfilesConf }}
     {{- if hasKey $v "job-json-overrides" }}
@@ -44,6 +60,10 @@ Please consider removing this configuration value.
 
 {{- if and .Values.launcher.enabled (and (not .Values.sharedStorage.create) (not .Values.sharedStorage.mount) (not $hasLauncherDataDir) (not $hasLauncherDataDirPVCName) ) }}
   {{- fail "\n\nWhen launcher is enabled, persistent storage must be provided.\nThis is usually done via a PersistentVolumeClaim (PVC) with `sharedStorage.create=true`, although there are other options."}}
+{{- end }}
+
+{{- if and .Values.backends.kubernetes.enabled (not .Values.sharedStorage.create) (not .Values.sharedStorage.mount) (not (dig "Kubernetes" "DataDirPVCName" "" .Values.config)) }}
+  {{- fail "\n\nWhen backends.kubernetes is enabled, persistent storage must be provided.\nThis is usually done via a PersistentVolumeClaim (PVC) with `sharedStorage.create=true`, although there are other options."}}
 {{- end }}
 
 {{- if .Values.launcher.contentInitContainer }}

@@ -1,4 +1,4 @@
-{{- if .Values.launcher.enabled }}
+{{- if include "rstudio-connect.oheEnabled" . }}
 ---
 apiVersion: v1
 kind: ConfigMap

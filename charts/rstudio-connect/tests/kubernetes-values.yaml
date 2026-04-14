@@ -1,0 +1,10 @@
+launcher:
+  enabled: false
+
+backends:
+  kubernetes:
+    enabled: true
+
+sharedStorage:
+  create: true
+  mount: true

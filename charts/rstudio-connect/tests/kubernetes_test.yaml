@@ -1,0 +1,1128 @@
+suite: test kubernetes configuration
+templates:
+  - NOTES.txt
+  - configmap-prestart.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - rbac.yaml
+tests:
+  # Test validation: launcher.enabled and backends.kubernetes.enabled cannot both be true
+  - it: should fail when both launcher.enabled and backends.kubernetes.enabled are true
+    template: NOTES.txt
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "launcher.enabled.*and.*backends.kubernetes.enabled.*cannot both be true"
+
+  - it: should fail when config.Kubernetes.Enabled conflicts with backends.kubernetes.enabled
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+      config:
+        Kubernetes:
+          Enabled: "false"
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.Kubernetes.Enabled.*is set to false.*backends.kubernetes.enabled.*is true"
+
+  - it: should fail when config.Kubernetes.Namespace conflicts with backends.kubernetes.namespace
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          namespace: correct-ns
+      sharedStorage:
+        create: true
+        mount: true
+      config:
+        Kubernetes:
+          Namespace: wrong-ns
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.Kubernetes.Namespace.*conflicts with.*backends.kubernetes.namespace"
+
+  - it: should fail when backends.kubernetes.enabled without shared storage
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: false
+        mount: false
+    asserts:
+      - failedTemplate:
+          errorPattern: "backends.kubernetes is enabled, persistent storage must be provided"
+
+  - it: should fail when defaultResourceJobBase.kind is not Job
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      backends:
+        kubernetes:
+          defaultResourceJobBase:
+            kind: Service
+    asserts:
+      - failedTemplate:
+          errorPattern: "defaultResourceJobBase.kind must be.*Job.*got.*Service"
+
+  - it: should fail when defaultResourceServiceBase.kind is not Service
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      backends:
+        kubernetes:
+          defaultResourceServiceBase:
+            kind: Job
+    asserts:
+      - failedTemplate:
+          errorPattern: "defaultResourceServiceBase.kind must be.*Service.*got.*Job"
+
+  # Test backends.kubernetes.enabled creates configmap entries for job base
+  - it: should create job.yaml in configmap when backends.kubernetes.enabled
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - exists:
+          path: data["job.yaml"]
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "apiVersion: batch/v1"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "kind: Job"
+
+  - it: should create service.yaml in configmap when defaultResourceServiceBase is set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      backends:
+        kubernetes:
+          defaultResourceServiceBase:
+            spec:
+              type: ClusterIP
+    asserts:
+      - exists:
+          path: data["service.yaml"]
+      - matchRegex:
+          path: data["service.yaml"]
+          pattern: "apiVersion: v1"
+      - matchRegex:
+          path: data["service.yaml"]
+          pattern: "kind: Service"
+      - matchRegex:
+          path: data["service.yaml"]
+          pattern: "type: ClusterIP"
+
+  - it: should not create service.yaml when defaultResourceServiceBase is not set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - notExists:
+          path: data["service.yaml"]
+
+  - it: should not create job.yaml when backends.kubernetes.enabled is false
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - notExists:
+          path: data["job.yaml"]
+
+  # Test deployment volumeMounts for kubernetes resource bases
+  - it: should mount job.yaml when backends.kubernetes.enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
+  - it: should not mount job.yaml when backends.kubernetes.enabled is false
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
+  # Test prestart volumeMount is only present when launcher or kubernetes is enabled
+  - it: should mount prestart scripts when backends.kubernetes.enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: /scripts/
+
+  - it: should mount prestart scripts when launcher.enabled only
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: false
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: /scripts/
+
+  - it: should not mount prestart scripts when neither launcher nor kubernetes is enabled
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: /scripts/
+
+  # Test custom mount paths for job.yaml and service.yaml
+  - it: should use custom DefaultResourceJobBase path for job.yaml mount
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes:
+          DefaultResourceJobBase: /custom/path/job.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /custom/path/job.yaml
+            subPath: job.yaml
+
+  - it: should use custom DefaultResourceServiceBase path for service.yaml mount
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            metadata:
+              labels:
+                test: value
+      config:
+        Kubernetes:
+          DefaultResourceServiceBase: /custom/path/service.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /custom/path/service.yaml
+            subPath: service.yaml
+
+  # Test default mount paths when config.Kubernetes is not set
+  - it: should use default job.yaml mount path when config.Kubernetes is absent
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes: null
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
+  - it: should fall back to default paths when DefaultResourceJobBase is empty string
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes:
+          DefaultResourceJobBase: ""
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/job.yaml
+            subPath: job.yaml
+
+  - it: should write default path in gcfg when DefaultResourceJobBase is empty string
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes:
+          DefaultResourceJobBase: ""
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DefaultResourceJobBase = /etc/rstudio-connect/job.yaml"
+
+  - it: should fall back to default paths when DefaultResourceServiceBase is empty string
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            metadata:
+              labels:
+                test: value
+      config:
+        Kubernetes:
+          DefaultResourceServiceBase: ""
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: /etc/rstudio-connect/service.yaml
+            subPath: service.yaml
+
+  - it: should write default path in gcfg when DefaultResourceServiceBase is empty string
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            metadata:
+              labels:
+                test: value
+      config:
+        Kubernetes:
+          DefaultResourceServiceBase: ""
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DefaultResourceServiceBase = /etc/rstudio-connect/service.yaml"
+
+  # Test RBAC resources are created when backends.kubernetes.enabled
+  - it: should create RBAC resources when backends.kubernetes.enabled and rbac.create are true
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+    asserts:
+      - hasDocuments:
+          count: 3 # ServiceAccount, Role, RoleBinding
+
+  - it: should render correct Role rules for direct Kubernetes runner
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      rbac:
+        create: true
+    documentIndex: 1 # Role
+    asserts:
+      - isKind:
+          of: Role
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["serviceaccounts"]
+            verbs: ["list"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["get", "list", "watch"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["services"]
+            verbs: ["create", "get", "list", "watch"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["batch"]
+            resources: ["jobs"]
+            verbs: ["create", "get", "delete", "list", "watch"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["discovery.k8s.io"]
+            resources: ["endpointslices"]
+            verbs: ["list", "watch"]
+
+  - it: should not create RBAC resources when backends.kubernetes.enabled is false and launcher.enabled is false
+    template: rbac.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+      rbac:
+        create: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test kubernetes namespace configuration
+  - it: should use custom namespace when backends.kubernetes.namespace is specified
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          namespace: custom-namespace
+      rbac:
+        create: true
+    documentIndex: 1 # Role document
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+
+  - it: should use release namespace when backends.kubernetes.namespace is not specified
+    template: rbac.yaml
+    release:
+      namespace: test-namespace
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+    documentIndex: 1 # Role document
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+
+  # Test serviceAccount configuration with backends.kubernetes.enabled
+  - it: should set serviceAccountName when backends.kubernetes.enabled and rbac.create are true
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+        serviceAccount:
+          create: true
+          name: custom-sa
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: custom-sa
+
+  # Test that sharedStorage.mountContent propagates to kubernetes config
+  - it: should configure DataDirPVCName when sharedStorage is enabled and mountContent is true
+    template: configmap.yaml
+    release:
+      name: my-connect
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        mountContent: true
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DataDirPVCName = my-connect-rstudio-connect-shared-storage"
+
+  - it: should not configure DataDirPVCName when sharedStorage.mountContent is false
+    template: configmap.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        mountContent: false
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DataDirPVCName"
+
+  # Test defaultInitContainer fields render on auto-generated init container
+  - it: should apply imagePullPolicy, resources, and securityContext to init container
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "128Mi"
+            securityContext:
+              runAsNonRoot: true
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: Always"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "cpu: 100m"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "runAsNonRoot: true"
+
+  - it: should apply defaultInitContainer fields to user-provided connect-content-init
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: "100m"
+            securityContext:
+              runAsNonRoot: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: Always"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "cpu: 100m"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "runAsNonRoot: true"
+
+  - it: should preserve user-provided init container fields over defaultInitContainer
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: "100m"
+            securityContext:
+              runAsNonRoot: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+                      image: custom-registry/custom-init:v1
+                      imagePullPolicy: IfNotPresent
+                      resources:
+                        requests:
+                          cpu: "200m"
+                      securityContext:
+                        runAsUser: 1000
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "image: custom-registry/custom-init:v1"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: IfNotPresent"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "cpu: 200m"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "runAsUser: 1000"
+      - notMatchRegex:
+          path: data["job.yaml"]
+          pattern: "imagePullPolicy: Always"
+      - notMatchRegex:
+          path: data["job.yaml"]
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init"
+
+  # Test kubernetes config section in rstudio-connect.gcfg
+  - it: should configure Kubernetes.Enabled in gcfg when backends.kubernetes.enabled is true
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          namespace: k8s-namespace
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "\\[Kubernetes\\]"
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "Enabled = true"
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "Namespace = k8s-namespace"
+
+  - it: should configure DefaultResourceJobBase path when backends.kubernetes.enabled
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DefaultResourceJobBase = /etc/rstudio-connect/job.yaml"
+
+  # Test with both launcher disabled and kubernetes enabled
+  - it: should work correctly with launcher disabled and kubernetes enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-rstudio-connect
+
+  # Test serviceAccount is set correctly when backends.kubernetes.enabled
+  - it: should generate default serviceAccountName when backends.kubernetes.enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+        serviceAccount:
+          create: true
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-rstudio-connect
+
+  # Test that config includes Kubernetes section
+  - it: should include Kubernetes config section when enabled
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "\\[Kubernetes\\]"
+
+  # Test auto-generated job base contains init container
+  - it: should auto-generate job.yaml with init container and correct image
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: connect-content-init"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:ubuntu2204-"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: connect-content"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: rsc-volume"
+
+  - it: should ensure rsc-volume mount on user-provided connect-content-init
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+                      image: custom-image:latest
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: connect-content-init"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "/mnt/rstudio-connect-runtime/"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: rsc-volume"
+
+  - it: should fail when connect-content has /opt/rstudio-connect mounted from a non-rsc-volume
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: connect-content
+                      volumeMounts:
+                        - name: other-volume
+                          mountPath: /opt/rstudio-connect
+    asserts:
+      - failedTemplate:
+          errorPattern: "mountPath is reserved for the runtime volume"
+
+  - it: should fail when connect-content-init has /mnt/rstudio-connect-runtime/ mounted from a non-rsc-volume
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  initContainers:
+                    - name: connect-content-init
+                      volumeMounts:
+                        - name: other-volume
+                          mountPath: /mnt/rstudio-connect-runtime/
+    asserts:
+      - failedTemplate:
+          errorPattern: "mountPath is reserved for the runtime volume"
+
+  - it: should not include init container when defaultInitContainer.enabled is false
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            enabled: false
+    asserts:
+      - exists:
+          path: data["job.yaml"]
+      - notMatchRegex:
+          path: data["job.yaml"]
+          pattern: "connect-content-init"
+
+  # Test 1: NodePort triggers ClusterRole auto-create
+  # Template order: ClusterRole(0), ClusterRoleBinding(1), SA(2), Role(3), RoleBinding(4)
+  - it: should create ClusterRole with nodes/get when service type is NodePort
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceServiceBase:
+            spec:
+              type: NodePort
+      rbac:
+        create: true
+        clusterRoleCreate: false
+    asserts:
+      - isKind:
+          of: ClusterRole
+        documentIndex: 0
+      - isKind:
+          of: ClusterRoleBinding
+        documentIndex: 1
+      - equal:
+          path: rules[0].resources
+          value: ["nodes"]
+        documentIndex: 0
+      - equal:
+          path: rules[0].verbs
+          value: ["get"]
+        documentIndex: 0
+
+  # Test 2: Explicit rbac.clusterRoleCreate=true creates ClusterRole even without NodePort
+  # Template order: ClusterRole(0), ClusterRoleBinding(1), SA(2), Role(3), RoleBinding(4)
+  - it: should create ClusterRole when rbac.clusterRoleCreate is true regardless of service type
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+        clusterRoleCreate: true
+    asserts:
+      - isKind:
+          of: ClusterRole
+        documentIndex: 0
+      - isKind:
+          of: ClusterRoleBinding
+        documentIndex: 1
+
+  # Test 3: rbac.serviceAccount.create=false skips SA but Role/RoleBinding reference configured name
+  # Renders: Role(0), RoleBinding(1)
+  - it: should not create ServiceAccount when rbac.serviceAccount.create is false
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: true
+        clusterRoleCreate: false
+        serviceAccount:
+          create: false
+          name: custom-sa
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Role
+        documentIndex: 0
+      - isKind:
+          of: RoleBinding
+        documentIndex: 1
+      - equal:
+          path: subjects[0].name
+          value: custom-sa
+        documentIndex: 1
+
+  # Test 4: rbac.create=false with direct runner enabled renders no RBAC docs
+  - it: should not create any RBAC resources when rbac.create is false
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      rbac:
+        create: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test 5: configmap-prestart gating
+  - it: should create configmap-prestart when backends.kubernetes.enabled
+    template: configmap-prestart.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ConfigMap
+
+  - it: should create configmap-prestart when launcher.enabled
+    template: configmap-prestart.yaml
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: false
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should not create configmap-prestart when neither is enabled
+    template: configmap-prestart.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test 6: checksum/config-prestart annotation gating
+  - it: should include checksum/config-prestart annotation when backends.kubernetes.enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations["checksum/config-prestart"]
+
+  - it: should include checksum/config-prestart annotation when launcher.enabled only
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: false
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations["checksum/config-prestart"]
+
+  - it: should not include checksum/config-prestart annotation when neither is enabled
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: false
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/config-prestart"]
+
+  # Test 7: Init image tag precedence — explicit tag overrides tagPrefix+appVersion
+  - it: should use explicit defaultInitContainer.tag when set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            tag: "custom-tag-1.2.3"
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:custom-tag-1.2.3"
+
+  - it: should use tagPrefix plus appVersion when tag is not set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultInitContainer:
+            tagPrefix: "jammy-"
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:jammy-\\d+\\.\\d+\\.\\d+"
+
+  - it: should preserve user-provided sidecar and nodeSelector in job base
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  nodeSelector:
+                    workload: content
+                  containers:
+                    - name: logging-sidecar
+                      image: busybox
+    asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: logging-sidecar"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "workload: content"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: connect-content-init"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "name: connect-content"
