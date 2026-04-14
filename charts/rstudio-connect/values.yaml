@@ -332,7 +332,7 @@ backends:
     # https://kubernetes.io/docs/concepts/workloads/controllers/job/
     defaultResourceJobBase: {}
     # -- defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's
-    # Service in Kubernetes. Conceptually this is a similar to a Kustomize base. Connect then applies any required Service configuration
+    # Service in Kubernetes. Conceptually this is similar to a Kustomize base. Connect then applies any required Service configuration
     # on-top of the overlay base to produce a final Service definition.
     # https://kubernetes.io/docs/concepts/services-networking/service/
     # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays
