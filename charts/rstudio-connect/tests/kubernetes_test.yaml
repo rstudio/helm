@@ -546,6 +546,7 @@ tests:
                 spec:
                   initContainers:
                     - name: connect-content-init
+                      image: custom-registry/custom-init:v1
                       imagePullPolicy: IfNotPresent
                       resources:
                         requests:
@@ -553,6 +554,9 @@ tests:
                       securityContext:
                         runAsUser: 1000
     asserts:
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "image: custom-registry/custom-init:v1"
       - matchRegex:
           path: data["job.yaml"]
           pattern: "imagePullPolicy: IfNotPresent"
@@ -565,6 +569,9 @@ tests:
       - notMatchRegex:
           path: data["job.yaml"]
           pattern: "imagePullPolicy: Always"
+      - notMatchRegex:
+          path: data["job.yaml"]
+          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init"
 
   # Test kubernetes config section in rstudio-connect.gcfg
   - it: should configure Kubernetes.Enabled in gcfg when backends.kubernetes.enabled is true
