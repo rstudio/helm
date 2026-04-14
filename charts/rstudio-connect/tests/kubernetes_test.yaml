@@ -73,6 +73,32 @@ tests:
       - failedTemplate:
           errorPattern: "backends.kubernetes is enabled, persistent storage must be provided"
 
+  - it: should fail when defaultResourceJobBase.kind is not Job
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      backends:
+        kubernetes:
+          defaultResourceJobBase:
+            kind: Service
+    asserts:
+      - failedTemplate:
+          errorPattern: "defaultResourceJobBase.kind must be.*Job.*got.*Service"
+
+  - it: should fail when defaultResourceServiceBase.kind is not Service
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      backends:
+        kubernetes:
+          defaultResourceServiceBase:
+            kind: Job
+    asserts:
+      - failedTemplate:
+          errorPattern: "defaultResourceServiceBase.kind must be.*Service.*got.*Job"
+
   # Test backends.kubernetes.enabled creates configmap entries for job base
   - it: should create job.yaml in configmap when backends.kubernetes.enabled
     template: configmap.yaml
