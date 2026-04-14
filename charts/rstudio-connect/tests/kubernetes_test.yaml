@@ -88,6 +88,31 @@ tests:
           path: data["job.yaml"]
           pattern: "kind: Job"
 
+  - it: should create service.yaml in configmap when defaultResourceServiceBase is set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      backends:
+        kubernetes:
+          defaultResourceServiceBase:
+            spec:
+              type: ClusterIP
+    asserts:
+      - exists:
+          path: data["service.yaml"]
+      - matchRegex:
+          path: data["service.yaml"]
+          pattern: "type: ClusterIP"
+
+  - it: should not create service.yaml when defaultResourceServiceBase is not set
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - notExists:
+          path: data["service.yaml"]
+
   - it: should not create job.yaml when backends.kubernetes.enabled is false
     template: configmap.yaml
     set:
