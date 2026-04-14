@@ -39,8 +39,8 @@ Please consider removing this configuration value.
 {{- end }}
 
 {{- if .Values.backends.kubernetes.enabled }}
-  {{- $configEnabled := dig "Kubernetes" "Enabled" "" .Values.config }}
-  {{- if or (eq (printf "%v" $configEnabled) "false") (eq (printf "%v" $configEnabled) "0") }}
+  {{- $configEnabled := dig "Kubernetes" "Enabled" "" .Values.config | printf "%v" | lower }}
+  {{- if or (eq $configEnabled "false") (eq $configEnabled "0") }}
     {{- fail "\n\n`config.Kubernetes.Enabled` is set to false but `backends.kubernetes.enabled` is true. Remove `config.Kubernetes.Enabled` because the chart sets it automatically." }}
   {{- end }}
   {{- $configNs := dig "Kubernetes" "Namespace" "" .Values.config }}
