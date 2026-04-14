@@ -8,6 +8,10 @@ This guide covers upgrading Posit Connect helm values from the Launcher (`launch
 
 The direct Kubernetes runner manages content Jobs and Services using standard Kubernetes manifests, replacing the Launcher's template system.
 
+:::{.callout-important}
+The direct Kubernetes runner requires Posit Connect version 2026.04.0 or later.
+:::
+
 ## Minimal upgrade
 
 If you haven't customized `launcher.templateValues`, the minimal upgrade is a single change: set `launcher.enabled: false` and `backends.kubernetes.enabled: true`.
