@@ -24,7 +24,7 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if or .Values.launcher.enabled .Values.backends.kubernetes.enabled }}
+        {{- if include "rstudio-connect.oheEnabled" . }}
         checksum/config-prestart: {{ include (print $.Template.BasePath "/configmap-prestart.yaml") . | sha256sum }}
         {{- end }}
       {{- if .Values.prometheus }}
@@ -73,7 +73,7 @@ spec:
          * and also the "Note" callout at the end of this section:
          * https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts
          */}}
-      {{- if and .Values.rbac.create (or .Values.launcher.enabled .Values.backends.kubernetes.enabled) }}
+      {{- if and .Values.rbac.create (include "rstudio-connect.oheEnabled" .) }}
       {{ $serviceAccountName := default (include "rstudio-connect.fullname" .) .Values.rbac.serviceAccount.name }}
       serviceAccountName: {{ $serviceAccountName }}
       {{- else }}
@@ -167,7 +167,7 @@ spec:
         {{- if .Values.command }}
         command:
 {{ toYaml .Values.command | indent 10 }}
-        {{- else if (or .Values.launcher.enabled .Values.backends.kubernetes.enabled) }}
+        {{- else if (include "rstudio-connect.oheEnabled" .) }}
         command:
           - tini
           - -s
@@ -176,7 +176,7 @@ spec:
         {{- if .Values.args }}
         args:
 {{ toYaml .Values.args | indent 10 }}
-        {{- else if (or .Values.launcher.enabled .Values.backends.kubernetes.enabled) }}
+        {{- else if (include "rstudio-connect.oheEnabled" .) }}
         args:
           - /scripts/prestart.bash
           - /usr/local/bin/startup.sh
@@ -230,7 +230,7 @@ spec:
             mountPath: "/mnt/job-json-overrides/"
           {{- end }}
           {{- end }}
-          {{- if or .Values.launcher.enabled .Values.backends.kubernetes.enabled }}
+          {{- if include "rstudio-connect.oheEnabled" . }}
           - name: rstudio-connect-prestart
             mountPath: "/scripts/"
           {{- end }}
@@ -326,7 +326,7 @@ spec:
           defaultMode: 0644
       {{- end }}
       {{- end }}
-      {{- if or .Values.launcher.enabled .Values.backends.kubernetes.enabled }}
+      {{- if include "rstudio-connect.oheEnabled" . }}
       - name: rstudio-connect-prestart
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-prestart

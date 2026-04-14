@@ -52,6 +52,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+  Whether off-host execution is enabled (via launcher or direct Kubernetes runner).
+  Returns "true" or empty string (for use in conditionals).
+*/}}
+{{- define "rstudio-connect.oheEnabled" -}}
+{{- if or .Values.launcher.enabled .Values.backends.kubernetes.enabled -}}true{{- end -}}
+{{- end -}}
+
+{{/*
   Generate the configuration
     - set remote licensing if applicable
     - set launcher parameters if applicable

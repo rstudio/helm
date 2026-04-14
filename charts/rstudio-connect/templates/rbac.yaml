@@ -1,4 +1,4 @@
-{{- if and (.Values.rbac.create) (or .Values.launcher.enabled .Values.backends.kubernetes.enabled) }}
+{{- if and (.Values.rbac.create) (include "rstudio-connect.oheEnabled" .) }}
 {{- $namespace := $.Release.Namespace }}
 {{- $targetNamespace := $.Release.Namespace }}
 {{- if .Values.launcher.enabled }}
