@@ -6,7 +6,14 @@ listing:
 ---
 
 
-The examples in this directory provide a starting point for deploying Posit Connect in different configurations. 
+The examples in this directory provide a starting point for deploying Posit Connect in different configurations.
+
+Posit Connect supports two backends for off-host execution:
+
+- **Direct Kubernetes Runner** (recommended) -- The preferred backend for new installations running Connect 2026.04.0+. Uses `backends.kubernetes` with native Kubernetes Job and Service specs.
+- **Launcher** -- The legacy backend for older Connect versions. Existing installations can upgrade using the [upgrade guide](upgrade-launcher-to-kubernetes/launcher-to-kubernetes.qmd).
+
+Examples that involve off-host execution configuration provide values for both backends in separate tabs, showing the recommended direct Kubernetes runner first.
 
 Each example has a beginning description and a series of `TODO` comments.
 Before using an example, read through all the comments and ensure you address each `TODO`.
