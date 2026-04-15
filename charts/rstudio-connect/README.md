@@ -47,7 +47,7 @@ helm search repo rstudio/rstudio-connect -l
 
 ### 0.9.0
 
-- Chart version 0.9.0 adds support for the direct Kubernetes runner via `backends.kubernetes.enabled`. See the [upgrade guide](../../examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.qmd) for details on transitioning from `launcher.enabled`.
+- Chart version 0.9.0 adds support for the direct Kubernetes runner via `backends.kubernetes.enabled`. See the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning from `launcher.enabled`.
 
 ### 0.8.0
 
