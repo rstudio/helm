@@ -19,7 +19,7 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 | Launcher setting | Action |
 | --- | --- |
 | `launcher.enabled` | Set to `false` and set `backends.kubernetes.enabled: true` |
-| `config.Launcher` | Move to `config.Kubernetes` (optional — only if you customized it) |
+| `config.Launcher` | Move applicable values to `config.Kubernetes` (optional — only if you customized it) |
 | `launcher.namespace` | Move to `backends.kubernetes.namespace` (optional — only if you customized it) |
 | `launcher.defaultInitContainer.*` | Move to `backends.kubernetes.defaultInitContainer.*` (optional — same structure) |
 

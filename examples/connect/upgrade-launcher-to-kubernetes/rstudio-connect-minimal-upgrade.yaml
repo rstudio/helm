@@ -1,13 +1,8 @@
 # Minimal upgrade from Launcher to direct Kubernetes runner.
-# One required change if you haven't customized templateValues.
-
-# sharedStorage values remain unchanged
-sharedStorage:
-  create: true
-  mount: true
-  storageClassName: nfs-sc-rwx # TODO: Change to your RWX StorageClass
-  requests:
-    storage: 100G
+#
+# If your values.yaml contains modifications to launcher.templateValues or
+# any other launcher.* fields use the examples below to move these values
+# to the new configuration structure.
 
 # Disable the Launcher
 launcher:
@@ -17,7 +12,3 @@ launcher:
 backends:
   kubernetes:
     enabled: true
-
-# Optional: if you had custom config.Launcher settings, move them to config.Kubernetes.
-# DataDirPVCName is auto-configured when sharedStorage.create or sharedStorage.mount is true
-# and sharedStorage.mountContent is true.
