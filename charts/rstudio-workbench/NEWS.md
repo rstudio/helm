@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.10.14
+- add suppressStdinAnnotation in order to suppress the Stdin Annotation (and not expose things such as ssl certs etc...)  
 
 ## 0.10.13
 
