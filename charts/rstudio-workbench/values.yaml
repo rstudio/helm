@@ -162,7 +162,7 @@ launcher:
       # into Kubernetes pod metadata, making it visible in kubectl describe, audit
       # logs, and monitoring tools. This can expose sensitive values such as TLS
       # certificates. The annotation is purely informational and safe to disable.
-      limitStdinAnnotation: false
+      suppressStdinAnnotation: false
       ephemeralStorage:
         request: ""
         limit: ""
