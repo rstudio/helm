@@ -157,6 +157,12 @@ launcher:
       affinity: {}
       nodeSelector: {}
       hostAliases: []
+      # -- Set to true to suppress the `stdin` pod annotation on session pods.
+      # The annotation mirrors the full stdin payload (session environment variables)
+      # into Kubernetes pod metadata, making it visible in kubectl describe, audit
+      # logs, and monitoring tools. This can expose sensitive values such as TLS
+      # certificates. The annotation is purely informational and safe to disable.
+      suppressStdinAnnotation: false
       ephemeralStorage:
         request: ""
         limit: ""

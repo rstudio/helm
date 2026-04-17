@@ -47,7 +47,9 @@ spec:
         {{- $i = add $i 1 }}
         {{- end }}
         {{- end }}
+        {{- if not $templateData.pod.limitStdinAnnotation }}
         stdin: {{ toYaml .Job.stdin | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
         user: {{ toYaml .Job.user }}
         name: {{ toYaml .Job.name | indent 8 | trimPrefix (repeat 8 " ") }}
         service_ports: {{ toYaml .Job.servicePortsJson | indent 8 | trimPrefix (repeat 8 " ") }}
