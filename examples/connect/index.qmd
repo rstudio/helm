@@ -10,7 +10,7 @@ The examples in this directory provide a starting point for deploying Posit Conn
 
 Posit Connect supports two backends for off-host execution:
 
-- **`backends.kubernetes`** (recommended) -- Connect 2026.04.0+ manages content Jobs and Services natively through Kubernetes. New installations should use this backend.
+- **`backends.kubernetes`** (recommended) -- Connect 2026.04.0+ manages content Jobs and Services natively through Kubernetes.
 - **Launcher** -- For Connect versions older than 2026.04.0. Existing installations can upgrade using the [upgrade guide](upgrade-launcher-to-kubernetes/launcher-to-kubernetes.qmd).
 
 Examples that involve off-host execution configuration provide values for both backends in separate tabs, with the recommended `backends.kubernetes` approach shown first.

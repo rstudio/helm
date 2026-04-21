@@ -20,7 +20,7 @@ There are several content containers listed as execution environments by default
 
 ## Kubernetes
 
-Recommended for new installations running Connect 2026.04.0+.
+Recommended for Connect 2026.04.0+.
 
 Use `executionEnvironments` instead of `launcher.customRuntimeYaml` to define content images. Unlike `customRuntimeYaml`, changes to `executionEnvironments` take effect on every `helm upgrade` without requiring a pod restart or database reset.
 

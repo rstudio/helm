@@ -16,7 +16,7 @@ For example, if you need to add TLS certificates for Connect via a `ConfigMap` t
 
 ## Kubernetes
 
-Recommended for new installations running Connect 2026.04.0+.
+Recommended for Connect 2026.04.0+.
 
 Specify content container volumes and mounts under `backends.kubernetes.defaultResourceJobBase` using standard Kubernetes Job spec fields. Name the content container `connect-content`.
 
