@@ -14,16 +14,5 @@ See the [OpenID Connect Authentication](https://docs.posit.co/connect/admin/auth
 
 {{< include ../_prereqs.qmd >}}
 
-## Kubernetes
-
-Recommended for Connect 2026.04.0+.
-
-```{.yaml include="rstudio-connect-oidc-kubernetes.yaml" filename="values.yaml"}
-```
-
-## Launcher
-
-For Connect versions older than 2026.04.0.
-
 ```{.yaml include="rstudio-connect-oidc.yaml" filename="values.yaml"}
 ```
