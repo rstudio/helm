@@ -38,8 +38,8 @@ jobs:
         if: steps.project-url.outputs.project != 'none'
         uses: actions/create-github-app-token@v2
         with:
-          app-id: 1064714
-          private-key: ${{ secrets.POSIT_PLATFORM_PROJECTS_PEM }}
+          app-id: ${{ secrets.POSIT_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.POSIT_PLATFORM_PEM }}
           owner: ${{ steps.project-url.outputs.ORG }}
       - name: Add issue to project
         id: add-to-project
