@@ -16,14 +16,14 @@ See the [Authentication Integration (Using SAML)](https://docs.posit.co/connect/
 
 ::: {.panel-tabset}
 
-## Direct Kubernetes runner (recommended)
+## Kubernetes
 
 Recommended for new installations running Connect 2026.04.0+.
 
 ```{.yaml include="rstudio-connect-saml-kubernetes.yaml" filename="values.yaml"}
 ```
 
-## Launcher (deprecated)
+## Launcher
 
 For Connect versions older than 2026.04.0.
 

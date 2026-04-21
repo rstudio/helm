@@ -14,7 +14,7 @@ For example, if you need to add TLS certificates for Connect via a `ConfigMap` t
 
 ::: {.panel-tabset}
 
-## Direct Kubernetes runner (recommended)
+## Kubernetes
 
 Recommended for new installations running Connect 2026.04.0+.
 
@@ -23,7 +23,7 @@ Specify content container volumes and mounts under `backends.kubernetes.defaultR
 ```{.yaml include="rstudio-connect-with-additional-mounts-kubernetes.yaml" filename="values.yaml"}
 ```
 
-## Launcher (deprecated)
+## Launcher
 
 For Connect versions older than 2026.04.0.
 
