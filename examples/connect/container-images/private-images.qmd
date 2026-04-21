@@ -12,7 +12,7 @@ There are a minimum of three images that Connect requires to function in Off-Hos
 - Content container [ghcr.io/rstudio/content-base](https://github.com/rstudio/rstudio-docker-products/pkgs/container/content-base)
 - Content init container [ghcr.io/rstudio/rstudio-connect-content-init](https://github.com/rstudio/rstudio-docker-products/pkgs/container/rstudio-connect-content-init)
   
-There are several content containers listed as execution environments by default on initial Connect startup based on the listing in the [default-runtime.yaml](https://github.com/rstudio/helm/blob/main/charts/rstudio-connect/default-runtime.yaml) file. Setting `executionEnvironments` overrides the default execution environments. Additional content containers may be added to provide more R, Python, and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
+Additional content containers may be added to provide more R, Python, and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
 
 These images can be pulled from your own container registry instead of the public Posit provided images.
 This example also shows where to provide private registry credentials in the form of a Kubernetes secret of type `kubernetes.io/dockercfg`.
