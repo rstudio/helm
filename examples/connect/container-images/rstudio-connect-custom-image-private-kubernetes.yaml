@@ -29,7 +29,7 @@ launcher:
 
 backends:
   kubernetes:
-    enabled: true # Required for Off-Host Execution mode (Connect 2026.04.0+)
+    enabled: true # Required for Off-Host Execution mode (Connect 2026.04.0 and later)
     # Define the custom image(s) for the content pod(s) init container
     defaultInitContainer:
       repository: ghcr.io/rstudio/rstudio-connect-content-init # TODO: Change to match your custom image repository

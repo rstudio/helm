@@ -47,7 +47,7 @@ launcher:
 
 backends:
   kubernetes:
-    enabled: true # Required for Off-Host Execution mode (Connect 2026.04.0+)
+    enabled: true # Required for Off-Host Execution mode (Connect 2026.04.0 and later)
     defaultResourceJobBase:
       spec:
         template:
