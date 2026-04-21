@@ -55,8 +55,8 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.POSIT_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.POSIT_PLATFORM_PEM }}
 
       - name: Checkout
         uses: actions/checkout@v6
