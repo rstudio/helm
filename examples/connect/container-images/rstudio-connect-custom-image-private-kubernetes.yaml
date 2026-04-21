@@ -18,8 +18,7 @@ sharedStorage:
 
 # Define the custom image for the Connect pod(s)
 image:
-  repository: ghcr.io/rstudio/rstudio-connect # TODO: Change to match your custom image repository
-  tagPrefix: ubuntu2204- # TODO: Change to match your custom image tag prefix
+  repository: ghcr.io/posit-dev/connect # TODO: Change to match your custom image repository
   tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
   imagePullSecrets:
     - name: private-registery-creds # TODO: Change this to match the secret of type kubernetes.io/dockercfg in your cluster containing authentication credentials to your registry. More information: https://kubernetes.io/docs/concepts/configuration/secret/#docker-config-secrets
@@ -32,8 +31,7 @@ backends:
     enabled: true # Required for Off-Host Execution mode (Connect 2026.04.0 and later)
     # Define the custom image(s) for the content pod(s) init container
     defaultInitContainer:
-      repository: ghcr.io/rstudio/rstudio-connect-content-init # TODO: Change to match your custom image repository
-      tagPrefix: ubuntu2204- # TODO: Change to match your custom image tag prefix
+      repository: ghcr.io/posit-dev/connect-content-init # TODO: Change to match your custom image repository
       tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
     defaultResourceJobBase:
       spec:
@@ -47,21 +45,21 @@ backends:
 # without requiring a pod restart or database reset.
 executionEnvironments:
   # TODO: Add custom images based on the below template
-  - name: ghcr.io/rstudio/content-base:r4.2.2-py3.11.3-ubuntu2204 # TODO: Change to match your custom image repository
+  - name: ghcr.io/posit-dev/connect-content:R4.5.2-python3.14.3-ubuntu-24.04 # TODO: Change to match your custom image repository
     title: "Custom Runtime" # TODO: Change to a descriptive title
-    description: "Runtime with R 4.2.2 and Python 3.11.3" # TODO: Change to a descriptive description
+    description: "Runtime with R 4.5.2 and Python 3.14.3" # TODO: Change to a descriptive description
     python:
       installations:
-        - path: /opt/python/3.11.3/bin/python3 # TODO: Change to match the Python path available in your image
-          version: 3.11.3 # TODO: Change to match the Python version available in your image
+        - path: /opt/python/3.14.3/bin/python3 # TODO: Change to match the Python path available in your image
+          version: 3.14.3 # TODO: Change to match the Python version available in your image
     r:
       installations:
-        - path: /opt/R/4.2.2/bin/R # TODO: Change to match the R path available in your image
-          version: 4.2.2 # TODO: Change to match the R version available in your image
+        - path: /opt/R/4.5.2/bin/R # TODO: Change to match the R path available in your image
+          version: 4.5.2 # TODO: Change to match the R version available in your image
     quarto:
       installations:
-        - path: /opt/quarto/1.3.340/bin/quarto # TODO: Change to match the quarto path available in your image
-          version: 1.3.340 # TODO: Change to match the Quarto version available in your image
+        - path: /opt/quarto/1.8.27/bin/quarto # TODO: Change to match the quarto path available in your image
+          version: 1.8.27 # TODO: Change to match the Quarto version available in your image
 
 # The config section overwrites values in Posit Connect's main
 # .gcfg configuration file.
