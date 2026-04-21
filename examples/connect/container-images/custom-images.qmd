@@ -12,7 +12,7 @@ There are a minimum of three images that Connect requires to function in Off-Hos
 - Content container [rstudio/content-base](https://hub.docker.com/r/rstudio/content-base)
 - Content init container [rstudio/rstudio-connect-content-init](https://hub.docker.com/r/rstudio/rstudio-connect-content-init)
   
-There are several content containers listed as execution environments by default on initial Connect startup based on the listing in the [default-runtime.yaml](https://github.com/rstudio/helm/blob/main/charts/rstudio-connect/default-runtime.yaml) file. Setting `executionEnvironments` (`backends.kubernetes`) or `customRuntimeYaml` (Launcher) uses the execution environments defined in that section instead of the default ones. Additional content containers may be added to provide more R, Python, and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
+There are several content containers listed as execution environments by default on initial Connect startup based on the listing in the [default-runtime.yaml](https://github.com/rstudio/helm/blob/main/charts/rstudio-connect/default-runtime.yaml) file. Setting `executionEnvironments` or `customRuntimeYaml` (Launcher) uses the execution environments defined in that section instead of the default ones. Additional content containers may be added to provide more R, Python, and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
 
 {{< include ../_prereqs.qmd >}}
 
@@ -22,7 +22,7 @@ There are several content containers listed as execution environments by default
 
 Recommended for new installations running Connect 2026.04.0+.
 
-With `backends.kubernetes`, use `executionEnvironments` instead of `launcher.customRuntimeYaml` to define content images. Unlike `customRuntimeYaml`, changes to `executionEnvironments` take effect on every `helm upgrade` without requiring a pod restart or database reset.
+Use `executionEnvironments` instead of `launcher.customRuntimeYaml` to define content images. Unlike `customRuntimeYaml`, changes to `executionEnvironments` take effect on every `helm upgrade` without requiring a pod restart or database reset.
 
 ```{.yaml include="rstudio-connect-custom-image-kubernetes.yaml" filename="values.yaml"}
 ```
