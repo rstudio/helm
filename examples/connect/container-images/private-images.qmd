@@ -21,8 +21,6 @@ The registry credentials secret must be specified in two places in the values to
 
 {{< include ../_prereqs.qmd >}}
 
-::: {.panel-tabset}
-
 ## Kubernetes
 
 Recommended for Connect 2026.04.0+.
@@ -40,5 +38,3 @@ The `launcher.templateValues.pod.imagePullSecrets` provides the pod-level `image
 
 ```{.yaml include="rstudio-connect-custom-image-private.yaml" filename="values.yaml"}
 ```
-
-:::

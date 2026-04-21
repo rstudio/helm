@@ -14,8 +14,6 @@ See the [Authentication Integration (Using SAML)](https://docs.posit.co/connect/
 
 {{< include ../_prereqs.qmd >}}
 
-::: {.panel-tabset}
-
 ## Kubernetes
 
 Recommended for Connect 2026.04.0+.
@@ -29,5 +27,3 @@ For Connect versions older than 2026.04.0.
 
 ```{.yaml include="rstudio-connect-saml.yaml" filename="values.yaml"}
 ```
-
-:::

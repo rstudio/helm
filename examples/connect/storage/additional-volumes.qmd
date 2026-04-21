@@ -12,8 +12,6 @@ For example, if you need to add TLS certificates for Connect via a `ConfigMap` t
 
 {{< include ../_prereqs.qmd >}}
 
-::: {.panel-tabset}
-
 ## Kubernetes
 
 Recommended for Connect 2026.04.0+.
@@ -29,5 +27,3 @@ For Connect versions older than 2026.04.0.
 
 ```{.yaml include="rstudio-connect-with-additional-mounts.yaml" filename="values.yaml"}
 ```
-
-:::
