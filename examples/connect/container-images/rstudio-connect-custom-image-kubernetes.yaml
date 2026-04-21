@@ -20,6 +20,7 @@ sharedStorage:
 # Define the custom image for the Connect pod(s)
 image:
   repository: ghcr.io/posit-dev/connect # TODO: Change to match your custom image repository
+  tagPrefix: "" # New posit-dev/images-connect images do not use a tag prefix
   tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
 
 launcher:
@@ -31,6 +32,7 @@ backends:
     # Define the custom image(s) for the content pod(s) init container
     defaultInitContainer:
       repository: ghcr.io/posit-dev/connect-content-init # TODO: Change to match your custom image repository
+      tagPrefix: "" # New posit-dev/images-connect images do not use a tag prefix
       tag: "" # TODO: Change to match your custom image tag. By default when this is left blank the chart app version is automatically filled out.
 
 # Define the custom image(s) for the content pod(s).
