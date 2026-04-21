@@ -23,7 +23,7 @@ The registry credentials secret must be specified in two places in the values to
 
 ## Kubernetes
 
-Recommended for Connect 2026.04.0+.
+Recommended for Connect 2026.04.0 and later.
 
 The `backends.kubernetes.defaultResourceJobBase.spec.template.spec.imagePullSecrets` provides the pod-level `imagePullSecret` for content and init containers.
 
