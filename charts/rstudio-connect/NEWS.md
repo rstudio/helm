@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1
+
+- Remove the default values for `launcher.customRuntimeYaml`. This configuration has been replaced by the `executionEnvironments` configuration which provides a mechanism for [managing execution environments declaratively](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management) and is better suited for IaC.
+
 ## 0.9.0
 
 - Add support for an alternative Kubernetes backend via `backends.kubernetes.enabled`, which replaces the Launcher's template system with standard Kubernetes Job and Service manifests configured through `defaultResourceJobBase` and `defaultResourceServiceBase`. This backend will be available starting with Connect 2026.04.0.

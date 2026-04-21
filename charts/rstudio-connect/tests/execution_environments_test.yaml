@@ -270,3 +270,114 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "executionEnvironments[0].name is required"
+
+  # =============================================================================
+  # configmap.yaml - runtime.yaml key omitted when customRuntimeYaml is empty
+  # =============================================================================
+
+  - it: should not include runtime.yaml key in configmap when customRuntimeYaml is empty (default)
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: true
+    asserts:
+      - notExists:
+          path: data["runtime.yaml"]
+
+  - it: should not include runtime.yaml key in configmap when customRuntimeYaml is null
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: null
+    asserts:
+      - notExists:
+          path: data["runtime.yaml"]
+
+  - it: should include runtime.yaml key in configmap when customRuntimeYaml is "base"
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: "base"
+    asserts:
+      - exists:
+          path: data["runtime.yaml"]
+
+  - it: should include runtime.yaml key in configmap when customRuntimeYaml is "pro"
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: "pro"
+    asserts:
+      - exists:
+          path: data["runtime.yaml"]
+
+  # =============================================================================
+  # configmap.yaml - ClusterDefinition omitted when customRuntimeYaml is empty
+  # =============================================================================
+
+  - it: should not set ClusterDefinition in gcfg when customRuntimeYaml is empty (default)
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: true
+    asserts:
+      - notMatchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "ClusterDefinition"
+
+  - it: should set ClusterDefinition in gcfg when customRuntimeYaml is "base"
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: "base"
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "ClusterDefinition = /etc/rstudio-connect/runtime.yaml"
+
+  # =============================================================================
+  # deployment.yaml - runtime.yaml volumeMount omitted when customRuntimeYaml is empty
+  # =============================================================================
+
+  - it: should not mount runtime.yaml when customRuntimeYaml is empty (default)
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: "/etc/rstudio-connect/runtime.yaml"
+            subPath: "runtime.yaml"
+
+  - it: should mount runtime.yaml when customRuntimeYaml is "base"
+    template: deployment.yaml
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: "base"
+      sharedStorage:
+        create: true
+        mount: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-config
+            mountPath: "/etc/rstudio-connect/runtime.yaml"
+            subPath: "runtime.yaml"
