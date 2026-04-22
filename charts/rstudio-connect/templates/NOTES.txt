@@ -78,6 +78,14 @@ Please consider removing this configuration value.
   {{- fail "\n\n`launcher.additionalRuntimeImages` has been removed. Use `executionEnvironments` for declarative management of execution environments." }}
 {{- end }}
 
+{{- if .Values.image.tagPrefix }}
+  {{- fail "\n\n`image.tagPrefix` has been removed. Use `image.os` instead (e.g. `ubuntu-24.04`). The image tag format is now `{version}-{os}`." }}
+{{- end }}
+
+{{- if .Values.launcher.defaultInitContainer.tagPrefix }}
+  {{- fail "\n\n`launcher.defaultInitContainer.tagPrefix` has been removed. Use `launcher.defaultInitContainer.os` instead (e.g. `ubuntu-24.04`). The image tag format is now `{version}-{os}`." }}
+{{- end }}
+
 {{- if .Values.pod.serviceAccountName }}
 
 {{- fail "\n\n`pod.serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead." }}
