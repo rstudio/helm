@@ -1,0 +1,26 @@
+suite: Connect Deprecated Keys
+templates:
+  - NOTES.txt
+tests:
+  - it: should fail when launcher.customRuntimeYaml is set
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: "base"
+      sharedStorage:
+        create: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "launcher.customRuntimeYaml.*has been removed.*executionEnvironments"
+
+  - it: should fail when launcher.additionalRuntimeImages is set
+    set:
+      launcher:
+        enabled: true
+        additionalRuntimeImages:
+          - name: ghcr.io/my-org/content-base:r4.4.0-py3.11.3-jammy
+      sharedStorage:
+        create: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "launcher.additionalRuntimeImages.*has been removed.*executionEnvironments"

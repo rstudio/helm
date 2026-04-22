@@ -70,6 +70,14 @@ Please consider removing this configuration value.
   {{- fail "\n\n`launcher.contentInitContainer` values are now stored at `launcher.defaultInitContainer`" }}
 {{- end }}
 
+{{- if .Values.launcher.customRuntimeYaml }}
+  {{- fail "\n\n`launcher.customRuntimeYaml` has been removed. Use `executionEnvironments` for declarative management of execution environments." }}
+{{- end }}
+
+{{- if .Values.launcher.additionalRuntimeImages }}
+  {{- fail "\n\n`launcher.additionalRuntimeImages` has been removed. Use `executionEnvironments` for declarative management of execution environments." }}
+{{- end }}
+
 {{- if .Values.pod.serviceAccountName }}
 
 {{- fail "\n\n`pod.serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead." }}

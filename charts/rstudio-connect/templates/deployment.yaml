@@ -171,7 +171,7 @@ spec:
         {{- if .Values.args }}
         args:
 {{ toYaml .Values.args | indent 10 }}
-        {{- else if .Values.launcher.enabled }}
+        {{- else if (include "rstudio-connect.oheEnabled" .) }}
         args:
           - /scripts/prestart.bash
           - /usr/local/bin/startup.sh
