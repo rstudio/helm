@@ -209,3 +209,30 @@ tests:
       - notMatchRegex:
           path: data["positron.conf"]
           pattern: "^exe="
+
+  - it: should set positron.conf exe even when launcher is disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        enabled: false
+      components:
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - matchRegex:
+          path: data["positron.conf"]
+          pattern: "exe=/usr/lib/rstudio-server/bin/positron-server/2026\\.03\\.0/bin/positron-server/bundled/bin/positron-server"
+
+  - it: should not set positron.conf exe when components are disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        enabled: false
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notMatchRegex:
+          path: data["positron.conf"]
+          pattern: "^exe="
