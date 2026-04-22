@@ -1,7 +1,12 @@
 # Changelog
 
+
+## 0.10.15
+
+- Bump Workbench version to 2026.04.0
+
 ## 0.10.14
-- add suppressStdinAnnotation in order to suppress the Stdin Annotation (and not expose things such as ssl certs etc...)  
+- add suppressStdinAnnotation in order to suppress the Stdin Annotation (and not expose things such as ssl certs etc...)
 
 ## 0.10.13
 
