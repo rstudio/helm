@@ -199,8 +199,8 @@ can be set and the release can be upgraded to include the new value.
 
 This chart supports [declarative management of execution environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management)
 via `ExecutionEnvironments.ConfigFilePath`. Requires Connect version 2026.03.0 or later.
-Unlike the legacy `launcher.customRuntimeYaml`, changes to `executionEnvironments`
-take effect on every `helm upgrade` without requiring a pod restart or database reset.
+Changes to `executionEnvironments` take effect on every `helm upgrade` without
+requiring a pod restart or database reset.
 
 When `executionEnvironments` is set, the chart renders the list into a dedicated
 ConfigMap and mounts it into the Connect pod. Connect only manages the execution
@@ -297,7 +297,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-connect deployment |
-| executionEnvironments | list | `[]` (disabled) | Optional list of execution environments to manage declaratively. Requires Connect version 2026.03.0 or later. When set, the chart renders these into a ConfigMap, mounts it into the Connect pod, and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration. Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade without requiring a pod restart or database reset. |
+| executionEnvironments | list | `[]` (disabled) | Optional list of execution environments to manage declaratively. Requires Connect version 2026.03.0 or later. When set, the chart renders these into a ConfigMap, mounts it into the Connect pod, and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration. Changes take effect on every helm upgrade without requiring a pod restart or database reset. |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"os":"ubuntu-24.04","repository":"posit/connect","tag":""}` | Defines the Posit Connect image to deploy |
@@ -312,8 +312,6 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
 | ingress.tls | list | `[]` |  |
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
-| launcher.additionalRuntimeImages | list | `[]` | Deprecated, use `executionEnvironments` instead. Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key). If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list". |
-| launcher.customRuntimeYaml | string | `""` | Deprecated, use `executionEnvironments` instead. Optional. The runtime.yaml definition of Kubernetes runtime containers. If set to "base", will pull in the default runtime.yaml file. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments the first time the server starts. If any execution environments already exist in the database, these values are ignored; execution environments are not created or modified during subsequent restarts. |
 | launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","os":"ubuntu-24.04","repository":"posit/connect-content-init","resources":{},"securityContext":{},"tag":""}` | Image definition for the default Posit Connect Content InitContainer |
 | launcher.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. |
 | launcher.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |

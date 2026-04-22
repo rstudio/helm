@@ -347,18 +347,6 @@ launcher:
   enabled: true
   # -- The namespace to launch sessions into. Uses the Release namespace by default
   namespace: ""
-  # -- Deprecated, use `executionEnvironments` instead. Optional. The runtime.yaml definition of Kubernetes runtime containers.
-  # If set to "base", will pull in the default runtime.yaml file.
-  # If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the
-  # cost of a larger image).
-  # Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments
-  # the first time the server starts. If any execution environments already exist in the database, these values are ignored;
-  # execution environments are not created or modified during subsequent restarts.
-  customRuntimeYaml: ""
-  # -- Deprecated, use `executionEnvironments` instead. Optional. Additional images to append to the end of
-  # the "launcher.customRuntimeYaml" (in the "images" key).
-  # If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list".
-  additionalRuntimeImages: []
   # -- User definition of launcher.kubernetes.profiles.conf for job customization
   launcherKubernetesProfilesConf: {}
   # -- Whether to use launcher templates when launching sessions. Defaults to true
@@ -440,8 +428,7 @@ launcher:
 # Requires Connect version 2026.03.0 or later.
 # When set, the chart renders these into a ConfigMap, mounts it into the Connect pod,
 # and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration.
-# Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade
-# without requiring a pod restart or database reset.
+# Changes take effect on every helm upgrade without requiring a pod restart or database reset.
 # @default -- `[]` (disabled)
 executionEnvironments: []
   # - name: ghcr.io/my-org/connect-runtime:ubuntu22

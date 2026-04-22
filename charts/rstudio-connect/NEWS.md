@@ -2,10 +2,12 @@
 
 ## 0.20.0
 
-- BREAKING: Default images now use `posit/connect` instead of `ghcr.io/rstudio/rstudio-connect`
-- BREAKING: Image tag format changed from `{os}{version}` (e.g. `ubuntu2204-2026.03.1`) to `{version}-{os}` (e.g. `2026.03.1-ubuntu-24.04`)
-- BREAKING: `image.tagPrefix` replaced by `image.os`; `launcher.defaultInitContainer.tagPrefix` replaced by `launcher.defaultInitContainer.os`
-- Default content runtime images updated to `posit/connect-content` with current R, Python, and Quarto versions
+- BREAKING:
+  - Default images now use `posit/connect` instead of `ghcr.io/rstudio/rstudio-connect`
+  - Image tag format changed from `{os}{version}` (e.g. `ubuntu2204-2026.03.1`) to `{version}-{os}` (e.g. `2026.03.1-ubuntu-24.04`)
+  - `image.tagPrefix` replaced by `image.os`; `launcher.defaultInitContainer.tagPrefix` replaced by `launcher.defaultInitContainer.os`
+  - Remove `launcher.customRuntimeYaml` and `launcher.additionalRuntimeImages`, along with the bundled `default-runtime.yaml` / `default-runtime-pro.yaml` files. Use `executionEnvironments` for declarative management of execution environments.
+- Default Quarto executable path for Local Execution updated to `/usr/local/bin/quarto`
 
 ## 0.9.2
 
