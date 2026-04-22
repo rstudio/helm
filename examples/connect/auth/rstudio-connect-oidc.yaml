@@ -16,9 +16,6 @@ sharedStorage:
   requests:
     storage: 100G
 
-launcher:
-  enabled: true # Required for Off-Host Execution mode
-
 # The config section overwrites values in Posit Connect's main
 # .gcfg configuration file.
 config:

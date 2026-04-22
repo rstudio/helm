@@ -15,5 +15,16 @@ These settings are recommend for most deployments and are described below:
 
 {{< include ../_prereqs.qmd >}}
 
+## Kubernetes
+
+Recommended for Connect 2026.04.0 and later.
+
+```{.yaml include="rstudio-connect-recommended-app-config-kubernetes.yaml" filename="values.yaml"}
+```
+
+## Launcher
+
+For Connect versions older than 2026.04.0.
+
 ```{.yaml include="rstudio-connect-recommended-app-config.yaml" filename="values.yaml"}
 ```

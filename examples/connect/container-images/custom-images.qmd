@@ -8,13 +8,26 @@ This example deploys Posit Connect using custom images instead of the default pu
 
 There are a minimum of three images that Connect requires to function in Off-Host Execution mode. They are listed below with their cooresponding default public repositories.
 
-- Connect service container [rstudio/rstudio-connect](https://hub.docker.com/r/rstudio/rstudio-connect)
-- Content container [rstudio/content-base](https://hub.docker.com/r/rstudio/content-base)
-- Content init container [rstudio/rstudio-connect-content-init](https://hub.docker.com/r/rstudio/rstudio-connect-content-init)
+- Connect service container [posit/connect](https://hub.docker.com/r/posit/connect)
+- Content container [posit/connect-content](https://hub.docker.com/r/posit/connect-content)
+- Content init container [posit/connect-content-init](https://hub.docker.com/r/posit/connect-content-init)
   
-There are several content contents listed as execution enviornments by default on initial Connect startup based on the listing in the [default-runtime.yaml](https://github.com/rstudio/helm/blob/main/charts/rstudio-connect/default-runtime.yaml) file. Setting `customRuntimeYaml` will instead use the execution environments defined in that section instead of the default ones. Additional content containers may be added to provide more R, Python and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
+Additional content containers may be added to provide more R, Python, and Quarto versions and other system dependencies. See the [Content Execution Environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) section in the Connect Admin Guide for more details.
 
 {{< include ../_prereqs.qmd >}}
+
+## Kubernetes
+
+Recommended for Connect 2026.04.0 and later.
+
+Define content images with `executionEnvironments`. Changes take effect on every `helm upgrade` without requiring a pod restart or database reset.
+
+```{.yaml include="rstudio-connect-custom-image-kubernetes.yaml" filename="values.yaml"}
+```
+
+## Launcher
+
+For Connect versions older than 2026.04.0.
 
 ```{.yaml include="rstudio-connect-custom-image.yaml" filename="values.yaml"}
 ```
