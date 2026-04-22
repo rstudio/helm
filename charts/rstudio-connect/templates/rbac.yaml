@@ -94,6 +94,12 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - "events"
+    verbs:
+      - "list"
+  - apiGroups:
+      - ""
+    resources:
       - "pods/attach"
     verbs:
       - "create"

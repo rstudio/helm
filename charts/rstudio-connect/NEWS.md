@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2
+
+- Add `events: list` permission to the direct Kubernetes runner Role. Connect 2026.04.0 lists events in the target namespace when a content pod fails to start and the failure reason cannot be determined from pod conditions.
+
 ## 0.9.1
 
 - Remove the default values for `launcher.customRuntimeYaml`. This configuration has been replaced by the `executionEnvironments` configuration which provides a mechanism for [managing execution environments declaratively](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management) and is better suited for IaC.
