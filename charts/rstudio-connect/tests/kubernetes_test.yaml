@@ -429,6 +429,12 @@ tests:
           path: rules
           content:
             apiGroups: [""]
+            resources: ["events"]
+            verbs: ["list"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
             resources: ["services"]
             verbs: ["create", "get", "list", "watch"]
       - contains:
