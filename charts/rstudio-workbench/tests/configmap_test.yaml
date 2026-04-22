@@ -121,7 +121,7 @@ tests:
           pattern: "launcher-positron-init-container-enabled=1"
       - matchRegex:
           path: data["rserver.conf"]
-          pattern: "launcher-positron-init-container-image-name=posit/workbench-positron-init"
+          pattern: "launcher-positron-init-container-image-name=rstudio/workbench-positron-init"
       - matchRegex:
           path: data["rserver.conf"]
           pattern: "launcher-positron-init-container-image-tag=2026.03.0-213"
@@ -188,3 +188,24 @@ tests:
       - notMatchRegex:
           path: data["rserver.conf"]
           pattern: "launcher-positron-init-container"
+
+  # -- Positron: positron.conf exe
+  - it: should set positron.conf exe to init container path when version is set
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - matchRegex:
+          path: data["positron.conf"]
+          pattern: "exe=/usr/lib/rstudio-server/bin/positron-server/2026\\.03\\.0/bin/positron-server/bundled/bin/positron-server"
+
+  - it: should not set positron.conf exe when version is empty
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["positron.conf"]
+          pattern: "^exe="

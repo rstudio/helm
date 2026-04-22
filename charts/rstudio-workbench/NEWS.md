@@ -10,6 +10,9 @@
   of a Workbench release. A default Positron version is already delivered by the
   `workbench-session-init` container. Set `components.positron.version` to
   override it with a specific version
+- When `components.positron.version` is set, automatically point `positron.conf`
+  `exe` at the binary delivered by the Positron init container so the Workbench
+  pod serves the same Positron version (and docs) as session pods
 
 ## 0.10.15
 

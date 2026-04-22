@@ -62,6 +62,13 @@
   {{- end }}
 {{- end }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
+{{- /* Point positron.conf exe at the version delivered by the positron init container
+    so the Workbench pod uses the same Positron version (and docs) as session pods. */}}
+{{- $defaultPositronConfValues := dict }}
+{{- if and .Values.launcher.enabled .Values.components.enabled .Values.components.positron.version }}
+  {{- $_ := set $defaultPositronConfValues "exe" (printf "/usr/lib/rstudio-server/bin/positron-server/%s/bin/positron-server/bundled/bin/positron-server" .Values.components.positron.version) }}
+{{- end }}
+{{- $defaultPositronConfig := dict "positron.conf" ($defaultPositronConfValues) }}
 {{- $defaultLauncherK8sConfigValues := dict "kubernetes-namespace" (default $.Release.Namespace .Values.launcher.namespace) }}
 {{- if .Values.launcher.useTemplates }}
   {{- $defaultLauncherK8sConfigValues = mergeOverwrite $defaultLauncherK8sConfigValues (dict "use-templating" 1) }}
@@ -82,6 +89,7 @@ data:
   {{- $overrideDict = mergeOverwrite $licenseServerConf $overrideDict }}
 {{- end }}
 {{- $overrideDict = mergeOverwrite $defaultRServerConfig $overrideDict }}
+{{- $overrideDict = mergeOverwrite $defaultPositronConfig $overrideDict }}
 {{- /* default metrics / prometheus configuration */}}
   {{- if .Values.prometheus.enabled }}
     {{- if .Values.prometheus.legacy }}

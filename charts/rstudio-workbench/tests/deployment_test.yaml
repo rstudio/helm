@@ -741,7 +741,7 @@ tests:
           path: 'spec.template.spec.initContainers[?(@.name=="positron-init")]'
       - equal:
           path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].image'
-          value: "posit/workbench-positron-init:2026.03.0-213"
+          value: "rstudio/workbench-positron-init:2026.03.0-213"
       - equal:
           path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].env[0].name'
           value: "PWB_POSITRON_TARGET"
@@ -777,7 +777,7 @@ tests:
     asserts:
       - equal:
           path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].image'
-          value: "posit/workbench-positron-init:custom-build-abc123"
+          value: "rstudio/workbench-positron-init:custom-build-abc123"
 
   - it: should use custom positron image repository in init container
     template: deployment.yaml
