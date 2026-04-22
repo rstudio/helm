@@ -29,7 +29,14 @@ If you haven't customized `launcher.templateValues`, the minimal upgrade is a si
 ## Important notes
 
 :::{.callout-important}
-The direct Kubernetes runner requires content service accounts to have the `connect.posit.co/service-account=true` label. Apply this label to any service account that content should be allowed to use, including the default and any custom service accounts set via `serviceAccountName` in the job base:
+The direct Kubernetes runner requires content service accounts to have the `connect.posit.co/service-account=true` label.
+
+When the chart creates the service account (`rbac.serviceAccount.create: true`, the default), it applies this label automatically — no manual step required.
+
+You only need to apply the label manually with `kubectl` when the chart does not manage the service account:
+
+- `rbac.serviceAccount.create: false` (you bring your own service account), or
+- a different service account is pinned via `serviceAccountName` in `backends.kubernetes.defaultResourceJobBase.spec.template.spec`.
 
 ```bash
 kubectl label sa <service-account-name> connect.posit.co/service-account=true -n <namespace>

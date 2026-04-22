@@ -1126,3 +1126,92 @@ tests:
       - matchRegex:
           path: data["job.yaml"]
           pattern: "name: connect-content"
+
+  # Test: chart auto-applies connect.posit.co/service-account=true on the SA it manages
+  # so content jobs launch without users needing to label the SA manually.
+  # Template order without clusterRoleCreate: SA(0), Role(1), RoleBinding(2)
+  - it: should auto-apply connect.posit.co/service-account label on chart-managed SA
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      rbac:
+        create: true
+        clusterRoleCreate: false
+        serviceAccount:
+          create: true
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: ServiceAccount
+      - equal:
+          path: metadata.labels["connect.posit.co/service-account"]
+          value: "true"
+
+  - it: should preserve user-provided labels alongside auto-applied label
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      rbac:
+        create: true
+        clusterRoleCreate: false
+        serviceAccount:
+          create: true
+          labels:
+            team: data-science
+            environment: prod
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: ServiceAccount
+      - equal:
+          path: metadata.labels["connect.posit.co/service-account"]
+          value: "true"
+      - equal:
+          path: metadata.labels.team
+          value: data-science
+      - equal:
+          path: metadata.labels.environment
+          value: prod
+
+  - it: should let user-provided label override auto-applied connect.posit.co/service-account
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      rbac:
+        create: true
+        clusterRoleCreate: false
+        serviceAccount:
+          create: true
+          labels:
+            connect.posit.co/service-account: "false"
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: ServiceAccount
+      - equal:
+          path: metadata.labels["connect.posit.co/service-account"]
+          value: "false"
+
+  - it: should not render a ServiceAccount when rbac.serviceAccount.create is false (no label to apply)
+    template: rbac.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      rbac:
+        create: true
+        clusterRoleCreate: false
+        serviceAccount:
+          create: false
+          name: byo-sa
+    asserts:
+      - hasDocuments:
+          count: 2 # Role + RoleBinding, no SA
+      - isKind:
+          of: Role
+        documentIndex: 0
+      - isKind:
+          of: RoleBinding
+        documentIndex: 1

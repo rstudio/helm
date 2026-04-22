@@ -49,6 +49,8 @@ subjects:
     namespace: {{ $namespace }}
 {{- end }}
 {{- if $serviceAccountCreate }}
+{{- /* Content jobs will not launch unless the SA has connect.posit.co/service-account=true, so the chart applies it automatically on the SA it manages. User-provided labels win on conflict. */}}
+{{- $mergedLabels := merge (deepCopy ($serviceAccountLabels | default dict)) (dict "connect.posit.co/service-account" "true") }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -59,10 +61,8 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $serviceAccountLabels }}
   labels:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- toYaml $mergedLabels | nindent 4 }}
 {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2
+
+- Auto-apply the `connect.posit.co/service-account=true` label on the chart-managed service account when `backends.kubernetes.enabled: true` and `rbac.serviceAccount.create: true`. The direct Kubernetes runner requires this label to launch content jobs; applying it automatically avoids a common gotcha. User-provided labels under `rbac.serviceAccount.labels` still apply alongside and win on conflict. Users bringing their own service account or pinning a different SA via `defaultResourceJobBase.spec.template.spec.serviceAccountName` must still apply the label manually.
+
 ## 0.9.1
 
 - Remove the default values for `launcher.customRuntimeYaml`. This configuration has been replaced by the `executionEnvironments` configuration which provides a mechanism for [managing execution environments declaratively](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management) and is better suited for IaC.
