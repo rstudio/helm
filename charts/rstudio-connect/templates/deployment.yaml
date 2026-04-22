@@ -208,9 +208,11 @@ spec:
           {{- end }}
           {{- end }}
           {{- if .Values.launcher.enabled }}
+          {{- if include "rstudio-connect.runtimeYaml" . }}
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/runtime.yaml"
             subPath: "runtime.yaml"
+          {{- end }}
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf"
             subPath: "launcher.kubernetes.profiles.conf"

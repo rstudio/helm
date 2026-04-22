@@ -26,8 +26,11 @@ data:
 {{- end }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
 {{- if .Values.launcher.enabled }}
+  {{- $runtimeYamlContent := include "rstudio-connect.runtimeYaml" . }}
+  {{- if $runtimeYamlContent }}
   runtime.yaml: |
-    {{- include "rstudio-connect.runtimeYaml" . | nindent 4 }}
+    {{- $runtimeYamlContent | nindent 4 }}
+  {{- end }}
   {{- /* configuration for job customization (also used below) */ -}}
     {{- /* 1 - volume */ -}}
       {{- $emptyRscVolume := dict "name" ("rsc-volume") "emptydir" (dict) }}

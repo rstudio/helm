@@ -71,7 +71,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- /* default launcher configuration */}}
   {{- if .Values.launcher.enabled }}
     {{- $namespace := default $.Release.Namespace .Values.launcher.namespace }}
-    {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf") }}
+    {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf") }}
+    {{- if include "rstudio-connect.runtimeYaml" . }}
+      {{- $_ := set $launcherSettingsDict "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") }}
+    {{- end }}
     {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $launcherSettingsDict "DataDirPVCName" $dataDirPVCName }}
@@ -142,7 +145,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     the end of the runtimeImages file is still in the context of the "images" key
 */}}
 {{- define "rstudio-connect.runtimeYaml" -}}
-  {{- $runtimeYaml := deepCopy .Values.launcher.customRuntimeYaml }}
+  {{- $runtimeYaml := deepCopy (.Values.launcher.customRuntimeYaml | default "") }}
   {{- $additionalImages := deepCopy .Values.launcher.additionalRuntimeImages }}
   {{- if kindIs "string" $runtimeYaml }}
     {{- if eq $runtimeYaml "pro" }}
@@ -165,10 +168,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $_ := set $runtimeYaml "images" (append $runtimeYaml.images $additionalImages) }}
     {{- end }}
     {{- toYaml $runtimeYaml }}
-  {{- else }}
-    {{- /* falsy or catch-all */ -}}
-    {{- .Files.Get "default-runtime.yaml" }}
-    {{- include "rstudio-connect.additionalImagesString" $additionalImages }}
   {{- end }}
 {{- end -}}
 
