@@ -13,6 +13,9 @@
 - When `components.positron.version` is set, automatically point `positron.conf`
   `exe` at the binary delivered by the Positron init container so the Workbench
   pod serves the same Positron version (and docs) as session pods
+- Warn when `components.enabled=true` is combined with
+  `session.image.repository: rstudio/r-session-complete`, since the init
+  containers deliver components already baked into that image
 
 ## 0.10.15
 
