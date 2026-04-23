@@ -67,7 +67,7 @@
     Path assumes the subPath mounts from _helpers.tpl; init container source:
     posit-dev/images-workbench → workbench-positron-init. */}}
 {{- $defaultPositronConfValues := dict }}
-{{- if and .Values.components.enabled .Values.components.positron.version }}
+{{- if (include "rstudio-workbench.positronInitEnabled" .) }}
   {{- $_ := set $defaultPositronConfValues "exe" (printf "/usr/lib/rstudio-server/bin/positron-server/%s/bin/positron-server" .Values.components.positron.version) }}
 {{- end }}
 {{- $defaultPositronConfig := dict "positron.conf" ($defaultPositronConfValues) }}

@@ -188,7 +188,7 @@ containers:
       mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
       subPath: "service.tpl"
     {{- end }}
-    {{- if and .Values.components.enabled .Values.components.positron.version }}
+    {{- if (include "rstudio-workbench.positronInitEnabled" .) }}
     {{- /* The positron-init container (posit-dev/images-workbench → workbench-positron-init)
         lays files out at the volume root: bin/positron-server/bundled/ (binary) and
         docs/positron/ (docs). subPath-mount those into the layout Positron expects,
@@ -428,7 +428,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" .}}-templates
     defaultMode: {{ .Values.config.defaultMode.server }}
 {{- end }}
-{{- if and .Values.components.enabled .Values.components.positron.version }}
+{{- if (include "rstudio-workbench.positronInitEnabled" .) }}
 - name: positron-components
   emptyDir: {}
 {{- end }}
@@ -628,4 +628,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
+{{- end -}}
+
+{{/*
+Gate for attaching the Positron init container to the Workbench pod.
+Renders "true" when enabled, "" otherwise, so callers can use it in
+`if (include ...)` and compose it with `or` in larger conditions.
+*/}}
+{{- define "rstudio-workbench.positronInitEnabled" -}}
+{{- if and .Values.components.enabled .Values.components.positron.version -}}
+true
+{{- end -}}
 {{- end -}}
