@@ -5,6 +5,8 @@
 
 - **BREAKING**: Change default session image from `rstudio/r-session-complete` to `rstudio/workbench-session` and enable session component delivery via init containers by default.
   Set `components.enabled: false` and `session.image.repository: rstudio/r-session-complete` to restore the previous behavior
+- **BREAKING**: The chart now manages the `rserver.conf` `launcher-sessions-auto-update` key when `components.enabled: true` and `launcher.enabled: true`.
+  Remove any manual `config.server.'rserver.conf'.launcher-sessions-auto-update` override to avoid duplicate configuration
 - Add top-level `components` key for configuring session component init containers
 - Add `components.positron` for updating the Positron IDE version independently
   of a Workbench release. A default Positron version is already delivered by the

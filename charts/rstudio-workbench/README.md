@@ -174,11 +174,28 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 ## Session images
 
-By default, session pods use the `rstudio/workbench-session` image with an init container
-(`rstudio/workbench-session-init`) that delivers Workbench session components at pod startup.
+By default, session pods use the `rstudio/workbench-session` image with an init
+container (`rstudio/workbench-session-init`) that delivers Workbench session
+components at pod startup.
 
-To use the classic all-in-one `r-session-complete` image instead (which bundles all components
-into a single image), disable session components and change the session image:
+### Upgrading from 0.10.x
+
+Chart defaults require no additional configuration.
+
+If you pin `session.image.repository: rstudio/r-session-complete`, also set
+`components.enabled: false` to preserve the previous behavior.
+
+If you adopt the init-container pattern with a custom session image, confirm
+that the image does not already include Workbench session components (only
+language runtimes, system tools, and similar dependencies). Otherwise, the init
+container repeats work that the image already performs.
+
+For platform-level upgrade steps, see the [Posit Workbench administrator guide](https://docs.posit.co/ide/server-pro/).
+
+### All-in-one image
+
+To use the `r-session-complete` image (which packages all components into a
+single image), disable session components and change the session image:
 
 ```yaml
 session:
@@ -190,10 +207,10 @@ components:
 
 ### Positron
 
-Positron IDE is available by default. The `workbench-session-init` container delivers
-a bundled Positron version alongside other session components.
+Positron IDE is available by default. The `workbench-session-init` container
+delivers a bundled Positron version alongside other session components.
 
-To update Positron independently of a Workbench release, set a version under
+To upgrade Positron independently of a Workbench release, set a version under
 `components.positron`:
 
 ```yaml
@@ -202,8 +219,12 @@ components:
     version: "2026.03.0"
 ```
 
-This attaches a separate init container that delivers the specified Positron version
-and its documentation, overriding the bundled version.
+This attaches a separate init container that delivers the specified Positron
+version and its documentation, overriding the bundled version.
+
+Changing `components.positron.version` updates the init container spec on the
+Workbench pod and triggers a pod rollout. This is not a zero-downtime,
+session-only operation.
 
 ## General principles
 
