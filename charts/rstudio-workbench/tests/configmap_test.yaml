@@ -236,3 +236,23 @@ tests:
       - notMatchRegex:
           path: data["positron.conf"]
           pattern: "^exe="
+
+  - it: should render no session components when disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      components:
+        enabled: false
+      session:
+        image:
+          repository: "rstudio/r-session-complete"
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-(auto-update|init-container)"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-positron-init-container"
+      - notMatchRegex:
+          path: data["positron.conf"]
+          pattern: "^exe="

@@ -849,3 +849,22 @@ tests:
           content:
             name: "positron-components"
           any: true
+
+  - it: should not add positron volume or volume mount when components are disabled
+    template: deployment.yaml
+    set:
+      components:
+        enabled: false
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "positron-components"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "positron-components"
+          any: true
