@@ -189,8 +189,16 @@ containers:
       subPath: "service.tpl"
     {{- end }}
     {{- if and .Values.components.enabled .Values.components.positron.version }}
+    {{- /* The positron-init container (posit-dev/images-workbench → workbench-positron-init)
+        lays files out at the volume root: bin/positron-server/bundled/ (binary) and
+        docs/positron/ (docs). subPath-mount those into the layout Positron expects,
+        so `exe` stays shallow and docs auto-discover at <exe_parent_parent>/docs. */}}
     - name: positron-components
       mountPath: {{ printf "/usr/lib/rstudio-server/bin/positron-server/%s" .Values.components.positron.version | quote }}
+      subPath: bin/positron-server/bundled
+    - name: positron-components
+      mountPath: {{ printf "/usr/lib/rstudio-server/bin/positron-server/%s/docs" .Values.components.positron.version | quote }}
+      subPath: docs/positron
     {{- end }}
     {{- if .Values.pod.volumeMounts }}
     {{- toYaml .Values.pod.volumeMounts | nindent 4 }}
