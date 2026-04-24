@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           fetch-depth: 0
 
@@ -21,21 +21,21 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2  # v5.0.0
 
       - name: Add rstudio helm repo
         run: helm repo add rstudio https://helm.rstudio.com
 
       # Uses the default cr.yaml config file in the repository
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1
+        uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f  # v1.7.0
         with:
           skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Run chart-releaser (other)
-        uses: helm/chart-releaser-action@v1
+        uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f  # v1.7.0
         with:
           charts_dir: other-charts
           skip_existing: true
@@ -44,7 +44,7 @@ jobs:
 
       - name: Notify Slack of chart release failure
         if: failure()
-        uses: slackapi/slack-github-action@v1.27.0
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
         with:
           payload-delimiter: "_"
           payload: |

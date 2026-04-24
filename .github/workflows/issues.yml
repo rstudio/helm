@@ -36,7 +36,7 @@ jobs:
       - name: Generate token for GitHub App
         id: generate-token
         if: steps.project-url.outputs.project != 'none'
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3  # v3.1.1
         with:
           app-id: ${{ secrets.POSIT_PLATFORM_APP_ID }}
           private-key: ${{ secrets.POSIT_PLATFORM_PEM }}
@@ -44,7 +44,7 @@ jobs:
       - name: Add issue to project
         id: add-to-project
         if: steps.project-url.outputs.project != 'none'
-        uses: actions/add-to-project@v1.0.2
+        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e  # v1.0.2
         with:
           project-url: ${{ steps.project-url.outputs.PROJECT }}
           github-token: ${{ steps.generate-token.outputs.token }}
