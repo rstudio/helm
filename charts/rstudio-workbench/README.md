@@ -180,10 +180,16 @@ components at pod startup.
 
 ### Upgrading from 0.10.x
 
-Chart defaults require no additional configuration.
+Chart defaults require no additional configuration, but the default
+`session.image.tag` now pins an explicit R/Python matrix (see `values.yaml`)
+because `rstudio/workbench-session` does not publish Workbench-version-shaped
+tags. Review the pinned tag against
+[hub.docker.com/r/rstudio/workbench-session/tags](https://hub.docker.com/r/rstudio/workbench-session/tags)
+during each Workbench upgrade.
 
 If you pin `session.image.repository: rstudio/r-session-complete`, also set
-`components.enabled: false` to preserve the previous behavior.
+`components.enabled: false` to preserve the previous behavior. The
+`r-session-complete` tag format (`<tagPrefix><appVersion>`) still works there.
 
 If you adopt the init-container pattern with a custom session image, confirm
 that the image does not already include Workbench session components (only
@@ -762,8 +768,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | session.defaultHomeMount | bool | `true` | Whether to automatically add the homeStorage PVC to the session (i.e. via the `launcher-mounts` file) |
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
 | session.image.repository | string | `"rstudio/workbench-session"` | The repository to use for the session image |
-| session.image.tag | string | `""` | A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}` |
-| session.image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined |
+| session.image.tag | string | `"ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11"` | A tag override for the session image. Pinned to an explicit R/Python matrix because `rstudio/workbench-session` publishes tags by language runtime version, not by Workbench release (unlike `rstudio/r-session-complete`). Pick a published tag from https://hub.docker.com/r/rstudio/workbench-session/tags. |
+| session.image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined. The `rstudio/workbench-session` default repository does not publish tags in `{{ tagPrefix }}{{ appVersion }}` form — see the pinned tag below — so `tagPrefix` is effectively unused for the default session image. |
 | shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |

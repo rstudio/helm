@@ -126,10 +126,16 @@ components at pod startup.
 
 ### Upgrading from 0.10.x
 
-Chart defaults require no additional configuration.
+Chart defaults require no additional configuration, but the default
+`session.image.tag` now pins an explicit R/Python matrix (see `values.yaml`)
+because `rstudio/workbench-session` does not publish Workbench-version-shaped
+tags. Review the pinned tag against
+[hub.docker.com/r/rstudio/workbench-session/tags](https://hub.docker.com/r/rstudio/workbench-session/tags)
+during each Workbench upgrade.
 
 If you pin `session.image.repository: rstudio/r-session-complete`, also set
-`components.enabled: false` to preserve the previous behavior.
+`components.enabled: false` to preserve the previous behavior. The
+`r-session-complete` tag format (`<tagPrefix><appVersion>`) still works there.
 
 If you adopt the init-container pattern with a custom session image, confirm
 that the image does not already include Workbench session components (only

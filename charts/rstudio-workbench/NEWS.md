@@ -5,6 +5,11 @@
 
 - **BREAKING**: Change default session image from `rstudio/r-session-complete` to `rstudio/workbench-session` and enable session component delivery via init containers by default.
   Set `components.enabled: false` and `session.image.repository: rstudio/r-session-complete` to restore the previous behavior
+- **BREAKING**: `session.image.tag` is now pinned to an explicit R/Python matrix tag because
+  `rstudio/workbench-session` publishes tags by language runtime (not by Workbench release), so
+  the previous `{{ tagPrefix }}{{ appVersion }}` fallback no longer resolves to a valid tag.
+  Chart upgrades no longer roll the session R/Python versions forward automatically — review
+  `session.image.tag` alongside Workbench upgrades
 - **BREAKING**: The chart now manages the `rserver.conf` `launcher-sessions-auto-update` key when `components.enabled: true` and `launcher.enabled: true`.
   Remove any manual `config.server.'rserver.conf'.launcher-sessions-auto-update` override to avoid duplicate configuration
 - Add top-level `components` key for configuring session component init containers

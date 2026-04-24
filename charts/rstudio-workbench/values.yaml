@@ -21,12 +21,17 @@ session:
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
-    # -- A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined
+    # -- A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined.
+    # The `rstudio/workbench-session` default repository does not publish tags in `{{ tagPrefix }}{{ appVersion }}`
+    # form — see the pinned tag below — so `tagPrefix` is effectively unused for the default session image.
     tagPrefix: ubuntu2204-
     # -- The repository to use for the session image
     repository: "rstudio/workbench-session"
-    # -- A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}`
-    tag: ""
+    # -- A tag override for the session image. Pinned to an explicit R/Python matrix because
+    # `rstudio/workbench-session` publishes tags by language runtime version, not by Workbench release
+    # (unlike `rstudio/r-session-complete`). Pick a published tag from
+    # https://hub.docker.com/r/rstudio/workbench-session/tags.
+    tag: "ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11"
 
 # -- Session component delivery via init containers. When enabled (default), the chart
 # configures rserver.conf so the launcher injects init containers into session pods at startup.
