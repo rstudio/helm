@@ -62,13 +62,11 @@
   {{- end }}
 {{- end }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
-{{- /* Point positron.conf exe at the version delivered by the positron init container
-    so the Workbench pod uses the same Positron version (and docs) as session pods.
-    Path assumes the subPath mounts from _helpers.tpl; init container source:
-    posit-dev/images-workbench → workbench-positron-init. */}}
+{{- /* Point positron.conf exe at the binary delivered by the positron init container
+    so the Workbench pod serves the same Positron version (and docs) as session pods. */}}
 {{- $defaultPositronConfValues := dict }}
 {{- if (include "rstudio-workbench.positronInitEnabled" .) }}
-  {{- $_ := set $defaultPositronConfValues "exe" (printf "/usr/lib/rstudio-server/bin/positron-server/%s/bin/positron-server" .Values.components.positron.version) }}
+  {{- $_ := set $defaultPositronConfValues "exe" (printf "%s/bin/positron-server" (include "rstudio-workbench.positronMountPath" .)) }}
 {{- end }}
 {{- $defaultPositronConfig := dict "positron.conf" ($defaultPositronConfValues) }}
 {{- $defaultLauncherK8sConfigValues := dict "kubernetes-namespace" (default $.Release.Namespace .Values.launcher.namespace) }}

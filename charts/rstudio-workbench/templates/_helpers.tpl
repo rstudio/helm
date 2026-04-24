@@ -189,15 +189,12 @@ containers:
       subPath: "service.tpl"
     {{- end }}
     {{- if (include "rstudio-workbench.positronInitEnabled" .) }}
-    {{- /* The positron-init container (posit-dev/images-workbench → workbench-positron-init)
-        lays files out at the volume root: bin/positron-server/bundled/ (binary) and
-        docs/positron/ (docs). subPath-mount those into the layout Positron expects,
-        so `exe` stays shallow and docs auto-discover at <exe_parent_parent>/docs. */}}
+    {{- /* subPath and exe paths mirror posit-dev/images-workbench/workbench-positron-init */}}
     - name: positron-components
-      mountPath: {{ printf "/usr/lib/rstudio-server/bin/positron-server/%s" .Values.components.positron.version | quote }}
+      mountPath: {{ include "rstudio-workbench.positronMountPath" . | quote }}
       subPath: bin/positron-server/bundled
     - name: positron-components
-      mountPath: {{ printf "/usr/lib/rstudio-server/bin/positron-server/%s/docs" .Values.components.positron.version | quote }}
+      mountPath: {{ printf "%s/docs" (include "rstudio-workbench.positronMountPath" .) | quote }}
       subPath: docs/positron
     {{- end }}
     {{- if .Values.pod.volumeMounts }}
@@ -438,6 +435,30 @@ volumes:
 {{- end }}
 
 {{/*
+Gate for attaching the Positron init container to the Workbench pod.
+Renders "true" when enabled, "" otherwise, so callers can use it in
+`if (include ...)` and compose it with `or` in larger conditions.
+*/}}
+{{- define "rstudio-workbench.positronInitEnabled" -}}
+{{- if and .Values.components.enabled .Values.components.positron.version -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Versioned mount path for Positron on the Workbench pod. The positron-init
+container (posit-dev/images-workbench → workbench-positron-init) writes
+artifacts to /mnt/init at fixed subpaths; subPath mounts and the
+positron.conf `exe` in configmap-general.yaml derive from this path.
+Returns empty when the gate is off, so callers compose safely.
+*/}}
+{{- define "rstudio-workbench.positronMountPath" -}}
+{{- if (include "rstudio-workbench.positronInitEnabled" .) -}}
+{{- printf "/usr/lib/rstudio-server/bin/positron-server/%s" .Values.components.positron.version -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "rstudio-workbench.chart" -}}
@@ -628,15 +649,4 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
-{{- end -}}
-
-{{/*
-Gate for attaching the Positron init container to the Workbench pod.
-Renders "true" when enabled, "" otherwise, so callers can use it in
-`if (include ...)` and compose it with `or` in larger conditions.
-*/}}
-{{- define "rstudio-workbench.positronInitEnabled" -}}
-{{- if and .Values.components.enabled .Values.components.positron.version -}}
-true
-{{- end -}}
 {{- end -}}
