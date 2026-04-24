@@ -1,0 +1,48 @@
+suite: Connect Deprecated Keys
+templates:
+  - NOTES.txt
+tests:
+  - it: should fail when launcher.customRuntimeYaml is set
+    set:
+      launcher:
+        enabled: true
+        customRuntimeYaml: "base"
+      sharedStorage:
+        create: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "launcher.customRuntimeYaml.*has been removed.*executionEnvironments"
+
+  - it: should fail when launcher.additionalRuntimeImages is set
+    set:
+      launcher:
+        enabled: true
+        additionalRuntimeImages:
+          - name: ghcr.io/my-org/content-base:r4.4.0-py3.11.3-jammy
+      sharedStorage:
+        create: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "launcher.additionalRuntimeImages.*has been removed.*executionEnvironments"
+
+  - it: should fail when image.tagPrefix is set
+    set:
+      image:
+        tagPrefix: "ubuntu2204-"
+      sharedStorage:
+        create: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "image.tagPrefix.*has been removed.*image.os"
+
+  - it: should fail when launcher.defaultInitContainer.tagPrefix is set
+    set:
+      launcher:
+        enabled: true
+        defaultInitContainer:
+          tagPrefix: "ubuntu2204-"
+      sharedStorage:
+        create: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "launcher.defaultInitContainer.tagPrefix.*has been removed.*launcher.defaultInitContainer.os"

@@ -139,8 +139,8 @@ can be set and the release can be upgraded to include the new value.
 
 This chart supports [declarative management of execution environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management)
 via `ExecutionEnvironments.ConfigFilePath`. Requires Connect version 2026.03.0 or later.
-Unlike the legacy `launcher.customRuntimeYaml`, changes to `executionEnvironments`
-take effect on every `helm upgrade` without requiring a pod restart or database reset.
+Changes to `executionEnvironments` take effect on every `helm upgrade` without
+requiring a pod restart or database reset.
 
 When `executionEnvironments` is set, the chart renders the list into a dedicated
 ConfigMap and mounts it into the Connect pod. Connect only manages the execution

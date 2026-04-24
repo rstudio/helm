@@ -1132,3 +1132,25 @@ tests:
       - matchRegex:
           path: data["job.yaml"]
           pattern: "name: connect-content"
+
+  - it: should set default prestart args when backends.kubernetes is enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - /scripts/prestart.bash
+            - /usr/local/bin/startup.sh
+
+  - it: should mount prestart script when backends.kubernetes is enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: "/scripts/"
