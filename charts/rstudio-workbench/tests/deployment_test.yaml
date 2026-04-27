@@ -728,3 +728,61 @@ tests:
     asserts:
       - exists:
           path: 'spec.template.spec.containers[?(@.name=="sidecarTest")]'
+  - it: should mount uv.toml to /etc/uv/uv.toml if config.session.uv.toml is defined
+    template: deployment.yaml
+    set:
+      config:
+        session:
+          uv.toml: |
+            [[index]]
+            url = "https://packagemanager.posit.co/pypi/latest/simple"
+            default = true
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "rstudio-session-config"
+            mountPath: "/etc/uv/uv.toml"
+            subPath: "uv.toml"
+          any: true
+  - it: should not mount uv.toml if config.session.uv.toml is not defined
+    template: deployment.yaml
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "rstudio-session-config"
+            mountPath: "/etc/uv/uv.toml"
+            subPath: "uv.toml"
+          any: true
+  - it: should include uv.toml in the session configmap
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          uv.toml: |
+            [[index]]
+            url = "https://packagemanager.posit.co/pypi/latest/simple"
+            default = true
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: data["uv.toml"]
+          pattern: 'packagemanager\.posit\.co'
+  - it: should include uv.toml volumeMount in launcher template when config.session.uv.toml is defined
+    template: configmap-general.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-rstudio-workbench-templates
+    set:
+      config:
+        session:
+          uv.toml: |
+            [[index]]
+            url = "https://packagemanager.posit.co/pypi/latest/simple"
+            default = true
+    asserts:
+      - matchRegex:
+          path: data["rstudio-library-templates-data.tpl"]
+          pattern: '/etc/uv/uv\.toml'

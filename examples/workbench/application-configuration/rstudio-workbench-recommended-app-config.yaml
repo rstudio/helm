@@ -50,6 +50,10 @@ config:
       "global":
         index-url: https://packagemanager.posit.co/pypi/latest/simple # TODO: Change this URL to point to your own Package Manager PyPI URL if desired
         trusted-host: packagemanager.posit.co # TODO: Change this to match the domain name specified in `index-url`. Do NOT include http:// or https://
+    uv.toml: |
+      [[index]]
+      url = "https://packagemanager.posit.co/pypi/latest/simple" # TODO: Change this URL to point to your own Package Manager PyPI URL if desired
+      default = true
   server:
     rserver.conf:
       admin-enabled: 1 # More information at https://docs.posit.co/ide/server-pro/server_management/administrative_dashboard.html

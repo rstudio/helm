@@ -219,6 +219,20 @@ pip can be configured with `config.session.pip.conf`:
           trusted-host: packagemanager.posit.co
   ```
 
+#### uv repositories
+
+[uv](https://docs.astral.sh/uv/) can be configured with `config.session.uv.toml`. When defined, the chart
+automatically mounts the file to `/etc/uv/uv.toml` on both the server and session pods:
+
+  ```yaml
+  config:
+    session:
+      uv.toml: |
+        [[index]]
+        url = "https://packagemanager.posit.co/pypi/latest/simple"
+        default = true
+  ```
+
 #### R repositories
 
 R package repositories can be configured with `config.session.repos.conf`:
