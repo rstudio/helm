@@ -49,7 +49,26 @@
 {{- $defaultIDEServiceName := include "rstudio-workbench.fullname" . }}
 {{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
 {{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
+{{- if and .Values.launcher.enabled .Values.components.enabled }}
+  {{- $initTag := .Values.components.sessionInit.image.tag | default $defaultVersion }}
+  {{- $_ := set $defaultRServerConfigValues "launcher-sessions-auto-update" 1 }}
+  {{- $_ := set $defaultRServerConfigValues "launcher-sessions-init-container-image-name" .Values.components.sessionInit.image.repository }}
+  {{- $_ := set $defaultRServerConfigValues "launcher-sessions-init-container-image-tag" $initTag }}
+  {{- if .Values.components.positron.version }}
+    {{- $positronTag := .Values.components.positron.image.tag | default .Values.components.positron.version }}
+    {{- $_ := set $defaultRServerConfigValues "launcher-positron-init-container-enabled" 1 }}
+    {{- $_ := set $defaultRServerConfigValues "launcher-positron-init-container-image-name" .Values.components.positron.image.repository }}
+    {{- $_ := set $defaultRServerConfigValues "launcher-positron-init-container-image-tag" $positronTag }}
+  {{- end }}
+{{- end }}
 {{- $defaultRServerConfig := dict "rserver.conf" ($defaultRServerConfigValues) }}
+{{- /* Point positron.conf exe at the binary delivered by the positron init container
+    so the Workbench pod serves the same Positron version (and docs) as session pods. */}}
+{{- $defaultPositronConfValues := dict }}
+{{- if (include "rstudio-workbench.positronInitEnabled" .) }}
+  {{- $_ := set $defaultPositronConfValues "exe" (printf "%s/bin/positron-server" (include "rstudio-workbench.positronMountPath" .)) }}
+{{- end }}
+{{- $defaultPositronConfig := dict "positron.conf" ($defaultPositronConfValues) }}
 {{- $defaultLauncherK8sConfigValues := dict "kubernetes-namespace" (default $.Release.Namespace .Values.launcher.namespace) }}
 {{- if .Values.launcher.useTemplates }}
   {{- $defaultLauncherK8sConfigValues = mergeOverwrite $defaultLauncherK8sConfigValues (dict "use-templating" 1) }}
@@ -70,6 +89,7 @@ data:
   {{- $overrideDict = mergeOverwrite $licenseServerConf $overrideDict }}
 {{- end }}
 {{- $overrideDict = mergeOverwrite $defaultRServerConfig $overrideDict }}
+{{- $overrideDict = mergeOverwrite $defaultPositronConfig $overrideDict }}
 {{- /* default metrics / prometheus configuration */}}
   {{- if .Values.prometheus.enabled }}
     {{- if .Values.prometheus.legacy }}

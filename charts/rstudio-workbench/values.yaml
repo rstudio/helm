@@ -21,12 +21,42 @@ session:
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
-    # -- A tag prefix for session images (common selections: ubuntu2204-, centos7-). Only used if tag is not defined
+    # -- A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined.
+    # The `rstudio/workbench-session` default repository does not publish tags in `{{ tagPrefix }}{{ appVersion }}`
+    # form — see the pinned tag below — so `tagPrefix` is effectively unused for the default session image.
     tagPrefix: ubuntu2204-
     # -- The repository to use for the session image
-    repository: "rstudio/r-session-complete"
-    # -- A tag override for the session image. Overrides the "tagPrefix" above, if set. Default tag is `{{ tagPrefix }}{{ version }}`
-    tag: ""
+    repository: "rstudio/workbench-session"
+    # -- A tag override for the session image. Pinned to an explicit R/Python matrix because
+    # `rstudio/workbench-session` publishes tags by language runtime version, not by Workbench release
+    # (unlike `rstudio/r-session-complete`). Pick a published tag from
+    # https://hub.docker.com/r/rstudio/workbench-session/tags.
+    tag: "ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11"
+
+# -- Session component delivery via init containers. When enabled (default), the chart
+# configures rserver.conf so the launcher injects init containers into session pods at startup.
+# Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete`
+# to use the classic all-in-one session image instead.
+components:
+  # -- Enable session component delivery via init containers. When false, no init containers
+  # are configured and session.image must be a self-contained image like r-session-complete.
+  enabled: true
+  sessionInit:
+    image:
+      # -- The repository for the session init container image
+      repository: "rstudio/workbench-session-init"
+      # -- A tag override for the session init container. Default tag is the chart appVersion (or versionOverride)
+      tag: ""
+  positron:
+    # -- A Positron version to enable the Positron init container for session pods.
+    # When set, configures rserver.conf with the Positron init container settings
+    # and attaches a Positron init container to the Workbench server pod.
+    version: ""
+    image:
+      # -- The image repository for the Positron init container
+      repository: "rstudio/workbench-positron-init"
+      # -- A tag override for the Positron init container image. Defaults to the positron version
+      tag: ""
 
 sharedStorage:
   # -- whether to create the persistentVolumeClaim for shared storage

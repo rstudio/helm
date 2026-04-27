@@ -53,6 +53,10 @@ Please consider removing this configuration value.
   {{- fail "\n\n`serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead"}}
 {{- end }}
 
+{{- if and .Values.components.enabled (eq .Values.session.image.repository "rstudio/r-session-complete") }}
+{{ print "\n\nWARNING: `components.enabled=true` is combined with `session.image.repository: rstudio/r-session-complete`. The init containers configured by `components.enabled` deliver session components that are already baked into `r-session-complete`, so this combination is likely unintended.\n\nEither:\n  - Keep the new default: `session.image.repository: rstudio/workbench-session` (with `components.enabled: true`), or\n  - Restore the previous behavior: set `components.enabled: false` along with `session.image.repository: rstudio/r-session-complete`." }}
+{{- end }}
+
 {{- if and (hasKey (get .Values.config.server "rserver.conf") "monitor-graphite-enabled") (not .Values.prometheus.legacy) }}
 
 {{- print "\n\n`config.server.'rserver/.conf'.monitor-graphite-enabled` is overwritten by `prometheus.legacy=false`. Internal Workbench Prometheus will be used instead." }}

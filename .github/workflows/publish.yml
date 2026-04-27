@@ -23,8 +23,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
-      - name: install Just
-        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3  # v4
+      - name: Install Just
+        uses: taiki-e/install-action@481c34c1cf3a84c68b5e46f4eccfc82af798415a  # v2.75.23
+        with:
+          tool: just@1.50.0
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@8a96df13519ee81fd526f2dfca5962811136661b  # v2.2.0

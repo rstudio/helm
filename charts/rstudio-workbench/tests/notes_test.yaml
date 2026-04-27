@@ -1,0 +1,36 @@
+suite: Workbench NOTES.txt
+templates:
+  - NOTES.txt
+tests:
+  - it: should warn when components.enabled=true with r-session-complete
+    set:
+      components:
+        enabled: true
+      session:
+        image:
+          repository: "rstudio/r-session-complete"
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING.*components\\.enabled=true.*r-session-complete"
+
+  - it: should not warn with new defaults (components.enabled=true + workbench-session)
+    set:
+      components:
+        enabled: true
+      session:
+        image:
+          repository: "rstudio/workbench-session"
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING.*components\\.enabled=true.*r-session-complete"
+
+  - it: should not warn with legacy opt-out (components.enabled=false + r-session-complete)
+    set:
+      components:
+        enabled: false
+      session:
+        image:
+          repository: "rstudio/r-session-complete"
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING.*components\\.enabled=true.*r-session-complete"

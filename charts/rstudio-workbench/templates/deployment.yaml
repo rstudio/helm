@@ -101,10 +101,20 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
-      {{- if or .Values.initContainers .Values.chronicleAgent.enabled }}
+      {{- if or .Values.initContainers .Values.chronicleAgent.enabled (include "rstudio-workbench.positronInitEnabled" .) }}
       initContainers:
         {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if (include "rstudio-workbench.positronInitEnabled" .) }}
+        - name: positron-init
+          image: "{{ .Values.components.positron.image.repository }}:{{ .Values.components.positron.image.tag | default .Values.components.positron.version }}"
+          env:
+            - name: PWB_POSITRON_TARGET
+              value: "positron,positron-docs"
+          volumeMounts:
+            - name: positron-components
+              mountPath: /mnt/init
         {{- end }}
         {{- if .Values.chronicleAgent.enabled }}
         - name: chronicle-agent
