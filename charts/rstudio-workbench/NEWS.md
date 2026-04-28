@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.10.16
+
+- Lower the default `revisionHistoryLimit` from `10` to `3` to prevent old ReplicaSets and their completed pods from accumulating across rolling updates. Operators can override via `revisionHistoryLimit` in values.
+
 ## 0.10.15
 
 - Bump Workbench version to 2026.04.0

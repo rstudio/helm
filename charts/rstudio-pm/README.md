@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.54](https://img.shields.io/badge/Version-0.5.54-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.5.55](https://img.shields.io/badge/Version-0.5.55-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.54:
+To install the chart with the release name `my-release` at version 0.5.55:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.54
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.55
 ```
 
 To explore other chart versions, look at:
@@ -246,6 +246,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
+| revisionHistoryLimit | int | `3` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | rootCheckIsFatal | bool | `true` | Whether the check for root accounts in the config file is fatal. This is meant to simplify migration to the new helm chart version. |
 | rstudioPMKey | bool | `false` | rstudioPMKey is the rstudio-pm key used for the RStudio Package Manager service |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |

@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.10.15](https://img.shields.io/badge/Version-0.10.15-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.10.16](https://img.shields.io/badge/Version-0.10.16-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.10.15:
+To install the chart with the release name `my-release` at version 0.10.16:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.15
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.10.16
 ```
 
 To explore other chart versions, look at:
@@ -680,7 +680,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/health-check","port":8787},"initialDelaySeconds":10,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |
-| revisionHistoryLimit | int | `10` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
+| revisionHistoryLimit | int | `3` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | sealedSecret.annotations | object | `{}` | annotations for SealedSecret resources |
 | sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
 | secureCookieKey | object | `{"existingSecret":"","value":""}` | global.secureCookieKey takes precedence over secureCookieKey |

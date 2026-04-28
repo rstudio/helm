@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3
+
+- Add `revisionHistoryLimit` value (default `3`) for the Connect deployment, exposing a knob to tune retained ReplicaSets and prevent old pods from accumulating across rolling updates.
+
 ## 0.9.2
 
 - Add `events: list` permission to the direct Kubernetes runner Role. Connect 2026.04.0 lists events in the target namespace when a content pod fails to start and the failure reason cannot be determined from pod conditions.

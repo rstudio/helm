@@ -372,7 +372,7 @@ tolerations: []
 podDisruptionBudget: {}
 
 # -- The revisionHistoryLimit to use for the pod deployment. Do not set to 0
-revisionHistoryLimit: 10
+revisionHistoryLimit: 3
 
 pod:
   # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
