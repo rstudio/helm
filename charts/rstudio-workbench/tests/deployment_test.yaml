@@ -728,3 +728,143 @@ tests:
     asserts:
       - exists:
           path: 'spec.template.spec.containers[?(@.name=="sidecarTest")]'
+
+  # -- Positron init container on server pod
+  - it: should add positron init container when version is set
+    template: deployment.yaml
+    set:
+      components:
+        positron:
+          version: "2026.03.0-213"
+    asserts:
+      - exists:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")]'
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].image'
+          value: "rstudio/workbench-positron-init:2026.03.0-213"
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].env[0].name'
+          value: "PWB_POSITRON_TARGET"
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].env[0].value'
+          value: "positron,positron-docs"
+
+  - it: should not add positron init container when version is empty
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")]'
+
+  - it: should not add positron init container when components are disabled
+    template: deployment.yaml
+    set:
+      components:
+        enabled: false
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")]'
+
+  - it: should use custom positron image tag in init container
+    template: deployment.yaml
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+          image:
+            tag: "custom-build-abc123"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].image'
+          value: "rstudio/workbench-positron-init:custom-build-abc123"
+
+  - it: should use custom positron image repository in init container
+    template: deployment.yaml
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+          image:
+            repository: "my-registry/positron-init"
+    asserts:
+      - equal:
+          path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].image'
+          value: "my-registry/positron-init:2026.03.0"
+
+  - it: should add positron binary mount to server container
+    template: deployment.yaml
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "positron-components"
+            mountPath: "/usr/lib/rstudio-server/bin/positron-server/2026.03.0"
+            subPath: "bin/positron-server/bundled"
+          any: true
+
+  - it: should add positron docs mount to server container
+    template: deployment.yaml
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "positron-components"
+            mountPath: "/usr/lib/rstudio-server/bin/positron-server/2026.03.0/docs"
+            subPath: "docs/positron"
+          any: true
+
+  - it: should add positron-components emptyDir volume
+    template: deployment.yaml
+    set:
+      components:
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "positron-components"
+            emptyDir: {}
+          any: true
+
+  - it: should not add positron volume or volume mount when version is empty
+    template: deployment.yaml
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "positron-components"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "positron-components"
+          any: true
+
+  - it: should not add positron volume or volume mount when components are disabled
+    template: deployment.yaml
+    set:
+      components:
+        enabled: false
+        positron:
+          version: "2026.03.0"
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "positron-components"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "positron-components"
+          any: true
