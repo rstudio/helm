@@ -1,9 +1,32 @@
 # Changelog
 
 
-## 0.10.16
+## 0.11.1
 
 - Lower the default `revisionHistoryLimit` from `10` to `3` to prevent old ReplicaSets and their completed pods from accumulating across rolling updates. Operators can override via `revisionHistoryLimit` in values.
+
+## 0.11.0
+
+- **BREAKING**: Change default session image from `rstudio/r-session-complete` to `rstudio/workbench-session` and enable session component delivery via init containers by default.
+  Set `components.enabled: false` and `session.image.repository: rstudio/r-session-complete` to restore the previous behavior
+- **BREAKING**: `session.image.tag` is now pinned to an explicit R/Python matrix tag because
+  `rstudio/workbench-session` publishes tags by language runtime (not by Workbench release), so
+  the previous `{{ tagPrefix }}{{ appVersion }}` fallback no longer resolves to a valid tag.
+  Chart upgrades no longer roll the session R/Python versions forward automatically — review
+  `session.image.tag` alongside Workbench upgrades
+- **BREAKING**: The chart now manages the `rserver.conf` `launcher-sessions-auto-update` key when `components.enabled: true` and `launcher.enabled: true`.
+  Remove any manual `config.server.'rserver.conf'.launcher-sessions-auto-update` override to avoid duplicate configuration
+- Add top-level `components` key for configuring session component init containers
+- Add `components.positron` for updating the Positron IDE version independently
+  of a Workbench release. A default Positron version is already delivered by the
+  `workbench-session-init` container. Set `components.positron.version` to
+  override it with a specific version
+- When `components.positron.version` is set, automatically point `positron.conf`
+  `exe` at the binary delivered by the Positron init container so the Workbench
+  pod serves the same Positron version (and docs) as session pods
+- Warn when `components.enabled=true` is combined with
+  `session.image.repository: rstudio/r-session-complete`, since the init
+  containers deliver components already baked into that image
 
 ## 0.10.15
 
@@ -15,7 +38,6 @@
 ## 0.10.13
 
 - Bump Workbench version to 2026.01.2
-
 
 ## 0.10.12
 
