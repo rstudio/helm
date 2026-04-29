@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.9.3](https://img.shields.io/badge/Version-0.9.3-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.9.4](https://img.shields.io/badge/Version-0.9.4-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.9.3:
+To install the chart with the release name `my-release` at version 0.9.4:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.9.3
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.9.4
 ```
 
 To explore other chart versions, look at:
@@ -370,6 +370,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | Used to configure the container's readinessProbe. Only included if enabled = true |
 | replicas | int | `1` | The number of replica pods to maintain for this service |
 | resources | object | `{}` | Defines resources for the rstudio-connect container |
+| revisionHistoryLimit | int | `3` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
 | securityContext | object | `{}` | Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when running in local execution mode. If launcher or backends.kubernetes is enabled, this can be removed with `securityContext: {}` |
 | service.annotations | object | `{}` | Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer) |
 | service.clusterIP | string | `""` | The cluster-internal IP to use with `service.type` ClusterIP |
