@@ -50,7 +50,7 @@ jobs:
 
       - name: Notify Slack of chart linting failure if on main
         if: github.ref == 'refs/heads/main' && (steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure')
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c  # v3.0.2
         with:
           payload-delimiter: "_"
           payload: |
@@ -114,7 +114,7 @@ jobs:
 
       - name: Notify Slack of chart unittest failure if on main
         if: github.ref == 'refs/heads/main' && steps.unittest.outcome == 'failure'
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c  # v3.0.2
         with:
           payload-delimiter: "_"
           payload: |
@@ -213,7 +213,7 @@ jobs:
 
       - name: Notify Slack of chart install failure if on main
         if: github.ref == 'refs/heads/main' && (steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure')
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c  # v3.0.2
         with:
           payload-delimiter: "_"
           payload: |
@@ -269,6 +269,6 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           persist-credentials: false
-      - uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8  # v0.5.2
+      - uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e  # v0.5.3
         with:
           advanced-security: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
