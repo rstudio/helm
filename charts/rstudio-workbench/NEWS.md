@@ -1,6 +1,12 @@
 # Changelog
 
 
+## 0.11.1
+
+- Fix `components.positron.version` breaking the server pod with
+  `CreateContainerConfigError` due to subPath mismatch with the
+  positron-init container's flat copy layout (#856)
+
 ## 0.11.0
 
 - **BREAKING**: Change default session image from `rstudio/r-session-complete` to `rstudio/workbench-session` and enable session component delivery via init containers by default.

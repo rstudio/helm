@@ -189,13 +189,8 @@ containers:
       subPath: "service.tpl"
     {{- end }}
     {{- if (include "rstudio-workbench.positronInitEnabled" .) }}
-    {{- /* subPath and exe paths mirror posit-dev/images-workbench/workbench-positron-init */}}
     - name: positron-components
       mountPath: {{ include "rstudio-workbench.positronMountPath" . | quote }}
-      subPath: bin/positron-server/bundled
-    - name: positron-components
-      mountPath: {{ printf "%s/docs" (include "rstudio-workbench.positronMountPath" .) | quote }}
-      subPath: docs/positron
     {{- end }}
     {{- if .Values.pod.volumeMounts }}
     {{- toYaml .Values.pod.volumeMounts | nindent 4 }}
@@ -447,9 +442,8 @@ true
 
 {{/*
 Versioned mount path for Positron on the Workbench pod. The positron-init
-container (posit-dev/images-workbench → workbench-positron-init) writes
-artifacts to /mnt/init at fixed subpaths; subPath mounts and the
-positron.conf `exe` in configmap-general.yaml derive from this path.
+container flattens artifacts into /mnt/init; this emptyDir is mounted at
+the version path so positron.conf `exe` resolves correctly.
 Returns empty when the gate is off, so callers compose safely.
 */}}
 {{- define "rstudio-workbench.positronMountPath" -}}
