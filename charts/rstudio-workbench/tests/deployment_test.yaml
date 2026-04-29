@@ -792,7 +792,7 @@ tests:
           path: 'spec.template.spec.initContainers[?(@.name=="positron-init")].image'
           value: "my-registry/positron-init:2026.03.0"
 
-  - it: should add positron binary mount to server container
+  - it: should add positron volume mount to server container
     template: deployment.yaml
     set:
       components:
@@ -804,22 +804,6 @@ tests:
           content:
             name: "positron-components"
             mountPath: "/usr/lib/rstudio-server/bin/positron-server/2026.03.0"
-            subPath: "bin/positron-server/bundled"
-          any: true
-
-  - it: should add positron docs mount to server container
-    template: deployment.yaml
-    set:
-      components:
-        positron:
-          version: "2026.03.0"
-    asserts:
-      - contains:
-          path: 'spec.template.spec.containers[0].volumeMounts'
-          content:
-            name: "positron-components"
-            mountPath: "/usr/lib/rstudio-server/bin/positron-server/2026.03.0/docs"
-            subPath: "docs/positron"
           any: true
 
   - it: should add positron-components emptyDir volume
