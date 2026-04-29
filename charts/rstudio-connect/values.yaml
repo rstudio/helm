@@ -69,9 +69,9 @@ podDisruptionBudget: {}
 # -- Defines the Posit Connect image to deploy
 image:
   # -- The repository to use for the main pod image
-  repository: ghcr.io/rstudio/rstudio-connect
-  # -- A tag prefix for the server image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-  tagPrefix: ubuntu2204-
+  repository: posit/connect
+  # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+  os: "ubuntu-24.04"
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- The imagePullPolicy for the main pod image
@@ -347,18 +347,6 @@ launcher:
   enabled: true
   # -- The namespace to launch sessions into. Uses the Release namespace by default
   namespace: ""
-  # -- Deprecated, use `executionEnvironments` instead. Optional. The runtime.yaml definition of Kubernetes runtime containers.
-  # If set to "base", will pull in the default runtime.yaml file.
-  # If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the
-  # cost of a larger image).
-  # Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments
-  # the first time the server starts. If any execution environments already exist in the database, these values are ignored;
-  # execution environments are not created or modified during subsequent restarts.
-  customRuntimeYaml: ""
-  # -- Deprecated, use `executionEnvironments` instead. Optional. Additional images to append to the end of
-  # the "launcher.customRuntimeYaml" (in the "images" key).
-  # If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list".
-  additionalRuntimeImages: []
   # -- User definition of launcher.kubernetes.profiles.conf for job customization
   launcherKubernetesProfilesConf: {}
   # -- Whether to use launcher templates when launching sessions. Defaults to true
@@ -418,9 +406,9 @@ launcher:
     # -- Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way.
     enabled: true
     # -- The repository to use for the Content InitContainer image
-    repository: ghcr.io/rstudio/rstudio-connect-content-init
-    # -- A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-    tagPrefix: ubuntu2204-
+    repository: posit/connect-content-init
+    # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+    os: "ubuntu-24.04"
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     # -- The imagePullPolicy for the default initContainer
@@ -440,8 +428,7 @@ launcher:
 # Requires Connect version 2026.03.0 or later.
 # When set, the chart renders these into a ConfigMap, mounts it into the Connect pod,
 # and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration.
-# Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade
-# without requiring a pod restart or database reset.
+# Changes take effect on every helm upgrade without requiring a pod restart or database reset.
 # @default -- `[]` (disabled)
 executionEnvironments: []
   # - name: ghcr.io/my-org/connect-runtime:ubuntu22
@@ -499,14 +486,13 @@ config:
     # For Off-Host Execution, Python versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/python/
     Executable:
-      - /opt/python/3.12.11/bin/python
-      - /opt/python/3.13.9/bin/python
+      - /opt/python/3.14.3/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.
     # For Off-Host Execution, Quarto versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/quarto/
-    Executable: "/opt/quarto/1.8.25/bin/quarto"
+    Executable: "/usr/local/bin/quarto"
   TensorFlow:
     Enabled: true
     # For off-host Execution, TensorFlow versions are defined by the set of Execution Environments https://docs.posit.co/connect/admin/tensorflow/

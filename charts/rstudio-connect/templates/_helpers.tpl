@@ -72,9 +72,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- if .Values.launcher.enabled }}
     {{- $namespace := default $.Release.Namespace .Values.launcher.namespace }}
     {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf") }}
-    {{- if include "rstudio-connect.runtimeYaml" . }}
-      {{- $_ := set $launcherSettingsDict "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") }}
-    {{- end }}
     {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $launcherSettingsDict "DataDirPVCName" $dataDirPVCName }}
@@ -127,59 +124,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- end }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
-
-{{/*
-  - Define the runtime.yaml file
-    - If a string:
-      - if "pro" - use pro runtime.yaml
-        - If additionalRuntimeImages is a string, append
-      - if "base" - use base runtime.yaml
-        - If additionalRuntimeImages is a string, append
-      - otherwise use the string verbatim
-        - If additionalRuntimeImages is a string, append
-    - If a map, pass it to "toYaml"
-      - If additionalRuntimeImages is a list, append
-    - Otherwise use the base runtime.yaml
-
-    When we append additionalRuntimeImages as a string, we presume that
-    the end of the runtimeImages file is still in the context of the "images" key
-*/}}
-{{- define "rstudio-connect.runtimeYaml" -}}
-  {{- $runtimeYaml := deepCopy (.Values.launcher.customRuntimeYaml | default "") }}
-  {{- $additionalImages := deepCopy .Values.launcher.additionalRuntimeImages }}
-  {{- if kindIs "string" $runtimeYaml }}
-    {{- if eq $runtimeYaml "pro" }}
-      {{- .Files.Get "default-runtime-pro.yaml" }}
-      {{- include "rstudio-connect.additionalImagesString" $additionalImages }}
-    {{- else if eq $runtimeYaml "base" }}
-      {{- .Files.Get "default-runtime.yaml" }}
-      {{- include "rstudio-connect.additionalImagesString" $additionalImages }}
-    {{- else }}
-      {{- /* Allow verbatim output */ -}}
-      {{- $runtimeYaml }}
-      {{- include "rstudio-connect.additionalImagesString" $additionalImages }}
-    {{- end }}
-  {{- else if kindIs "map" $runtimeYaml }}
-    {{- /*
-      only include additionalImages if it is a list.
-      otherwise it is possible the keys could be mismatched
-     */ -}}
-    {{- if kindIs "list" $additionalImages }}
-      {{- $_ := set $runtimeYaml "images" (append $runtimeYaml.images $additionalImages) }}
-    {{- end }}
-    {{- toYaml $runtimeYaml }}
-  {{- end }}
-{{- end -}}
-
-{{- define "rstudio-connect.additionalImagesString" }}
-  {{- if . }}
-    {{- if kindIs "string" . }}
-      {{- . | nindent 2 }}
-    {{- else }}
-      {{- toYaml . | nindent 2 }}
-    {{- end }}
-  {{- end }}
-{{- end }}
 
 {{- define "rstudio-connect.pod.annotations" -}}
 {{- range $key,$value := $.Values.pod.annotations -}}

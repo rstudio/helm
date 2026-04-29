@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.20.0
+
+- BREAKING:
+  - Default images now use `posit/connect` instead of `ghcr.io/rstudio/rstudio-connect`
+  - Image tag format changed from `{os}{version}` (e.g. `ubuntu2204-2026.03.1`) to `{version}-{os}` (e.g. `2026.03.1-ubuntu-24.04`)
+  - `image.tagPrefix` replaced by `image.os`; `launcher.defaultInitContainer.tagPrefix` replaced by `launcher.defaultInitContainer.os`
+  - Remove `launcher.customRuntimeYaml` and `launcher.additionalRuntimeImages`. Use `executionEnvironments` for declarative management of execution environments.
+  - Remove the bundled `default-runtime.yaml` and `default-runtime-pro.yaml` files.
+- Default Quarto executable path for Local Execution updated to `/usr/local/bin/quarto`
+
 ## 0.9.2
 
 - Add `events: list` permission to the direct Kubernetes runner Role. Connect 2026.04.0 lists events in the target namespace when a content pod fails to start and the failure reason cannot be determined from pod conditions.
