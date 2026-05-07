@@ -256,3 +256,6 @@ tolerations: []
 priorityClassName: ""
 # -- Pod disruption budget
 podDisruptionBudget: {}
+
+# -- The revisionHistoryLimit to use for the pod deployment. Do not set to 0
+revisionHistoryLimit: 3

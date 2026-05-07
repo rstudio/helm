@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.11.2
+
+- Lower the default `revisionHistoryLimit` from `10` to `3` to prevent old ReplicaSets and their completed pods from accumulating across rolling updates. Operators can override via `revisionHistoryLimit` in values.
+
 ## 0.11.1
 
 - Fix `components.positron.version` breaking the server pod with

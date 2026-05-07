@@ -859,7 +859,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: rstudio-workbench
       app.kubernetes.io/instance: release-name
-  revisionHistoryLimit: 10
+  revisionHistoryLimit: 3
   template:
     metadata:
       annotations:
