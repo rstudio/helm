@@ -122,6 +122,37 @@ awsSecretAccessKey: your-secret-access-key
 Bear in mind that static, long-lived credentials are the least secure option and
 should be avoided if at all possible.
 
+## Gateway API
+
+This chart can optionally create Kubernetes [Gateway API](https://gateway-api.sigs.k8s.io/) `HTTPRoute` resources that point at the chart `Service`. This is controlled with `gatewayApi.enabled` and is **independent** of the built-in `Ingress` (`ingress.enabled`); you may enable one, both, or neither.
+
+**Prerequisites:** Install the Gateway API CRDs in your cluster and provision a `Gateway` (and `GatewayClass`) appropriate for your ingress controller. This chart does not create a `Gateway` resource; set `gatewayApi.parentRefs` to attach each `HTTPRoute` to your existing `Gateway`.
+
+**TLS:** Termination is typically configured on the `Gateway` listener or by your controller, not on `HTTPRoute`. This chart does not mirror `ingress.tls` onto Gateway API resources.
+
+**Cross-namespace parents:** If the `Gateway` lives in another namespace, ensure your controller requirements are met (for example a [`ReferenceGrant`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ReferenceGrant)).
+
+Example:
+
+```yaml
+gatewayApi:
+  enabled: true
+  parentRefs:
+    - name: contour
+      namespace: projectcontour
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hosts:
+    - host: package-manager.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+```
+
+Path entries use the same shape as `ingress.hosts` paths: a string or an object with `path` and optional `pathType` (`Prefix`, `Exact`, or `ImplementationSpecific`). Each `gatewayApi.hosts` entry becomes one `HTTPRoute`. The backend uses `service.port`, which must be numeric for the Gateway API `backendRef`.
+
+**Examples:** Shared-gateway walkthroughs for [AWS Load Balancer Controller (ALB)](../../examples/gateway-api/aws/README.md) and [KGateway](../../examples/gateway-api/kgateway/README.md) live under `examples/gateway-api/` in this repository.
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format

@@ -1,0 +1,13 @@
+# TLS for HTTPS:443 uses ACM (not Gateway listener certificateRefs) per AWS LBC.
+# Replace the ARN and namespace to match your Gateway.
+# https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/gateway/l7gateway/
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+  name: posit-shared-alb-lbconfig
+  namespace: posit-gateway
+spec:
+  scheme: internet-facing
+  listenerConfigurations:
+    - protocolPort: HTTPS:443
+      defaultCertificate: arn:aws:acm:REGION:ACCOUNT_ID:certificate/CERT_ID

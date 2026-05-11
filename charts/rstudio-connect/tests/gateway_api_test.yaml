@@ -1,0 +1,84 @@
+suite: Connect Gateway API
+templates:
+  - httproute.yaml
+tests:
+  - it: should not create HTTPRoute when gatewayApi is disabled
+    template: httproute.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not create HTTPRoute when enabled but hosts is empty
+    template: httproute.yaml
+    set:
+      gatewayApi:
+        enabled: true
+        parentRefs:
+          - name: gw
+            kind: Gateway
+            group: gateway.networking.k8s.io
+        hosts: []
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should create HTTPRoute when enabled with hosts and parentRefs
+    template: httproute.yaml
+    set:
+      gatewayApi:
+        enabled: true
+        annotations:
+          test.io/route: "true"
+        labels:
+          test.io/kind: httproute
+        parentRefs:
+          - name: test-gateway
+            namespace: gw-ns
+            kind: Gateway
+            group: gateway.networking.k8s.io
+        hosts:
+          - host: example.com
+            paths:
+              - /
+              - path: /api
+                pathType: Prefix
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+          apiVersion: gateway.networking.k8s.io/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-rstudio-connect-gw-0
+      - equal:
+          path: metadata.annotations["test.io/route"]
+          value: "true"
+      - equal:
+          path: metadata.labels["test.io/kind"]
+          value: httproute
+      - equal:
+          path: spec.parentRefs[0].name
+          value: test-gateway
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: gw-ns
+      - equal:
+          path: spec.hostnames[0]
+          value: example.com
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+      - equal:
+          path: spec.rules[0].matches[1].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[1].path.value
+          value: /api
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: RELEASE-NAME-rstudio-connect
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 80
