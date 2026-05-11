@@ -1,0 +1,21 @@
+# Install in the Gateway namespace (here: kgateway-system).
+# Set .spec.from[].namespace to each namespace that will contain Posit HTTPRoutes.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: posit-products-to-shared-gateway
+  namespace: kgateway-system
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: rstudio-connect
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: rstudio-pm
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: rstudio-workbench
+  to:
+    - group: gateway.networking.k8s.io
+      kind: Gateway

@@ -1,0 +1,37 @@
+{{- if and .Values.gatewayApi.enabled .Values.gatewayApi.hosts -}}
+{{- $apiVersion := include "rstudio-library.gateway.apiVersion" . -}}
+{{- $fullName := include "rstudio-connect.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $root := . -}}
+{{- range $i, $h := .Values.gatewayApi.hosts }}
+{{- if and $h.paths (gt (len $h.paths) 0) }}
+---
+apiVersion: {{ $apiVersion }}
+kind: HTTPRoute
+metadata:
+  name: {{ include "rstudio-library.gateway.httpRouteName" (dict "fullName" $fullName "index" $i) }}
+  labels:
+    {{- include "rstudio-connect.labels" $root | nindent 4 }}
+    {{- with $root.Values.gatewayApi.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $root.Values.gatewayApi.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+    {{- toYaml $root.Values.gatewayApi.parentRefs | nindent 4 }}
+  hostnames:
+    - {{ $h.host | quote }}
+  rules:
+    - matches:
+      {{- range $h.paths }}
+        - path:
+            {{- include "rstudio-library.gateway.httpPathMatchBody" (dict "pathData" .) | nindent 12 }}
+      {{- end }}
+      backendRefs:
+        {{- include "rstudio-library.gateway.serviceBackendRef" (dict "svcName" $fullName "svcPort" $svcPort) | nindent 8 }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,62 @@
+# -----------------------------------------------------------------------------
+# Posit Connect — merge into values. Gateway in namespace kgateway-system.
+# -----------------------------------------------------------------------------
+# gatewayApi:
+#   enabled: true
+#   parentRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared
+#       namespace: kgateway-system
+#       sectionName: http
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared
+#       namespace: kgateway-system
+#       sectionName: https
+#   hosts:
+#     - host: connect.example.com
+#       paths:
+#         - /
+
+# -----------------------------------------------------------------------------
+# Posit Package Manager
+# -----------------------------------------------------------------------------
+# gatewayApi:
+#   enabled: true
+#   parentRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared
+#       namespace: kgateway-system
+#       sectionName: http
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared
+#       namespace: kgateway-system
+#       sectionName: https
+#   hosts:
+#     - host: packagemanager.example.com
+#       paths:
+#         - /
+
+# -----------------------------------------------------------------------------
+# Posit Workbench
+# -----------------------------------------------------------------------------
+# gatewayApi:
+#   enabled: true
+#   parentRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared
+#       namespace: kgateway-system
+#       sectionName: http
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared
+#       namespace: kgateway-system
+#       sectionName: https
+#   hosts:
+#     - host: workbench.example.com
+#       paths:
+#         - /

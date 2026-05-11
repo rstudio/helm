@@ -1,0 +1,21 @@
+license:
+  key: test
+replicas: 1
+rbac:
+  create: true
+homeStorage:
+  create: true
+userCreate: true
+
+securityContext:
+  privileged: false
+gatewayApi:
+  enabled: true
+  parentRefs:
+    - name: example-gateway
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hosts:
+    - host: workbench.example.com
+      paths:
+        - /

@@ -212,6 +212,29 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+# -- Gateway API (HTTPRoute) resources. Independent of `ingress`; both may be enabled if desired.
+gatewayApi:
+  enabled: false
+  # -- Annotations for all HTTPRoute resources created by this chart
+  annotations: {}
+  # -- Extra labels for all HTTPRoute resources created by this chart
+  labels: {}
+  # -- parentRefs attach HTTPRoutes to an existing Gateway (or other supported parent).
+  # Required when `gatewayApi.enabled` is true.
+  # [Gateway API parent reference](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference)
+  parentRefs: []
+  # - name: example-gateway
+  #   namespace: gateway-namespace
+  #   kind: Gateway
+  #   group: gateway.networking.k8s.io
+  # -- Same shape as `ingress.hosts`. Each entry becomes one HTTPRoute; omit or use empty `paths` to skip an entry.
+  hosts: []
+  # - host: chart-example.local
+  #   paths:
+  #     - /
+  #     # or path: /api
+  #     #    pathType: Prefix
+
 serviceAccount:
   # -- Whether to create a [Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
   create: true

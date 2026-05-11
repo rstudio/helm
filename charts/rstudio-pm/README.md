@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.5.57](https://img.shields.io/badge/Version-0.5.57-informational?style=flat-square) ![AppVersion: 2026.04.2](https://img.shields.io/badge/AppVersion-2026.04.2-informational?style=flat-square)
+![Version: 0.5.58](https://img.shields.io/badge/Version-0.5.58-informational?style=flat-square) ![AppVersion: 2026.04.2](https://img.shields.io/badge/AppVersion-2026.04.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.57:
+To install the chart with the release name `my-release` at version 0.5.58:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.57
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.58
 ```
 
 To explore other chart versions, look at:
@@ -176,6 +176,37 @@ awsSecretAccessKey: your-secret-access-key
 Bear in mind that static, long-lived credentials are the least secure option and
 should be avoided if at all possible.
 
+## Gateway API
+
+This chart can optionally create Kubernetes [Gateway API](https://gateway-api.sigs.k8s.io/) `HTTPRoute` resources that point at the chart `Service`. This is controlled with `gatewayApi.enabled` and is **independent** of the built-in `Ingress` (`ingress.enabled`); you may enable one, both, or neither.
+
+**Prerequisites:** Install the Gateway API CRDs in your cluster and provision a `Gateway` (and `GatewayClass`) appropriate for your ingress controller. This chart does not create a `Gateway` resource; set `gatewayApi.parentRefs` to attach each `HTTPRoute` to your existing `Gateway`.
+
+**TLS:** Termination is typically configured on the `Gateway` listener or by your controller, not on `HTTPRoute`. This chart does not mirror `ingress.tls` onto Gateway API resources.
+
+**Cross-namespace parents:** If the `Gateway` lives in another namespace, ensure your controller requirements are met (for example a [`ReferenceGrant`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ReferenceGrant)).
+
+Example:
+
+```yaml
+gatewayApi:
+  enabled: true
+  parentRefs:
+    - name: contour
+      namespace: projectcontour
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hosts:
+    - host: package-manager.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+```
+
+Path entries use the same shape as `ingress.hosts` paths: a string or an object with `path` and optional `pathType` (`Prefix`, `Exact`, or `ImplementationSpecific`). Each `gatewayApi.hosts` entry becomes one `HTTPRoute`. The backend uses `service.port`, which must be numeric for the Gateway API `backendRef`.
+
+**Examples:** Shared-gateway walkthroughs for [AWS Load Balancer Controller (ALB)](../../examples/gateway-api/aws/README.md) and [KGateway](../../examples/gateway-api/kgateway/README.md) live under `examples/gateway-api/` in this repository.
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
@@ -207,6 +238,11 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | extraContainers | list | `[]` | sidecar container list |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | the full name of the release (can be overridden) |
+| gatewayApi | object | `{"annotations":{},"enabled":false,"hosts":[],"labels":{},"parentRefs":[]}` | Gateway API (HTTPRoute) resources. Independent of `ingress`; both may be enabled if desired. |
+| gatewayApi.annotations | object | `{}` | Annotations for all HTTPRoute resources created by this chart |
+| gatewayApi.hosts | list | `[]` | Same shape as `ingress.hosts`. Each entry becomes one HTTPRoute; omit or use empty `paths` to skip an entry. |
+| gatewayApi.labels | object | `{}` | Extra labels for all HTTPRoute resources created by this chart |
+| gatewayApi.parentRefs | list | `[]` | parentRefs attach HTTPRoutes to an existing Gateway (or other supported parent). Required when `gatewayApi.enabled` is true. [Gateway API parent reference](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference) |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
 | image.repository | string | `"rstudio/rstudio-package-manager"` | the repository to use for the main pod image |
@@ -281,5 +317,5 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | versionOverride | string | `""` | A Package Manager version to override the "tag" for the RStudio Package Manager image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
 

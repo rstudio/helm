@@ -1,4 +1,8 @@
 # Changelog
+## 0.9.5
+
+- Document shared Gateway API examples (`examples/gateway-api/aws`, `examples/gateway-api/kgateway`) in the README.
+- Add optional Gateway API support (`HTTPRoute` via `gatewayApi` values), independent of `ingress`.
 
 ## 0.9.4
 
@@ -35,6 +39,7 @@
 
 - Remove deprecated default value `Metrics.Enabled = true`
 - Remove legacy Graphite exporter sidecar (`prometheus.legacy`, `prometheusExporter.*`, and `configmap-graphite-exporter.yaml`). The built-in Prometheus `/metrics` endpoint is now the only supported metrics path. Use OpenTelemetry for richer instrumentation.
+
 
 ## 0.8.35
 

@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.9.4](https://img.shields.io/badge/Version-0.9.4-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.9.5](https://img.shields.io/badge/Version-0.9.5-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.9.4:
+To install the chart with the release name `my-release` at version 0.9.5:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.9.4
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.9.5
 ```
 
 To explore other chart versions, look at:
@@ -243,6 +243,37 @@ job pods to reach Connect's embedded OTel collector directly (pod-to-pod).
 
 To override the advertise host, set `CONNECT_OPENTELEMETRY_COLLECTORADVERTISEHOST` explicitly in `pod.env`.
 
+## Gateway API
+
+This chart can optionally create Kubernetes [Gateway API](https://gateway-api.sigs.k8s.io/) `HTTPRoute` resources that point at the chart `Service`. This is controlled with `gatewayApi.enabled` and is **independent** of the built-in `Ingress` (`ingress.enabled`); you may enable one, both, or neither.
+
+**Prerequisites:** Install the Gateway API CRDs in your cluster and provision a `Gateway` (and `GatewayClass`) appropriate for your ingress controller. This chart does not create a `Gateway` resource; set `gatewayApi.parentRefs` to attach each `HTTPRoute` to your existing `Gateway`.
+
+**TLS:** Termination is typically configured on the `Gateway` listener or by your controller, not on `HTTPRoute`. This chart does not mirror `ingress.tls` onto Gateway API resources.
+
+**Cross-namespace parents:** If the `Gateway` lives in another namespace, ensure your controller requirements are met (for example a [`ReferenceGrant`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ReferenceGrant)).
+
+Example:
+
+```yaml
+gatewayApi:
+  enabled: true
+  parentRefs:
+    - name: contour
+      namespace: projectcontour
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hosts:
+    - host: connect.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+```
+
+Path entries use the same shape as `ingress.hosts` paths: a string or an object with `path` and optional `pathType` (`Prefix`, `Exact`, or `ImplementationSpecific`). Each `gatewayApi.hosts` entry becomes one `HTTPRoute`. The backend uses `service.port`, which must be numeric for the Gateway API `backendRef`.
+
+**Examples:** Shared-gateway walkthroughs for [AWS Load Balancer Controller (ALB)](../../examples/gateway-api/aws/README.md) and [KGateway](../../examples/gateway-api/kgateway/README.md) live under `examples/gateway-api/` in this repository.
+
 ## General principles
 
 - In most places, we opt to pass Helm values over configmaps. We translate these into the valid `.gcfg` file format
@@ -300,6 +331,11 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | executionEnvironments | list | `[]` (disabled) | Optional list of execution environments to manage declaratively. Requires Connect version 2026.03.0 or later. When set, the chart renders these into a ConfigMap, mounts it into the Connect pod, and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration. Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade without requiring a pod restart or database reset. |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
+| gatewayApi | object | `{"annotations":{},"enabled":false,"hosts":[],"labels":{},"parentRefs":[]}` | Gateway API (HTTPRoute) resources. Independent of `ingress`; both may be enabled if desired. |
+| gatewayApi.annotations | object | `{}` | Annotations for all HTTPRoute resources created by this chart |
+| gatewayApi.hosts | list | `[]` | Same shape as `ingress.hosts`. Each entry becomes one HTTPRoute; omit or use empty `paths` to skip an entry. |
+| gatewayApi.labels | object | `{}` | Extra labels for all HTTPRoute resources created by this chart |
+| gatewayApi.parentRefs | list | `[]` | parentRefs attach HTTPRoutes to an existing Gateway (or other supported parent). Required when `gatewayApi.enabled` is true. [Gateway API parent reference](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference) |
 | image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"ubuntu2204-"}` | Defines the Posit Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
@@ -402,5 +438,5 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | versionOverride | string | `""` | A Connect version to override the "tag" for the Posit Connect image and the Content Init image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
 
