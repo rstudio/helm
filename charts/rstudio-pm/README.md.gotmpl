@@ -10,6 +10,11 @@
 
 ## Upgrade guidance
 
+### 0.20.0
+
+- Chart version 0.20.0 switches default images from `rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
+- Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`. The chart will fail with a clear error if you have `image.tagPrefix` set — replace it with `image.os`.
+
 ### 0.4.0
 
 - When upgrading to version 0.4.0 or later, the Package Manager service moves from running as `root` to running as

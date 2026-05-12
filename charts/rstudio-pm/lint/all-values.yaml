@@ -1,6 +1,6 @@
 image:
-  repository: rstudio/rstudio-package-manager
-  tag: 1.1.6.1-5
+  repository: ghcr.io/posit-dev/package-manager
+  tag: 2026.04.2-ubuntu-24.04
   imagePullPolicy: Always
   imagePullSecrets:
     - name: "some-secret"
