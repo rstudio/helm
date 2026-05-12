@@ -3,7 +3,7 @@ nameOverride: ""
 # -- the full name of the release (can be overridden)
 fullnameOverride: ""
 
-# -- A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194
+# -- A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
 # -- Settings for enabling server diagnostics
@@ -21,17 +21,16 @@ session:
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
-    # -- A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined.
-    # The `rstudio/workbench-session` default repository does not publish tags in `{{ tagPrefix }}{{ appVersion }}`
-    # form — see the pinned tag below — so `tagPrefix` is effectively unused for the default session image.
-    tagPrefix: ubuntu2204-
+    # -- The OS version for the session image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+    os: "ubuntu-24.04"
+    # -- The R version for the session image tag. Only used if tag is not defined
+    rVersion: "4.5.2"
+    # -- The Python version for the session image tag. Only used if tag is not defined
+    pythonVersion: "3.14.3"
     # -- The repository to use for the session image
-    repository: "rstudio/workbench-session"
-    # -- A tag override for the session image. Pinned to an explicit R/Python matrix because
-    # `rstudio/workbench-session` publishes tags by language runtime version, not by Workbench release
-    # (unlike `rstudio/r-session-complete`). Pick a published tag from
-    # https://hub.docker.com/r/rstudio/workbench-session/tags.
-    tag: "ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11"
+    repository: "posit/workbench-session"
+    # -- A tag override for the session image. Overrides rVersion, pythonVersion, and os. Default tag is `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}`
+    tag: ""
 
 # -- Session component delivery via init containers. When enabled (default), the chart
 # configures rserver.conf so the launcher injects init containers into session pods at startup.
@@ -44,7 +43,7 @@ components:
   sessionInit:
     image:
       # -- The repository for the session init container image
-      repository: "rstudio/workbench-session-init"
+      repository: "posit/workbench-session-init"
       # -- A tag override for the session init container. Default tag is the chart appVersion (or versionOverride)
       tag: ""
   positron:
@@ -54,7 +53,7 @@ components:
     version: ""
     image:
       # -- The image repository for the Positron init container
-      repository: "rstudio/workbench-positron-init"
+      repository: "posit/workbench-positron-init"
       # -- A tag override for the Positron init container image. Defaults to the positron version
       tag: ""
 
@@ -229,9 +228,9 @@ homeStorage:
 
 image:
   # -- the repository to use for the main pod image
-  repository: rstudio/rstudio-workbench
-  # -- A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined
-  tagPrefix: ubuntu2204-
+  repository: posit/workbench
+  # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+  os: "ubuntu-24.04"
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- the imagePullPolicy for the main pod image

@@ -53,8 +53,16 @@ Please consider removing this configuration value.
   {{- fail "\n\n`serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead"}}
 {{- end }}
 
+{{- if .Values.image.tagPrefix }}
+  {{- fail "\n\n`image.tagPrefix` has been removed. Use `image.os` instead (e.g. `ubuntu-24.04`). The image tag format is now `{version}-{os}`." }}
+{{- end }}
+
+{{- if .Values.session.image.tagPrefix }}
+  {{- fail "\n\n`session.image.tagPrefix` has been removed. Use `session.image.os`, `session.image.rVersion`, and `session.image.pythonVersion` instead. The session image tag format is now `R{rVersion}-python{pythonVersion}-{os}`." }}
+{{- end }}
+
 {{- if and .Values.components.enabled (eq .Values.session.image.repository "rstudio/r-session-complete") }}
-{{ print "\n\nWARNING: `components.enabled=true` is combined with `session.image.repository: rstudio/r-session-complete`. The init containers configured by `components.enabled` deliver session components that are already baked into `r-session-complete`, so this combination is likely unintended.\n\nEither:\n  - Keep the new default: `session.image.repository: rstudio/workbench-session` (with `components.enabled: true`), or\n  - Restore the previous behavior: set `components.enabled: false` along with `session.image.repository: rstudio/r-session-complete`." }}
+{{ print "\n\nWARNING: `components.enabled=true` is combined with `session.image.repository: rstudio/r-session-complete`. The init containers configured by `components.enabled` deliver session components that are already baked into `r-session-complete`, so this combination is likely unintended.\n\nEither:\n  - Keep the new default: `session.image.repository: posit/workbench-session` (with `components.enabled: true`), or\n  - Restore the previous behavior: set `components.enabled: false` along with `session.image.repository: rstudio/r-session-complete`." }}
 {{- end }}
 
 {{- if and (hasKey (get .Values.config.server "rserver.conf") "monitor-graphite-enabled") (not .Values.prometheus.legacy) }}

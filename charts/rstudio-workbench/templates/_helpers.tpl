@@ -29,7 +29,7 @@ If release name contains chart name it will be used as a full name.
 containers:
 - name: rstudio
   {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-  {{- $imageTag := .Values.image.tag | default (printf "%s%s" .Values.image.tagPrefix $defaultVersion )}}
+  {{- $imageTag := .Values.image.tag | default (printf "%s-%s" $defaultVersion .Values.image.os )}}
   image: "{{ .Values.image.repository }}:{{ $imageTag }}"
   {{- with .Values.pod.lifecycle }}
   lifecycle:

@@ -33,7 +33,7 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `rstudio/rstudio-workbench` image has `sssd` installed and started by default.
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `posit/workbench` image has `sssd` installed and started by default.
   You can include `sssd` configuration in `config.userProvisioning` like so:
 
     ```yaml
@@ -118,29 +118,32 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
 
+## Upgrade guidance
+
+### 0.20.0
+
+- Chart version 0.20.0 switches default images from `rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
+- Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`. The chart will fail with a clear error if you have `image.tagPrefix` or `session.image.tagPrefix` set.
+- Session image tag is now constructed from `session.image.rVersion`, `session.image.pythonVersion`, and `session.image.os` (format: `R{rVersion}-python{pythonVersion}-{os}`).
+
 ## Session images
 
-By default, session pods use the `rstudio/workbench-session` image with an init
-container (`rstudio/workbench-session-init`) that delivers Workbench session
-components at pod startup.
+By default, session pods use the `posit/workbench-session` image (also available
+at `ghcr.io/posit-dev/workbench-session`) with an init container
+(`posit/workbench-session-init`) that delivers Workbench session components at
+pod startup.
 
-### Upgrading from 0.10.x
+The session image tag is constructed from three values: `session.image.rVersion`,
+`session.image.pythonVersion`, and `session.image.os`. Override
+`session.image.tag` to bypass this construction entirely.
 
-Chart defaults require no additional configuration, but the default
-`session.image.tag` now pins an explicit R/Python matrix (see `values.yaml`)
-because `rstudio/workbench-session` does not publish Workbench-version-shaped
-tags. Review the pinned tag against
-[hub.docker.com/r/rstudio/workbench-session/tags](https://hub.docker.com/r/rstudio/workbench-session/tags)
-during each Workbench upgrade.
+### Upgrading from 0.11.x
 
-If you pin `session.image.repository: rstudio/r-session-complete`, also set
-`components.enabled: false` to preserve the previous behavior. The
-`r-session-complete` tag format (`<tagPrefix><appVersion>`) still works there.
+If you use default values, no action is needed. If you customized session images:
 
-If you adopt the init-container pattern with a custom session image, confirm
-that the image does not already include Workbench session components (only
-language runtimes, system tools, and similar dependencies). Otherwise, the init
-container repeats work that the image already performs.
+- Replace `session.image.tagPrefix` with `session.image.os`, `session.image.rVersion`, and `session.image.pythonVersion`
+- Replace `session.image.repository: rstudio/workbench-session` with `posit/workbench-session`
+- If you pinned `session.image.tag` to an old-format string (e.g., `ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11`), verify that tag exists in the `posit/workbench-session` repository or update to the new format
 
 For platform-level upgrade steps, see the [Posit Workbench administrator guide](https://docs.posit.co/ide/server-pro/).
 
