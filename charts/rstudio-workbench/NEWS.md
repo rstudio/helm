@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.20.2
+-  correct job.tpl to check `suppressStdinAnnotation` instead of `limitStdinAnnotation` 
+   to supress stdin annotation from pod metadata (#842)
 
 ## 0.20.1
 
