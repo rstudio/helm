@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Configure AWS credentials
         id: creds
-        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885  # v6.1.1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -38,7 +38,7 @@ jobs:
 
       - name: Notify Slack of publishing chart documentation failure
         if: failure()
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c  # v3.0.3
         with:
           payload-delimiter: "_"
           payload: |
