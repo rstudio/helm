@@ -774,7 +774,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | session.image.pythonVersion | string | `"3.14.3"` | The Python version for the session image tag. Only used if tag is not defined |
 | session.image.rVersion | string | `"4.5.2"` | The R version for the session image tag. Only used if tag is not defined |
 | session.image.repository | string | `"posit/workbench-session"` | The repository to use for the session image |
-| session.image.tag | string | `""` | A tag override for the session image. Overrides rVersion, pythonVersion, and os. Default tag is `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}` |
+| session.image.tag | string | `""` | A tag override for the session image. When empty, the chart computes the tag as `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}` |
 | shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |

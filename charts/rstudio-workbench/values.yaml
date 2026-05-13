@@ -29,7 +29,7 @@ session:
     pythonVersion: "3.14.3"
     # -- The repository to use for the session image
     repository: "posit/workbench-session"
-    # -- A tag override for the session image. Overrides rVersion, pythonVersion, and os. Default tag is `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}`
+    # -- A tag override for the session image. When empty, the chart computes the tag as `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}`
     tag: ""
 
 # -- Session component delivery via init containers. When enabled (default), the chart
