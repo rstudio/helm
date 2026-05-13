@@ -57,7 +57,11 @@ These values cause a hard error if set:
 - `launcher.additionalRuntimeImages`: use [`executionEnvironments`](../charts/rstudio-connect/README.md#execution-environments) instead
 
 :::{.callout-note}
-The chart defaults for `config.Python.Executable` and `config.Quarto.Executable` changed to match the new server image. Python moved from two executables (3.12.11, 3.13.9) to a single executable (3.14.4). Quarto moved from `/opt/quarto/1.8.25/bin/quarto` to `/usr/local/bin/quarto`. If you override these values, verify the paths exist in your image.
+The chart defaults for `config.Python.Executable` and `config.Quarto.Executable` changed to match the new server image. If you override these values, verify the paths exist in your image.
+
+Python: `/opt/python/3.12.11/bin/python` and `/opt/python/3.13.9/bin/python` → `/opt/python/3.14.4/bin/python`
+
+Quarto: `/opt/quarto/1.8.25/bin/quarto` → `/usr/local/bin/quarto`
 :::
 
 ### Connect Content images
