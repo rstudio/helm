@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/posit-dev/package-manager
+  repository: posit/package-manager
   tag: 2026.04.2-ubuntu-24.04
   imagePullPolicy: Always
   imagePullSecrets:

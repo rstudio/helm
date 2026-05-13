@@ -4,7 +4,7 @@
 
 - **BREAKING**: Default images now pull from the `posit/` namespace on Docker Hub
   - `image.repository` changed from `rstudio/rstudio-package-manager` to `posit/package-manager`
-  - Image tag format changed from `{os}{version}` to `{version}-{os}`
+  - Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`
   - `image.tagPrefix` replaced by `image.os`
 
 ## 0.5.57
