@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.11.3
+-  correct job.tpl to check suppressStdinAnnotation instead of limitStdinAnnotation, fixing issue introduced in #842  
 
 ## 0.11.2
 
