@@ -20,6 +20,7 @@ spec:
   selector:
     matchLabels:
       {{- include "rstudio-connect.selectorLabels" . | nindent 6 }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   template:
     metadata:
       annotations:

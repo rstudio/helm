@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4
+
+- Add `revisionHistoryLimit` value (default `3`) for the Connect deployment, exposing a knob to tune retained ReplicaSets and prevent old pods from accumulating across rolling updates.
+
 ## 0.9.3
 
 - Bump Connect version to 2026.04.0
