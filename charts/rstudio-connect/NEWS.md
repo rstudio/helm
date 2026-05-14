@@ -12,6 +12,10 @@
 - **BREAKING**: Remove `launcher.customRuntimeYaml`, `launcher.additionalRuntimeImages`, and bundled `default-runtime.yaml` / `default-runtime-pro.yaml`. Use `executionEnvironments` instead.
 - Default Python executable updated to 3.14.4
 
+## 0.9.5
+
+- Bump Connect version to 2026.04.1
+
 ## 0.9.4
 
 - Add `revisionHistoryLimit` value (default `3`) for the Connect deployment, exposing a knob to tune retained ReplicaSets and prevent old pods from accumulating across rolling updates.
