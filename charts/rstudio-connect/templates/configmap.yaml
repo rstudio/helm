@@ -26,11 +26,6 @@ data:
 {{- end }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
 {{- if .Values.launcher.enabled }}
-  {{- $runtimeYamlContent := include "rstudio-connect.runtimeYaml" . }}
-  {{- if $runtimeYamlContent }}
-  runtime.yaml: |
-    {{- $runtimeYamlContent | nindent 4 }}
-  {{- end }}
   {{- /* configuration for job customization (also used below) */ -}}
     {{- /* 1 - volume */ -}}
       {{- $emptyRscVolume := dict "name" ("rsc-volume") "emptydir" (dict) }}
@@ -46,7 +41,7 @@ data:
       {{- $jobJsonRuntimeMountExt := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMountExt") "json" ( $rscVolumeMountExt ) }}
     {{- /* 3 - init container */ -}}
       {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-      {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default (printf "%s%s" .Values.launcher.defaultInitContainer.tagPrefix $defaultVersion )}}
+      {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default (printf "%s-%s" $defaultVersion .Values.launcher.defaultInitContainer.os )}}
       {{- $initContainerImage := print .Values.launcher.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
       {{- $initContainerPullPolicy := default "IfNotPresent" .Values.launcher.defaultInitContainer.imagePullPolicy }}
       {{- $initContainerResources := .Values.launcher.defaultInitContainer.resources }}

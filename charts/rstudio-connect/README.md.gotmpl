@@ -10,6 +10,12 @@
 
 ## Upgrade guidance
 
+### 0.20.0
+
+- Chart version 0.20.0 switches default images from `ghcr.io/rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
+- Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`. The chart will fail with a clear error if you have `image.tagPrefix` set — replace it with `image.os`.
+- `launcher.customRuntimeYaml` and `launcher.additionalRuntimeImages` have been removed. Use `executionEnvironments` instead.
+
 ### 0.9.0
 
 - Chart version 0.9.0 adds support for the direct Kubernetes runner via `backends.kubernetes.enabled`. See the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning from `launcher.enabled`.
@@ -139,8 +145,8 @@ can be set and the release can be upgraded to include the new value.
 
 This chart supports [declarative management of execution environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management)
 via `ExecutionEnvironments.ConfigFilePath`. Requires Connect version 2026.03.0 or later.
-Unlike the legacy `launcher.customRuntimeYaml`, changes to `executionEnvironments`
-take effect on every `helm upgrade` without requiring a pod restart or database reset.
+Changes to `executionEnvironments` take effect on every `helm upgrade` without
+requiring a pod restart or database reset.
 
 When `executionEnvironments` is set, the chart renders the list into a dedicated
 ConfigMap and mounts it into the Connect pod. Connect only manages the execution
