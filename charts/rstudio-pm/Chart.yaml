@@ -30,7 +30,7 @@ annotations:
     - name: Container Images
       url: https://github.com/posit-dev/images-package-manager
     - name: Posit Community Forum
-      url: https://forum.posit.co/c/posit-professional-hosted/package-manager/21
+      url: https://forum.posit.co/c/posit-professional-hosted
     - name: GitHub Discussions
       url: https://github.com/posit-dev/images/discussions
     - name: About Posit Team

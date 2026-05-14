@@ -32,7 +32,7 @@ annotations:
     - name: Container Images
       url: https://github.com/posit-dev/images-workbench
     - name: Posit Community Forum
-      url: https://forum.posit.co/c/posit-professional-hosted/posit-workbench/69
+      url: https://forum.posit.co/c/posit-professional-hosted
     - name: GitHub Discussions
       url: https://github.com/posit-dev/images/discussions
     - name: About Posit Team
