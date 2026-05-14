@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: 2026.04.1](https://img.shields.io/badge/AppVersion-2026.04.1-informational?style=flat-square)
+![Version: 0.20.1](https://img.shields.io/badge/Version-0.20.1-informational?style=flat-square) ![AppVersion: 2026.04.1](https://img.shields.io/badge/AppVersion-2026.04.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.0:
+To install the chart with the release name `my-release` at version 0.20.1:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.0
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.1
 ```
 
 To explore other chart versions, look at:
@@ -44,6 +44,12 @@ helm search repo rstudio/rstudio-connect -l
 ```
 
 ## Upgrade guidance
+
+### 0.20.1
+
+- Chart version 0.10.0 changes the default execution backend to use a new Off-Host Execution implementation: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`.
+New installations use the new implementation by default. To continue using the Launcher, set `launcher.enabled: true` and `backends.kubernetes.enabled: false` in your values.yaml.
+See the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning to the new implementation.
 
 ### 0.20.0
 
@@ -281,7 +287,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | backends.kubernetes.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | backends.kubernetes.defaultResourceJobBase | object | `{}` | defaultResourceJobBase is an optional Kubernetes Job definition used as the base when launching content jobs. The chart automatically adds the init container and runtime volume when backends.kubernetes.defaultInitContainer.enabled is true. Only set this if you need to customize the job (e.g., add sidecars, node selectors, tolerations). https://kubernetes.io/docs/concepts/workloads/controllers/job/ |
 | backends.kubernetes.defaultResourceServiceBase | object | `{}` | defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's Service in Kubernetes. Conceptually this is similar to a Kustomize base. Connect then applies any required Service configuration on-top of the overlay base to produce a final Service definition. https://kubernetes.io/docs/concepts/services-networking/service/ https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays |
-| backends.kubernetes.enabled | bool | `false` | Whether to enable off-host execution for running content-jobs in remote Kubernetes pods. |
+| backends.kubernetes.enabled | bool | `true` | Whether to enable off-host execution for running content-jobs in remote Kubernetes pods. |
 | backends.kubernetes.namespace | string | `""` | The namespace to launch connect-content jobs into. Uses the Release namespace by default |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
@@ -326,7 +332,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | launcher.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
 | launcher.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| launcher.enabled | bool | `true` | Whether to enable the launcher |
+| launcher.enabled | bool | `false` | Whether to enable the launcher |
 | launcher.extraTemplates | object | `{}` | extra templates to render in the template directory. |
 | launcher.includeDefaultTemplates | bool | `true` | whether to include the default `job.tpl` and `service.tpl` files included with the chart |
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
