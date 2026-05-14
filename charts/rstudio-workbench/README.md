@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.11.2](https://img.shields.io/badge/Version-0.11.2-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.11.2:
+To install the chart with the release name `my-release` at version 0.20.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.11.2
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.20.0
 ```
 
 To explore other chart versions, look at:
@@ -62,7 +62,7 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `rstudio/rstudio-workbench` image has `sssd` installed and started by default.
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `posit/workbench` image has `sssd` installed and started by default.
   You can include `sssd` configuration in `config.userProvisioning` like so:
 
     ```yaml
@@ -172,29 +172,32 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
 
+## Upgrade guidance
+
+### 0.20.0
+
+- Chart version 0.20.0 switches default images from `rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
+- Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`. The chart will fail with a clear error if you have `image.tagPrefix` or `session.image.tagPrefix` set.
+- Session image tag is now constructed from `session.image.rVersion`, `session.image.pythonVersion`, and `session.image.os` (format: `R{rVersion}-python{pythonVersion}-{os}`).
+
 ## Session images
 
-By default, session pods use the `rstudio/workbench-session` image with an init
-container (`rstudio/workbench-session-init`) that delivers Workbench session
-components at pod startup.
+By default, session pods use the `posit/workbench-session` image (also available
+at `ghcr.io/posit-dev/workbench-session`) with an init container
+(`posit/workbench-session-init`) that delivers Workbench session components at
+pod startup.
 
-### Upgrading from 0.10.x
+The session image tag is constructed from three values: `session.image.rVersion`,
+`session.image.pythonVersion`, and `session.image.os`. Override
+`session.image.tag` to bypass this construction entirely.
 
-Chart defaults require no additional configuration, but the default
-`session.image.tag` now pins an explicit R/Python matrix (see `values.yaml`)
-because `rstudio/workbench-session` does not publish Workbench-version-shaped
-tags. Review the pinned tag against
-[hub.docker.com/r/rstudio/workbench-session/tags](https://hub.docker.com/r/rstudio/workbench-session/tags)
-during each Workbench upgrade.
+### Upgrading from 0.11.x
 
-If you pin `session.image.repository: rstudio/r-session-complete`, also set
-`components.enabled: false` to preserve the previous behavior. The
-`r-session-complete` tag format (`<tagPrefix><appVersion>`) still works there.
+If you use default values, no action is needed. If you customized session images:
 
-If you adopt the init-container pattern with a custom session image, confirm
-that the image does not already include Workbench session components (only
-language runtimes, system tools, and similar dependencies). Otherwise, the init
-container repeats work that the image already performs.
+- Replace `session.image.tagPrefix` with `session.image.os`, `session.image.rVersion`, and `session.image.pythonVersion`
+- Replace `session.image.repository: rstudio/workbench-session` with `posit/workbench-session`
+- If you pinned `session.image.tag` to an old-format string (e.g., `ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11`), verify that tag exists in the `posit/workbench-session` repository or update to the new format
 
 For platform-level upgrade steps, see the [Posit Workbench administrator guide](https://docs.posit.co/ide/server-pro/).
 
@@ -632,12 +635,12 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
 | command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
-| components | object | `{"enabled":true,"positron":{"image":{"repository":"rstudio/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"rstudio/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
+| components | object | `{"enabled":true,"positron":{"image":{"repository":"posit/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"posit/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
 | components.enabled | bool | `true` | Enable session component delivery via init containers. When false, no init containers are configured and session.image must be a self-contained image like r-session-complete. |
-| components.positron.image.repository | string | `"rstudio/workbench-positron-init"` | The image repository for the Positron init container |
+| components.positron.image.repository | string | `"posit/workbench-positron-init"` | The image repository for the Positron init container |
 | components.positron.image.tag | string | `""` | A tag override for the Positron init container image. Defaults to the positron version |
 | components.positron.version | string | `""` | A Positron version to enable the Positron init container for session pods. When set, configures rserver.conf with the Positron init container settings and attaches a Positron init container to the Workbench server pod. |
-| components.sessionInit.image.repository | string | `"rstudio/workbench-session-init"` | The repository for the session init container image |
+| components.sessionInit.image.repository | string | `"posit/workbench-session-init"` | The repository for the session init container image |
 | components.sessionInit.image.tag | string | `""` | A tag override for the session init container. Default tag is the chart appVersion (or versionOverride) |
 | config.database | object | `{"conf":{"existingSecret":"","value":""}}` | a map of database connection config files. Mounted to `/mnt/secret-configmap/rstudio/database.conf` with 0600 permissions |
 | config.database.conf.existingSecret | string | `""` | Secret for database connection config. Will take precedence over `config.database.conf.value`.  Key: 'database.conf' |
@@ -682,9 +685,9 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | homeStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-workbench"` | the repository to use for the main pod image |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"posit/workbench"` | the repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -767,9 +770,11 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.defaultHomeMount | bool | `true` | Whether to automatically add the homeStorage PVC to the session (i.e. via the `launcher-mounts` file) |
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
-| session.image.repository | string | `"rstudio/workbench-session"` | The repository to use for the session image |
-| session.image.tag | string | `"ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11"` | A tag override for the session image. Pinned to an explicit R/Python matrix because `rstudio/workbench-session` publishes tags by language runtime version, not by Workbench release (unlike `rstudio/r-session-complete`). Pick a published tag from https://hub.docker.com/r/rstudio/workbench-session/tags. |
-| session.image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined. The `rstudio/workbench-session` default repository does not publish tags in `{{ tagPrefix }}{{ appVersion }}` form — see the pinned tag below — so `tagPrefix` is effectively unused for the default session image. |
+| session.image.os | string | `"ubuntu-24.04"` | The OS version for the session image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| session.image.pythonVersion | string | `"3.14.3"` | The Python version for the session image tag. Only used if tag is not defined |
+| session.image.rVersion | string | `"4.5.2"` | The R version for the session image tag. Only used if tag is not defined |
+| session.image.repository | string | `"posit/workbench-session"` | The repository to use for the session image |
+| session.image.tag | string | `""` | A tag override for the session image. When empty, the chart computes the tag as `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}` |
 | shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |
@@ -793,7 +798,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | userPassword.existingSecret | string | `""` | Existing Secret for userPassword. Will take precedence over `userPassword.value`. Key: 'password' |
 | userPassword.value | string | `"rstudio"` | userPassword determines the password of the created user. Will only be used if `userPassword.existingSecret` is not set. |
 | userUid | string | `"10000"` | userUid determines the UID of the created user |
-| versionOverride | string | `""` | A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194 |
+| versionOverride | string | `""` | A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194 |
 | xdgConfigDirs | string | `"/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"` | The XDG config dirs (directories where configuration will be read from). Do not change without good reason. |
 | xdgConfigDirsExtra | list | `[]` | A list of additional XDG config dir paths |
 

@@ -1,6 +1,6 @@
 {{- /* Define the default values that will be merged over */}}
 {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-{{- $sessionTag := .Values.session.image.tag | default (printf "%s%s" .Values.session.image.tagPrefix $defaultVersion ) }}
+{{- $sessionTag := .Values.session.image.tag | default (printf "R%s-python%s-%s" .Values.session.image.rVersion .Values.session.image.pythonVersion .Values.session.image.os ) }}
 {{- $defaultImages := list (printf "%s:%s" .Values.session.image.repository $sessionTag) }}
 {{- $defaultOverrides := list }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}

@@ -15,7 +15,7 @@ tests:
           pattern: "launcher-sessions-auto-update=1"
       - matchRegex:
           path: data["rserver.conf"]
-          pattern: "launcher-sessions-init-container-image-name=rstudio/workbench-session-init"
+          pattern: "launcher-sessions-init-container-image-name=posit/workbench-session-init"
       - matchRegex:
           path: data["rserver.conf"]
           pattern: "launcher-sessions-init-container-image-tag=\\d+\\.\\d+\\.\\d+"
@@ -26,7 +26,7 @@ tests:
     asserts:
       - matchRegex:
           path: data["launcher.kubernetes.profiles.conf"]
-          pattern: "default-container-image=rstudio/workbench-session:"
+          pattern: "default-container-image=posit/workbench-session:"
 
   # -- Components disabled (classic mode)
   - it: should not include session-init settings when components are disabled
@@ -121,7 +121,7 @@ tests:
           pattern: "launcher-positron-init-container-enabled=1"
       - matchRegex:
           path: data["rserver.conf"]
-          pattern: "launcher-positron-init-container-image-name=rstudio/workbench-positron-init"
+          pattern: "launcher-positron-init-container-image-name=posit/workbench-positron-init"
       - matchRegex:
           path: data["rserver.conf"]
           pattern: "launcher-positron-init-container-image-tag=2026.03.0-213"
