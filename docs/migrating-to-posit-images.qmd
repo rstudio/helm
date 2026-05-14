@@ -1,0 +1,216 @@
+---
+category: "Upgrade"
+---
+
+# Migrating to Posit images
+
+Chart version 0.20.0 replaces the `rstudio/` and `ghcr.io/rstudio/` default images with new images under `posit/` on [Docker Hub](https://hub.docker.com/u/posit) and `ghcr.io/posit-dev/` on [GitHub Container Registry](https://github.com/orgs/posit-dev/packages) (GHCR).
+
+Docker Hub applies [rate limits](https://docs.docker.com/docker-hub/usage/) to unauthenticated and free-tier pulls. For production clusters, consider using `ghcr.io/posit-dev/` or a pull-through cache to avoid throttling.
+
+:::{.callout-important}
+Breaking change: default tags moved from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`, following the `{version}-{variant}` convention used by official Docker images. Update image references before upgrading.
+:::
+
+The default OS changed from Ubuntu 22.04 to Ubuntu 24.04 across all products. The new images bundle a single R version and a single Python version instead of two of each. Set `image.os` to `ubuntu-22.04` if you need to stay on the previous OS.
+
+If you never set `image.repository`, `image.tagPrefix`, or `image.tag`, you do not need to change anything.
+
+If you mirror images to a private registry, update the repository path. Make sure your mirror tags follow the new `{appVersion}-{os}` format, or pin `image.tag` to an exact value.
+
+## Posit Connect
+
+Images are renamed as follows:
+
+- `ghcr.io/rstudio/rstudio-connect` → `posit/connect`
+- `ghcr.io/rstudio/content-base` / `content-pro` → `posit/connect-content`
+- `ghcr.io/rstudio/rstudio-connect-content-init` → `posit/connect-content-init`
+
+See the [images-connect](https://github.com/posit-dev/images-connect) repository for image-specific migration details.
+
+```{.yaml filename="Old default"}
+image:
+  repository: "ghcr.io/rstudio/rstudio-connect"
+  tagPrefix: ubuntu2204-
+```
+
+```{.yaml filename="New default"}
+image:
+  repository: "posit/connect"
+  os: "ubuntu-24.04"
+```
+
+These values can be configured as follows:
+
+- `image.os`: OS variant (default: `ubuntu-24.04`)
+- `image.tag`: full tag override, bypasses `os` and `appVersion`
+- `image.repository`: use `ghcr.io/posit-dev/connect` for GHCR
+
+### Removed values
+
+These values cause a hard error if set:
+
+- `image.tagPrefix`: use `image.os` instead
+- `launcher.defaultInitContainer.tagPrefix`: use `launcher.defaultInitContainer.os` instead
+- `backends.kubernetes.defaultInitContainer.tagPrefix`: use `backends.kubernetes.defaultInitContainer.os` instead
+- `launcher.customRuntimeYaml`: use [`executionEnvironments`](../charts/rstudio-connect/README.md#execution-environments) instead
+- `launcher.additionalRuntimeImages`: use [`executionEnvironments`](../charts/rstudio-connect/README.md#execution-environments) instead
+
+:::{.callout-note}
+The chart defaults for `config.Python.Executable` and `config.Quarto.Executable` changed to match the new server image. If you override these values, verify the paths exist in your image.
+
+Python: `/opt/python/3.12.11/bin/python` and `/opt/python/3.13.9/bin/python` → `/opt/python/3.14.4/bin/python`
+
+Quarto: `/opt/quarto/1.8.25/bin/quarto` → `/usr/local/bin/quarto`
+:::
+
+### Connect Content images
+
+Content runtime images moved from `ghcr.io/rstudio/content-base` and `content-pro` to a single `posit/connect-content` repository. The base and pro variants are now differentiated by tag suffix rather than separate repos:
+
+- Base: `posit/connect-content:R4.6.0-python3.14.4-ubuntu-24.04`
+- Pro: `posit/connect-content:R4.6.0-python3.14.4-ubuntu-24.04-pro`
+
+Configure content images through the [`executionEnvironments`](../charts/rstudio-connect/README.md#execution-environments) value:
+
+```{.yaml filename="values.yaml"}
+executionEnvironments:
+  - name: posit/connect-content:R4.6.0-python3.14.4-ubuntu-24.04
+    title: "R 4.6.0 / Python 3.14.4"
+    matching: any
+    python:
+      installations:
+        - version: "3.14.4"
+          path: /opt/python/3.14.4/bin/python3
+    r:
+      installations:
+        - version: "4.6.0"
+          path: /opt/R/4.6.0/bin/R
+```
+
+For available tags and R/Python combinations, see the [images-connect](https://github.com/posit-dev/images-connect) repository.
+
+## Posit Workbench
+
+Images are renamed as follows:
+
+- `rstudio/rstudio-workbench` → `posit/workbench`
+- `rstudio/r-session-complete` → `posit/workbench-session`
+- `rstudio/workbench-session` → `posit/workbench-session`
+- `rstudio/workbench-session-init` → `posit/workbench-session-init`
+- `rstudio/workbench-positron-init` → `posit/workbench-positron-init`
+
+See the [images-workbench](https://github.com/posit-dev/images-workbench) repository for image-specific migration details.
+
+### Server image
+
+```{.yaml filename="Old default"}
+image:
+  repository: "rstudio/rstudio-workbench"
+  tagPrefix: ubuntu2204-
+```
+
+```{.yaml filename="New default"}
+image:
+  repository: "posit/workbench"
+  os: "ubuntu-24.04"
+```
+
+These values can be configured as follows:
+
+- `image.os`: OS variant (default: `ubuntu-24.04`)
+- `image.tag`: full tag override, bypasses `os` and `appVersion`
+- `image.repository`: use `ghcr.io/posit-dev/workbench` for GHCR
+
+### Workbench Session image
+
+Session image tags now use three separate values instead of a single pinned tag string:
+
+```{.yaml filename="Old default"}
+session:
+  image:
+    repository: "rstudio/workbench-session"
+    tagPrefix: ubuntu2204-
+```
+
+```{.yaml filename="New default"}
+session:
+  image:
+    repository: "posit/workbench-session"
+    os: "ubuntu-24.04"
+    rVersion: "4.5.2"
+    pythonVersion: "3.14.3"
+```
+
+These values can be configured as follows:
+
+- `session.image.rVersion`: R version (default: `4.5.2`)
+- `session.image.pythonVersion`: Python version (default: `3.14.3`)
+- `session.image.os`: OS variant (default: `ubuntu-24.04`)
+- `session.image.tag`: full tag override, bypasses all three
+
+### Removed values
+
+These values cause a hard error if set:
+
+- `image.tagPrefix`: use `image.os` instead
+- `session.image.tagPrefix`: use `session.image.os`, `session.image.rVersion`, and `session.image.pythonVersion` instead
+
+## Posit Package Manager
+
+Images are renamed as follows:
+
+- `rstudio/rstudio-package-manager` → `posit/package-manager`
+
+See the [images-package-manager](https://github.com/posit-dev/images-package-manager) repository for image-specific migration details.
+
+```{.yaml filename="Old default"}
+image:
+  repository: "rstudio/rstudio-package-manager"
+  tagPrefix: ubuntu2204-
+```
+
+```{.yaml filename="New default"}
+image:
+  repository: "posit/package-manager"
+  os: "ubuntu-24.04"
+```
+
+These values can be configured as follows:
+
+- `image.os`: OS variant (default: `ubuntu-24.04`)
+- `image.tag`: full tag override, bypasses `os` and `appVersion`
+- `image.repository`: use `ghcr.io/posit-dev/package-manager` for GHCR
+
+### Removed values
+
+These values cause a hard error if set:
+
+- `image.tagPrefix`: use `image.os` instead
+
+## Verifying the upgrade
+
+Run `helm diff upgrade` before applying to preview the rendered manifests:
+
+```{.bash filename="Terminal"}
+helm diff upgrade my-release rstudio/<chart-name> \
+  --version <target-version> \
+  -f my-values.yaml
+```
+
+Check that each `image:` reference resolves to a real tag:
+
+All products:
+
+- Server pod: `posit/<product>:{appVersion}-{os}`
+
+Connect:
+
+- Content runtime: `posit/connect-content:R{rVersion}-python{pythonVersion}-{os}`
+- Content init container: `posit/connect-content-init:{appVersion}-{os}`
+
+Workbench:
+
+- Session image: `posit/workbench-session:R{rVersion}-python{pythonVersion}-{os}`
+- Session init container: `posit/workbench-session-init:{appVersion}-{os}`
+- Positron init container: `posit/workbench-positron-init:{positronVersion}`
