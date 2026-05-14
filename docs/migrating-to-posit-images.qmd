@@ -68,10 +68,27 @@ Quarto: `/opt/quarto/1.8.25/bin/quarto` → `/usr/local/bin/quarto`
 
 Content runtime images moved from `ghcr.io/rstudio/content-base` and `content-pro` to a single `posit/connect-content` repository. The base and pro variants are now differentiated by tag suffix rather than separate repos:
 
-- Base: `posit/connect-content:R4.5.2-python3.14.3-ubuntu-24.04`
-- Pro: `posit/connect-content:R4.5.2-python3.14.3-ubuntu-24.04-pro`
+- Base: `posit/connect-content:R4.6.0-python3.14.4-ubuntu-24.04`
+- Pro: `posit/connect-content:R4.6.0-python3.14.4-ubuntu-24.04-pro`
 
-Configure content images through the [`executionEnvironments`](../charts/rstudio-connect/README.md#execution-environments) value. For available tags and R/Python combinations, see the [images-connect](https://github.com/posit-dev/images-connect) repository.
+Configure content images through the [`executionEnvironments`](../charts/rstudio-connect/README.md#execution-environments) value:
+
+```{.yaml filename="values.yaml"}
+executionEnvironments:
+  - name: posit/connect-content:R4.6.0-python3.14.4-ubuntu-24.04
+    title: "R 4.6.0 / Python 3.14.4"
+    matching: any
+    python:
+      installations:
+        - version: "3.14.4"
+          path: /opt/python/3.14.4/bin/python3
+    r:
+      installations:
+        - version: "4.6.0"
+          path: /opt/R/4.6.0/bin/R
+```
+
+For available tags and R/Python combinations, see the [images-connect](https://github.com/posit-dev/images-connect) repository.
 
 ## Posit Workbench
 
