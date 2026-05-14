@@ -1,0 +1,11 @@
+suite: Package Manager Deprecated Keys
+templates:
+  - NOTES.txt
+tests:
+  - it: should fail when image.tagPrefix is set
+    set:
+      image:
+        tagPrefix: "ubuntu2204-"
+    asserts:
+      - failedTemplate:
+          errorPattern: "image.tagPrefix.*has been removed.*image.os"
