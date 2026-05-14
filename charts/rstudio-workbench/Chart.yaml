@@ -3,14 +3,13 @@ description: Official Helm chart for Posit Workbench
 version: 0.20.0
 apiVersion: v2
 appVersion: 2026.04.0
-icon:
-  https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
-home: https://www.rstudio.com
+icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
+home: https://posit.co
 sources:
   - https://github.com/rstudio/helm
 maintainers:
   - name: sol-eng
-    email: docker@rstudio.com
+    email: docker@posit.co
     url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
@@ -20,18 +19,28 @@ annotations:
   artifacthub.io/images: |
     - name: workbench
       image: posit/workbench:2026.04.0-ubuntu-24.04
-    - name: workbench-session
-      image: posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
+    - name: workbench-session-init
+      image: posit/workbench-session-init:2026.04.0-ubuntu-24.04
   artifacthub.io/license: MIT
   artifacthub.io/links: |
-    - name: Docker Images
-      url: https://github.com/rstudio/rstudio-docker-products
-    - name: RStudio Community
-      url: https://community.rstudio.com/c/r-admin/5
     - name: About Workbench
-      url: https://www.rstudio.com/products/workbench/
-    - name: About RStudio Team
-      url: https://www.rstudio.com/products/team/
+      url: https://posit.co/products/enterprise/workbench/
+    - name: Workbench Documentation
+      url: https://docs.posit.co/ide/server-pro/
+    - name: Posit Helm Documentation
+      url: https://docs.posit.co/helm
+    - name: Container Images
+      url: https://github.com/posit-dev/images-workbench
+    - name: Posit Community Forum
+      url: https://forum.posit.co/c/posit-professional-hosted/posit-workbench/69
+    - name: GitHub Discussions
+      url: https://github.com/posit-dev/images/discussions
+    - name: About Posit Team
+      url: https://posit.co/products/enterprise/team/
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
+    - url: https://artifacthub.io/packages/helm/rstudio/posit-chronicle
 keywords:
   - data science
   - machine learning
@@ -43,3 +52,4 @@ keywords:
   - jupyter
   - vscode
   - rstudio
+  - posit

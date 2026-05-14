@@ -9,6 +9,7 @@
   - Default content images updated to `posit/connect-content`
   - Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`
   - `image.tagPrefix` replaced by `image.os`; same for `launcher.defaultInitContainer` and `backends.kubernetes.defaultInitContainer`
+  - Update chart metadata links and branding.
 - **BREAKING**: Remove `launcher.customRuntimeYaml`, `launcher.additionalRuntimeImages`, and bundled `default-runtime.yaml` / `default-runtime-pro.yaml`. Use `executionEnvironments` instead.
 - Default Python executable updated to 3.14.4
 

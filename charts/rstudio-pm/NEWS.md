@@ -6,6 +6,7 @@
   - `image.repository` changed from `rstudio/rstudio-package-manager` to `posit/package-manager`
   - Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`
   - `image.tagPrefix` replaced by `image.os`
+  - Update chart metadata links and branding.
 
 ## 0.5.57
 

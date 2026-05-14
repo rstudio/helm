@@ -11,6 +11,7 @@
   - `image.tagPrefix` replaced by `image.os`
   - `session.image.tagPrefix` replaced by `session.image.os`, `session.image.rVersion`, `session.image.pythonVersion`
   - `versionOverride` no longer affects the session image tag (use `session.image.rVersion`, `session.image.pythonVersion`, `session.image.os` instead)
+  - Update chart metadata links and branding.
 
 ## 0.11.2
 
