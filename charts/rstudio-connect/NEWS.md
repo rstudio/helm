@@ -2,7 +2,10 @@
 
 ## 0.20.1
 
-- BREAKING: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`. New installations use the new implementation for Off-Host Execution by default. To continue using the Launcher implementation, set `launcher.enabled: true` and `backends.kubernetes.enabled: false` in your values.yaml. See the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning to the new implementation.
+- BREAKING: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`. 
+    - New installations use the new implementation for Off-Host Execution by default. 
+    - For existing installations, see the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning to the new implementation.
+    - To continue using the Launcher implementation, set `launcher.enabled: true` and `backends.kubernetes.enabled: false` in your values.yaml. 
 
 ## 0.20.0
 
