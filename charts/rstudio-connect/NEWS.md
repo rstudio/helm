@@ -6,6 +6,7 @@
     - New installations use the new implementation for Off-Host Execution by default. 
     - For existing installations, see the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning to the new implementation.
     - To continue using the Launcher implementation, set `launcher.enabled: true` and `backends.kubernetes.enabled: false` in your values.yaml. 
+    - **IMPORTANT** When `backends.kubernetes.enabled=true`, service accounts used for content execution require the `connect.posit.co/service-account` label.
 
 ## 0.20.0
 
