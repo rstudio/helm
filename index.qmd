@@ -20,3 +20,65 @@ title: Posit Helm Charts
    ```{.bash}
    helm search repo rstudio
    ```
+
+## Installing Charts
+
+The general pattern for installing a Posit Helm chart:
+
+```{.bash}
+helm install <release-name> rstudio/<chart-name> \
+  --values values.yaml
+```
+
+For product-specific installation instructions, including license configuration, see each chart's overview:
+
+- [Posit Workbench](charts/rstudio-workbench/README.md#installing-the-chart)
+- [Posit Connect](charts/rstudio-connect/README.md#installing-the-chart)
+- [Posit Package Manager](charts/rstudio-pm/README.md#installing-the-chart)
+- [Posit Chronicle](charts/posit-chronicle/README.md#installing-the-chart)
+
+## Upgrading a Release
+
+```{.bash}
+helm upgrade <release-name> rstudio/<chart-name> \
+  --values <values-file>.yaml
+```
+
+## Uninstalling a Release
+
+```{.bash}
+helm uninstall <release-name> --namespace posit
+```
+
+## Troubleshooting
+
+List running pods:
+
+```{.bash}
+kubectl get pods 
+```
+
+View application logs:
+
+```{.bash}
+kubectl logs <pod-name> 
+```
+
+View pod events and status:
+
+```{.bash}
+kubectl describe pod <pod-name> 
+```
+
+For troubleshooting pods themselves, and testing the installation of new packages/services, 
+open a shell in a pod:
+
+```{.bash}
+kubectl exec -it <pod-name> -- /bin/bash
+```
+
+Restart a deployment:
+
+```{.bash}
+kubectl rollout restart deployment/<deployment-name>
+```
