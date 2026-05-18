@@ -306,7 +306,7 @@ chronicleAgent:
 backends:
   kubernetes:
     # -- Whether to enable off-host execution for running content-jobs in remote Kubernetes pods.
-    enabled: false
+    enabled: true
     # -- The namespace to launch connect-content jobs into. Uses the Release namespace by default
     namespace: ""
     defaultInitContainer:
@@ -347,7 +347,7 @@ backends:
 
 launcher:
   # -- Whether to enable the launcher
-  enabled: true
+  enabled: false
   # -- The namespace to launch sessions into. Uses the Release namespace by default
   namespace: ""
   # -- User definition of launcher.kubernetes.profiles.conf for job customization

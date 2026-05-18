@@ -4,6 +4,9 @@ templates:
 tests:
   - it: should fail when launcher.customRuntimeYaml is set
     set:
+      backends:
+        kubernetes:
+          enabled: false
       launcher:
         enabled: true
         customRuntimeYaml: "base"
@@ -15,6 +18,9 @@ tests:
 
   - it: should fail when launcher.additionalRuntimeImages is set
     set:
+      backends:
+        kubernetes:
+          enabled: false
       launcher:
         enabled: true
         additionalRuntimeImages:
@@ -37,6 +43,9 @@ tests:
 
   - it: should fail when launcher.defaultInitContainer.tagPrefix is set
     set:
+      backends:
+        kubernetes:
+          enabled: false
       launcher:
         enabled: true
         defaultInitContainer:

@@ -10,6 +10,13 @@
 
 ## Upgrade guidance
 
+### 0.20.1
+
+- Chart version 0.10.0 changes the default execution backend to use a new Off-Host Execution implementation: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`.
+New installations use the new implementation by default. To continue using the Launcher, set `launcher.enabled: true` and `backends.kubernetes.enabled: false` in your values.yaml.
+See the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning to the new implementation.
+  - **IMPORTANT** When `backends.kubernetes.enabled=true`, service accounts used for content execution require the `connect.posit.co/service-account` label.
+
 ### 0.20.0
 
 - Chart version 0.20.0 switches default images from `ghcr.io/rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
