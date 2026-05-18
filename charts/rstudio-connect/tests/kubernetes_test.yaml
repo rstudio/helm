@@ -784,7 +784,7 @@ tests:
           pattern: "name: connect-content-init"
       - matchRegex:
           path: data["job.yaml"]
-          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:ubuntu2204-"
+          pattern: "image: posit/connect-content-init:\\d+\\.\\d+\\.\\d+-ubuntu-24\\.04"
       - matchRegex:
           path: data["job.yaml"]
           pattern: "name: connect-content"
@@ -1065,7 +1065,7 @@ tests:
       - notExists:
           path: spec.template.metadata.annotations["checksum/config-prestart"]
 
-  # Test 7: Init image tag precedence — explicit tag overrides tagPrefix+appVersion
+  # Test 7: Init image tag precedence — explicit tag overrides os+appVersion
   - it: should use explicit defaultInitContainer.tag when set
     template: configmap.yaml
     values:
@@ -1081,9 +1081,9 @@ tests:
     asserts:
       - matchRegex:
           path: data["job.yaml"]
-          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:custom-tag-1.2.3"
+          pattern: "image: posit/connect-content-init:custom-tag-1.2.3"
 
-  - it: should use tagPrefix plus appVersion when tag is not set
+  - it: should use appVersion-os when tag is not set
     template: configmap.yaml
     values:
       - kubernetes-values.yaml
@@ -1094,11 +1094,11 @@ tests:
         kubernetes:
           enabled: true
           defaultInitContainer:
-            tagPrefix: "jammy-"
+            os: "ubuntu-22.04"
     asserts:
       - matchRegex:
           path: data["job.yaml"]
-          pattern: "image: ghcr.io/rstudio/rstudio-connect-content-init:jammy-\\d+\\.\\d+\\.\\d+"
+          pattern: "image: posit/connect-content-init:\\d+\\.\\d+\\.\\d+-ubuntu-22\\.04"
 
   - it: should preserve user-provided sidecar and nodeSelector in job base
     template: configmap.yaml
@@ -1132,3 +1132,25 @@ tests:
       - matchRegex:
           path: data["job.yaml"]
           pattern: "name: connect-content"
+
+  - it: should set default prestart args when backends.kubernetes is enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - /scripts/prestart.bash
+            - /usr/local/bin/startup.sh
+
+  - it: should mount prestart script when backends.kubernetes is enabled
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-connect-prestart
+            mountPath: "/scripts/"

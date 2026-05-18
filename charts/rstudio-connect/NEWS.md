@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.20.0
+
+- **BREAKING**: Default images now pull from the `posit/` namespace on Docker Hub
+  - `image.repository` changed from `ghcr.io/rstudio/rstudio-connect` to `posit/connect`
+  - `launcher.defaultInitContainer.repository` changed to `posit/connect-content-init`
+  - `backends.kubernetes.defaultInitContainer.repository` changed to `posit/connect-content-init`
+  - Default content images updated to `posit/connect-content`
+  - Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`
+  - `image.tagPrefix` replaced by `image.os`; same for `launcher.defaultInitContainer` and `backends.kubernetes.defaultInitContainer`
+  - Update chart metadata links and branding.
+- **BREAKING**: Remove `launcher.customRuntimeYaml`, `launcher.additionalRuntimeImages`, and bundled `default-runtime.yaml` / `default-runtime-pro.yaml`. Use `executionEnvironments` instead.
+- Default Python executable updated to 3.14.4
+
 ## 0.9.5
 
 - Bump Connect version to 2026.04.1

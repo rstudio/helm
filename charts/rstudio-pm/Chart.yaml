@@ -1,33 +1,44 @@
 name: rstudio-pm
 description: Official Helm chart for Posit Package Manager
-version: 0.5.57
+version: 0.20.0
 apiVersion: v2
 appVersion: 2026.04.2
 icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
-home: https://www.rstudio.com
+home: https://posit.co
 sources:
   - https://github.com/rstudio/helm
-  - https://github.com/rstudio/rstudio-docker-products
 maintainers:
   - name: sol-eng
-    email: docker@rstudio.com
-    url: https://github.com/rstudio/helm
+    email: docker@posit.co
+    url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
     version: 0.1.31
     repository: https://helm.rstudio.com
 annotations:
   artifacthub.io/images: |
-    - name: rstudio-package-manager
-      image: rstudio/rstudio-package-manager:ubuntu2204-2026.04.2
+    - name: package-manager
+      image: posit/package-manager:2026.04.2-ubuntu-24.04
   artifacthub.io/license: MIT
   artifacthub.io/links: |
-    - name: RStudio Community
-      url: https://community.rstudio.com/c/r-admin/5
     - name: About Package Manager
       url: https://posit.co/products/enterprise/package-manager/
+    - name: Package Manager Documentation
+      url: https://docs.posit.co/rspm/
+    - name: Posit Helm Documentation
+      url: https://docs.posit.co/helm
+    - name: Container Images
+      url: https://github.com/posit-dev/images-package-manager
+    - name: Posit Community Forum
+      url: https://forum.posit.co/c/posit-professional-hosted
+    - name: GitHub Discussions
+      url: https://github.com/posit-dev/images/discussions
     - name: About Posit Team
       url: https://posit.co/products/enterprise/team/
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+    - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
+    - url: https://artifacthub.io/packages/helm/rstudio/posit-chronicle
 keywords:
   - "data science"
   - "machine learning"

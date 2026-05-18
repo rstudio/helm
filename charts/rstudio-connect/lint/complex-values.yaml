@@ -11,8 +11,8 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 image:
-  repository: rstudio/rstudio-connect
-  tag: 1.8.4-11
+  repository: ghcr.io/posit-dev/connect
+  tag: 2026.04.0-ubuntu-24.04
   imagePullPolicy: "IfNotPresent"
   imagePullSecrets:
     - name: "some-secret"

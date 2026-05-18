@@ -96,7 +96,7 @@ test-connect-interpreter-versions:
     helm template ./charts/rstudio-connect \
     --set launcher.enabled=false \
     --show-only templates/deployment.yaml | \
-    grep "image\:.*rstudio-connect.*" | \
+    grep "image\:.*posit/connect\:.*" | \
     awk -F": " '{print $2}' | \
     xargs)
 

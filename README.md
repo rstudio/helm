@@ -3,11 +3,23 @@
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/rstudio)](https://artifacthub.io/packages/search?repo=rstudio)
 [![GitHub license](https://img.shields.io/github/license/rstudio/helm.svg)](https://github.com/rstudio/helm/blob/main/LICENSE)
 
+> [!IMPORTANT]
+> **Chart version 0.20.0 contains breaking changes:**
+>
+> - Default images moved from `rstudio/` and `ghcr.io/rstudio/` to
+>   `posit/` on [Docker Hub](https://hub.docker.com/u/posit) and
+>   `ghcr.io/posit-dev/` on [GitHub Container Registry (GHCR)](https://github.com/orgs/posit-dev/packages).
+> - The default tag format changed from `{tagPrefix}{appVersion}` to
+>   `{appVersion}-{os}`.
+>
+> If you are upgrading from an earlier version, read the
+> [image migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) first.
+
 ## Usage
 
 1. Install [Helm](https://helm.sh). Please refer to Helm's [documentation](https://helm.sh/docs/) for more information on getting started.
 
-2. Add the RStudio Helm repo:
+2. Add the Helm repo:
 
    ```console
    helm repo add rstudio https://helm.rstudio.com

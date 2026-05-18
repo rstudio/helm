@@ -16,6 +16,7 @@ project:
     - examples/workbench/README.md
     - examples/connect/README.md
     - docs/customize.md
+    - docs/migrating-to-posit-images.qmd
     - "*.qmd"
 
 filters:
@@ -51,6 +52,8 @@ website:
     contents:
       - text: Overview
         file: index.qmd
+      - text: Image migration guide
+        file: docs/migrating-to-posit-images.qmd
       - section: "Posit Workbench"
         contents:
           - text: Overview
