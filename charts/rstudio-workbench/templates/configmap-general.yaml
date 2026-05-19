@@ -49,6 +49,9 @@
 {{- $defaultIDEServiceName := include "rstudio-workbench.fullname" . }}
 {{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
 {{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
+{{- if .Values.serviceAccountUser }}
+  {{- $_ := set $defaultRServerConfigValues "server-user" .Values.serviceAccountUser }}
+{{- end }}
 {{- if and .Values.launcher.enabled .Values.components.enabled }}
   {{- $initTag := .Values.components.sessionInit.image.tag | default $defaultVersion }}
   {{- $_ := set $defaultRServerConfigValues "launcher-sessions-auto-update" 1 }}

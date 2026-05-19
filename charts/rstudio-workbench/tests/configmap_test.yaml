@@ -256,3 +256,59 @@ tests:
       - notMatchRegex:
           path: data["positron.conf"]
           pattern: "^exe="
+
+  # -- serviceAccountUser -> rserver.conf server-user
+  - it: should render server-user with default service account user
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=rstudio-server"
+
+  - it: should render server-user when serviceAccountUser is overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "workbench"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=workbench"
+
+  - it: should render server-user=root when serviceAccountUser is root
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "root"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=root"
+
+  - it: should omit server-user when serviceAccountUser is empty
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: ""
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user="
+
+  - it: should let config.server.rserver.conf.server-user override serviceAccountUser
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "rstudio-server"
+      config:
+        server:
+          rserver.conf:
+            server-user: "explicit-override"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=explicit-override"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=rstudio-server"

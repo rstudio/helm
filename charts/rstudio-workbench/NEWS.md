@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.0
+
+- **BREAKING**: Workbench pods now run as non-root by default. New top-level values `serviceAccountUser` (default `rstudio-server`) and `serviceAccountUserId` (default `999`) control the OS user and UID. The user is written to `rserver.conf` as `server-user` and applied to the pod's `securityContext` as `runAsUser` with `runAsNonRoot: true`. Set `serviceAccountUser: "root"` to restore the previous root behavior. The same values will be wired into session and session-init containers in follow-up releases.
+
 ## 0.20.0
 
 - **BREAKING**: Default images now pull from the `posit/` namespace on Docker Hub

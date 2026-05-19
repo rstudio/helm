@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.21.0](https://img.shields.io/badge/Version-0.21.0-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.0:
+To install the chart with the release name `my-release` at version 0.21.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.20.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.21.0
 ```
 
 To explore other chart versions, look at:
@@ -764,6 +764,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.targetPort | int | `8787` | The port to forward to on the Workbench pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
+| serviceAccountUser | string | `"rstudio-server"` | The OS user that the Workbench server runs as. Written to `rserver.conf` as `server-user` and used as `runAsUser` together with `serviceAccountUserId` in the pod's securityContext. Set to `"root"` to run as root (sets `runAsUser: 0` and leaves `runAsNonRoot` unset). Set to `""` to omit `server-user` from `rserver.conf` and skip the runAsUser/runAsNonRoot defaults entirely. |
+| serviceAccountUserId | int | `999` | The UID matching `serviceAccountUser`. Used as `runAsUser` in the pod's securityContext when `serviceAccountUser` is not `"root"` and not empty. Must match the UID baked into the Workbench image for the named user. |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |

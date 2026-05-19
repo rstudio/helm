@@ -6,6 +6,12 @@ fullnameOverride: ""
 # -- A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
+# -- The OS user that the Workbench server runs as. Written to `rserver.conf` as `server-user` and used as `runAsUser` together with `serviceAccountUserId` in the pod's securityContext. Set to `"root"` to run as root (sets `runAsUser: 0` and leaves `runAsNonRoot` unset). Set to `""` to omit `server-user` from `rserver.conf` and skip the runAsUser/runAsNonRoot defaults entirely.
+serviceAccountUser: "rstudio-server"
+
+# -- The UID matching `serviceAccountUser`. Used as `runAsUser` in the pod's securityContext when `serviceAccountUser` is not `"root"` and not empty. Must match the UID baked into the Workbench image for the named user.
+serviceAccountUserId: 999
+
 # -- Settings for enabling server diagnostics
 diagnostics:
   enabled: false

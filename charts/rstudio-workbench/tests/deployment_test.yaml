@@ -852,3 +852,64 @@ tests:
           content:
             name: "positron-components"
           any: true
+
+  # -- serviceAccountUser -> pod securityContext
+  - it: should run pod as non-root with default serviceAccountUser
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 999
+
+  - it: should use custom uid when serviceAccountUserId is overridden
+    template: deployment.yaml
+    set:
+      serviceAccountUser: "workbench"
+      serviceAccountUserId: 1500
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 1500
+
+  - it: should run as root when serviceAccountUser is root
+    template: deployment.yaml
+    set:
+      serviceAccountUser: "root"
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 0
+      - notExists:
+          path: spec.template.spec.securityContext.runAsNonRoot
+
+  - it: should not set securityContext defaults when serviceAccountUser is empty
+    template: deployment.yaml
+    set:
+      serviceAccountUser: ""
+    asserts:
+      - notExists:
+          path: spec.template.spec.securityContext
+
+  - it: should let pod.securityContext override the rootless defaults
+    template: deployment.yaml
+    set:
+      pod:
+        securityContext:
+          runAsUser: 4242
+          fsGroup: 4242
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 4242
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 4242
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
