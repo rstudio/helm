@@ -41,6 +41,7 @@ jobs:
           app-id: ${{ secrets.POSIT_PLATFORM_APP_ID }}
           private-key: ${{ secrets.POSIT_PLATFORM_PEM }}
           owner: ${{ steps.project-url.outputs.ORG }}
+          permission-organization-projects: write
       - name: Add issue to project
         id: add-to-project
         if: steps.project-url.outputs.project != 'none'
