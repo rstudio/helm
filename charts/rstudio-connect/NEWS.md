@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.2
+
+- Bump Connect version to 2026.05.0
+
 ## 0.20.1
 
 - BREAKING: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`. 
