@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.3
+
+- Add `get` on `pods/attach` and `pods/exec` to the direct Kubernetes runner Role in `templates/rbac.yaml` to support attach/exec authorization checks used by Kubernetes clients to support websocket connection upgrades.
+
 ## 0.20.2
 
 - Bump Connect version to 2026.05.0

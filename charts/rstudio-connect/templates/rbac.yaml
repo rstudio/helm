@@ -103,12 +103,14 @@ rules:
       - "pods/attach"
     verbs:
       - "create"
+      - "get"
   - apiGroups:
       - ""
     resources:
       - "pods/exec"
     verbs:
       - "create"
+      - "get"
   - apiGroups:
       - ""
     resources:
