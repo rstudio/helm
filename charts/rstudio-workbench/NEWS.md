@@ -3,7 +3,6 @@
 ## 0.21.0
 
 - Workbench pods can now run as a non-root user. Set `runAsRoot: false` (new top-level value, default `true`) to run unprivileged; the pod `securityContext` is set to `runAsNonRoot: true` with `runAsUser`/`fsGroup` of `serviceAccountUserId` (default `999`). Existing deployments are unchanged.
-- `serviceAccountUser` is now solely the `server-user` written to `rserver.conf`; pod privilege is controlled by `runAsRoot`, not by the value of `serviceAccountUser`.
 - When `runAsRoot: false`, the chart applies non-root defaults (all overridable via `config.server`):
   - `secure-cookie-key-file` points at the shared key so the launcher does not generate its own (which breaks authentication of rserver-signed requests).
   - `auth-pam-sessions-enabled: 0` — opening host PAM sessions requires root.
