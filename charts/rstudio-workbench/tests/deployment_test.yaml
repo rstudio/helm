@@ -858,7 +858,7 @@ tests:
             name: "positron-components"
           any: true
 
-  # -- serviceAccountUser -> pod securityContext
+  # -- runAsRoot -> pod securityContext
   - it: should run pod as root by default
     template: deployment.yaml
     asserts:
@@ -868,10 +868,10 @@ tests:
       - notExists:
           path: spec.template.spec.securityContext.runAsNonRoot
 
-  - it: should run pod as non-root when serviceAccountUser is non-root
+  - it: should run pod as non-root when runAsRoot is false
     template: deployment.yaml
     set:
-      serviceAccountUser: "rstudio-server"
+      runAsRoot: false
     asserts:
       - equal:
           path: spec.template.spec.securityContext.runAsNonRoot
@@ -886,7 +886,7 @@ tests:
   - it: should use custom uid when serviceAccountUserId is overridden
     template: deployment.yaml
     set:
-      serviceAccountUser: "workbench"
+      runAsRoot: false
       serviceAccountUserId: 1500
     asserts:
       - equal:
@@ -896,18 +896,10 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
           value: 1500
 
-  - it: should not set securityContext defaults when serviceAccountUser is empty
-    template: deployment.yaml
-    set:
-      serviceAccountUser: ""
-    asserts:
-      - notExists:
-          path: spec.template.spec.securityContext
-
   - it: should let pod.securityContext override the non-root defaults
     template: deployment.yaml
     set:
-      serviceAccountUser: "rstudio-server"
+      runAsRoot: false
       pod:
         securityContext:
           runAsUser: 4242
@@ -926,7 +918,7 @@ tests:
   - it: should not force runAsUser 0 when root pod.securityContext sets runAsNonRoot
     template: deployment.yaml
     set:
-      serviceAccountUser: "root"
+      runAsRoot: true
       pod:
         securityContext:
           runAsNonRoot: true
@@ -940,7 +932,7 @@ tests:
   - it: should respect a root pod.securityContext runAsUser override
     template: deployment.yaml
     set:
-      serviceAccountUser: "root"
+      runAsRoot: true
       pod:
         securityContext:
           runAsUser: 1234
@@ -970,20 +962,20 @@ tests:
             name: supervisor-tmp
             mountPath: /tmp
 
-  - it: should not override command/args when serviceAccountUser is root
+  - it: should not override command/args when runAsRoot is true
     template: deployment.yaml
     set:
-      serviceAccountUser: "root"
+      runAsRoot: true
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].command
       - notExists:
           path: spec.template.spec.containers[0].args
 
-  - it: should not override command/args when serviceAccountUser is empty
+  - it: should not override command/args when runAsRoot is false
     template: deployment.yaml
     set:
-      serviceAccountUser: ""
+      runAsRoot: false
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].command

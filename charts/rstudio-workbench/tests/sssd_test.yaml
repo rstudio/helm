@@ -22,10 +22,10 @@ tests:
           path: data['sssd.conf']
           pattern: "/usr/sbin/sssd -i -c /etc/sssd/sssd.conf"
 
-  - it: does not start the sssd daemon when running non-root
+  - it: does not start the sssd daemon when runAsRoot is false
     template: configmap-startup.yaml
     set:
-      serviceAccountUser: rstudio-server
+      runAsRoot: false
     asserts:
       - notMatchRegexRaw:
           pattern: "program:sssd"
@@ -47,8 +47,6 @@ tests:
   - it: renders the sssd conf secret when enabled with conf
     template: configmap-secret.yaml
     set:
-      serviceAccountUser: root
-      config.sssd.enabled: true
       config.sssd.conf:
         mysssd.conf:
           sssd:
@@ -74,10 +72,10 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
           value: "/startup/user-provisioning"
 
-  - it: does not mount sssd directories when running non-root
+  - it: does not mount sssd directories when runAsRoot is false
     template: deployment.yaml
     set:
-      serviceAccountUser: rstudio-server
+      runAsRoot: false
     asserts:
       - notExists:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
@@ -87,7 +85,6 @@ tests:
   - it: mounts sssd directories when running as root with sssd.conf set
     template: deployment.yaml
     set:
-      serviceAccountUser: root
       config.sssd.conf:
         mysssd.conf:
           sssd:
@@ -100,19 +97,10 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
           value: "/startup/user-provisioning"
 
-  - it: silently skips sssd when running non-root even if sssd.enabled is true
+  - it: silently skips sssd when runAsRoot is false even if sssd.enabled is true
     template: NOTES.txt
     set:
-      serviceAccountUser: rstudio-server
-      config.sssd.enabled: true
-    asserts:
-      - matchRegexRaw:
-          pattern: "successfully deployed"
-
-  - it: silently skips sssd with empty serviceAccountUser even if sssd.enabled is true
-    template: NOTES.txt
-    set:
-      serviceAccountUser: ""
+      runAsRoot: false
       config.sssd.enabled: true
     asserts:
       - matchRegexRaw:
@@ -120,9 +108,6 @@ tests:
 
   - it: renders successfully when running as root with sssd enabled
     template: NOTES.txt
-    set:
-      serviceAccountUser: root
-      config.sssd.enabled: true
     asserts:
       - matchRegexRaw:
           pattern: "successfully deployed"

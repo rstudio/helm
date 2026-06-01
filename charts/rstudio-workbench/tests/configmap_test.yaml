@@ -360,12 +360,12 @@ tests:
           path: data["prestart-workbench.bash"]
           pattern: "/etc/rstudio/README"
 
-  # -- Rootless config defaults (serviceAccountUser != root)
-  - it: should apply rootless config defaults when running non-root
+  # -- runAsRoot -> rootless config defaults
+  - it: should apply rootless config defaults when runAsRoot is false
     template: configmap-general.yaml
     documentIndex: 0
     set:
-      serviceAccountUser: "rstudio-server"
+      runAsRoot: false
     asserts:
       - matchRegex:
           path: data["rserver.conf"]
@@ -377,11 +377,9 @@ tests:
           path: data["launcher.conf"]
           pattern: "secure-cookie-key-file=/mnt/secret-configmap/rstudio/secure-cookie-key"
 
-  - it: should keep PAM sessions on and not force provisioning when root
+  - it: should keep PAM sessions on and not force provisioning when runAsRoot is true
     template: configmap-general.yaml
     documentIndex: 0
-    set:
-      serviceAccountUser: "root"
     asserts:
       - matchRegex:
           path: data["rserver.conf"]

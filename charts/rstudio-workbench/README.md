@@ -757,6 +757,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |
 | revisionHistoryLimit | int | `3` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
+| runAsRoot | bool | `true` | Whether the pod's containers run as the root OS user. `true` (default) preserves historical behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on. `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to `serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root `rserver.conf`/`launcher.conf` defaults are applied. |
 | sealedSecret.annotations | object | `{}` | annotations for SealedSecret resources |
 | sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
 | secureCookieKey | object | `{"existingSecret":"","value":""}` | global.secureCookieKey takes precedence over secureCookieKey |
@@ -770,8 +771,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.targetPort | int | `8787` | The port to forward to on the Workbench pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
-| serviceAccountUser | string | `"root"` | The OS user that the Workbench server runs as. Written to `rserver.conf` as `server-user` and used to derive the pod's `securityContext`. Defaults to `"root"` (sets `runAsUser: 0` and leaves `runAsNonRoot` unset), preserving the historical behavior. Set to a non-root user (e.g. `"rstudio-server"`) to run unprivileged, which sets `runAsNonRoot: true` and `runAsUser: serviceAccountUserId`, applies non-root `rserver.conf`/`launcher.conf` defaults, and mounts secrets group-readable (0640). Set to `""` to omit `server-user` from `rserver.conf` and skip the runAsUser/runAsNonRoot defaults entirely. |
-| serviceAccountUserId | int | `999` | The UID matching `serviceAccountUser`, used as `runAsUser`/`fsGroup` in the pod's securityContext when `serviceAccountUser` is not `"root"` and not empty. Must match the UID baked into the Workbench image for the named user. |
+| serviceAccountUser | string | `"root"` | The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user` from `rserver.conf` entirely. |
+| serviceAccountUserId | int | `999` | The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `runAsRoot` is false. Must match the UID of `serviceAccountUser` baked into the Workbench image. |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |

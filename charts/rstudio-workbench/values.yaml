@@ -6,10 +6,19 @@ fullnameOverride: ""
 # -- A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
-# -- The OS user that the Workbench server runs as. Written to `rserver.conf` as `server-user` and used to derive the pod's `securityContext`. Defaults to `"root"` (sets `runAsUser: 0` and leaves `runAsNonRoot` unset), preserving the historical behavior. Set to a non-root user (e.g. `"rstudio-server"`) to run unprivileged, which sets `runAsNonRoot: true` and `runAsUser: serviceAccountUserId`, applies non-root `rserver.conf`/`launcher.conf` defaults, and mounts secrets group-readable (0640). Set to `""` to omit `server-user` from `rserver.conf` and skip the runAsUser/runAsNonRoot defaults entirely.
+# -- Whether the pod's containers run as the root OS user. `true` (default) preserves historical
+# behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on.
+# `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to
+# `serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root
+# `rserver.conf`/`launcher.conf` defaults are applied.
+runAsRoot: true
+
+# -- The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user`
+# from `rserver.conf` entirely.
 serviceAccountUser: "root"
 
-# -- The UID matching `serviceAccountUser`, used as `runAsUser`/`fsGroup` in the pod's securityContext when `serviceAccountUser` is not `"root"` and not empty. Must match the UID baked into the Workbench image for the named user.
+# -- The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `runAsRoot` is false.
+# Must match the UID of `serviceAccountUser` baked into the Workbench image.
 serviceAccountUserId: 999
 
 # -- Settings for enabling server diagnostics

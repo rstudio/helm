@@ -89,14 +89,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- $defaultPodSC := dict }}
-      {{- if eq .Values.serviceAccountUser "root" }}
-        {{- /* Skip the runAsUser: 0 default when pod.securityContext already pins the user
-               (runAsUser or runAsNonRoot), so we never emit a contradictory
-               runAsNonRoot: true + runAsUser: 0 combination that fails admission. */ -}}
+      {{- if .Values.runAsRoot }}
+        {{- /* Skip runAsUser: 0 when pod.securityContext already pins the user, to avoid emitting
+               a contradictory runAsNonRoot: true + runAsUser: 0 combination that fails admission. */ -}}
         {{- if not (or (hasKey .Values.pod.securityContext "runAsUser") (hasKey .Values.pod.securityContext "runAsNonRoot")) }}
           {{- $_ := set $defaultPodSC "runAsUser" 0 }}
         {{- end }}
-      {{- else if .Values.serviceAccountUser }}
+      {{- else }}
         {{- $_ := set $defaultPodSC "runAsNonRoot" true }}
         {{- $_ := set $defaultPodSC "runAsUser" (int .Values.serviceAccountUserId) }}
         {{- $_ := set $defaultPodSC "fsGroup" (int .Values.serviceAccountUserId) }}
