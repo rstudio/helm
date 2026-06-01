@@ -25,8 +25,18 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Returns "true" when the SSSD daemon should actually run: sssd.enabled=true and serviceAccountUser=root.
+SSSD cannot run as a non-root process, so the flag is silently ignored for non-root deployments.
+*/}}
+{{- define "rstudio-workbench.sssd.active" -}}
+{{- if and .Values.config.sssd.enabled (eq .Values.serviceAccountUser "root") -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
 supervisord program definition that starts the bundled SSSD daemon.
-Rendered into the user-provisioning startup ConfigMap when config.sssd.enabled is true.
+Rendered into the user-provisioning startup ConfigMap when sssd is active.
 */}}
 {{- define "rstudio-workbench.sssd.program" -}}
 [program:sssd]
@@ -163,7 +173,7 @@ containers:
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
-    {{- if and .Values.config.sssd.enabled (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
+    {{- if and (include "rstudio-workbench.sssd.active" .) (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
     - name: rstudio-user
       mountPath: "/etc/sssd/conf.d/"
     {{- end }}
@@ -177,7 +187,7 @@ containers:
     - name: rstudio-launcher-startup
       mountPath: "/startup/launcher"
     {{- end }}
-    {{- if or .Values.config.sssd.enabled .Values.config.startupUserProvisioning }}
+    {{- if or (include "rstudio-workbench.sssd.active" .) .Values.config.startupUserProvisioning }}
     - name: rstudio-user-startup
       mountPath: "/startup/user-provisioning"
     {{- end }}
@@ -332,7 +342,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
     defaultMode: {{ .Values.config.defaultMode.startup }}
 {{- end }}
-{{- if or .Values.config.sssd.enabled .Values.config.startupUserProvisioning }}
+{{- if or (include "rstudio-workbench.sssd.active" .) .Values.config.startupUserProvisioning }}
 - name: rstudio-user-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-user
@@ -429,7 +439,7 @@ volumes:
         {{- end }}
 {{- end }}
 {{- end }}
-{{- if and .Values.config.sssd.enabled (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
+{{- if and (include "rstudio-workbench.sssd.active" .) (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
 - name: rstudio-user
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-user

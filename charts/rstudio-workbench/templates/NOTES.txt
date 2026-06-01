@@ -71,14 +71,10 @@ Please consider removing this configuration value.
 
 {{- end }}
 
-{{- if and .Values.config.sssd.enabled (ne .Values.serviceAccountUser "root") }}
-  {{- fail (printf "\n\n`config.sssd.enabled=true` requires running as root, but `serviceAccountUser` is `%s`. SSSD (legacy LDAP/AD provisioning) cannot run rootless.\n\nEither set `serviceAccountUser: root`, or disable SSSD with `config.sssd.enabled=false` and use SCIM/native provisioning instead." .Values.serviceAccountUser) }}
-{{- end }}
-
 {{- if .Values.config.userProvisioning }}
-{{ print "\n\nWARNING: `config.userProvisioning` is deprecated. Use `config.sssd.conf` instead, and set `config.sssd.enabled=true` to start the bundled SSSD daemon." }}
+{{ print "\n\nWARNING: `config.userProvisioning` is deprecated. Use `config.sssd.conf` instead." }}
 {{- end }}
 
-{{- if and .Values.config.sssd.conf (not .Values.config.sssd.enabled) }}
-{{ print "\n\nWARNING: `config.sssd.conf` is set but `config.sssd.enabled=false`, so the SSSD daemon will not start and the config has no effect. Set `config.sssd.enabled=true` to use it." }}
+{{- if and .Values.config.sssd.conf (not (include "rstudio-workbench.sssd.active" .)) }}
+{{ print "\n\nWARNING: `config.sssd.conf` is set but the SSSD daemon will not start. SSSD requires `serviceAccountUser: root` and `config.sssd.enabled: true`." }}
 {{- end }}

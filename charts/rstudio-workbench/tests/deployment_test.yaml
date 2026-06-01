@@ -356,13 +356,15 @@ tests:
       - equal:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].configMap.defaultMode'
           value: 0600
-  - it: should not specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is not defined
+  - it: should not specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is not defined and sssd is disabled
     template: deployment.yaml
     set:
       config:
         defaultMode:
           startup: 0600
         startupUserProvisioning: null
+        sssd:
+          enabled: false
     asserts:
       - notExists:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'

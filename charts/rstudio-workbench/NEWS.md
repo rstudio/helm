@@ -4,16 +4,13 @@
 
 - Workbench pods can now run as a non-root user. New top-level values `serviceAccountUser` (default `root`) and `serviceAccountUserId` (default `999`) control the OS user and UID. The user is written to `rserver.conf` as `server-user`, and a non-root value sets the pod `securityContext` to `runAsNonRoot: true` with `runAsUser`/`fsGroup` of `serviceAccountUserId`. The default remains `root`, so existing deployments are unchanged. Set `serviceAccountUser` to a non-root user (e.g. `rstudio-server`) to run unprivileged; this requires a Workbench image whose `/var/lib/rstudio-server`, `/var/lib/rstudio-launcher`, and `/var/log/rstudio` directories are owned by that user.
 - When running non-root (`serviceAccountUser` other than `root`), the chart applies defaults so Workbench comes up cleanly without root, all overridable via `config.server`:
-  - The Job Launcher's `secure-cookie-key-file` points at the shared key (`/mnt/secret-configmap/rstudio/secure-cookie-key`). An unprivileged launcher otherwise generates its own key, which breaks authentication of rserver-signed launcher requests (`401 Unauthorized`).
-  - `auth-pam-sessions-enabled` defaults to `0`. Opening host PAM sessions requires root; launcher session workloads handle session setup. This matches Workbench's own default for launcher-sessions deployments. Root deployments are unchanged (`1`).
-  - `user-provisioning-enabled` defaults to `1`. Native (SCIM) provisioning is the supported user-resolution path when not running as root.
-  - Mounted secret files are made group-readable (`0640`) so the non-root process can read them via `fsGroup`. Root deployments keep the `0600` default.
-- **BREAKING**: The bundled SSSD daemon is no longer started by default. SSSD is a legacy LDAP/Active Directory user-provisioning path that must run as root; modern provisioning (SCIM / native) does not require it. A new `config.sssd` block controls it:
-  - `config.sssd.enabled` (default `false`) starts the bundled SSSD daemon. It requires `serviceAccountUser: root` and the chart will fail to render if SSSD is enabled while running as a non-root user.
-  - `config.sssd.conf` replaces `config.userProvisioning` for the files mounted to `/etc/sssd/conf.d/`.
-  - To restore the previous behavior, set `config.sssd.enabled: true` (the default `serviceAccountUser: root` already satisfies the root requirement) and move any `config.userProvisioning` files to `config.sssd.conf`.
-- `config.userProvisioning` is deprecated. It is still honored as a fallback for `config.sssd.conf` when SSSD is enabled, and the chart emits a warning when it is set.
-- `config.startupUserProvisioning` no longer ships a default SSSD program. It remains available for custom provisioning daemons; the bundled SSSD service is now controlled by `config.sssd.enabled`.
+  - `secure-cookie-key-file` points at the shared key so the launcher does not generate its own (which breaks authentication of rserver-signed requests).
+  - `auth-pam-sessions-enabled: 0` — opening host PAM sessions requires root.
+  - `user-provisioning-enabled: 1` — enables native (SCIM) provisioning.
+  - Mounted secret files are made group-readable (`0640`) so the non-root process can read them via `fsGroup`.
+  - The bundled SSSD daemon is automatically skipped. SSSD requires root; use native (SCIM) provisioning for non-root deployments.
+- A new `config.sssd` block controls the bundled SSSD daemon: `config.sssd.enabled` (default `true`, effective only when `serviceAccountUser: root`) and `config.sssd.conf` for SSSD config files (replaces the deprecated `config.userProvisioning`).
+- `config.userProvisioning` is deprecated; use `config.sssd.conf`. A warning is emitted when it is set.
 - The chart no longer overrides the container `command`/`args`; the image's default `supervisord` startup is used for both root and non-root operation. Non-root operation requires a Workbench image whose `supervisord.conf` writes its socket and pidfile to a non-root-writable location (e.g. `/var/run/supervisor`, owned by `rstudio-server`).
 - The Workbench and launcher prestart scripts (`prestart-workbench.bash`, `prestart-launcher.bash`) no longer perform root-only operations. The redundant Kubernetes CA trust-store install was removed (the launcher reads `ca.crt` directly), and the `chown`/`mkdir` calls for `/var/lib/rstudio-server` and `/var/lib/rstudio-launcher` were dropped.
 

@@ -9,17 +9,8 @@ templates:
   - deployment.yaml
   - NOTES.txt
 tests:
-  - it: does not start the sssd daemon by default
+  - it: starts the sssd daemon by default when running as root
     template: configmap-startup.yaml
-    asserts:
-      - notMatchRegexRaw:
-          pattern: "program:sssd"
-
-  - it: starts the sssd daemon when config.sssd.enabled is true
-    template: configmap-startup.yaml
-    set:
-      serviceAccountUser: root
-      config.sssd.enabled: true
     documentSelector:
       path: metadata.name
       value: RELEASE-NAME-rstudio-workbench-start-user
@@ -30,6 +21,22 @@ tests:
       - matchRegex:
           path: data['sssd.conf']
           pattern: "/usr/sbin/sssd -i -c /etc/sssd/sssd.conf"
+
+  - it: does not start the sssd daemon when running non-root
+    template: configmap-startup.yaml
+    set:
+      serviceAccountUser: rstudio-server
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "program:sssd"
+
+  - it: does not start the sssd daemon when config.sssd.enabled is false
+    template: configmap-startup.yaml
+    set:
+      config.sssd.enabled: false
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "program:sssd"
 
   - it: does not render the sssd conf secret by default
     template: configmap-secret.yaml
@@ -58,19 +65,29 @@ tests:
           path: stringData['mysssd.conf']
           pattern: "id_provider"
 
-  - it: does not mount sssd directories by default
+  - it: mounts sssd-user-startup by default when running as root
     template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
+          value: "/startup/user-provisioning"
+
+  - it: does not mount sssd directories when running non-root
+    template: deployment.yaml
+    set:
+      serviceAccountUser: rstudio-server
     asserts:
       - notExists:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
       - notExists:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'
 
-  - it: mounts sssd directories when enabled as root
+  - it: mounts sssd directories when running as root with sssd.conf set
     template: deployment.yaml
     set:
       serviceAccountUser: root
-      config.sssd.enabled: true
       config.sssd.conf:
         mysssd.conf:
           sssd:
@@ -83,25 +100,25 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
           value: "/startup/user-provisioning"
 
-  - it: fails when sssd is enabled while running rootless
+  - it: silently skips sssd when running non-root even if sssd.enabled is true
     template: NOTES.txt
     set:
       serviceAccountUser: rstudio-server
       config.sssd.enabled: true
     asserts:
-      - failedTemplate:
-          errorPattern: "config.sssd.enabled.*requires.*root"
+      - matchRegexRaw:
+          pattern: "successfully deployed"
 
-  - it: fails when sssd is enabled with an empty serviceAccountUser
+  - it: silently skips sssd with empty serviceAccountUser even if sssd.enabled is true
     template: NOTES.txt
     set:
       serviceAccountUser: ""
       config.sssd.enabled: true
     asserts:
-      - failedTemplate:
-          errorPattern: "config.sssd.enabled.*requires.*root"
+      - matchRegexRaw:
+          pattern: "successfully deployed"
 
-  - it: allows sssd when running as root
+  - it: renders successfully when running as root with sssd enabled
     template: NOTES.txt
     set:
       serviceAccountUser: root

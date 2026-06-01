@@ -576,10 +576,10 @@ config:
   #     path: custom-file.conf
   # -- DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`.
   userProvisioning: {}
-  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. SSSD must run as root, so this cannot be enabled when the pod runs as a non-root user (`serviceAccountUser` other than `root`). Off by default in all modes. Modern provisioning (SCIM / native) does not require SSSD.
+  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs as a non-root user (`serviceAccountUser` other than `root`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD.
   sssd:
-    # -- whether to start the bundled SSSD daemon. Requires `serviceAccountUser: root`.
-    enabled: false
+    # -- whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `serviceAccountUser` is not `root`. Set to `false` to disable entirely.
+    enabled: true
     # -- a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`.
     conf: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`

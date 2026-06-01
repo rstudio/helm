@@ -32,7 +32,7 @@ data:
     stderr_logfile_maxbytes=0
 {{- end }}
 {{- $userStartup := deepCopy (default (dict) .Values.config.startupUserProvisioning) }}
-{{- if .Values.config.sssd.enabled }}
+{{- if include "rstudio-workbench.sssd.active" . }}
 {{- $_ := set $userStartup "sssd.conf" (include "rstudio-workbench.sssd.program" .) }}
 {{- end }}
 {{- if $userStartup }}
