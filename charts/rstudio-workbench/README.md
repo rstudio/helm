@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.21.0](https://img.shields.io/badge/Version-0.21.0-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.0:
+To install the chart with the release name `my-release` at version 0.21.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.20.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.21.0
 ```
 
 To explore other chart versions, look at:
@@ -62,20 +62,23 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `posit/workbench` image has `sssd` installed and started by default.
-  You can include `sssd` configuration in `config.userProvisioning` like so:
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning, but it is **not** started by default. SSSD must run as root, so it can only be enabled when `serviceAccountUser: root`. Modern provisioning (SCIM / native) does not require SSSD.
+  To start the bundled SSSD daemon, set `config.sssd.enabled: true` and provide its configuration in `config.sssd.conf` like so:
 
     ```yaml
+    serviceAccountUser: root
     config:
-      userProvisioning:
-        mysssd.conf:
-          sssd:
-            config_file_version: 2
-            services: nss, pam
-            domains: rstudio.com
-          domain/rstudio.com:
-            id_provider: ldap
-            auth_provider: ldap
+      sssd:
+        enabled: true
+        conf:
+          mysssd.conf:
+            sssd:
+              config_file_version: 2
+              services: nss, pam
+              domains: rstudio.com
+            domain/rstudio.com:
+              id_provider: ldap
+              auth_provider: ldap
     ```
 
 ## Licensing
@@ -302,9 +305,9 @@ the `XDG_CONFIG_DIRS` environment variable.
   - It is mounted into the pod at `/scripts/`.
   - `prestart-workbench.bash` is used to start workbench.
   - `prestart-launcher.bash` is used to start launcher.
-- User Provisioning Configuration:
-  - These configuration files are used for configuring user provisioning (i.e., `sssd`).
-  - Located at:<br> `config.userProvisioning.<< name of file >>` Helm values
+- SSSD Configuration:
+  - These configuration files configure the bundled `sssd` daemon (legacy LDAP/AD provisioning), which is started only when `config.sssd.enabled=true`.
+  - Located at:<br> `config.sssd.conf.<< name of file >>` Helm values (the deprecated `config.userProvisioning` is honored as a fallback)
   - Mounted onto:<br> `/etc/sssd/conf.d/` with `0600` permissions by default.
 - Custom Startup Configuration:
   - `supervisord` service / unit definition `.conf` files.
@@ -355,9 +358,9 @@ Provisioning users in Workbench containers is challenging. Session images create
 consistent UIDs / GIDs). However, creating users in the Workbench containers is a responsibility that falls to the
 administrator.
 
-The most common way to provision users is via `sssd`.
-The [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
-has `sssd` included and running by default (see `userProvisioning` configuration files above).
+Posit Workbench's native user provisioning (SCIM / just-in-time) is the recommended approach and does not require SSSD.
+The legacy approach is `sssd`: the [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
+includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `serviceAccountUser: root`; see `config.sssd` above).
 
 The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever)
 or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.
@@ -605,7 +608,7 @@ To activate the use of `SealedSecret` templates instead of `Secret` templates in
 
 - `config.secret`
 - `config.sessionSecret`
-- `config.userProvisioning`
+- `config.sssd.conf` (or the deprecated `config.userProvisioning`)
 - `launcherPem`
 - `secureCookieKey` (or `global.secureCookieKey`)
 
@@ -616,7 +619,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
-| args | list | `[]` | args is the pod container's run arguments. |
+| args | list | `[]` | args is the pod container's run arguments. When unset, the container's default arguments are used. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
@@ -634,7 +637,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.workbenchApiKey | object | `{"value":"","valueFrom":{}}` | A read-only administrator permissions API key generated for Workbench for the Chronicle agent to use, API keys    can only be created after Workbench has been deployed so this value may need to be filled in later if performing    an initial deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
-| command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| command | list | `[]` | command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation. |
 | components | object | `{"enabled":true,"positron":{"image":{"repository":"posit/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"posit/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
 | components.enabled | bool | `true` | Enable session component delivery via init containers. When false, no init containers are configured and session.image must be a self-contained image like r-session-complete. |
 | components.positron.image.repository | string | `"posit/workbench-positron-init"` | The image repository for the Positron init container |
@@ -662,9 +665,12 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
 | config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
+| config.sssd | object | `{"conf":{},"enabled":false}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. SSSD must run as root, so this cannot be enabled when the pod runs as a non-root user (`serviceAccountUser` other than `root`). Off by default in all modes. Modern provisioning (SCIM / native) does not require SSSD. |
+| config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |
+| config.sssd.enabled | bool | `false` | whether to start the bundled SSSD daemon. Requires `serviceAccountUser: root`. |
 | config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
-| config.startupUserProvisioning | object | `{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/ |
-| config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
+| config.startupUserProvisioning | object | `{}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons. |
+| config.userProvisioning | object | `{}` | DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`. |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
 | deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench deployment |
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
@@ -764,6 +770,8 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.targetPort | int | `8787` | The port to forward to on the Workbench pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
+| serviceAccountUser | string | `"root"` | The OS user that the Workbench server runs as. Written to `rserver.conf` as `server-user` and used to derive the pod's `securityContext`. Defaults to `"root"` (sets `runAsUser: 0` and leaves `runAsNonRoot` unset), preserving the historical behavior. Set to a non-root user (e.g. `"rstudio-server"`) to run unprivileged, which sets `runAsNonRoot: true` and `runAsUser: serviceAccountUserId`, applies non-root `rserver.conf`/`launcher.conf` defaults, and mounts secrets group-readable (0640). Set to `""` to omit `server-user` from `rserver.conf` and skip the runAsUser/runAsNonRoot defaults entirely. |
+| serviceAccountUserId | int | `999` | The UID matching `serviceAccountUser`, used as `runAsUser`/`fsGroup` in the pod's securityContext when `serviceAccountUser` is not `"root"` and not empty. Must match the UID baked into the Workbench image for the named user. |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |

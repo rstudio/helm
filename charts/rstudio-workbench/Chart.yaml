@@ -1,6 +1,6 @@
 name: rstudio-workbench
 description: Official Helm chart for Posit Workbench
-version: 0.20.0
+version: 0.21.0
 apiVersion: v2
 appVersion: 2026.04.0
 icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg

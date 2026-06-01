@@ -70,3 +70,15 @@ Please consider removing this configuration value.
 {{- print "\n\n`config.server.'rserver/.conf'.monitor-graphite-enabled` is overwritten by `prometheus.legacy=false`. Internal Workbench Prometheus will be used instead." }}
 
 {{- end }}
+
+{{- if and .Values.config.sssd.enabled (ne .Values.serviceAccountUser "root") }}
+  {{- fail (printf "\n\n`config.sssd.enabled=true` requires running as root, but `serviceAccountUser` is `%s`. SSSD (legacy LDAP/AD provisioning) cannot run rootless.\n\nEither set `serviceAccountUser: root`, or disable SSSD with `config.sssd.enabled=false` and use SCIM/native provisioning instead." .Values.serviceAccountUser) }}
+{{- end }}
+
+{{- if .Values.config.userProvisioning }}
+{{ print "\n\nWARNING: `config.userProvisioning` is deprecated. Use `config.sssd.conf` instead, and set `config.sssd.enabled=true` to start the bundled SSSD daemon." }}
+{{- end }}
+
+{{- if and .Values.config.sssd.conf (not .Values.config.sssd.enabled) }}
+{{ print "\n\nWARNING: `config.sssd.conf` is set but `config.sssd.enabled=false`, so the SSSD daemon will not start and the config has no effect. Set `config.sssd.enabled=true` to use it." }}
+{{- end }}

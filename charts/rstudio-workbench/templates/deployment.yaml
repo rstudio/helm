@@ -88,7 +88,21 @@ spec:
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.pod.securityContext }}
+      {{- $defaultPodSC := dict }}
+      {{- if eq .Values.serviceAccountUser "root" }}
+        {{- /* Skip the runAsUser: 0 default when pod.securityContext already pins the user
+               (runAsUser or runAsNonRoot), so we never emit a contradictory
+               runAsNonRoot: true + runAsUser: 0 combination that fails admission. */ -}}
+        {{- if not (or (hasKey .Values.pod.securityContext "runAsUser") (hasKey .Values.pod.securityContext "runAsNonRoot")) }}
+          {{- $_ := set $defaultPodSC "runAsUser" 0 }}
+        {{- end }}
+      {{- else if .Values.serviceAccountUser }}
+        {{- $_ := set $defaultPodSC "runAsNonRoot" true }}
+        {{- $_ := set $defaultPodSC "runAsUser" (int .Values.serviceAccountUserId) }}
+        {{- $_ := set $defaultPodSC "fsGroup" (int .Values.serviceAccountUserId) }}
+      {{- end }}
+      {{- $effectivePodSC := mergeOverwrite $defaultPodSC (deepCopy .Values.pod.securityContext) }}
+      {{- with $effectivePodSC }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}

@@ -1,0 +1,122 @@
+suite: Workbench SSSD provisioning
+templates:
+  - configmap-startup.yaml
+  - configmap-secret.yaml
+  - configmap-general.yaml
+  - configmap-graphite-exporter.yaml
+  - configmap-prestart.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+  - NOTES.txt
+tests:
+  - it: does not start the sssd daemon by default
+    template: configmap-startup.yaml
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "program:sssd"
+
+  - it: starts the sssd daemon when config.sssd.enabled is true
+    template: configmap-startup.yaml
+    set:
+      serviceAccountUser: root
+      config.sssd.enabled: true
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-rstudio-workbench-start-user
+    asserts:
+      - matchRegex:
+          path: data['sssd.conf']
+          pattern: "\\[program:sssd\\]"
+      - matchRegex:
+          path: data['sssd.conf']
+          pattern: "/usr/sbin/sssd -i -c /etc/sssd/sssd.conf"
+
+  - it: does not render the sssd conf secret by default
+    template: configmap-secret.yaml
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "workbench-user"
+
+  - it: renders the sssd conf secret when enabled with conf
+    template: configmap-secret.yaml
+    set:
+      serviceAccountUser: root
+      config.sssd.enabled: true
+      config.sssd.conf:
+        mysssd.conf:
+          sssd:
+            config_file_version: 2
+          domain/example.com:
+            id_provider: ldap
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-rstudio-workbench-user
+    asserts:
+      - isKind:
+          of: Secret
+      - matchRegex:
+          path: stringData['mysssd.conf']
+          pattern: "id_provider"
+
+  - it: does not mount sssd directories by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'
+
+  - it: mounts sssd directories when enabled as root
+    template: deployment.yaml
+    set:
+      serviceAccountUser: root
+      config.sssd.enabled: true
+      config.sssd.conf:
+        mysssd.conf:
+          sssd:
+            config_file_version: 2
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].mountPath'
+          value: "/etc/sssd/conf.d/"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
+          value: "/startup/user-provisioning"
+
+  - it: fails when sssd is enabled while running rootless
+    template: NOTES.txt
+    set:
+      serviceAccountUser: rstudio-server
+      config.sssd.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.sssd.enabled.*requires.*root"
+
+  - it: fails when sssd is enabled with an empty serviceAccountUser
+    template: NOTES.txt
+    set:
+      serviceAccountUser: ""
+      config.sssd.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.sssd.enabled.*requires.*root"
+
+  - it: allows sssd when running as root
+    template: NOTES.txt
+    set:
+      serviceAccountUser: root
+      config.sssd.enabled: true
+    asserts:
+      - matchRegexRaw:
+          pattern: "successfully deployed"
+
+  - it: warns when the deprecated config.userProvisioning is set
+    template: NOTES.txt
+    set:
+      config.userProvisioning:
+        mysssd.conf:
+          sssd:
+            config_file_version: 2
+    asserts:
+      - matchRegexRaw:
+          pattern: "config.userProvisioning.*deprecated"

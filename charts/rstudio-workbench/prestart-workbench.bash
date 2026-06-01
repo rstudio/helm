@@ -27,16 +27,6 @@ main() {
     echo -e "delete-node-on-exit=1\nwww-host-name=$(hostname -i)" > /mnt/load-balancer/rstudio/load-balancer
   fi
 
-  _logf 'Preparing dirs'
-  mkdir -p \
-    /var/lib/rstudio-server/monitor/log
-  
-  if [ -d "/var/lib/rstudio-server/Local" ]; then
-    chown -v -R \
-    rstudio-server:rstudio-server \
-    /var/lib/rstudio-server/Local 2>&1 | _indent
-  fi
-
   _writeEtcRstudioReadme
 
   # TODO: necessary until https://github.com/rstudio/rstudio-pro/issues/3638
@@ -69,7 +59,7 @@ in order to facilitate running in Kubernetes. The directories are specified via
 the XDG_CONFIG_DIRS environment variable defined in the Helm chart. The currently
 defined directories are:
 
-$(echo "$XDG_CONFIG_DIRS" | sed 's/:/\n/g')
+$(echo "$XDG_CONFIG_DIRS" | tr ':' '\n')
 $HERE$
   ) > /etc/rstudio/README
 }

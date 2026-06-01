@@ -31,7 +31,11 @@ data:
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
 {{- end }}
-{{- if .Values.config.startupUserProvisioning }}
+{{- $userStartup := deepCopy (default (dict) .Values.config.startupUserProvisioning) }}
+{{- if .Values.config.sssd.enabled }}
+{{- $_ := set $userStartup "sssd.conf" (include "rstudio-workbench.sssd.program" .) }}
+{{- end }}
+{{- if $userStartup }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -39,7 +43,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-start-user
   namespace: {{ $.Release.Namespace }}
 data:
-  {{- include "rstudio-library.config.ini" .Values.config.startupUserProvisioning | nindent 2 }}
+  {{- include "rstudio-library.config.ini" $userStartup | nindent 2 }}
 {{- end }}
 {{- if .Values.config.startupCustom }}
 ---

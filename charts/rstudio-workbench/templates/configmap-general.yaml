@@ -49,6 +49,9 @@
 {{- $defaultIDEServiceName := include "rstudio-workbench.fullname" . }}
 {{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
 {{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
+{{- if .Values.serviceAccountUser }}
+  {{- $_ := set $defaultRServerConfigValues "server-user" .Values.serviceAccountUser }}
+{{- end }}
 {{- if and .Values.launcher.enabled .Values.components.enabled }}
   {{- $initTag := .Values.components.sessionInit.image.tag | default $defaultVersion }}
   {{- $_ := set $defaultRServerConfigValues "launcher-sessions-auto-update" 1 }}
@@ -109,6 +112,18 @@ data:
     {{- end }}
   {{- end }}
 {{- $overrideDict = mergeOverwrite $defaultLauncherK8sConfig $overrideDict }}
+{{- /* Non-root (rootless) defaults, overridable by config.server:
+       - secure-cookie-key-file: the launcher runs unprivileged and would otherwise generate its own
+         secure-cookie-key, so rserver-signed launcher requests fail auth. Point it at the shared key.
+       - auth-pam-sessions-enabled=0: opening host PAM sessions requires root; launcher session
+         workloads handle session setup. Matches the product default for launcher-sessions deployments.
+       - user-provisioning-enabled=1: native (SCIM) provisioning is the rootless user-resolution path. */}}
+{{- if and .Values.serviceAccountUser (ne .Values.serviceAccountUser "root") }}
+  {{- $rootlessDefaults := dict "rserver.conf" (dict "auth-pam-sessions-enabled" 0 "user-provisioning-enabled" 1) "launcher.conf" (dict "server" (dict "secure-cookie-key-file" "/mnt/secret-configmap/rstudio/secure-cookie-key")) }}
+  {{- $overrideDict = mergeOverwrite $rootlessDefaults $overrideDict }}
+{{- else }}
+  {{- $overrideDict = mergeOverwrite (dict "rserver.conf" (dict "auth-pam-sessions-enabled" 1)) $overrideDict }}
+{{- end }}
 {{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
 {{- $profilesConfig := .Values.config.profiles }}

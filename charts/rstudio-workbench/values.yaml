@@ -6,6 +6,12 @@ fullnameOverride: ""
 # -- A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
+# -- The OS user that the Workbench server runs as. Written to `rserver.conf` as `server-user` and used to derive the pod's `securityContext`. Defaults to `"root"` (sets `runAsUser: 0` and leaves `runAsNonRoot` unset), preserving the historical behavior. Set to a non-root user (e.g. `"rstudio-server"`) to run unprivileged, which sets `runAsNonRoot: true` and `runAsUser: serviceAccountUserId`, applies non-root `rserver.conf`/`launcher.conf` defaults, and mounts secrets group-readable (0640). Set to `""` to omit `server-user` from `rserver.conf` and skip the runAsUser/runAsNonRoot defaults entirely.
+serviceAccountUser: "root"
+
+# -- The UID matching `serviceAccountUser`, used as `runAsUser`/`fsGroup` in the pod's securityContext when `serviceAccountUser` is not `"root"` and not empty. Must match the UID baked into the Workbench image for the named user.
+serviceAccountUserId: 999
+
 # -- Settings for enabling server diagnostics
 diagnostics:
   enabled: false
@@ -339,9 +345,9 @@ loadBalancer:
   # -- whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node
   forceEnabled: false
 
-# -- command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup
+# -- command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation.
 command: []
-# -- args is the pod container's run arguments.
+# -- args is the pod container's run arguments. When unset, the container's default arguments are used.
 args: []
 
 license:
@@ -568,14 +574,19 @@ config:
   #   items:
   #   - key: custom-file.conf
   #     path: custom-file.conf
-  # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
+  # -- DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`.
   userProvisioning: {}
+  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. SSSD must run as root, so this cannot be enabled when the pod runs as a non-root user (`serviceAccountUser` other than `root`). Off by default in all modes. Modern provisioning (SCIM / native) does not require SSSD.
+  sssd:
+    # -- whether to start the bundled SSSD daemon. Requires `serviceAccountUser: root`.
+    enabled: false
+    # -- a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`.
+    conf: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
   # @default -- [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values`
   server:
     rserver.conf:
       server-health-check-enabled: 1
-      auth-pam-sessions-enabled: 1
       admin-enabled: 1
       www-port: 8787
       server-project-sharing: 1
@@ -663,19 +674,8 @@ config:
     launcher-mounts: []
   # -- a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/
   startupCustom: {}
-  # -- a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/
-  startupUserProvisioning:
-    sssd.conf: |
-      [program:sssd]
-      command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
-      autorestart=false
-      numprocs=1
-      stdout_logfile=/dev/stdout
-      stdout_logfile_maxbytes=0
-      stdout_logfile_backups=0
-      stderr_logfile=/dev/stderr
-      stderr_logfile_maxbytes=0
-      stderr_logfile_backups=0
+  # -- a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons.
+  startupUserProvisioning: {}
 
   # -- a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files
   pam: {}

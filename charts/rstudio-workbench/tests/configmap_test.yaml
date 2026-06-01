@@ -256,3 +256,157 @@ tests:
       - notMatchRegex:
           path: data["positron.conf"]
           pattern: "^exe="
+
+  # -- serviceAccountUser -> rserver.conf server-user
+  - it: should render server-user=root by default
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=root"
+
+  - it: should render server-user when serviceAccountUser is overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "workbench"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=workbench"
+
+  - it: should omit server-user when serviceAccountUser is empty
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: ""
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user="
+
+  - it: should let config.server.rserver.conf.server-user override serviceAccountUser
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "rstudio-server"
+      config:
+        server:
+          rserver.conf:
+            server-user: "explicit-override"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=explicit-override"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=rstudio-server"
+
+  # -- Rootless: prestart-launcher.bash has no privileged operations
+  - it: should not install CA certs into the system trust store in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "update-ca-certificates"
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "update-ca-trust"
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "/usr/local/share/ca-certificates"
+
+  - it: should not chown launcher dirs in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "chown"
+
+  - it: should keep the launcher health check and scratch dirs in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "--cacert"
+      - matchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "/var/lib/rstudio-launcher/Local"
+
+  # -- Rootless: prestart-workbench.bash has no privileged operations
+  - it: should not chown or create monitor dirs in prestart-workbench.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "chown"
+      - notMatchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "/var/lib/rstudio-server/monitor/log"
+
+  - it: should keep launcher.pub generation and README write in prestart-workbench.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "openssl rsa"
+      - matchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "/etc/rstudio/README"
+
+  # -- Rootless config defaults (serviceAccountUser != root)
+  - it: should apply rootless config defaults when running non-root
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "rstudio-server"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^auth-pam-sessions-enabled=0$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^user-provisioning-enabled=1$"
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "secure-cookie-key-file=/mnt/secret-configmap/rstudio/secure-cookie-key"
+
+  - it: should keep PAM sessions on and not force provisioning when root
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "root"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^auth-pam-sessions-enabled=1$"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "user-provisioning-enabled"
+      - notMatchRegex:
+          path: data["launcher.conf"]
+          pattern: "secure-cookie-key-file"
+
+  - it: should let config.server override the rootless auth defaults
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      serviceAccountUser: "rstudio-server"
+      config:
+        server:
+          rserver.conf:
+            auth-pam-sessions-enabled: 1
+            user-provisioning-enabled: 0
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^auth-pam-sessions-enabled=1$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^user-provisioning-enabled=0$"

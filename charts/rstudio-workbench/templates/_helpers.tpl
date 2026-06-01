@@ -24,8 +24,32 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{/*
+supervisord program definition that starts the bundled SSSD daemon.
+Rendered into the user-provisioning startup ConfigMap when config.sssd.enabled is true.
+*/}}
+{{- define "rstudio-workbench.sssd.program" -}}
+[program:sssd]
+command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
+autorestart=false
+numprocs=1
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stdout_logfile_backups=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+stderr_logfile_backups=0
+{{- end -}}
+
 {{- define "rstudio-workbench.containers" -}}
 {{- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
+{{- /* When running as non-root, secret files must be group-readable (0640) because Kubernetes mounts
+       them as root-owned and the non-root process accesses them via fsGroup group membership.
+       Root deployments keep the tighter 0600 default. */ -}}
+{{- $secretMode := $.Values.config.defaultMode.secret -}}
+{{- if and $.Values.serviceAccountUser (ne $.Values.serviceAccountUser "root") -}}
+  {{- $secretMode = 416 -}}{{/* octal 0640 */}}
+{{- end }}
 containers:
 - name: rstudio
   {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
@@ -85,13 +109,13 @@ containers:
   {{- if .Values.pod.env }}
   {{- toYaml .Values.pod.env | nindent 2 }}
   {{- end }}
-  {{- if .Values.command }}
+  {{- with .Values.command }}
   command:
-    {{- toYaml .Values.command | nindent 4 }}
- {{- end }}
-  {{- if .Values.args }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.args }}
   args:
-    {{- toYaml .Values.args | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
   ports:
@@ -139,19 +163,21 @@ containers:
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
-    {{- if .Values.config.userProvisioning }}
+    {{- if and .Values.config.sssd.enabled (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
     - name: rstudio-user
       mountPath: "/etc/sssd/conf.d/"
     {{- end }}
     - name: etc-rstudio
       mountPath: "/etc/rstudio"
+    - name: mnt-dynamic
+      mountPath: "/mnt/dynamic"
     - name: rstudio-rsw-startup
       mountPath: "/startup/base"
     {{- if .Values.launcher.enabled }}
     - name: rstudio-launcher-startup
       mountPath: "/startup/launcher"
     {{- end }}
-    {{- if .Values.config.startupUserProvisioning }}
+    {{- if or .Values.config.sssd.enabled .Values.config.startupUserProvisioning }}
     - name: rstudio-user-startup
       mountPath: "/startup/user-provisioning"
     {{- end }}
@@ -276,6 +302,8 @@ volumes:
 {{- end }}
 - name: etc-rstudio
   emptyDir: {}
+- name: mnt-dynamic
+  emptyDir: {}
 - name: rstudio-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-config
@@ -304,7 +332,7 @@ volumes:
     name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
     defaultMode: {{ .Values.config.defaultMode.startup }}
 {{- end }}
-{{- if .Values.config.startupUserProvisioning }}
+{{- if or .Values.config.sssd.enabled .Values.config.startupUserProvisioning }}
 - name: rstudio-user-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-user
@@ -335,7 +363,7 @@ volumes:
         items:
         - key: {{ $key }}
           path: {{ $key }}
-          mode: {{ $.Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
 {{- end }}
 {{- end }}
 {{- if .Values.launcherPem.existingSecret  }}
@@ -344,7 +372,7 @@ volumes:
         items:
         - key: launcher.pem
           path: launcher.pem
-          mode: {{ .Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
 {{- end }}
 {{- /* Project launcher.pem from chart-managed secret when using .value (not existingSecret). */ -}}
 {{- if and .Values.launcherPem.value (not .Values.launcherPem.existingSecret) }}
@@ -353,7 +381,7 @@ volumes:
         items:
         - key: launcher.pem
           path: launcher.pem
-          mode: {{ .Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
 {{- end }}
 {{- if and .Values.secureCookieKey.existingSecret (not .Values.global.secureCookieKey.existingSecret) }}
     - secret:
@@ -361,7 +389,7 @@ volumes:
         items:
         - key: secure-cookie-key
           path: secure-cookie-key
-          mode: {{ .Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
 {{- end }}
 {{- if .Values.global.secureCookieKey.existingSecret }}
     - secret:
@@ -369,7 +397,7 @@ volumes:
         items:
         - key: secure-cookie-key
           path: secure-cookie-key
-          mode: {{ .Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
 {{- end }}
 {{- /* Project secure-cookie-key from chart-managed secret when using .value (not existingSecret).
        This handles the case where secureCookieKey.value or global.secureCookieKey.value is set directly,
@@ -380,7 +408,7 @@ volumes:
         items:
         - key: secure-cookie-key
           path: secure-cookie-key
-          mode: {{ .Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
 {{- end }}
 {{- if .Values.config.database.conf.existingSecret  }}
     - secret:
@@ -388,7 +416,7 @@ volumes:
         items:
         - key: database.conf
           path: database.conf
-          mode: {{ .Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
 {{- end }}
 {{- range .Values.config.existingSecrets }}
     - secret:
@@ -397,11 +425,11 @@ volumes:
         {{- range .items }}
         - key: {{ .key }}
           path: {{ .path }}
-          mode: {{ $.Values.config.defaultMode.secret }}
+          mode: {{ $secretMode }}
         {{- end }}
 {{- end }}
 {{- end }}
-{{- if .Values.config.userProvisioning }}
+{{- if and .Values.config.sssd.enabled (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
 - name: rstudio-user
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-user
