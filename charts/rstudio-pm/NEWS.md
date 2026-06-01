@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.1
+
+- Update default Posit Package Manager version to 2026.05.0
+
 ## 0.20.0
 
 - **BREAKING**: Default images now pull from the `posit/` namespace on Docker Hub
