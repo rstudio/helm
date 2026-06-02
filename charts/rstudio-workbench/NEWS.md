@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.21.0
+## 0.21.1
 
 - Workbench pods can now run as a non-root user. Set `pod.runAsRoot: false` (new value, default `true`) to run unprivileged.
 - When running unprivelaged SCIM must be used for user management.
