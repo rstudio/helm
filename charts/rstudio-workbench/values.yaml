@@ -15,7 +15,7 @@ runAsRoot: true
 
 # -- The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user`
 # from `rserver.conf` entirely.
-serviceAccountUser: "root"
+serviceAccountUser: "rstudio-server"
 
 # -- The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `runAsRoot` is false.
 # Must match the UID of `serviceAccountUser` baked into the Workbench image.

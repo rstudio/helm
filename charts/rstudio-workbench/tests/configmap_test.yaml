@@ -258,13 +258,13 @@ tests:
           pattern: "^exe="
 
   # -- serviceAccountUser -> rserver.conf server-user
-  - it: should render server-user=root by default
+  - it: should render server-user=rstudio-server by default
     template: configmap-general.yaml
     documentIndex: 0
     asserts:
       - matchRegex:
           path: data["rserver.conf"]
-          pattern: "server-user=root"
+          pattern: "server-user=rstudio-server"
 
   - it: should render server-user when serviceAccountUser is overridden
     template: configmap-general.yaml
