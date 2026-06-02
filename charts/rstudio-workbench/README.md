@@ -62,8 +62,8 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning, but it is **not** started by default. SSSD must run as root, so it can only be enabled when `pod.runAsRoot: true`. Modern provisioning (SCIM / native) does not require SSSD.
-  To start the bundled SSSD daemon, set `config.sssd.enabled: true` and provide its configuration in `config.sssd.conf` like so:
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning. SSSD must run as root, so the bundled daemon starts by default only on root deployments (`config.sssd.enabled: true`, `pod.runAsRoot: true`) and is automatically skipped when `pod.runAsRoot: false`. Modern provisioning (SCIM / native) does not require SSSD.
+  Provide its configuration in `config.sssd.conf` like so (set `config.sssd.enabled: false` to disable the daemon entirely):
 
     ```yaml
     config:
