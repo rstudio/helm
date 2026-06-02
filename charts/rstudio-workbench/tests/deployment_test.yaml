@@ -269,7 +269,7 @@ tests:
   - it: should specify a volumeMount and a volume for sssd conf when sssd is enabled (deprecated userProvisioning fallback)
     template: deployment.yaml
     set:
-      serviceAccountUser: root
+      pod.serviceAccountUser: root
       config:
         defaultMode:
           userProvisioning: 0600
@@ -871,7 +871,7 @@ tests:
   - it: should run pod as non-root when runAsRoot is false
     template: deployment.yaml
     set:
-      runAsRoot: false
+      pod.runAsRoot: false
     asserts:
       - equal:
           path: spec.template.spec.securityContext.runAsNonRoot
@@ -886,8 +886,8 @@ tests:
   - it: should use custom uid when serviceAccountUserId is overridden
     template: deployment.yaml
     set:
-      runAsRoot: false
-      serviceAccountUserId: 1500
+      pod.runAsRoot: false
+      pod.serviceAccountUserId: 1500
     asserts:
       - equal:
           path: spec.template.spec.securityContext.runAsNonRoot
@@ -899,7 +899,7 @@ tests:
   - it: should let pod.securityContext override the non-root defaults
     template: deployment.yaml
     set:
-      runAsRoot: false
+      pod.runAsRoot: false
       pod:
         securityContext:
           runAsUser: 4242
@@ -918,7 +918,7 @@ tests:
   - it: should not force runAsUser 0 when root pod.securityContext sets runAsNonRoot
     template: deployment.yaml
     set:
-      runAsRoot: true
+      pod.runAsRoot: true
       pod:
         securityContext:
           runAsNonRoot: true
@@ -932,7 +932,7 @@ tests:
   - it: should respect a root pod.securityContext runAsUser override
     template: deployment.yaml
     set:
-      runAsRoot: true
+      pod.runAsRoot: true
       pod:
         securityContext:
           runAsUser: 1234
@@ -965,7 +965,7 @@ tests:
   - it: should not override command/args when runAsRoot is true
     template: deployment.yaml
     set:
-      runAsRoot: true
+      pod.runAsRoot: true
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].command
@@ -975,7 +975,7 @@ tests:
   - it: should not override command/args when runAsRoot is false
     template: deployment.yaml
     set:
-      runAsRoot: false
+      pod.runAsRoot: false
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].command

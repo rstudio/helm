@@ -33,11 +33,10 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning, but it is **not** started by default. SSSD must run as root, so it can only be enabled when `serviceAccountUser: root`. Modern provisioning (SCIM / native) does not require SSSD.
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning, but it is **not** started by default. SSSD must run as root, so it can only be enabled when `pod.runAsRoot: true`. Modern provisioning (SCIM / native) does not require SSSD.
   To start the bundled SSSD daemon, set `config.sssd.enabled: true` and provide its configuration in `config.sssd.conf` like so:
 
     ```yaml
-    serviceAccountUser: root
     config:
       sssd:
         enabled: true
@@ -306,7 +305,7 @@ administrator.
 
 Posit Workbench's native user provisioning (SCIM / just-in-time) is the recommended approach and does not require SSSD.
 The legacy approach is `sssd`: the [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
-includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `serviceAccountUser: root`; see `config.sssd` above).
+includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `pod.runAsRoot: true`; see `config.sssd` above).
 
 The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever)
 or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.

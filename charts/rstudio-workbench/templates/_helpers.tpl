@@ -25,11 +25,11 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Returns "true" when the SSSD daemon should actually run: sssd.enabled=true and serviceAccountUser=root.
+Returns "true" when the SSSD daemon should actually run: sssd.enabled=true and pod.runAsRoot=true.
 SSSD cannot run as a non-root process, so the flag is silently ignored for non-root deployments.
 */}}
 {{- define "rstudio-workbench.sssd.active" -}}
-{{- if and .Values.config.sssd.enabled .Values.runAsRoot -}}
+{{- if and .Values.config.sssd.enabled .Values.pod.runAsRoot -}}
 true
 {{- end -}}
 {{- end -}}
@@ -57,7 +57,7 @@ stderr_logfile_backups=0
        them as root-owned and the non-root process accesses them via fsGroup group membership.
        Root deployments keep the tighter 0600 default. */ -}}
 {{- $secretMode := $.Values.config.defaultMode.secret -}}
-{{- if not $.Values.runAsRoot -}}
+{{- if not $.Values.pod.runAsRoot -}}
   {{- $secretMode = 416 -}}{{/* octal 0640 */}}
 {{- end }}
 containers:

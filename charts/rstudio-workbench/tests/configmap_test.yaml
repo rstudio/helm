@@ -270,7 +270,7 @@ tests:
     template: configmap-general.yaml
     documentIndex: 0
     set:
-      serviceAccountUser: "workbench"
+      pod.serviceAccountUser: "workbench"
     asserts:
       - matchRegex:
           path: data["rserver.conf"]
@@ -280,7 +280,7 @@ tests:
     template: configmap-general.yaml
     documentIndex: 0
     set:
-      serviceAccountUser: ""
+      pod.serviceAccountUser: ""
     asserts:
       - notMatchRegex:
           path: data["rserver.conf"]
@@ -290,7 +290,7 @@ tests:
     template: configmap-general.yaml
     documentIndex: 0
     set:
-      serviceAccountUser: "rstudio-server"
+      pod.serviceAccountUser: "rstudio-server"
       config:
         server:
           rserver.conf:
@@ -365,7 +365,7 @@ tests:
     template: configmap-general.yaml
     documentIndex: 0
     set:
-      runAsRoot: false
+      pod.runAsRoot: false
     asserts:
       - matchRegex:
           path: data["rserver.conf"]
@@ -395,7 +395,7 @@ tests:
     template: configmap-general.yaml
     documentIndex: 0
     set:
-      serviceAccountUser: "rstudio-server"
+      pod.serviceAccountUser: "rstudio-server"
       config:
         server:
           rserver.conf:

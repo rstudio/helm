@@ -2,7 +2,7 @@
 
 ## 0.21.0
 
-- Workbench pods can now run as a non-root user. Set `runAsRoot: false` (new top-level value, default `true`) to run unprivileged. 
+- Workbench pods can now run as a non-root user. Set `pod.runAsRoot: false` (new value, default `true`) to run unprivileged.
 - When running unprivelaged SCIM must be used for user management.
 - A new `config.sssd` block controls the bundled SSSD daemon (replaces the deprecated `config.userProvisioning`).
 - `config.userProvisioning` is deprecated; use `config.sssd.conf`. A warning is emitted when it is set.

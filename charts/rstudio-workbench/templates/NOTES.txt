@@ -76,5 +76,5 @@ Please consider removing this configuration value.
 {{- end }}
 
 {{- if and .Values.config.sssd.conf (not (include "rstudio-workbench.sssd.active" .)) }}
-{{ print "\n\nWARNING: `config.sssd.conf` is set but the SSSD daemon will not start. SSSD requires `runAsRoot: true` and `config.sssd.enabled: true`." }}
+{{ print "\n\nWARNING: `config.sssd.conf` is set but the SSSD daemon will not start. SSSD requires `pod.runAsRoot: true` and `config.sssd.enabled: true`." }}
 {{- end }}

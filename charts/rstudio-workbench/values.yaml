@@ -6,21 +6,6 @@ fullnameOverride: ""
 # -- A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
-# -- Whether the pod's containers run as the root OS user. `true` (default) preserves historical
-# behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on.
-# `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to
-# `serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root
-# `rserver.conf`/`launcher.conf` defaults are applied.
-runAsRoot: true
-
-# -- The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user`
-# from `rserver.conf` entirely.
-serviceAccountUser: "rstudio-server"
-
-# -- The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `runAsRoot` is false.
-# Must match the UID of `serviceAccountUser` baked into the Workbench image.
-serviceAccountUserId: 999
-
 # -- Settings for enabling server diagnostics
 diagnostics:
   enabled: false
@@ -419,6 +404,18 @@ podDisruptionBudget: {}
 revisionHistoryLimit: 3
 
 pod:
+  # -- Whether the pod's containers run as the root OS user. `true` (default) preserves historical
+  # behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on.
+  # `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to
+  # `pod.serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root
+  # `rserver.conf`/`launcher.conf` defaults are applied.
+  runAsRoot: true
+  # -- The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user`
+  # from `rserver.conf` entirely.
+  serviceAccountUser: "rstudio-server"
+  # -- The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `pod.runAsRoot` is
+  # false. Must match the UID of `pod.serviceAccountUser` baked into the Workbench image.
+  serviceAccountUserId: 999
   # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
   env: []
   # -- volumes is injected as-is into the "volumes:" component of the pod.container spec
@@ -585,9 +582,9 @@ config:
   #     path: custom-file.conf
   # -- DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`.
   userProvisioning: {}
-  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs as a non-root user (`serviceAccountUser` other than `root`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD.
+  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD.
   sssd:
-    # -- whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `serviceAccountUser` is not `root`. Set to `false` to disable entirely.
+    # -- whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `pod.runAsRoot` is false. Set to `false` to disable entirely.
     enabled: true
     # -- a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`.
     conf: {}

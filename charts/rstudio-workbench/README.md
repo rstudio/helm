@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.21.0](https://img.shields.io/badge/Version-0.21.0-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.21.1](https://img.shields.io/badge/Version-0.21.1-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.21.0:
+To install the chart with the release name `my-release` at version 0.21.1:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.21.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.21.1
 ```
 
 To explore other chart versions, look at:
@@ -62,11 +62,10 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning, but it is **not** started by default. SSSD must run as root, so it can only be enabled when `serviceAccountUser: root`. Modern provisioning (SCIM / native) does not require SSSD.
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning, but it is **not** started by default. SSSD must run as root, so it can only be enabled when `pod.runAsRoot: true`. Modern provisioning (SCIM / native) does not require SSSD.
   To start the bundled SSSD daemon, set `config.sssd.enabled: true` and provide its configuration in `config.sssd.conf` like so:
 
     ```yaml
-    serviceAccountUser: root
     config:
       sssd:
         enabled: true
@@ -360,7 +359,7 @@ administrator.
 
 Posit Workbench's native user provisioning (SCIM / just-in-time) is the recommended approach and does not require SSSD.
 The legacy approach is `sssd`: the [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
-includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `serviceAccountUser: root`; see `config.sssd` above).
+includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `pod.runAsRoot: true`; see `config.sssd` above).
 
 The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever)
 or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.
@@ -665,9 +664,9 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
 | config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
-| config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs as a non-root user (`serviceAccountUser` other than `root`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
+| config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
 | config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |
-| config.sssd.enabled | bool | `true` | whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `serviceAccountUser` is not `root`. Set to `false` to disable entirely. |
+| config.sssd.enabled | bool | `true` | whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `pod.runAsRoot` is false. Set to `false` to disable entirely. |
 | config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
 | config.startupUserProvisioning | object | `{}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons. |
 | config.userProvisioning | object | `{}` | DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`. |
@@ -733,7 +732,10 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.lifecycle | object | `{}` | container lifecycle hooks |
 | pod.port | int | `8787` | The containerPort used by the main pod container |
+| pod.runAsRoot | bool | `true` | Whether the pod's containers run as the root OS user. `true` (default) preserves historical behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on. `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to `pod.serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root `rserver.conf`/`launcher.conf` defaults are applied. |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the service pod |
+| pod.serviceAccountUser | string | `"rstudio-server"` | The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user` from `rserver.conf` entirely. |
+| pod.serviceAccountUserId | int | `999` | The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `pod.runAsRoot` is false. Must match the UID of `pod.serviceAccountUser` baked into the Workbench image. |
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
 | pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
@@ -757,7 +759,6 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service. Use 2 or more to enable HA |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-server pod |
 | revisionHistoryLimit | int | `3` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
-| runAsRoot | bool | `true` | Whether the pod's containers run as the root OS user. `true` (default) preserves historical behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on. `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to `serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root `rserver.conf`/`launcher.conf` defaults are applied. |
 | sealedSecret.annotations | object | `{}` | annotations for SealedSecret resources |
 | sealedSecret.enabled | bool | `false` | use SealedSecret instead of Secret to deploy secrets |
 | secureCookieKey | object | `{"existingSecret":"","value":""}` | global.secureCookieKey takes precedence over secureCookieKey |
@@ -771,8 +772,6 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | service.port | int | `80` | The Service port. This is the port your service will run under. |
 | service.targetPort | int | `8787` | The port to forward to on the Workbench pod. Also see pod.port |
 | service.type | string | `"ClusterIP"` | The service type, usually ClusterIP (in-cluster only) or LoadBalancer (to expose the service using your cloud provider's load balancer) |
-| serviceAccountUser | string | `"root"` | The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user` from `rserver.conf` entirely. |
-| serviceAccountUserId | int | `999` | The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `runAsRoot` is false. Must match the UID of `serviceAccountUser` baked into the Workbench image. |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels normally includes the release name of the Prometheus Operator |
 | serviceMonitor.enabled | bool | `false` | Whether to create a ServiceMonitor CRD for use with a Prometheus Operator |
 | serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in (usually the same as the one in which the Prometheus Operator is running). Defaults to the release namespace |

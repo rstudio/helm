@@ -25,7 +25,7 @@ tests:
   - it: does not start the sssd daemon when runAsRoot is false
     template: configmap-startup.yaml
     set:
-      runAsRoot: false
+      pod.runAsRoot: false
     asserts:
       - notMatchRegexRaw:
           pattern: "program:sssd"
@@ -75,7 +75,7 @@ tests:
   - it: does not mount sssd directories when runAsRoot is false
     template: deployment.yaml
     set:
-      runAsRoot: false
+      pod.runAsRoot: false
     asserts:
       - notExists:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
@@ -100,7 +100,7 @@ tests:
   - it: silently skips sssd when runAsRoot is false even if sssd.enabled is true
     template: NOTES.txt
     set:
-      runAsRoot: false
+      pod.runAsRoot: false
       config.sssd.enabled: true
     asserts:
       - matchRegexRaw:
