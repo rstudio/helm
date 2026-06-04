@@ -318,8 +318,6 @@ backends:
       enabled: true
       # -- The repository to use for the Content InitContainer image
       repository: posit/connect-content-init
-      # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
-      os: "ubuntu-24.04"
       # -- Overrides the image tag whose default is the chart appVersion.
       tag: ""
       # -- The imagePullPolicy for the default initContainer
@@ -410,8 +408,6 @@ launcher:
     enabled: true
     # -- The repository to use for the Content InitContainer image
     repository: posit/connect-content-init
-    # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
-    os: "ubuntu-24.04"
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     # -- The imagePullPolicy for the default initContainer
