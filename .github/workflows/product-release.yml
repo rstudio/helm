@@ -39,16 +39,20 @@ jobs:
           case "$PRODUCT" in
             connect)
               echo "name=rstudio-connect" >> "$GITHUB_OUTPUT"
-              echo "image=rstudio/rstudio-connect" >> "$GITHUB_OUTPUT"
+              echo "image=posit/connect" >> "$GITHUB_OUTPUT"
+              echo "init-image=posit/connect-content-init" >> "$GITHUB_OUTPUT"
+              echo "os-tag=ubuntu-24.04" >> "$GITHUB_OUTPUT"
               ;;
             workbench)
               echo "name=rstudio-workbench" >> "$GITHUB_OUTPUT"
-              echo "image=rstudio/rstudio-workbench" >> "$GITHUB_OUTPUT"
-              echo "session-image=rstudio/r-session-complete" >> "$GITHUB_OUTPUT"
+              echo "image=posit/workbench" >> "$GITHUB_OUTPUT"
+              echo "session-image=posit/workbench-session-init" >> "$GITHUB_OUTPUT"
+              echo "os-tag=ubuntu-24.04" >> "$GITHUB_OUTPUT"
               ;;
             package-manager)
               echo "name=rstudio-pm" >> "$GITHUB_OUTPUT"
-              echo "image=rstudio/rstudio-package-manager" >> "$GITHUB_OUTPUT"
+              echo "image=posit/package-manager" >> "$GITHUB_OUTPUT"
+              echo "os-tag=ubuntu-24.04" >> "$GITHUB_OUTPUT"
               ;;
             *)
               echo "::error::Unknown product: $PRODUCT"
@@ -106,7 +110,9 @@ jobs:
           APP_VERSION: ${{ steps.app-version.outputs.value }}
           CHART_NAME: ${{ steps.chart.outputs.name }}
           IMAGE: ${{ steps.chart.outputs.image }}
+          INIT_IMAGE: ${{ steps.chart.outputs.init-image }}
           SESSION_IMAGE: ${{ steps.chart.outputs.session-image }}
+          OS_TAG: ${{ steps.chart.outputs.os-tag }}
         run: |
           CHART="charts/${CHART_NAME}/Chart.yaml"
 
@@ -121,12 +127,17 @@ jobs:
           NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
           yq -i ".version = \"$NEW_VERSION\"" "$CHART"
 
-          # Update image annotations (ubuntu2204-{version} format)
-          yq -i "(.annotations.\"artifacthub.io/images\" | select(. != null)) |= sub(\"${IMAGE}:[^\n]*\", \"${IMAGE}:ubuntu2204-${APP_VERSION}\")" "$CHART"
+          # Update main image annotation ({version}-{os-tag} format)
+          yq -i "(.annotations.\"artifacthub.io/images\" | select(. != null)) |= sub(\"${IMAGE}:[^\n]*\", \"${IMAGE}:${APP_VERSION}-${OS_TAG}\")" "$CHART"
 
-          # Workbench has a second image (r-session-complete)
+          # connect-content-init is OS-agnostic; tag is just the version
+          if [ -n "$INIT_IMAGE" ]; then
+            yq -i "(.annotations.\"artifacthub.io/images\" | select(. != null)) |= sub(\"${INIT_IMAGE}:[^\n]*\", \"${INIT_IMAGE}:${APP_VERSION}\")" "$CHART"
+          fi
+
+          # Workbench session-init uses the same OS-suffixed format as the main image
           if [ -n "$SESSION_IMAGE" ]; then
-            yq -i "(.annotations.\"artifacthub.io/images\" | select(. != null)) |= sub(\"${SESSION_IMAGE}:[^\n]*\", \"${SESSION_IMAGE}:ubuntu2204-${APP_VERSION}\")" "$CHART"
+            yq -i "(.annotations.\"artifacthub.io/images\" | select(. != null)) |= sub(\"${SESSION_IMAGE}:[^\n]*\", \"${SESSION_IMAGE}:${APP_VERSION}-${OS_TAG}\")" "$CHART"
           fi
 
           echo "chart-version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
