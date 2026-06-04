@@ -137,8 +137,21 @@ jobs:
         if: steps.unittest.outcome == 'failure'
         run: exit 1
 
+  detect-fork:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      is-fork: ${{ steps.check.outputs.is-fork }}
+    steps:
+      - name: Check fork status
+        id: check
+        env:
+          IS_FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: echo "is-fork=$IS_FORK" >> "$GITHUB_OUTPUT"
+
   install:
     runs-on: ubuntu-latest-4x
+    needs: [detect-fork]
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
@@ -178,6 +191,7 @@ jobs:
         run: kubectl create namespace posit-test
 
       - name: Create License File Secrets
+        if: needs.detect-fork.outputs.is-fork != 'true'
         env:
           PWB_LICENSE: ${{ secrets.PWB_LICENSE_FILE }}
           PCT_LICENSE: ${{ secrets.PCT_LICENSE_FILE }}
@@ -201,14 +215,30 @@ jobs:
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install changed)
         id: ct-install
-        if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' }}
+        if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' && needs.detect-fork.outputs.is-fork != 'true' }}
         run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library,rstudio-library-test --namespace posit-test
         continue-on-error: true
 
       # no allow-failure until https://github.com/actions/toolkit/issues/399
       - name: Run chart-testing (install all)
         id: ct-install-all
+        if: needs.detect-fork.outputs.is-fork != 'true'
         run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library,rstudio-library-test --namespace posit-test
+        continue-on-error: true
+
+      # Fork PRs have no access to license secrets. replicas=0 causes Kubernetes to
+      # create all non-pod resources (Services, RBAC, ConfigMaps, PVCs) and consider
+      # the Deployment immediately rolled out — no pod is scheduled that needs the license.
+      - name: Run chart-testing (install changed, fork)
+        id: ct-install-fork
+        if: ${{ github.ref != 'refs/heads/main' && steps.list-changed.outputs.changed == 'true' && needs.detect-fork.outputs.is-fork == 'true' }}
+        run: ct install --target-branch main --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library,rstudio-library-test --namespace posit-test --helm-extra-set-args "--set=replicas=0"
+        continue-on-error: true
+
+      - name: Run chart-testing (install all, fork)
+        id: ct-install-all-fork
+        if: needs.detect-fork.outputs.is-fork == 'true'
+        run: ct install --target-branch main --all --chart-dirs charts --chart-dirs other-charts --excluded-charts rstudio-library,rstudio-library-test --namespace posit-test --helm-extra-set-args "--set=replicas=0"
         continue-on-error: true
 
       - name: Notify Slack of chart install failure if on main
@@ -233,7 +263,7 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Fail the workflow if failed installs
-        if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure'
+        if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure' || steps.ct-install-fork.outcome == 'failure' || steps.ct-install-all-fork.outcome == 'failure'
         run: exit 1
 
   check-versions-connect:
