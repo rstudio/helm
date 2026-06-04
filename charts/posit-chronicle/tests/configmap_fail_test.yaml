@@ -27,7 +27,7 @@ tests:
           ServiceLogLevel: INVALID
     asserts:
       - failedTemplate:
-          errorPattern: ".*ServiceLogLevel: Does not match pattern.*"
+          errorPattern: ".*ServiceLogLevel.*does not match pattern.*"
   - it: should fail for invalid log level values
     set:
       config:
@@ -35,7 +35,7 @@ tests:
           ServiceLogFormat: INVALID
     asserts:
       - failedTemplate:
-          errorPattern: ".*ServiceLogFormat: Does not match pattern.*"
+          errorPattern: ".*ServiceLogFormat.*does not match pattern.*"
   - it: should fail if S3 is enabled but no bucket is specified
     set:
       config:

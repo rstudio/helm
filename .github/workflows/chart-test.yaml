@@ -87,7 +87,7 @@ jobs:
           version: "v3.19.2"
 
       - name: Install helm unittest plugin
-        run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.0.0
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.1.0
 
       - name: Run chart unit tests
         id: unittest
