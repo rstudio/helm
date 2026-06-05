@@ -2,6 +2,7 @@ name: Document Charts
 
 on:
   pull_request:
+  merge_group:
 
 jobs:
   document:
