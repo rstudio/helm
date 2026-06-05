@@ -1,0 +1,88 @@
+# Using a license file with the helm chart:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-file
+# If you would like to use a license key see this documentation:
+# https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#license-key
+license:
+  file:
+    secret: posit-licenses # TODO: Change to the secret name in your cluster
+    secretKey: workbench.lic # TODO: Change to the secret key containing your Workbench license
+
+# Configures user home directory shared storage
+homeStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-home-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 100G
+
+# Configures Workbench shared storage
+sharedStorage:
+  create: true
+  mount: true
+  storageClassName: nfs-sc-rwx # TODO: Change to a RWX StorageClass available in your cluster
+  # volumeName: wb-shared-pv-name # Only needed if PVs have been statically provisioned, in which case this will need to match the PV name.
+  requests:
+    storage: 1G
+
+# Contour's `Ingress` annotations don't expose cookie session affinity, so the
+# chart's templated Ingress is disabled and an HTTPProxy is rendered via
+# extraObjects below. Envoy talks directly to this ClusterIP service.
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8787
+
+ingress:
+  enabled: false
+
+extraObjects:
+  - |
+    apiVersion: projectcontour.io/v1
+    kind: HTTPProxy
+    metadata:
+      name: {{ include "rstudio-workbench.fullname" . }}
+      labels:
+        {{- include "rstudio-workbench.labels" . | nindent 8 }}
+    spec:
+      virtualhost:
+        fqdn: workbench.example.com # TODO: Change to your domain
+        tls:
+          secretName: posit-workbench-tls # TODO: Change to the name of your secret of type kubernetes.io/tls
+          minimumProtocolVersion: "1.2"
+      routes:
+        - conditions:
+            - prefix: /
+          services:
+            - name: {{ include "rstudio-workbench.fullname" . }}
+              port: 80
+          # Cookie-based session affinity. Required when replicas > 1.
+          loadBalancerPolicy:
+            strategy: Cookie
+          # Required for the RStudio IDE, VS Code, Positron, Jupyter, and the
+          # job-status stream.
+          enableWebsockets: true
+          # Long timeouts so idle IDE sessions are not torn down by Envoy.
+          timeoutPolicy:
+            response: 1h
+            idle: 1h
+            idleConnection: 1h
+          requestHeadersPolicy:
+            set:
+              - name: X-Forwarded-Proto
+                value: https
+              - name: X-RStudio-Request
+                value: "https://workbench.example.com%REQ(:PATH)%" # TODO: Change to your domain
+
+# Tells Workbench it sits behind a TLS-terminating proxy so auth redirects use
+# https://. The HTTPProxy above sets X-Forwarded-Proto and X-RStudio-Request.
+config:
+  server:
+    rserver.conf:
+      ssl-enabled: 0
+      www-frame-origin: same
+  secret:
+    database.conf:
+      provider: "postgresql"
+      connection-uri: "postgres://<USERNAME>@<HOST>:<PORT>/<DATABASE>?sslmode=require" # TODO: Change this URI to reach your Postgres database.
+      password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.secret.database\.conf.password=<your-postgres-password>.
