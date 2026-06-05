@@ -70,6 +70,10 @@ Bugs or feature requests should be opened in an [issue](https://github.com/rstud
 
 Posit values your contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
 
+## Code of Conduct
+
+We expect all contributors to adhere to the project's [Code of Conduct](CODE_OF_CONDUCT.md) and create a positive and inclusive community.
+
 ## License
 
 [MIT License](./LICENSE)
