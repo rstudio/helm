@@ -181,6 +181,10 @@ containers:
       mountPath: "/etc/rstudio"
     - name: mnt-dynamic
       mountPath: "/mnt/dynamic"
+    {{- if or (gt (int .Values.replicas) 1) .Values.loadBalancer.forceEnabled }}
+    - name: mnt-load-balancer
+      mountPath: "/mnt/load-balancer"
+    {{- end }}
     - name: rstudio-rsw-startup
       mountPath: "/startup/base"
     {{- if .Values.launcher.enabled }}
@@ -314,6 +318,14 @@ volumes:
   emptyDir: {}
 - name: mnt-dynamic
   emptyDir: {}
+{{- if or (gt (int .Values.replicas) 1) .Values.loadBalancer.forceEnabled }}
+{{- /* prestart-workbench.bash writes the load-balancer config here when RSW_LOAD_BALANCING
+       is set. Without a mounted volume the path is on the read-only-by-default root fs,
+       which a non-root pod (pod.runAsRoot: false) cannot write to. fsGroup makes the
+       emptyDir group-writable for the unprivileged user. */}}
+- name: mnt-load-balancer
+  emptyDir: {}
+{{- end }}
 - name: rstudio-config
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-config

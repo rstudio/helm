@@ -7,6 +7,7 @@
 - A new `config.sssd` block controls the bundled SSSD daemon (replaces the deprecated `config.userProvisioning`).
 - `config.userProvisioning` is deprecated; use `config.sssd.conf`. A warning is emitted when it is set.
 - The Workbench and launcher prestart scripts (`prestart-workbench.bash`, `prestart-launcher.bash`) no longer perform root-only operations.
+- A writable `emptyDir` is now mounted at `/mnt/load-balancer` when load balancing is active (`replicas > 1` or `loadBalancer.forceEnabled: true`), so the prestart script can write the load-balancer config when the pod runs unprivileged (`pod.runAsRoot: false`).
 
 ## 0.20.0
 

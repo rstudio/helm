@@ -141,6 +141,61 @@ tests:
       - equal:
           path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
           value: "true"
+  - it: should mount a writable /mnt/load-balancer volume when replicas > 1
+    template: deployment.yaml
+    set:
+      replicas: 2
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "mnt-load-balancer"
+            mountPath: "/mnt/load-balancer"
+          any: true
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "mnt-load-balancer"
+            emptyDir: {}
+          any: true
+  - it: should mount a writable /mnt/load-balancer volume when loadBalancer.forceEnabled is true even if replicas = 1
+    template: deployment.yaml
+    set:
+      replicas: 1
+      loadBalancer:
+        forceEnabled: true
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "mnt-load-balancer"
+            mountPath: "/mnt/load-balancer"
+          any: true
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "mnt-load-balancer"
+            emptyDir: {}
+          any: true
+  - it: should not mount the /mnt/load-balancer volume when replicas = 1 and forceEnabled is false
+    template: deployment.yaml
+    set:
+      replicas: 1
+      loadBalancer:
+        forceEnabled: false
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "mnt-load-balancer"
+            mountPath: "/mnt/load-balancer"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "mnt-load-balancer"
+            emptyDir: {}
+          any: true
   - it: should specify a volumeMount and a volume for sharedStorage if sharedStorage.create is true
     template: deployment.yaml
     set:
