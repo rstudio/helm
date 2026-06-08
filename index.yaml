@@ -802,6 +802,62 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: connect
+          image: posit/connect:2026.05.1-ubuntu-24.04
+        - name: connect-content-init
+          image: posit/connect-content-init:2026.05.1
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: About Connect
+          url: https://posit.co/products/enterprise/connect/
+        - name: Connect Documentation
+          url: https://docs.posit.co/connect/
+        - name: Posit Helm Documentation
+          url: https://docs.posit.co/helm
+        - name: Container Images
+          url: https://github.com/posit-dev/images-connect
+        - name: Posit Community Forum
+          url: https://forum.posit.co/c/posit-professional-hosted
+        - name: GitHub Discussions
+          url: https://github.com/posit-dev/images/discussions
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
+        - url: https://artifacthub.io/packages/helm/rstudio/posit-chronicle
+    apiVersion: v2
+    appVersion: 2026.05.1
+    created: "2026-06-08T19:50:20.787050757Z"
+    dependencies:
+    - name: rstudio-library
+      repository: https://helm.rstudio.com
+      version: 0.1.36
+    description: Official Helm chart for Posit Connect
+    digest: 8198b685cfb43bb9b96dd8ead753a75bd1a9e4c0e7bd013cbbf81c61e3698df6
+    home: https://posit.co
+    icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - deploy
+    - rstudio
+    - posit
+    maintainers:
+    - email: docker@posit.co
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-connect
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-connect-0.20.5/rstudio-connect-0.20.5.tgz
+    version: 0.20.5
+  - annotations:
+      artifacthub.io/images: |
+        - name: connect
           image: posit/connect:2026.04.1-ubuntu-24.04
         - name: connect-content-init
           image: posit/connect-content-init:2026.04.1-ubuntu-24.04
@@ -20702,4 +20758,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2026-06-02T17:42:22.961767145Z"
+generated: "2026-06-08T19:50:20.788072643Z"
