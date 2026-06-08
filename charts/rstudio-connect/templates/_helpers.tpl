@@ -151,7 +151,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- if .Values.backends.kubernetes.defaultInitContainer.enabled }}
     {{- /* build init container image tag */}}
     {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-    {{- $tag := .Values.backends.kubernetes.defaultInitContainer.tag | default (printf "%s-%s" $defaultVersion .Values.backends.kubernetes.defaultInitContainer.os) }}
+    {{- $tag := .Values.backends.kubernetes.defaultInitContainer.tag | default $defaultVersion }}
     {{- $image := printf "%s:%s" .Values.backends.kubernetes.defaultInitContainer.repository $tag }}
     {{- /* build the init container */}}
     {{- $initVolumeMount := dict "name" "rsc-volume" "mountPath" "/mnt/rstudio-connect-runtime/" }}

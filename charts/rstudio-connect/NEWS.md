@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.20.5
+
+- Remove the `os` field from `backends.kubernetes.defaultInitContainer` and
+  `launcher.defaultInitContainer`. The `connect-content-init` image copies an
+  architecture-specific binary and is not OS-specific; the tag is now the chart
+  `appVersion` (e.g. `2026.05.1`) rather than `2026.05.1-ubuntu-24.04`. Any
+  `os:` values in your `values.yaml` can be removed.
+
 ## 0.20.4
 
 - Bump Connect version to 2026.05.1

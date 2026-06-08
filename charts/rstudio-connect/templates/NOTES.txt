@@ -83,11 +83,11 @@ Please consider removing this configuration value.
 {{- end }}
 
 {{- if .Values.launcher.defaultInitContainer.tagPrefix }}
-  {{- fail "\n\n`launcher.defaultInitContainer.tagPrefix` has been removed. Use `launcher.defaultInitContainer.os` instead (e.g. `ubuntu-24.04`). The image tag format is now `{version}-{os}`." }}
+  {{- fail "\n\n`launcher.defaultInitContainer.tagPrefix` has been removed. The default tag is now the chart appVersion. Use `launcher.defaultInitContainer.tag` to override." }}
 {{- end }}
 
 {{- if .Values.backends.kubernetes.defaultInitContainer.tagPrefix }}
-  {{- fail "\n\n`backends.kubernetes.defaultInitContainer.tagPrefix` has been removed. Use `backends.kubernetes.defaultInitContainer.os` instead (e.g. `ubuntu-24.04`). The image tag format is now `{version}-{os}`." }}
+  {{- fail "\n\n`backends.kubernetes.defaultInitContainer.tagPrefix` has been removed. The default tag is now the chart appVersion. Use `backends.kubernetes.defaultInitContainer.tag` to override." }}
 {{- end }}
 
 {{- if .Values.pod.serviceAccountName }}

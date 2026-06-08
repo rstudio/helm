@@ -784,7 +784,7 @@ tests:
           pattern: "name: connect-content-init"
       - matchRegex:
           path: data["job.yaml"]
-          pattern: "image: posit/connect-content-init:\\d+\\.\\d+\\.\\d+-ubuntu-24\\.04"
+          pattern: "(?m)^.*image: posit/connect-content-init:\\d+\\.\\d+\\.\\d+$"
       - matchRegex:
           path: data["job.yaml"]
           pattern: "name: connect-content"
@@ -1082,23 +1082,6 @@ tests:
       - matchRegex:
           path: data["job.yaml"]
           pattern: "image: posit/connect-content-init:custom-tag-1.2.3"
-
-  - it: should use appVersion-os when tag is not set
-    template: configmap.yaml
-    values:
-      - kubernetes-values.yaml
-    set:
-      launcher:
-        enabled: false
-      backends:
-        kubernetes:
-          enabled: true
-          defaultInitContainer:
-            os: "ubuntu-22.04"
-    asserts:
-      - matchRegex:
-          path: data["job.yaml"]
-          pattern: "image: posit/connect-content-init:\\d+\\.\\d+\\.\\d+-ubuntu-22\\.04"
 
   - it: should preserve user-provided sidecar and nodeSelector in job base
     template: configmap.yaml
