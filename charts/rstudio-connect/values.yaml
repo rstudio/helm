@@ -457,7 +457,8 @@ executionEnvironments: []
 nameservice:
   # -- Whether to enable nameservice integration.
   enabled: false
-  # -- Connect API key for nameservice module. Must be a Viewer API key.
+  # -- Connect service token (with the `nameservice:read` scope) used by the nameservice module.
+  # Use a service token scoped to `nameservice:read`, not a Viewer API key.
   apiKey: ""
   # -- Connect server URL for nameservice module.
   server: "http://127.0.0.1:3939"

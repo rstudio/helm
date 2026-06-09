@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.20.6
+
+- Clarify `nameservice.apiKey` documentation: use a Connect service token scoped
+  to `nameservice:read` rather than a Viewer API key.
+
 ## 0.20.5
 
 - Remove the `os` field from `backends.kubernetes.defaultInitContainer` and
