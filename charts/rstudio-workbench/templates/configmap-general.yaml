@@ -117,9 +117,14 @@ data:
          secure-cookie-key, so rserver-signed launcher requests fail auth. Point it at the shared key.
        - auth-pam-sessions-enabled=0: opening host PAM sessions requires root; launcher session
          workloads handle session setup. Matches the product default for launcher-sessions deployments.
-       - user-provisioning-enabled=1: native (SCIM) provisioning is the rootless user-resolution path. */}}
+       - user-provisioning-enabled=1: native (SCIM) provisioning is the rootless user-resolution path.
+       - launcher-sessions-create-container-user=0: the create-container-user model needs the session
+         container to start as root so it can useradd + setuid into the requesting user; an unprivileged
+         container cannot, so the session fails to launch (EPERM). Disabling it makes rserver stamp the
+         session pod securityContext with the user's UID/GID instead (the runAsUserId branch in
+         ServerJobLauncher), so the session runs directly as the user with no privilege. */}}
 {{- if not .Values.pod.runAsRoot }}
-  {{- $rootlessDefaults := dict "rserver.conf" (dict "auth-pam-sessions-enabled" 0 "user-provisioning-enabled" 1) "launcher.conf" (dict "server" (dict "secure-cookie-key-file" "/mnt/secret-configmap/rstudio/secure-cookie-key")) }}
+  {{- $rootlessDefaults := dict "rserver.conf" (dict "auth-pam-sessions-enabled" 0 "user-provisioning-enabled" 1 "launcher-sessions-create-container-user" 0) "launcher.conf" (dict "server" (dict "secure-cookie-key-file" "/mnt/secret-configmap/rstudio/secure-cookie-key")) }}
   {{- $overrideDict = mergeOverwrite $rootlessDefaults $overrideDict }}
 {{- else }}
   {{- $overrideDict = mergeOverwrite (dict "rserver.conf" (dict "auth-pam-sessions-enabled" 1)) $overrideDict }}

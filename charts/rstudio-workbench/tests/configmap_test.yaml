@@ -374,6 +374,9 @@ tests:
           path: data["rserver.conf"]
           pattern: "(?m)^user-provisioning-enabled=1$"
       - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-create-container-user=0$"
+      - matchRegex:
           path: data["launcher.conf"]
           pattern: "secure-cookie-key-file=/mnt/secret-configmap/rstudio/secure-cookie-key"
 
@@ -387,6 +390,9 @@ tests:
       - notMatchRegex:
           path: data["rserver.conf"]
           pattern: "user-provisioning-enabled"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-create-container-user"
       - notMatchRegex:
           path: data["launcher.conf"]
           pattern: "secure-cookie-key-file"
