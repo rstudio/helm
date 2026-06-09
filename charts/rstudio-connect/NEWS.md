@@ -2,7 +2,7 @@
 
 ## 0.20.6
 
-- Clarify `nameservice.apiKey` documentation: use a Connect service token with the
+- Clarify `nameservice.apiKey` documentation to use a Connect service token with the
   `nameservice:read` scope.
 
 ## 0.20.5
