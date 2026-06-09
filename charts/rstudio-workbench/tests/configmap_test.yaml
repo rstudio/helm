@@ -337,6 +337,20 @@ tests:
           path: data["prestart-launcher.bash"]
           pattern: "/var/lib/rstudio-launcher/Local"
 
+  - it: should create launcher scratch dirs group-writable in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      # In root mode prestart runs as root but the launcher drops to serviceAccountUser;
+      # creating the scratch dirs setgid + group-writable lets the launcher write to them
+      # via the rstudio-server group inherited from the parent, with no root-only chown.
+      - matchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "install -d -m 2775"
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "mkdir -p"
+
   # -- Rootless: prestart-workbench.bash has no privileged operations
   - it: should not chown or create monitor dirs in prestart-workbench.bash
     template: configmap-prestart.yaml

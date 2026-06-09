@@ -938,6 +938,72 @@ tests:
           path: spec.template.spec.securityContext.fsGroup
           value: 999
 
+  - it: should set fsGroup in root mode when launcher is enabled
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 0
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 999
+      - equal:
+          path: spec.template.spec.securityContext.fsGroupChangePolicy
+          value: OnRootMismatch
+
+  - it: should not set fsGroup in root mode when launcher is disabled
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: false
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 0
+      - notExists:
+          path: spec.template.spec.securityContext.fsGroup
+      - notExists:
+          path: spec.template.spec.securityContext.fsGroupChangePolicy
+
+  - it: should use custom serviceAccountUserId for root-mode fsGroup
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: true
+      pod.serviceAccountUserId: 1500
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1500
+
+  - it: should let pod.securityContext fsGroup override the root-mode default
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: true
+      pod:
+        securityContext:
+          fsGroup: 4242
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 4242
+
+  - it: should set fsGroupChangePolicy alongside fsGroup in rootless mode
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: false
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 999
+      - equal:
+          path: spec.template.spec.securityContext.fsGroupChangePolicy
+          value: OnRootMismatch
+
   - it: should use custom uid when serviceAccountUserId is overridden
     template: deployment.yaml
     set:

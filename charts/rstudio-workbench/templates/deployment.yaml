@@ -96,10 +96,20 @@ spec:
         {{- if not (or (hasKey $userPodSC "runAsUser") (hasKey $userPodSC "runAsNonRoot")) }}
           {{- $_ := set $defaultPodSC "runAsUser" 0 }}
         {{- end }}
+        {{- /* The Kubernetes launcher daemon drops to serviceAccountUser (non-root) even in a root
+               pod, so its projected ServiceAccount token (root:root 0600) is otherwise unreadable.
+               fsGroup makes the token group-readable (root:<gid> 0640) to the launcher without
+               exposing it world-readable to end-user sessions on the pod. OnRootMismatch bounds the
+               one-time recursive chown of mounted volumes. Only needed when the launcher runs. */ -}}
+        {{- if .Values.launcher.enabled }}
+          {{- $_ := set $defaultPodSC "fsGroup" (int .Values.pod.serviceAccountUserId) }}
+          {{- $_ := set $defaultPodSC "fsGroupChangePolicy" "OnRootMismatch" }}
+        {{- end }}
       {{- else }}
         {{- $_ := set $defaultPodSC "runAsNonRoot" true }}
         {{- $_ := set $defaultPodSC "runAsUser" (int .Values.pod.serviceAccountUserId) }}
         {{- $_ := set $defaultPodSC "fsGroup" (int .Values.pod.serviceAccountUserId) }}
+        {{- $_ := set $defaultPodSC "fsGroupChangePolicy" "OnRootMismatch" }}
       {{- end }}
       {{- $effectivePodSC := mergeOverwrite $defaultPodSC (deepCopy $userPodSC) }}
       {{- with $effectivePodSC }}
