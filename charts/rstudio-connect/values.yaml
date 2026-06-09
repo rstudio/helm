@@ -457,8 +457,7 @@ executionEnvironments: []
 nameservice:
   # -- Whether to enable nameservice integration.
   enabled: false
-  # -- Connect service token (with the `nameservice:read` scope) used by the nameservice module.
-  # Use a service token scoped to `nameservice:read`, not a Viewer API key.
+  # -- The Connect service token used by the nameservice module. Create a service token with the `nameservice:read` scope. See https://docs.posit.co/connect/api/#post-/v1/system/service-tokens.
   apiKey: ""
   # -- Connect server URL for nameservice module.
   server: "http://127.0.0.1:3939"

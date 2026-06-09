@@ -2,8 +2,8 @@
 
 ## 0.20.6
 
-- Clarify `nameservice.apiKey` documentation: use a Connect service token scoped
-  to `nameservice:read` rather than a Viewer API key.
+- Clarify `nameservice.apiKey` documentation: use a Connect service token with the
+  `nameservice:read` scope.
 
 ## 0.20.5
 

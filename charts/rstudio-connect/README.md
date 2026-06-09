@@ -352,7 +352,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | Used to configure the container's livenessProbe. Only included if enabled = true |
 | nameOverride | string | `""` | The name of the chart deployment (can be overridden) |
 | nameservice | object | `{"apiKey":"","enabled":false,"secretName":"","server":"http://127.0.0.1:3939"}` | Nameservice configuration for current user execution (RunAsCurrentUser). This can only be enabled if using an SSO authentication provider (OAuth2, SAML, or LDAP). |
-| nameservice.apiKey | string | `""` | Connect service token (with the `nameservice:read` scope) used by the nameservice module. Use a service token scoped to `nameservice:read`, not a Viewer API key. |
+| nameservice.apiKey | string | `""` | The Connect service token used by the nameservice module. Create a service token with the `nameservice:read` scope. See https://docs.posit.co/connect/api/#post-/v1/system/service-tokens. |
 | nameservice.enabled | bool | `false` | Whether to enable nameservice integration. |
 | nameservice.secretName | string | `""` | Optional: name of existing secret containing libnss_connect.conf (overrides apiKey and server). The secret must be in the same namespace as the Connect deployment. |
 | nameservice.server | string | `"http://127.0.0.1:3939"` | Connect server URL for nameservice module. |
