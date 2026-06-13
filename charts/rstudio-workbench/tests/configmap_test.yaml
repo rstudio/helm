@@ -374,8 +374,8 @@ tests:
           path: data["prestart-workbench.bash"]
           pattern: "/etc/rstudio/README"
 
-  # -- runAsRoot -> rootless config defaults
-  - it: should apply rootless config defaults when runAsRoot is false
+  # -- runAsRoot -> rootless config defaults (nss-mode when the init container is available)
+  - it: should default to nss-mode session provisioning when runAsRoot is false and components are enabled
     template: configmap-general.yaml
     documentIndex: 0
     set:
@@ -389,10 +389,30 @@ tests:
           pattern: "(?m)^user-provisioning-enabled=1$"
       - matchRegex:
           path: data["rserver.conf"]
-          pattern: "(?m)^launcher-sessions-create-container-user=0$"
+          pattern: "(?m)^launcher-sessions-create-container-user=1$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-create-container-user-mode=nss$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-init-container-run-user=server-user$"
       - matchRegex:
           path: data["launcher.conf"]
           pattern: "secure-cookie-key-file=/mnt/secret-configmap/rstudio/secure-cookie-key"
+
+  - it: should fall back to create-container-user=0 when runAsRoot is false but components are disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      pod.runAsRoot: false
+      components.enabled: false
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-create-container-user=0$"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-create-container-user-mode"
 
   - it: should keep PAM sessions on and not force provisioning when runAsRoot is true
     template: configmap-general.yaml
