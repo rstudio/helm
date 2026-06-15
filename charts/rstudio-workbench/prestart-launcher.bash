@@ -30,15 +30,14 @@ main() {
     printf '\n'
   fi
 
-  # Create the scratch dirs setgid + group-writable (2775). In root mode this prestart runs as
-  # root but the launcher drops to the non-root serviceAccountUser; the dirs inherit the
-  # rstudio-server group from the setgid parent, so the launcher can write to them via group
+  # Create the Local scratch dir setgid + group-writable (2775). In root mode this prestart runs as
+  # root but the launcher drops to the non-root serviceAccountUser; the dir inherits the
+  # rstudio-server group from the setgid parent, so the launcher can write to it via group
   # permission without any root-only ownership change. In rootless mode the process already
-  # is serviceAccountUser.
+  # is serviceAccountUser. The Kubernetes scratch dir is mounted as an fsGroup-owned emptyDir by
+  # the chart, so it arrives group-writable and must not be chmod-ed here (a non-owner chmod EPERMs).
   _logf 'Preparing dirs'
-  install -d -m 2775 \
-    /var/lib/rstudio-launcher/Local \
-    /var/lib/rstudio-launcher/Kubernetes
+  install -d -m 2775 /var/lib/rstudio-launcher/Local
 
   _logf 'Replacing process with %s' "${startup_script}"
   exec "${startup_script}"

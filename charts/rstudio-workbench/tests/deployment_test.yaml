@@ -375,6 +375,11 @@ tests:
       - equal:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.defaultMode'
           value: 0755
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="launcher-kubernetes-scratch")].mountPath'
+          value: "/var/lib/rstudio-launcher/Kubernetes"
+      - exists:
+          path: 'spec.template.spec.volumes[?(@.name=="launcher-kubernetes-scratch")].emptyDir'
   - it: should not specify a volumeMount and a volume for launcher if launcher.enabled is false
     template: deployment.yaml
     set:
@@ -385,6 +390,10 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="launcher-kubernetes-scratch")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="launcher-kubernetes-scratch")]'
   - it: should specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is defined and not empty
     template: deployment.yaml
     set:

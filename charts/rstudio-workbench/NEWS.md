@@ -4,7 +4,7 @@
 
 - New `pod.runAsRoot` value (default `true`); set it to `false` to run the Workbench pod as a non-root user. In rootless mode user management uses SCIM provisioning, JIT, and requires init containers.
 - The bundled SSSD daemon is now controlled by the new `config.sssd` block; `config.userProvisioning` is deprecated.
-- Supporting changes for unprivileged pods and the non-root launcher: prestart scripts no longer perform root-only operations, the launcher's ServiceAccount token is made group-readable via `fsGroup`, the `secure-cookie-key` is shared with the launcher, and writable scratch and `/mnt/load-balancer` volumes are mounted as needed.
+- Supporting changes for unprivileged pods and the non-root launcher: prestart scripts no longer perform root-only operations, the launcher's ServiceAccount token is made group-readable via `fsGroup`, the `secure-cookie-key` is shared with the launcher, the Kubernetes launcher scratch dir (`/var/lib/rstudio-launcher/Kubernetes`) is backed by an `fsGroup`-owned `emptyDir` so it is group-writable for the non-root launcher, and writable scratch and `/mnt/load-balancer` volumes are mounted as needed.
 
 ## 0.20.0
 

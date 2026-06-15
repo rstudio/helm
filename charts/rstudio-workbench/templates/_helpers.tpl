@@ -219,6 +219,14 @@ containers:
     - name: rstudio-job-overrides-new
       mountPath: "/mnt/job-json-overrides-new"
     {{- end }}
+    {{- if .Values.launcher.enabled }}
+    {{- /* Back the Kubernetes launcher scratch-path with an emptyDir so it is governed by fsGroup
+           and comes up group-writable for the non-root launcher. Without this, the useTemplates
+           subPath mounts below force kubelet to pre-create this dir on the container rootfs as
+           root-owned, which an unprivileged prestart cannot chmod. */}}
+    - name: launcher-kubernetes-scratch
+      mountPath: "/var/lib/rstudio-launcher/Kubernetes"
+    {{- end }}
     {{- if .Values.launcher.useTemplates }}
     # mount into the default scratch-path... what if it gets changed?
     - name: session-templates
@@ -356,6 +364,8 @@ volumes:
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-launcher
     defaultMode: {{ .Values.config.defaultMode.startup }}
+- name: launcher-kubernetes-scratch
+  emptyDir: {}
 {{- end }}
 {{- if or (include "rstudio-workbench.sssd.active" .) .Values.config.startupUserProvisioning }}
 - name: rstudio-user-startup
