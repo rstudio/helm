@@ -22,12 +22,6 @@ Test harness for rstudio-library templates
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| testChronicle.enabled | bool | `true` |  |
-| testChronicle.image.registry | string | `"ghcr.io"` |  |
-| testChronicle.image.repository | string | `"rstudio/chronicle-agent"` |  |
-| testChronicle.image.tag | string | `"1.0.0"` |  |
-| testChronicle.serverAddress | string | `"http://chronicle-server.default:8080"` |  |
-| testChronicle.serverNamespace | string | `""` |  |
 | testConfig.dcf.config.key1 | string | `"value1"` |  |
 | testConfig.dcf.config.nested.subkey | string | `"subvalue"` |  |
 | testConfig.dcf.filename | string | `"test.dcf"` |  |
