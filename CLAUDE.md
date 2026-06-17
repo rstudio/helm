@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is the official Helm charts repository for Posit (formerly RStudio) products: Connect, Workbench, Package Manager, and Chronicle.
+This is the official Helm charts repository for Posit (formerly RStudio) products: Connect, Workbench, Package and Manager.
 
 ## Common Commands
 

@@ -148,14 +148,3 @@ testTplvalues:
   objectValue:
     name: "{{ .Release.Name }}"
     namespace: "{{ .Release.Namespace }}"
-
-# Chronicle agent test values
-# Exercises: chronicle-agent.image, chronicle-agent.serverAddress
-testChronicle:
-  enabled: true
-  serverAddress: "http://chronicle-server.default:8080"
-  serverNamespace: ""
-  image:
-    registry: ghcr.io
-    repository: rstudio/chronicle-agent
-    tag: "1.0.0"

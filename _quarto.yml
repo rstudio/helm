@@ -1,17 +1,15 @@
-project: 
+project:
   type: posit-docs
-  pre-render: 
+  pre-render:
     - just setup
     - just docs
-  render: 
-    - charts/rstudio-workbench/README.md 
-    - charts/rstudio-workbench/NEWS.md 
+  render:
+    - charts/rstudio-workbench/README.md
+    - charts/rstudio-workbench/NEWS.md
     - charts/rstudio-connect/README.md
     - charts/rstudio-connect/NEWS.md
     - charts/rstudio-pm/README.md
     - charts/rstudio-pm/NEWS.md
-    - charts/posit-chronicle/README.md
-    - charts/posit-chronicle/NEWS.md
     - examples/auto-scaling/README.md
     - examples/workbench/README.md
     - examples/connect/README.md
@@ -22,7 +20,7 @@ project:
 filters:
   - include-code-files
 
-website: 
+website:
   title: Posit Helm Charts
   site-url: https://docs.posit.co/helm
   bread-crumbs: true
@@ -81,9 +79,3 @@ website:
             file: charts/rstudio-pm/NEWS.md
           - text: Examples
             file: examples/package-manager/index.qmd
-      - section: "Posit Chronicle"
-        contents:
-          - text: Overview
-            file: charts/posit-chronicle/README.md
-          - text: Changelog
-            file: charts/posit-chronicle/NEWS.md

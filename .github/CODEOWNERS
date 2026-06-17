@@ -9,10 +9,6 @@
 /charts/rstudio-connect/** @rstudio/connect
 /examples/connect/** @rstudio/connect
 
-# posit-chronicle resources
-/charts/posit-chronicle/** @matt-urbina @markrtucker @t-margheim
-/ci/posit-chronicle/** @matt-urbina @markrtucker @t-margheim
-
 # rstudio-workbench resources
 /charts/rstudio-workbench/** @GCrev @zachhannum
 /ci/rstudio-workbench/** @GCrev @zachhannum

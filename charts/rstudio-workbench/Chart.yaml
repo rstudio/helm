@@ -41,7 +41,6 @@ annotations:
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
     - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
-    - url: https://artifacthub.io/packages/helm/rstudio/posit-chronicle
 keywords:
   - data science
   - machine learning

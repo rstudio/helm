@@ -33,19 +33,6 @@ pod:
     app.kubernetes.io/part-of: rstudio-team
   annotations:
     testannotation2: three
-  # This will spin up the chronicle-agent sidecar container
-  sidecar:
-    - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
-      volumeMounts:
-      - name: logs
-        mountPath: "/var/lib/rstudio-server/audit"
-      env:
-      - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default"
-    - name: busybox-sidecar
-      image: "busybox"
-      imagePullPolicy: "IfNotPresent"
 
 ingress:
   enabled: true

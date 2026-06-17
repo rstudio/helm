@@ -48,12 +48,6 @@ pod:
       command: ["sleep"]
       args: ["infinity"]
       imagePullPolicy: "IfNotPresent"
-    # This will spin up the chronicle-agent sidecar container
-    - name: chronicle-agent
-      image: ghcr.io/rstudio/chronicle-agent:2025.03.0
-      env:
-      - name: CHRONICLE_SERVER_ADDRESS
-        value: "http://chronicle-server.default"
   priorityClassName: something-fun
   tolerations:
     - key: "example-key"
