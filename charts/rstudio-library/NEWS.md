@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.37
+
+- remove chronicle
+
 ## 0.1.36
 
 - Update chart icon to Posit icon
@@ -91,7 +95,7 @@
 - Add an `Ingress` helper
   - Provides template for rendering `Ingress` `apiVersion` based on
     Kubernetes version
-  - Provides template for rendering `Ingress` `backend` based on 
+  - Provides template for rendering `Ingress` `backend` based on
     `apiVersion`
   - Provides template for determining if `Ingress` `apiVersion` supports
     the `ingressClassName` field
@@ -109,7 +113,7 @@
   - Allows comments (if using `key=value` pairs) and customizing the comment "delimiter" (`##` by default)
   - Example usage:
 ```
-{{- $config := dict "data" (dict "some-file.txt" (dict "key" "value")) }} 
+{{- $config := dict "data" (dict "some-file.txt" (dict "key" "value")) }}
 {{- include "rstudio-library.config.txt" $config }}
 
 ## results in
@@ -125,11 +129,11 @@ some-file.txt: |
 
 ## 0.1.15
 
-- Added a new parameter `clusterRoleCreate` to `rstudio-library.rbac` to allow for disabling the creation of the 
+- Added a new parameter `clusterRoleCreate` to `rstudio-library.rbac` to allow for disabling the creation of the
   `ClusterRole` that allows for access to the nodes API. This API is used to ensure that all of the IP addresses
-  for nodes are available when reporting the addresses of the node that is running a particular job so that 
-  clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is 
-  usually sufficient, so it is disabled by default. 
+  for nodes are available when reporting the addresses of the node that is running a particular job so that
+  clients can connect to it. This is generally not a needed permission for the Launcher as the internal IP is
+  usually sufficient, so it is disabled by default.
 
 ## 0.1.12 - 0.1.14
 

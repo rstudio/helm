@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.20.2
+
+- remove chronicle
 
 ## 0.20.1
 
