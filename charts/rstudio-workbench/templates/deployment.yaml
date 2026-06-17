@@ -101,7 +101,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.pod.terminationGracePeriodSeconds }}
-      {{- if or .Values.initContainers .Values.chronicleAgent.enabled (include "rstudio-workbench.positronInitEnabled" .) }}
+      {{- if or .Values.initContainers (include "rstudio-workbench.positronInitEnabled" .) }}
       initContainers:
         {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}
