@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.37
+
+- **DEPRECATED**: Chronicle agent helpers are deprecated. Posit Chronicle is no longer actively developed.
+
 ## 0.1.36
 
 - Update chart icon to Posit icon

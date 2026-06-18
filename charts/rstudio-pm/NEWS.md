@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.2
+
+- Remove deprecated posit-chronicle from chart recommendations
+
 ## 0.20.1
 
 - Update default Posit Package Manager version to 2026.05.0
