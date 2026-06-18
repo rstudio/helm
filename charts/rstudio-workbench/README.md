@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.20.2](https://img.shields.io/badge/Version-0.20.2-informational?style=flat-square) ![AppVersion: 2026.05.1](https://img.shields.io/badge/AppVersion-2026.05.1-informational?style=flat-square)
+![Version: 0.20.3](https://img.shields.io/badge/Version-0.20.3-informational?style=flat-square) ![AppVersion: 2026.05.1](https://img.shields.io/badge/AppVersion-2026.05.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.2:
+To install the chart with the release name `my-release` at version 0.20.3:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.20.2
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.20.3
 ```
 
 To explore other chart versions, look at:
@@ -506,6 +506,11 @@ launcher:
 
 ## Chronicle Agent
 
+::: {.callout-warning}
+**Deprecated**: Posit Chronicle and the Chronicle agent are deprecated and will be removed in a future release.
+Please plan to remove the Chronicle agent from your deployment.
+:::
+
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
 
@@ -619,7 +624,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | args | list | `[]` | args is the pod container's run arguments. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
-| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.enabled | DEPRECATED | `false` | Creates a Chronicle agent sidecar container in the pod if true |
 | chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
 | chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |

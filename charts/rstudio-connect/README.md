@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.20.6](https://img.shields.io/badge/Version-0.20.6-informational?style=flat-square) ![AppVersion: 2026.05.1](https://img.shields.io/badge/AppVersion-2026.05.1-informational?style=flat-square)
+![Version: 0.20.7](https://img.shields.io/badge/Version-0.20.7-informational?style=flat-square) ![AppVersion: 2026.05.1](https://img.shields.io/badge/AppVersion-2026.05.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.6:
+To install the chart with the release name `my-release` at version 0.20.7:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.6
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.7
 ```
 
 To explore other chart versions, look at:
@@ -149,6 +149,11 @@ Alternatively, database passwords may be set during `helm install` with the foll
 `--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
 ## Chronicle Agent
+
+::: {.callout-warning}
+**Deprecated**: Posit Chronicle and the Chronicle agent are deprecated and will be removed in a future release.
+Please plan to remove the Chronicle agent from your deployment.
+:::
 
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
@@ -294,7 +299,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
 | chronicleAgent.connectApiKey.value | string | `""` | Connect API key as a raw string to set as the `CHRONICLE_CONNECT_APIKEY` environment variable (not recommended) |
 | chronicleAgent.connectApiKey.valueFrom | object | `{}` | Connect API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_CONNECT_APIKEY` environment variable (recommended) |
-| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.enabled | DEPRECATED | `false` | Creates a Chronicle agent sidecar container in the pod if true |
 | chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
 | chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |

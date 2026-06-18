@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.20.3
+
+- **DEPRECATED**: The `chronicleAgent` configuration is deprecated. Posit Chronicle and the Chronicle agent are no longer actively developed and will be removed in a future release.
 
 ## 0.20.2
 

@@ -1,8 +1,18 @@
 # Posit Chronicle
 
-![Version: 0.4.6](https://img.shields.io/badge/Version-0.4.6-informational?style=flat-square) ![AppVersion: 2026.01.0](https://img.shields.io/badge/AppVersion-2026.01.0-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![AppVersion: 2026.01.0](https://img.shields.io/badge/AppVersion-2026.01.0-informational?style=flat-square)
+
+::: {.callout-warning}
+## Deprecated
+
+The posit-chronicle Helm chart is deprecated and will be removed in a future release.
+Posit Chronicle and the Chronicle agent are no longer actively developed.
+Please plan to remove Chronicle from your deployment.
+:::
 
 #### _Official Helm chart for Posit Chronicle Server_
+
+> **Deprecated**: Posit Chronicle is deprecated and will be removed in a future release.
 
 [Posit Chronicle](https://docs.posit.co/chronicle/) helps data science managers and other stakeholders understand their
 organization's use of other Posit products, primarily Posit Connect and
@@ -25,11 +35,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.4.6:
+To install the chart with the release name `my-release` at version 0.5.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/posit-chronicle --version=0.4.6
+helm upgrade --install my-release rstudio/posit-chronicle --version=0.5.0
 ```
 
 To explore other chart versions, look at:

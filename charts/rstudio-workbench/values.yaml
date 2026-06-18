@@ -92,9 +92,10 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 
+# DEPRECATED: Posit Chronicle is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:
-  # -- Creates a Chronicle agent sidecar container in the pod if true
+  # -- (DEPRECATED) Creates a Chronicle agent sidecar container in the pod if true
   enabled: false
   # -- Additional environment variables to set on the Chronicle agent container `env`
   env: []

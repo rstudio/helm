@@ -1,7 +1,8 @@
 apiVersion: v2
 name: posit-chronicle
 description: Official Helm chart for Posit Chronicle Server
-version: 0.4.6
+version: 0.5.0
+deprecated: true
 appVersion: 2026.01.0
 icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png
 home: https://www.posit.co

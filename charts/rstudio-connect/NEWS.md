@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.7
+
+- **DEPRECATED**: The `chronicleAgent` configuration is deprecated. Posit Chronicle and the Chronicle agent are no longer actively developed and will be removed in a future release.
+
 ## 0.20.6
 
 - Clarify `nameservice.apiKey` documentation to use a Connect service token with the
