@@ -1,6 +1,4 @@
 WARNING: The posit-chronicle Helm chart is DEPRECATED and will be removed in a future release.
-Posit Chronicle and the Chronicle agent are no longer actively developed.
-Please plan to remove Chronicle from your deployment.
 
 {{ include "posit-chronicle.fullname" . }} successfully deployed to namespace {{ .Release.Namespace }}
 

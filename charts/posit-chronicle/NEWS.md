@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.5.0
-- **DEPRECATED**: The posit-chronicle chart is deprecated and will be removed in a future release. Posit Chronicle and the Chronicle agent are no longer actively developed.
+- **DEPRECATED**: The posit-chronicle chart is deprecated and will be removed in a future release.
 
 ## 0.4.6
 - Bump Chronicle to version 2026.01.0

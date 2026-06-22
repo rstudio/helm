@@ -14,7 +14,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
@@ -507,8 +507,7 @@ launcher:
 ## Chronicle Agent
 
 ::: {.callout-warning}
-**Deprecated**: Posit Chronicle and the Chronicle agent are deprecated and will be removed in a future release.
-Please plan to remove the Chronicle agent from your deployment.
+**Deprecated**: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 :::
 
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled

@@ -6,13 +6,11 @@
 ## Deprecated
 
 The posit-chronicle Helm chart is deprecated and will be removed in a future release.
-Posit Chronicle and the Chronicle agent are no longer actively developed.
-Please plan to remove Chronicle from your deployment.
 :::
 
 #### _Official Helm chart for Posit Chronicle Server_
 
-> **Deprecated**: Posit Chronicle is deprecated and will be removed in a future release.
+> **Deprecated**: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 
 [Posit Chronicle](https://docs.posit.co/chronicle/) helps data science managers and other stakeholders understand their
 organization's use of other Posit products, primarily Posit Connect and
@@ -25,7 +23,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::

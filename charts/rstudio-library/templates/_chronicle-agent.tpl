@@ -1,5 +1,5 @@
 {{/*
-DEPRECATED: Posit Chronicle is deprecated and will be removed in a future release.
+DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 These helpers are kept for backwards compatibility but should not be used in new charts.
 
 Attempts to determine an image tag for the chronicle-agent image by looking up a Chronicle server in the current

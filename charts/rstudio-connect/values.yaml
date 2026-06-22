@@ -251,7 +251,7 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-# DEPRECATED: Posit Chronicle is deprecated and will be removed in a future release.
+# DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:
   # -- (DEPRECATED) Creates a Chronicle agent sidecar container in the pod if true

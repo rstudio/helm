@@ -48,7 +48,7 @@ pod:
       command: ["sleep"]
       args: ["infinity"]
       imagePullPolicy: "IfNotPresent"
-    # DEPRECATED: Chronicle is deprecated and will be removed in a future release
+    # DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release
     - name: chronicle-agent
       image: ghcr.io/rstudio/chronicle-agent:2025.03.0
       env:
