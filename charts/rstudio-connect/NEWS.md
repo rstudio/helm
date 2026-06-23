@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.7
+
+- The init container's `rsc-volume` now mounts at `/opt/rstudio-connect-runtime`
+  (previously `/opt/rstudio-connect`), and the chart sets
+  `Kubernetes.ConnectRuntimeDir` to match so Connect finds the runtime there.
+
 ## 0.20.6
 
 - Clarify `nameservice.apiKey` documentation to use a Connect service token with the
