@@ -128,6 +128,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- if not (dig "Kubernetes" "DefaultResourceServiceBase" "" $configCopy) }}
       {{- $_ := unset (index $configCopy "Kubernetes") "DefaultResourceServiceBase" }}
     {{- end }}
+    {{- /* drop an empty/null ConnectRuntimeDir so the injected default applies and
+           the rendered gcfg value stays aligned with the content container mount */}}
+    {{- if not (dig "Kubernetes" "ConnectRuntimeDir" "" $configCopy) }}
+      {{- $_ := unset (index $configCopy "Kubernetes") "ConnectRuntimeDir" }}
+    {{- end }}
   {{- end }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
@@ -178,7 +183,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
            mountPath from the resolved config value so the two can never diverge.
            The default here MUST match the ConnectRuntimeDir default injected in
            rstudio-connect.config. */}}
-    {{- $runtimeDir := dig "Kubernetes" "ConnectRuntimeDir" "/opt/rstudio-connect-runtime" .Values.config }}
+    {{- /* default handles empty/null overrides (dig only fills in a missing key),
+           so config.Kubernetes.ConnectRuntimeDir: "" still falls back here. */}}
+    {{- $runtimeDir := default "/opt/rstudio-connect-runtime" (dig "Kubernetes" "ConnectRuntimeDir" "" .Values.config) }}
     {{- $contentVolumeMount := dict "name" "rsc-volume" "mountPath" $runtimeDir }}
     {{- $contentContainer := dict "name" "connect-content" "volumeMounts" (list $contentVolumeMount) }}
     {{- /* build the shared volume */}}
@@ -244,6 +251,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
             {{- $hasMount = true }}
           {{- else if eq .mountPath $runtimeDir }}
             {{- fail (printf "backends.kubernetes.defaultResourceJobBase: connect-content container has a volumeMount at %s using a volume other than rsc-volume. This mountPath is reserved for the runtime volume (ConnectRuntimeDir) shared with the init container." $runtimeDir) }}
+          {{- else if eq .mountPath "/opt/rstudio-connect" }}
+            {{- fail "backends.kubernetes.defaultResourceJobBase: connect-content container has a volumeMount at /opt/rstudio-connect. This is the Connect installation and content bind-mount root (/opt/rstudio-connect/mnt/app) and must not be mounted over." }}
           {{- end }}
         {{- end }}
         {{- if not $hasMount }}

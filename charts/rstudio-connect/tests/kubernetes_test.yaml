@@ -839,6 +839,27 @@ tests:
           path: data["job.yaml"]
           pattern: "(?m)mountPath: /opt/rstudio-connect-runtime$"
 
+  - it: should fall back to the default runtime dir when ConnectRuntimeDir is empty
+    template: configmap.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      config:
+        Kubernetes:
+          ConnectRuntimeDir: ""
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "ConnectRuntimeDir = /opt/rstudio-connect-runtime"
+      - matchRegex:
+          path: data["job.yaml"]
+          pattern: "(?m)mountPath: /opt/rstudio-connect-runtime$"
+
   - it: should ensure rsc-volume mount on user-provided connect-content-init
     template: configmap.yaml
     values:
@@ -889,6 +910,31 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "mountPath is reserved for the runtime volume"
+
+  # /opt/rstudio-connect is the Connect install and content bind-mount root
+  # (/opt/rstudio-connect/mnt/app), so it must never be mounted over.
+  - it: should fail when connect-content has /opt/rstudio-connect mounted over
+    template: deployment.yaml
+    values:
+      - kubernetes-values.yaml
+    set:
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+          defaultResourceJobBase:
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: connect-content
+                      volumeMounts:
+                        - name: other-volume
+                          mountPath: /opt/rstudio-connect
+    asserts:
+      - failedTemplate:
+          errorPattern: "must not be mounted over"
 
   - it: should fail when connect-content-init has /mnt/rstudio-connect-runtime/ mounted from a non-rsc-volume
     template: deployment.yaml
