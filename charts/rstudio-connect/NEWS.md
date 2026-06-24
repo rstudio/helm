@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.8
+
+- Bump Connect version to 2026.06.0
+
 ## 0.20.7
 
 - The init container's `rsc-volume` now mounts at `/opt/rstudio-connect-runtime`
