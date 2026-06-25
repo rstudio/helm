@@ -121,8 +121,13 @@ test-connect-interpreter-versions:
         echo "ERROR: $lang executable '$ex' configured in charts/rstudio-connect/values.yaml" >&2
         echo "       was not found in image '$image'." >&2
         echo "       Update the $lang Executable path in values.yaml to match the version shipped in the image:" >&2
-        # derive the install root from the configured path (e.g. /opt/python/3.14.6/bin/python -> /opt/python)
-        install_root=$(dirname "$(dirname "$(dirname "$ex")")")
+        # derive the install root from the configured path, e.g.
+        #   /opt/python/3.14.6/bin/python -> /opt/python (strip the version dir)
+        #   /usr/local/bin/quarto         -> /usr/local (no version dir)
+        install_root=$(dirname "$(dirname "$ex")")
+        if [[ "$(basename "$install_root")" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+          install_root=$(dirname "$install_root")
+        fi
         docker run --rm $image /bin/bash -c "ls -d $install_root/*/ 2>/dev/null" >&2 || true
         exit 1
       fi
