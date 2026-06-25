@@ -485,7 +485,7 @@ config:
     # For Off-Host Execution, Python versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/python/
     Executable:
-      - /opt/python/3.14.5/bin/python
+      - /opt/python/3.14.6/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.

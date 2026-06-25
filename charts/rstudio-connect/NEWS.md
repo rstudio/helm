@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.8
+
+- Bump Connect version to 2026.06.0
+- Update the default Python `Executable` path to `/opt/python/3.14.6/bin/python` to
+  match the interpreter shipped in the 2026.06.0 image
+
 ## 0.20.7
 
 - The init container's `rsc-volume` now mounts at `/opt/rstudio-connect-runtime`
