@@ -151,7 +151,6 @@ jobs:
           PRODUCT: ${{ inputs.product }}
           CHART_NAME: ${{ steps.chart.outputs.name }}
           CHART_VERSION: ${{ steps.update.outputs.chart-version }}
-          PYTHON_VERSION: ${{ inputs.python_version }}
         run: |
           NEWS="charts/${CHART_NAME}/NEWS.md"
 
@@ -165,9 +164,6 @@ jobs:
             echo "## ${CHART_VERSION}"
             echo ""
             echo "- Bump ${DISPLAY_NAME} version to ${APP_VERSION}"
-            if [ -n "${PYTHON_VERSION}" ]; then
-              echo "- Update Python to ${PYTHON_VERSION}"
-            fi
             echo ""
             tail -n +3 "$NEWS"
           } > "${NEWS}.tmp" && mv "${NEWS}.tmp" "$NEWS"
