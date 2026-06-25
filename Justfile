@@ -117,7 +117,13 @@ test-connect-interpreter-versions:
     for ex in $executables
     do
       echo "Checking $ex"
-      docker run --rm $image /bin/bash -c "command -v $ex"
+      if ! docker run --rm $image /bin/bash -c "command -v $ex"; then
+        echo "ERROR: $lang executable '$ex' configured in charts/rstudio-connect/values.yaml" >&2
+        echo "       was not found in image '$image'." >&2
+        echo "       Update the $lang Executable path in values.yaml to match the version shipped in the image:" >&2
+        docker run --rm $image /bin/bash -c "ls -d /opt/$(echo "$lang" | tr 'A-Z' 'a-z')/*/ 2>/dev/null" >&2 || true
+        exit 1
+      fi
     done
   done
 
