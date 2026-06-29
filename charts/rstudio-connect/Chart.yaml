@@ -1,8 +1,8 @@
 name: rstudio-connect
 description: Official Helm chart for Posit Connect
-version: 0.20.1
+version: 0.20.8
 apiVersion: v2
-appVersion: 2026.04.1
+appVersion: 2026.06.0
 icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
 home: https://posit.co
 sources:
@@ -18,9 +18,9 @@ dependencies:
 annotations:
   artifacthub.io/images: |
     - name: connect
-      image: posit/connect:2026.04.1-ubuntu-24.04
+      image: posit/connect:2026.05.1-ubuntu-24.04
     - name: connect-content-init
-      image: posit/connect-content-init:2026.04.1-ubuntu-24.04
+      image: posit/connect-content-init:2026.05.1
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: About Connect

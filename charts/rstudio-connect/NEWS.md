@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.20.8
+
+- Bump Connect version to 2026.06.0
+- Update the default Python `Executable` path to `/opt/python/3.14.6/bin/python` to
+  match the interpreter shipped in the 2026.06.0 image
+
+## 0.20.7
+
+- The init container's `rsc-volume` now mounts at `/opt/rstudio-connect-runtime`
+  (previously `/opt/rstudio-connect`), and the chart sets
+  `Kubernetes.ConnectRuntimeDir` to match so Connect finds the runtime there.
+
+## 0.20.6
+
+- Clarify `nameservice.apiKey` documentation to use a Connect service token with the
+  `nameservice:read` scope.
+
+## 0.20.5
+
+- Remove the `os` field from `backends.kubernetes.defaultInitContainer` and
+  `launcher.defaultInitContainer`. The `connect-content-init` image copies an
+  architecture-specific binary and is not OS-specific; the tag is now the chart
+  `appVersion` (e.g. `2026.05.1`) rather than `2026.05.1-ubuntu-24.04`. Any
+  `os:` values in your `values.yaml` can be removed.
+
+## 0.20.4
+
+- Bump Connect version to 2026.05.1
+
+## 0.20.3
+
+- Add `get` on `pods/attach` and `pods/exec` to the direct Kubernetes runner Role in `templates/rbac.yaml` to support attach/exec authorization checks used by Kubernetes clients to support websocket connection upgrades.
+
+## 0.20.2
+
+- Bump Connect version to 2026.05.0
+
 ## 0.20.1
 
 - BREAKING: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`. 

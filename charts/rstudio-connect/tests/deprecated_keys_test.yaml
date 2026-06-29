@@ -54,7 +54,7 @@ tests:
         create: true
     asserts:
       - failedTemplate:
-          errorPattern: "launcher.defaultInitContainer.tagPrefix.*has been removed.*launcher.defaultInitContainer.os"
+          errorPattern: "launcher.defaultInitContainer.tagPrefix.*has been removed.*launcher.defaultInitContainer.tag"
 
   - it: should fail when backends.kubernetes.defaultInitContainer.tagPrefix is set
     set:
@@ -69,4 +69,4 @@ tests:
         create: true
     asserts:
       - failedTemplate:
-          errorPattern: "backends.kubernetes.defaultInitContainer.tagPrefix.*has been removed.*backends.kubernetes.defaultInitContainer.os"
+          errorPattern: "backends.kubernetes.defaultInitContainer.tagPrefix.*has been removed.*backends.kubernetes.defaultInitContainer.tag"
