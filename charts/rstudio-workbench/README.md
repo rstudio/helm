@@ -62,8 +62,8 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning. SSSD must run as root, so the bundled daemon starts by default only on root deployments (`config.sssd.enabled: true`, `pod.runAsRoot: true`) and is automatically skipped when `pod.runAsRoot: false`. Modern provisioning (SCIM / native) does not require SSSD.
-  Provide its configuration in `config.sssd.conf` like so (set `config.sssd.enabled: false` to disable the daemon entirely):
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning; because it must run as root, the bundled daemon starts only when `config.sssd.enabled: true` and `pod.runAsRoot: true`. Modern provisioning (SCIM / native) does not require `sssd`. See [User provisioning](#user-provisioning) for details.
+  Provide `sssd` configuration in `config.sssd.conf` like so:
 
     ```yaml
     config:
@@ -306,7 +306,7 @@ the `XDG_CONFIG_DIRS` environment variable.
   - `prestart-launcher.bash` is used to start launcher.
 - SSSD Configuration:
   - These configuration files configure the bundled `sssd` daemon (legacy LDAP/AD provisioning), which is started only when `config.sssd.enabled=true`.
-  - Located at:<br> `config.sssd.conf.<< name of file >>` Helm values (the deprecated `config.userProvisioning` is honored as a fallback)
+  - Located at:<br> `config.sssd.conf.<< name of file >>` Helm values. The deprecated `config.userProvisioning` is still read when `config.sssd.conf` is unset.
   - Mounted onto:<br> `/etc/sssd/conf.d/` with `0600` permissions by default.
 - Custom Startup Configuration:
   - `supervisord` service / unit definition `.conf` files.
@@ -358,7 +358,7 @@ consistent UIDs / GIDs). However, creating users in the Workbench containers is 
 administrator.
 
 Posit Workbench's native user provisioning (SCIM / just-in-time) is the recommended approach and does not require SSSD.
-The legacy approach is `sssd`: the [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
+`sssd` is the legacy approach: the [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
 includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `pod.runAsRoot: true`; see `config.sssd` above).
 
 The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever)
@@ -620,7 +620,7 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
-| args | list | `[]` | args is the pod container's run arguments. When unset, the container's default arguments are used. |
+| args | list | the image's built-in arguments | args is the pod container's run arguments. When unset, the container's default arguments are used. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |

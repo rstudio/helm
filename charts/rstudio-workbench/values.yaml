@@ -342,6 +342,7 @@ loadBalancer:
 # -- command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation.
 command: []
 # -- args is the pod container's run arguments. When unset, the container's default arguments are used.
+# @default -- the image's built-in arguments
 args: []
 
 license:

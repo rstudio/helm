@@ -1033,14 +1033,14 @@ tests:
       pod:
         securityContext:
           runAsUser: 4242
-          fsGroup: 4242
+          fsGroup: 4243
     asserts:
       - equal:
           path: spec.template.spec.securityContext.runAsUser
           value: 4242
       - equal:
           path: spec.template.spec.securityContext.fsGroup
-          value: 4242
+          value: 4243
       - equal:
           path: spec.template.spec.securityContext.runAsNonRoot
           value: true
