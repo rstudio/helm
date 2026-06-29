@@ -44,6 +44,14 @@ tests:
       - notMatchRegexRaw:
           pattern: "workbench-user"
 
+  - it: renders successfully when config.sssd is explicitly null
+    template: configmap-secret.yaml
+    set:
+      config.sssd: null
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "workbench-user"
+
   - it: renders the sssd conf secret when enabled with conf
     template: configmap-secret.yaml
     set:
@@ -122,3 +130,21 @@ tests:
     asserts:
       - matchRegexRaw:
           pattern: "config.userProvisioning.*deprecated"
+
+  - it: fails rootless + sealedSecret when secureCookieKey is not explicitly set
+    template: deployment.yaml
+    set:
+      sealedSecret:
+        enabled: true
+      pod:
+        runAsRoot: false
+      secureCookieKey:
+        value: ""
+        existingSecret: ""
+      global:
+        secureCookieKey:
+          value: ""
+          existingSecret: ""
+    asserts:
+      - failedTemplate:
+          errorPattern: "sealedSecret.enabled=true.*pod.runAsRoot=false.*requires an explicit secure cookie key"

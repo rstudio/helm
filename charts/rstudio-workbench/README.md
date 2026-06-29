@@ -613,6 +613,8 @@ To activate the use of `SealedSecret` templates instead of `Secret` templates in
 
 Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables the chart's auto-generation and reuse capabilities for `launcherPem` and `secureCookieKey`. `launcherPem` is an RSA private key, which can be generated via an RSA tool such as Helm's [`genPrivateKey`](https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey) function. `secureCookieKey` is typically a UUID, which can be generated via a UUID generator such as Helm's [`uuidv4`](https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions) function.
 
+When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=false`), you **must** explicitly provide `secureCookieKey` (value or existingSecret, local or global). In rootless mode the launcher reads `/mnt/secret-configmap/rstudio/secure-cookie-key`, so the key cannot be omitted.
+
 ## Values
 
 | Key | Type | Default | Description |

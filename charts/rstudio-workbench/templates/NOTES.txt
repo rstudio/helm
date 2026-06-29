@@ -75,6 +75,7 @@ Please consider removing this configuration value.
 {{ print "\n\nWARNING: `config.userProvisioning` is deprecated. Use `config.sssd.conf` instead." }}
 {{- end }}
 
-{{- if and .Values.config.sssd.conf (not (include "rstudio-workbench.sssd.active" .)) }}
+{{- $sssd := mergeOverwrite (dict "enabled" true "conf" (dict)) (deepCopy (default (dict) .Values.config.sssd)) }}
+{{- if and $sssd.conf (not (include "rstudio-workbench.sssd.active" .)) }}
 {{ print "\n\nWARNING: `config.sssd.conf` is set but the SSSD daemon will not start. SSSD requires `pod.runAsRoot: true` and `config.sssd.enabled: true`." }}
 {{- end }}

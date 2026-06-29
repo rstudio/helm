@@ -29,7 +29,8 @@ Returns "true" when the SSSD daemon should actually run: sssd.enabled=true and p
 SSSD cannot run as a non-root process, so the flag is silently ignored for non-root deployments.
 */}}
 {{- define "rstudio-workbench.sssd.active" -}}
-{{- if and .Values.config.sssd.enabled .Values.pod.runAsRoot -}}
+{{- $sssd := mergeOverwrite (dict "enabled" true) (deepCopy (default (dict) .Values.config.sssd)) -}}
+{{- if and $sssd.enabled .Values.pod.runAsRoot -}}
 true
 {{- end -}}
 {{- end -}}
@@ -53,6 +54,7 @@ stderr_logfile_backups=0
 
 {{- define "rstudio-workbench.containers" -}}
 {{- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
+{{- $sssd := mergeOverwrite (dict "enabled" true "conf" (dict)) (deepCopy (default (dict) .Values.config.sssd)) }}
 {{- /* When running as non-root, secret files must be group-readable (0640) because Kubernetes mounts
        them as root-owned and the non-root process accesses them via fsGroup group membership.
        Root deployments keep the tighter 0600 default. */ -}}
@@ -176,7 +178,7 @@ containers:
     - name: rstudio-secret
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
-    {{- if and (include "rstudio-workbench.sssd.active" .) (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
+    {{- if and (include "rstudio-workbench.sssd.active" .) (or $sssd.conf .Values.config.userProvisioning) }}
     - name: rstudio-user
       mountPath: "/etc/sssd/conf.d/"
     {{- end }}
@@ -465,7 +467,7 @@ volumes:
         {{- end }}
 {{- end }}
 {{- end }}
-{{- if and (include "rstudio-workbench.sssd.active" .) (or .Values.config.sssd.conf .Values.config.userProvisioning) }}
+{{- if and (include "rstudio-workbench.sssd.active" .) (or $sssd.conf .Values.config.userProvisioning) }}
 - name: rstudio-user
   secret:
     secretName: {{ include "rstudio-workbench.fullname" . }}-user
