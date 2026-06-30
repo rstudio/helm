@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.20.4
+
+- finally fix the last bit for suppressStdinAnnotation (cf. PR #842)
 
 ## 0.20.3
 
