@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.2
+
+- Update default Posit Package Manager version to 2026.06.0
+
 ## 0.20.1
 
 - Update default Posit Package Manager version to 2026.05.0
