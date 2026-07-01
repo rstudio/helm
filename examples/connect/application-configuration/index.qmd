@@ -12,6 +12,11 @@ These settings are recommend for most deployments and are described below:
 - [Set a default Posit Package Manager CRAN URL](https://docs.posit.co/connect/admin/r/package-management/#configuring-on-posit-connect)
 - [Set a default Posit Package Manager PyPI URL](https://docs.posit.co/connect/admin/python/package-management/#configuring-pip)
 - [Enable Quarto content](https://docs.posit.co/connect/admin/quarto/#enabling-quarto-support)
+- [Define at least one execution environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) so content can run under off-host execution
+
+::: {.callout-note}
+Off-host execution requires at least one execution environment. Content cannot run until you define one, so the example values files below include a minimal `executionEnvironments` entry. To manage execution environments in detail, including custom images and management through the Connect UI or API, see [Content execution environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/) in the Connect Admin Guide and the [Custom container images](../container-images/custom-images.qmd) example.
+:::
 
 {{< include ../_prereqs.qmd >}}
 

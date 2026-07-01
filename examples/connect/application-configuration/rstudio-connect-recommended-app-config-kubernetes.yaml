@@ -103,6 +103,29 @@ backends:
 securityContext:
   privileged: false
 
+# Off-host execution requires at least one execution environment; content
+# cannot run until one is defined. Each entry describes the R, Python, and
+# Quarto versions available in a content image. Match these to the versions in
+# your content image. You can also manage execution environments through the
+# Connect UI or API. See:
+# https://docs.posit.co/connect/admin/appendix/off-host/execution-environments
+executionEnvironments:
+  - name: posit/connect-content:R4.6-python3.14-ubuntu-24.04-pro # TODO: Change to match your content image
+    title: "Default Runtime"
+    description: "Runtime with R, Python, and Quarto"
+    python:
+      installations:
+        - path: /opt/python/3.14.6/bin/python3 # TODO: Match the Python path in your content image
+          version: 3.14.6 # TODO: Match the Python version in your content image
+    r:
+      installations:
+        - path: /opt/R/4.6.1/bin/R # TODO: Match the R path in your content image
+          version: 4.6.1 # TODO: Match the R version in your content image
+    quarto:
+      installations:
+        - path: /opt/quarto/1.9.38/bin/quarto # TODO: Match the Quarto path in your content image
+          version: 1.9.38 # TODO: Match the Quarto version in your content image
+
 # The config section overwrites values in Posit Connect's main
 # .gcfg configuration file.
 config:
