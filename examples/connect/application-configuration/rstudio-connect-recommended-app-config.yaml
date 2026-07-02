@@ -96,13 +96,13 @@ launcher:
 securityContext:
   privileged: false
 
-# Off-host execution requires at least one execution environment; content
-# cannot run until one is defined. launcher.customRuntimeYaml was removed in
+# Define the image used to execute content.
+# Each entry describes the runtime versions available in a content image.
+# Match these to the runtime versions in your content image.
+# You can also manage execution environments through the Connect UI or API.
+# launcher.customRuntimeYaml was removed in
 # chart 0.20.0, so use the top-level executionEnvironments key for both
-# backends. This key requires Connect 2026.03.0 or later. Each entry describes
-# the R, Python, and Quarto versions available in a content image. Match these
-# to the versions in your content image. You can also manage execution
-# environments through the Connect UI or API. See:
+# backends. This key requires Connect 2026.03.0 or later. 
 # https://docs.posit.co/connect/admin/appendix/off-host/execution-environments
 executionEnvironments:
   - name: posit/connect-content:R4.6-python3.14-ubuntu-24.04-pro # TODO: Change to match your content image

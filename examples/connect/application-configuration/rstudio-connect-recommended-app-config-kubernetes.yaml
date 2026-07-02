@@ -103,11 +103,6 @@ backends:
 securityContext:
   privileged: false
 
-# Off-host execution requires at least one execution environment; content
-# cannot run until one is defined. Each entry describes the R, Python, and
-# Quarto versions available in a content image. Match these to the versions in
-# your content image. You can also manage execution environments through the
-# Connect UI or API. See:
 # Define the image used to execute content.
 # Each entry describes the runtime versions available in a content image.
 # Match these to the runtime versions in your content image.
