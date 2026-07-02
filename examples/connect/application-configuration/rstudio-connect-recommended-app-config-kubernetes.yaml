@@ -108,6 +108,11 @@ securityContext:
 # Quarto versions available in a content image. Match these to the versions in
 # your content image. You can also manage execution environments through the
 # Connect UI or API. See:
+# Define the image used to execute content.
+# Each entry describes the runtime versions available in a content image.
+# Match these to the runtime versions in your content image.
+# You can also manage execution environments through the Connect UI or API.
+# See:
 # https://docs.posit.co/connect/admin/appendix/off-host/execution-environments
 executionEnvironments:
   - name: posit/connect-content:R4.6-python3.14-ubuntu-24.04-pro # TODO: Change to match your content image
@@ -123,7 +128,7 @@ executionEnvironments:
           version: 4.6.1 # TODO: Match the R version in your content image
     quarto:
       installations:
-        - path: /opt/quarto/1.9.38/bin/quarto # TODO: Match the Quarto path in your content image
+        - path: /opt/quarto/bin/quarto # TODO: Match the Quarto path in your content image
           version: 1.9.38 # TODO: Match the Quarto version in your content image
 
 # The config section overwrites values in Posit Connect's main
