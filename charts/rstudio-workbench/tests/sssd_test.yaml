@@ -1,0 +1,150 @@
+suite: Workbench SSSD provisioning
+templates:
+  - configmap-startup.yaml
+  - configmap-secret.yaml
+  - configmap-general.yaml
+  - configmap-graphite-exporter.yaml
+  - configmap-prestart.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+  - NOTES.txt
+tests:
+  - it: starts the sssd daemon by default when running as root
+    template: configmap-startup.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-rstudio-workbench-start-user
+    asserts:
+      - matchRegex:
+          path: data['sssd.conf']
+          pattern: "\\[program:sssd\\]"
+      - matchRegex:
+          path: data['sssd.conf']
+          pattern: "/usr/sbin/sssd -i -c /etc/sssd/sssd.conf"
+
+  - it: does not start the sssd daemon when runAsRoot is false
+    template: configmap-startup.yaml
+    set:
+      pod.runAsRoot: false
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "program:sssd"
+
+  - it: does not start the sssd daemon when config.sssd.enabled is false
+    template: configmap-startup.yaml
+    set:
+      config.sssd.enabled: false
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "program:sssd"
+
+  - it: does not render the sssd conf secret by default
+    template: configmap-secret.yaml
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "workbench-user"
+
+  - it: renders successfully when config.sssd is explicitly null
+    template: configmap-secret.yaml
+    set:
+      config.sssd: null
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "workbench-user"
+
+  - it: renders the sssd conf secret when enabled with conf
+    template: configmap-secret.yaml
+    set:
+      config.sssd.conf:
+        mysssd.conf:
+          sssd:
+            config_file_version: 2
+          domain/example.com:
+            id_provider: ldap
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-rstudio-workbench-user
+    asserts:
+      - isKind:
+          of: Secret
+      - matchRegex:
+          path: stringData['mysssd.conf']
+          pattern: "id_provider"
+
+  - it: mounts sssd-user-startup by default when running as root
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
+          value: "/startup/user-provisioning"
+
+  - it: does not mount sssd directories when runAsRoot is false
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: false
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'
+
+  - it: mounts sssd directories when running as root with sssd.conf set
+    template: deployment.yaml
+    set:
+      config.sssd.conf:
+        mysssd.conf:
+          sssd:
+            config_file_version: 2
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].mountPath'
+          value: "/etc/sssd/conf.d/"
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
+          value: "/startup/user-provisioning"
+
+  - it: silently skips sssd when runAsRoot is false even if sssd.enabled is true
+    template: NOTES.txt
+    set:
+      pod.runAsRoot: false
+      config.sssd.enabled: true
+    asserts:
+      - matchRegexRaw:
+          pattern: "successfully deployed"
+
+  - it: renders successfully when running as root with sssd enabled
+    template: NOTES.txt
+    asserts:
+      - matchRegexRaw:
+          pattern: "successfully deployed"
+
+  - it: warns when the deprecated config.userProvisioning is set
+    template: NOTES.txt
+    set:
+      config.userProvisioning:
+        mysssd.conf:
+          sssd:
+            config_file_version: 2
+    asserts:
+      - matchRegexRaw:
+          pattern: "config.userProvisioning.*deprecated"
+
+  - it: fails rootless + sealedSecret when secureCookieKey is not explicitly set
+    template: deployment.yaml
+    set:
+      sealedSecret:
+        enabled: true
+      pod:
+        runAsRoot: false
+      secureCookieKey:
+        value: ""
+        existingSecret: ""
+      global:
+        secureCookieKey:
+          value: ""
+          existingSecret: ""
+    asserts:
+      - failedTemplate:
+          errorPattern: "sealedSecret.enabled=true.*pod.runAsRoot=false.*requires an explicit secure cookie key"

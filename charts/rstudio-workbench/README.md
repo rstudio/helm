@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.20.4](https://img.shields.io/badge/Version-0.20.4-informational?style=flat-square) ![AppVersion: 2026.06.0](https://img.shields.io/badge/AppVersion-2026.06.0-informational?style=flat-square)
+![Version: 0.21.0](https://img.shields.io/badge/Version-0.21.0-informational?style=flat-square) ![AppVersion: 2026.06.0](https://img.shields.io/badge/AppVersion-2026.06.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.4:
+To install the chart with the release name `my-release` at version 0.21.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.20.4
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.21.0
 ```
 
 To explore other chart versions, look at:
@@ -62,20 +62,22 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `posit/workbench` image has `sssd` installed and started by default.
-  You can include `sssd` configuration in `config.userProvisioning` like so:
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning; because it must run as root, the bundled daemon starts only when `config.sssd.enabled: true` and `pod.runAsRoot: true`. Modern provisioning (SCIM / native) does not require `sssd`. See [User provisioning](#user-provisioning) for details.
+  Provide `sssd` configuration in `config.sssd.conf` like so:
 
     ```yaml
     config:
-      userProvisioning:
-        mysssd.conf:
-          sssd:
-            config_file_version: 2
-            services: nss, pam
-            domains: rstudio.com
-          domain/rstudio.com:
-            id_provider: ldap
-            auth_provider: ldap
+      sssd:
+        enabled: true
+        conf:
+          mysssd.conf:
+            sssd:
+              config_file_version: 2
+              services: nss, pam
+              domains: rstudio.com
+            domain/rstudio.com:
+              id_provider: ldap
+              auth_provider: ldap
     ```
 
 ## Licensing
@@ -302,9 +304,9 @@ the `XDG_CONFIG_DIRS` environment variable.
   - It is mounted into the pod at `/scripts/`.
   - `prestart-workbench.bash` is used to start workbench.
   - `prestart-launcher.bash` is used to start launcher.
-- User Provisioning Configuration:
-  - These configuration files are used for configuring user provisioning (i.e., `sssd`).
-  - Located at:<br> `config.userProvisioning.<< name of file >>` Helm values
+- SSSD Configuration:
+  - These configuration files configure the bundled `sssd` daemon (legacy LDAP/AD provisioning), which is started only when `config.sssd.enabled=true`.
+  - Located at:<br> `config.sssd.conf.<< name of file >>` Helm values. The deprecated `config.userProvisioning` is still read when `config.sssd.conf` is unset.
   - Mounted onto:<br> `/etc/sssd/conf.d/` with `0600` permissions by default.
 - Custom Startup Configuration:
   - `supervisord` service / unit definition `.conf` files.
@@ -355,9 +357,9 @@ Provisioning users in Workbench containers is challenging. Session images create
 consistent UIDs / GIDs). However, creating users in the Workbench containers is a responsibility that falls to the
 administrator.
 
-The most common way to provision users is via `sssd`.
-The [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
-has `sssd` included and running by default (see `userProvisioning` configuration files above).
+Posit Workbench's native user provisioning (SCIM / just-in-time) is the recommended approach and does not require SSSD.
+`sssd` is the legacy approach: the [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
+includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `pod.runAsRoot: true`; see `config.sssd` above).
 
 The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever)
 or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.
@@ -605,18 +607,20 @@ To activate the use of `SealedSecret` templates instead of `Secret` templates in
 
 - `config.secret`
 - `config.sessionSecret`
-- `config.userProvisioning`
+- `config.sssd.conf` (or the deprecated `config.userProvisioning`)
 - `launcherPem`
 - `secureCookieKey` (or `global.secureCookieKey`)
 
 Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables the chart's auto-generation and reuse capabilities for `launcherPem` and `secureCookieKey`. `launcherPem` is an RSA private key, which can be generated via an RSA tool such as Helm's [`genPrivateKey`](https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey) function. `secureCookieKey` is typically a UUID, which can be generated via a UUID generator such as Helm's [`uuidv4`](https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions) function.
+
+When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=false`), you **must** explicitly provide `secureCookieKey` (value or existingSecret, local or global). In rootless mode the launcher reads `/mnt/secret-configmap/rstudio/secure-cookie-key`, so the key cannot be omitted.
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
-| args | list | `[]` | args is the pod container's run arguments. |
+| args | list | the image's built-in arguments | args is the pod container's run arguments. When unset, the container's default arguments are used. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
@@ -634,7 +638,7 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | chronicleAgent.workbenchApiKey | object | `{"value":"","valueFrom":{}}` | A read-only administrator permissions API key generated for Workbench for the Chronicle agent to use, API keys    can only be created after Workbench has been deployed so this value may need to be filled in later if performing    an initial deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
-| command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
+| command | list | `[]` | command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation. |
 | components | object | `{"enabled":true,"positron":{"image":{"repository":"posit/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"posit/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
 | components.enabled | bool | `true` | Enable session component delivery via init containers. When false, no init containers are configured and session.image must be a self-contained image like r-session-complete. |
 | components.positron.image.repository | string | `"posit/workbench-positron-init"` | The image repository for the Positron init container |
@@ -662,9 +666,12 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
 | config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
+| config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
+| config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |
+| config.sssd.enabled | bool | `true` | whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `pod.runAsRoot` is false. Set to `false` to disable entirely. |
 | config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
-| config.startupUserProvisioning | object | `{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/ |
-| config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
+| config.startupUserProvisioning | object | `{}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons. |
+| config.userProvisioning | object | `{}` | DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`. |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
 | deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench deployment |
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
@@ -727,7 +734,10 @@ Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.lifecycle | object | `{}` | container lifecycle hooks |
 | pod.port | int | `8787` | The containerPort used by the main pod container |
+| pod.runAsRoot | bool | `true` | Whether the pod's containers run as the root OS user. `true` (default) preserves historical behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on. `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to `pod.serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root `rserver.conf`/`launcher.conf` defaults are applied. |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the service pod |
+| pod.serviceAccountUser | string | `"rstudio-server"` | The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user` from `rserver.conf` entirely. |
+| pod.serviceAccountUserId | int | `999` | The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `pod.runAsRoot` is false. Must match the UID of `pod.serviceAccountUser` baked into the Workbench image. |
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
 | pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
