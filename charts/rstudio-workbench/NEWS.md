@@ -6,6 +6,10 @@
 - The bundled SSSD daemon is now controlled by the new `config.sssd` block; `config.userProvisioning` is deprecated.
 - Supporting changes for unprivileged pods and the non-root launcher: prestart scripts no longer perform root-only operations, the launcher's ServiceAccount token is made group-readable via `fsGroup`, the `secure-cookie-key` is shared with the launcher, the Kubernetes launcher scratch dir (`/var/lib/rstudio-launcher/Kubernetes`) is backed by an `fsGroup`-owned `emptyDir` so it is group-writable for the non-root launcher, and writable scratch and `/mnt/load-balancer` volumes are mounted as needed.
 
+## 0.20.4
+
+- finally fix the last bit for suppressStdinAnnotation (cf. PR #842)
+
 ## 0.20.3
 
 - Bump Workbench version to 2026.06.0
