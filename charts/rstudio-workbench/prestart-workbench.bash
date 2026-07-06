@@ -12,6 +12,14 @@ main() {
   _logf 'Ensuring %s exists' "${dyn_dir}"
   mkdir -p "${dyn_dir}"
 
+  if [[ -f "${launcher_pem}" ]]; then
+    # fsGroup adds group-read (0640) to the secret mount, which rserver rejects for
+    # launcher.pem. Read the key from a private 0600 copy instead; dyn_dir precedes
+    # the secret mount in XDG_CONFIG_DIRS.
+    _logf 'Copying %s to %s with mode 0600' "${launcher_pem}" "${dyn_dir}/launcher.pem"
+    install -m 0600 "${launcher_pem}" "${dyn_dir}/launcher.pem"
+  fi
+
   if [[ ! -s "${launcher_pub}" ]] && [[ -f "${launcher_pem}" ]]; then
     _logf 'Generating %s from %s' "${launcher_pub}" "${launcher_pem}"
     openssl rsa -in "${launcher_pem}" -outform PEM -pubout -out "${launcher_pub}" 2>&1 | _indent
