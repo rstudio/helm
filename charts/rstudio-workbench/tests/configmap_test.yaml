@@ -256,3 +256,205 @@ tests:
       - notMatchRegex:
           path: data["positron.conf"]
           pattern: "^exe="
+
+  # -- serviceAccountUser -> rserver.conf server-user
+  - it: should render server-user=rstudio-server by default
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=rstudio-server"
+
+  - it: should render server-user when serviceAccountUser is overridden
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      pod.serviceAccountUser: "workbench"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=workbench"
+
+  - it: should omit server-user when serviceAccountUser is empty
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      pod.serviceAccountUser: ""
+    asserts:
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user="
+
+  - it: should let config.server.rserver.conf.server-user override serviceAccountUser
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      pod.serviceAccountUser: "rstudio-server"
+      config:
+        server:
+          rserver.conf:
+            server-user: "explicit-override"
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=explicit-override"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "server-user=rstudio-server"
+
+  # -- Rootless: prestart-launcher.bash has no privileged operations
+  - it: should not install CA certs into the system trust store in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "update-ca-certificates"
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "update-ca-trust"
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "/usr/local/share/ca-certificates"
+
+  - it: should not chown launcher dirs in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "chown"
+
+  - it: should keep the launcher health check and scratch dirs in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "--cacert"
+      - matchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "/var/lib/rstudio-launcher/Local"
+
+  - it: should create the Local scratch dir group-writable in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      # In root mode prestart runs as root but the launcher drops to serviceAccountUser;
+      # creating the scratch dir setgid + group-writable lets the launcher write to it
+      # via the rstudio-server group inherited from the parent, with no root-only chown.
+      - matchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "install -d -m 2775 /var/lib/rstudio-launcher/Local"
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "mkdir -p"
+
+  - it: should not create the Kubernetes scratch dir in prestart-launcher.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      # The Kubernetes scratch dir is an fsGroup-owned emptyDir; a non-owner chmod would EPERM,
+      # so prestart must not try to create or chmod it.
+      - notMatchRegex:
+          path: data["prestart-launcher.bash"]
+          pattern: "/var/lib/rstudio-launcher/Kubernetes"
+
+  # -- Rootless: prestart-workbench.bash has no privileged operations
+  - it: should not chown or create monitor dirs in prestart-workbench.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "chown"
+      - notMatchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "/var/lib/rstudio-server/monitor/log"
+
+  - it: should keep launcher.pub generation and README write in prestart-workbench.bash
+    template: configmap-prestart.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "openssl rsa"
+      - matchRegex:
+          path: data["prestart-workbench.bash"]
+          pattern: "/etc/rstudio/README"
+
+  # -- runAsRoot -> rootless config defaults (nss-mode when the init container is available)
+  - it: should default to nss-mode session provisioning when runAsRoot is false and components are enabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      pod.runAsRoot: false
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^auth-pam-sessions-enabled=0$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^user-provisioning-enabled=1$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-create-container-user=1$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-create-container-user-mode=nss$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-init-container-run-user=server-user$"
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "secure-cookie-key-file=/mnt/secret-configmap/rstudio/secure-cookie-key"
+
+  - it: should fall back to create-container-user=0 when runAsRoot is false but components are disabled
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      pod.runAsRoot: false
+      components.enabled: false
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^launcher-sessions-create-container-user=0$"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-create-container-user-mode"
+
+  - it: should keep PAM sessions on and not force provisioning when runAsRoot is true
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^auth-pam-sessions-enabled=1$"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "user-provisioning-enabled"
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "launcher-sessions-create-container-user"
+      - notMatchRegex:
+          path: data["launcher.conf"]
+          pattern: "secure-cookie-key-file"
+
+  - it: should let config.server override the rootless auth defaults
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      pod.serviceAccountUser: "rstudio-server"
+      config:
+        server:
+          rserver.conf:
+            auth-pam-sessions-enabled: 1
+            user-provisioning-enabled: 0
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^auth-pam-sessions-enabled=1$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^user-provisioning-enabled=0$"

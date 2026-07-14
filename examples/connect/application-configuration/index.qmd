@@ -12,6 +12,7 @@ These settings are recommend for most deployments and are described below:
 - [Set a default Posit Package Manager CRAN URL](https://docs.posit.co/connect/admin/r/package-management/#configuring-on-posit-connect)
 - [Set a default Posit Package Manager PyPI URL](https://docs.posit.co/connect/admin/python/package-management/#configuring-pip)
 - [Enable Quarto content](https://docs.posit.co/connect/admin/quarto/#enabling-quarto-support)
+- Define at least one [execution environment](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/)
 
 {{< include ../_prereqs.qmd >}}
 

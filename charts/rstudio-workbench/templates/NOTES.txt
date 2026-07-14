@@ -70,3 +70,12 @@ Please consider removing this configuration value.
 {{- print "\n\n`config.server.'rserver/.conf'.monitor-graphite-enabled` is overwritten by `prometheus.legacy=false`. Internal Workbench Prometheus will be used instead." }}
 
 {{- end }}
+
+{{- if .Values.config.userProvisioning }}
+{{ print "\n\nWARNING: `config.userProvisioning` is deprecated. Use `config.sssd.conf` instead." }}
+{{- end }}
+
+{{- $sssd := mergeOverwrite (dict "enabled" true "conf" (dict)) (deepCopy (default (dict) .Values.config.sssd)) }}
+{{- if and $sssd.conf (not (include "rstudio-workbench.sssd.active" .)) }}
+{{ print "\n\nWARNING: `config.sssd.conf` is set but the SSSD daemon will not start. SSSD requires `pod.runAsRoot: true` and `config.sssd.enabled: true`." }}
+{{- end }}

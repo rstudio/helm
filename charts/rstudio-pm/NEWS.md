@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.20.2
+## 0.20.3
 
 - Remove deprecated posit-chronicle from chart recommendations
+
+## 0.20.2
+
+- Update default Posit Package Manager version to 2026.06.0
 
 ## 0.20.1
 
@@ -55,7 +59,7 @@
 ## 0.5.48
 
 - Add recommended labels to all PVCs created by the chart.
- 
+
 ## 0.5.47
 
 - Update default Posit Package Manager version to 2025.04.2-8

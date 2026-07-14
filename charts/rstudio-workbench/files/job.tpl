@@ -47,7 +47,7 @@ spec:
         {{- $i = add $i 1 }}
         {{- end }}
         {{- end }}
-        {{- if not $templateData.pod.limitStdinAnnotation }}
+        {{- if not $templateData.pod.suppressStdinAnnotation }}
         stdin: {{ toYaml .Job.stdin | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- end }}
         user: {{ toYaml .Job.user }}

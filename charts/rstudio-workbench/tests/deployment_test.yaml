@@ -141,6 +141,61 @@ tests:
       - equal:
           path: 'spec.template.spec.containers[0].env[?(@.name=="RSW_LOAD_BALANCING")].value'
           value: "true"
+  - it: should mount a writable /mnt/load-balancer volume when replicas > 1
+    template: deployment.yaml
+    set:
+      replicas: 2
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "mnt-load-balancer"
+            mountPath: "/mnt/load-balancer"
+          any: true
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "mnt-load-balancer"
+            emptyDir: {}
+          any: true
+  - it: should mount a writable /mnt/load-balancer volume when loadBalancer.forceEnabled is true even if replicas = 1
+    template: deployment.yaml
+    set:
+      replicas: 1
+      loadBalancer:
+        forceEnabled: true
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "mnt-load-balancer"
+            mountPath: "/mnt/load-balancer"
+          any: true
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "mnt-load-balancer"
+            emptyDir: {}
+          any: true
+  - it: should not mount the /mnt/load-balancer volume when replicas = 1 and forceEnabled is false
+    template: deployment.yaml
+    set:
+      replicas: 1
+      loadBalancer:
+        forceEnabled: false
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: "mnt-load-balancer"
+            mountPath: "/mnt/load-balancer"
+          any: true
+      - notContains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: "mnt-load-balancer"
+            emptyDir: {}
+          any: true
   - it: should specify a volumeMount and a volume for sharedStorage if sharedStorage.create is true
     template: deployment.yaml
     set:
@@ -266,12 +321,15 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-session-secret")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-session-secret")]'
-  - it: should specify a volumeMount and a volume for userProvisioning if config.userProvisioning is defined and not empty
+  - it: should specify a volumeMount and a volume for sssd conf when sssd is enabled (deprecated userProvisioning fallback)
     template: deployment.yaml
     set:
+      pod.serviceAccountUser: root
       config:
         defaultMode:
           userProvisioning: 0600
+        sssd:
+          enabled: true
         userProvisioning:
           sssd.conf:
             dsn: "test"
@@ -317,6 +375,11 @@ tests:
       - equal:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")].configMap.defaultMode'
           value: 0755
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="launcher-kubernetes-scratch")].mountPath'
+          value: "/var/lib/rstudio-launcher/Kubernetes"
+      - exists:
+          path: 'spec.template.spec.volumes[?(@.name=="launcher-kubernetes-scratch")].emptyDir'
   - it: should not specify a volumeMount and a volume for launcher if launcher.enabled is false
     template: deployment.yaml
     set:
@@ -327,6 +390,10 @@ tests:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-launcher-startup")]'
       - notExists:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-launcher-startup")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="launcher-kubernetes-scratch")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="launcher-kubernetes-scratch")]'
   - it: should specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is defined and not empty
     template: deployment.yaml
     set:
@@ -353,13 +420,15 @@ tests:
       - equal:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-user-startup")].configMap.defaultMode'
           value: 0600
-  - it: should not specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is not defined
+  - it: should not specify a volumeMount and a volume for startupUserProvisioning if config.startupUserProvisioning is not defined and sssd is disabled
     template: deployment.yaml
     set:
       config:
         defaultMode:
           startup: 0600
         startupUserProvisioning: null
+        sssd:
+          enabled: false
     asserts:
       - notExists:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")]'
@@ -852,3 +921,221 @@ tests:
           content:
             name: "positron-components"
           any: true
+
+  # -- runAsRoot -> pod securityContext
+  - it: should run pod as root by default
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 0
+      - notExists:
+          path: spec.template.spec.securityContext.runAsNonRoot
+
+  - it: should run pod as non-root when runAsRoot is false
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: false
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 999
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 999
+
+  - it: should set fsGroup in root mode when launcher is enabled
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 0
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 999
+      - equal:
+          path: spec.template.spec.securityContext.fsGroupChangePolicy
+          value: OnRootMismatch
+
+  - it: should not set fsGroup in root mode when launcher is disabled
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: false
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 0
+      - notExists:
+          path: spec.template.spec.securityContext.fsGroup
+      - notExists:
+          path: spec.template.spec.securityContext.fsGroupChangePolicy
+
+  - it: should use custom serviceAccountUserId for root-mode fsGroup
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: true
+      pod.serviceAccountUserId: 1500
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1500
+
+  - it: should let pod.securityContext fsGroup override the root-mode default
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      launcher.enabled: true
+      pod:
+        securityContext:
+          fsGroup: 4242
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 4242
+
+  - it: should set fsGroupChangePolicy alongside fsGroup in rootless mode
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: false
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 999
+      - equal:
+          path: spec.template.spec.securityContext.fsGroupChangePolicy
+          value: OnRootMismatch
+
+  - it: should use custom uid when serviceAccountUserId is overridden
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: false
+      pod.serviceAccountUserId: 1500
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 1500
+
+  - it: should let pod.securityContext override the non-root defaults
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: false
+      pod:
+        securityContext:
+          runAsUser: 4242
+          fsGroup: 4243
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 4242
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 4243
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+
+  - it: should not force runAsUser 0 when root pod.securityContext sets runAsNonRoot
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      pod:
+        securityContext:
+          runAsNonRoot: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - notExists:
+          path: spec.template.spec.securityContext.runAsUser
+
+  - it: should respect a root pod.securityContext runAsUser override
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+      pod:
+        securityContext:
+          runAsUser: 1234
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 1234
+
+  # -- command/args: the image's supervisord.conf supports non-root operation, so the
+  # chart sets no command/args override and relies on the container's default CMD for
+  # every serviceAccountUser value. No supervisor-tmp emptyDir is needed.
+  - it: should not override command/args with default serviceAccountUser
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - notExists:
+          path: spec.template.spec.containers[0].args
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: supervisor-tmp
+            emptyDir: {}
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: supervisor-tmp
+            mountPath: /tmp
+
+  - it: should not override command/args when runAsRoot is true
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: true
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - notExists:
+          path: spec.template.spec.containers[0].args
+
+  - it: should not override command/args when runAsRoot is false
+    template: deployment.yaml
+    set:
+      pod.runAsRoot: false
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - notExists:
+          path: spec.template.spec.containers[0].args
+
+  - it: should respect an explicitly-set command
+    template: deployment.yaml
+    set:
+      command:
+        - /custom/entrypoint
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /custom/entrypoint
+      - notExists:
+          path: spec.template.spec.containers[0].args
+
+  - it: should respect explicitly-set args
+    template: deployment.yaml
+    set:
+      args:
+        - --foo
+        - bar
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - --foo
+            - bar

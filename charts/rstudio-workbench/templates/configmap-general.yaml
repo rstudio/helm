@@ -49,6 +49,9 @@
 {{- $defaultIDEServiceName := include "rstudio-workbench.fullname" . }}
 {{- $defaultIDEServiceURL := printf "http://%s.%s.svc.cluster.local:80" $defaultIDEServiceName $.Release.Namespace }}
 {{- $defaultRServerConfigValues := dict "launcher-sessions-callback-address" ($defaultIDEServiceURL) }}
+{{- if .Values.pod.serviceAccountUser }}
+  {{- $_ := set $defaultRServerConfigValues "server-user" .Values.pod.serviceAccountUser }}
+{{- end }}
 {{- if and .Values.launcher.enabled .Values.components.enabled }}
   {{- $initTag := .Values.components.sessionInit.image.tag | default $defaultVersion }}
   {{- $_ := set $defaultRServerConfigValues "launcher-sessions-auto-update" 1 }}
@@ -109,6 +112,36 @@ data:
     {{- end }}
   {{- end }}
 {{- $overrideDict = mergeOverwrite $defaultLauncherK8sConfig $overrideDict }}
+{{- /* Non-root (rootless) defaults, overridable by config.server:
+       - secure-cookie-key-file: the launcher runs unprivileged and would otherwise generate its own
+         secure-cookie-key, so rserver-signed launcher requests fail auth. Point it at the shared key.
+       - auth-pam-sessions-enabled=0: opening host PAM sessions requires root; launcher session
+         workloads handle session setup. Matches the product default for launcher-sessions deployments.
+       - user-provisioning-enabled=1: native (SCIM) provisioning is the rootless user-resolution path.
+       Rootless session user provisioning: when the session-init container is available
+       (launcher.enabled + components.enabled, which also sets launcher-sessions-auto-update=1),
+       default to nss mode. The session container starts directly as the requesting user and
+       resolves identity in-session via the pwb NSS module (backed by SCIM), so no root/useradd
+       step is needed. This requires create-container-user=1, create-container-user-mode=nss, and
+       init-container-run-user=server-user (the init container projects the NSS module + config
+       into the shared volume as the server user). The session image must ship libnss_pwb plus the
+       `pwb` nsswitch entries. Without the init container we fall back to create-container-user=0,
+       which stamps the pod's UID/GID directly (the runAsUserId branch in ServerJobLauncher) but
+       does not wire NSS. */}}
+{{- if not .Values.pod.runAsRoot }}
+  {{- $rootlessRserver := dict "auth-pam-sessions-enabled" 0 "user-provisioning-enabled" 1 }}
+  {{- if and .Values.launcher.enabled .Values.components.enabled }}
+    {{- $_ := set $rootlessRserver "launcher-sessions-create-container-user" 1 }}
+    {{- $_ := set $rootlessRserver "launcher-sessions-create-container-user-mode" "nss" }}
+    {{- $_ := set $rootlessRserver "launcher-sessions-init-container-run-user" "server-user" }}
+  {{- else }}
+    {{- $_ := set $rootlessRserver "launcher-sessions-create-container-user" 0 }}
+  {{- end }}
+  {{- $rootlessDefaults := dict "rserver.conf" $rootlessRserver "launcher.conf" (dict "server" (dict "secure-cookie-key-file" "/mnt/secret-configmap/rstudio/secure-cookie-key")) }}
+  {{- $overrideDict = mergeOverwrite $rootlessDefaults $overrideDict }}
+{{- else }}
+  {{- $overrideDict = mergeOverwrite (dict "rserver.conf" (dict "auth-pam-sessions-enabled" 1)) $overrideDict }}
+{{- end }}
 {{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
 {{- $profilesConfig := .Values.config.profiles }}

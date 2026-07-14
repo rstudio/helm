@@ -1,8 +1,24 @@
 # Changelog
 
-## 0.20.7
+## 0.20.10
 
 - **DEPRECATED**: The `chronicleAgent` configuration is deprecated and will be removed in a future release.
+
+## 0.20.9
+
+- Bump Connect version to 2026.06.1
+
+## 0.20.8
+
+- Bump Connect version to 2026.06.0
+- Update the default Python `Executable` path to `/opt/python/3.14.6/bin/python` to
+  match the interpreter shipped in the 2026.06.0 image
+
+## 0.20.7
+
+- The init container's `rsc-volume` now mounts at `/opt/rstudio-connect-runtime`
+  (previously `/opt/rstudio-connect`), and the chart sets
+  `Kubernetes.ConnectRuntimeDir` to match so Connect finds the runtime there.
 
 ## 0.20.6
 

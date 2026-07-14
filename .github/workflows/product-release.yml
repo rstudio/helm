@@ -15,6 +15,11 @@ on:
         description: "Product version to set as appVersion (e.g. 2026.03.0)"
         required: true
         type: string
+      python_version:
+        description: "Python version baked into the server image (connect only, e.g. 3.14.6)"
+        required: false
+        type: string
+        default: ""
 
 defaults:
   run:
@@ -126,6 +131,19 @@ jobs:
 
           echo "chart-version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Sync Connect interpreter paths
+        if: >-
+          steps.current.outputs.app-version != steps.app-version.outputs.value &&
+          inputs.product == 'connect' &&
+          inputs.python_version != ''
+        env:
+          CHART_NAME: ${{ steps.chart.outputs.name }}
+          PYTHON_VERSION: ${{ inputs.python_version }}
+        run: |
+          yq -i \
+            ".config.Python.Executable = [\"/opt/python/${PYTHON_VERSION}/bin/python\"]" \
+            "charts/${CHART_NAME}/values.yaml"
+
       - name: Add NEWS.md entry
         if: steps.current.outputs.app-version != steps.app-version.outputs.value
         env:
@@ -173,5 +191,6 @@ jobs:
 
             - Chart: `${{ steps.chart.outputs.name }}`
             - appVersion: `${{ steps.current.outputs.app-version }}` → `${{ steps.app-version.outputs.value }}`
+            ${{ inputs.python_version != '' && format('- Python: `{0}`', inputs.python_version) || '' }}
           commit-message: "Update ${{ inputs.product }} appVersion to ${{ steps.app-version.outputs.value }}"
           base: main
