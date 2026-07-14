@@ -518,7 +518,7 @@ config:
       metrics-enabled: 1
 ```
 
-For more information on running Chronicle within Workbench, see the [Workbench Chronicle documentation](https://docs.posit.co/ide/server-pro/2026.06.0/admin/auditing_and_monitoring/chronicle.html).
+For more information on running Chronicle within Workbench, see the [Workbench Chronicle documentation](https://docs.posit.co/ide/server-pro/admin/auditing_and_monitoring/chronicle.html).
 
 ### Deprecated Chronicle Agent
 
