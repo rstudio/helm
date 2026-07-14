@@ -10190,6 +10190,24 @@ entries:
   rstudio-library-test:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2026-07-14T19:07:15.154769485Z"
+    dependencies:
+    - name: rstudio-library
+      repository: file://../../charts/rstudio-library
+      version: '>= 0.1.0, < 1.0.0'
+    description: Test harness for rstudio-library templates
+    digest: e8b9acbfbf95ef2ee52b2ff42d6a63a34a2dbe528b3cbe66967cac0e8e82882b
+    maintainers:
+    - email: docker@posit.co
+      name: rstudio
+      url: https://github.com/rstudio/helm
+    name: rstudio-library-test
+    type: application
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-library-test-0.1.1/rstudio-library-test-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2026-03-26T11:38:03.158180433Z"
     dependencies:
     - name: rstudio-library
@@ -21547,4 +21565,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2026-07-14T19:07:10.700385238Z"
+generated: "2026-07-14T19:07:15.156379766Z"
