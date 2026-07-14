@@ -1,5 +1,10 @@
 # Changelog
 
+
+## 0.21.1
+
+- Bump Workbench version to 2026.07.0
+
 ## 0.21.0
 
 - New `pod.runAsRoot` value (default `true`); set it to `false` to run the Workbench pod as a non-root user. Rootless mode requires Workbench's native user provisioning (SCIM or just-in-time) with an external auth provider (e.g. OpenID/SAML) — local/PAM authentication is not supported — and adds init containers.
