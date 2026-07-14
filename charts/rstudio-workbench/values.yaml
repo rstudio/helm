@@ -603,6 +603,8 @@ config:
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
       audited-jobs: 1
+      chronicle-enabled: 0
+      metrics-enabled: 0
     launcher.conf:
       server:
         address: 127.0.0.1
