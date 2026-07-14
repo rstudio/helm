@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.2
+
+- Bump Workbench version to 2026.07.0
+
 ## 0.21.1
 
 - **DEPRECATED**: The `chronicleAgent` configuration is deprecated.
