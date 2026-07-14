@@ -508,3 +508,6 @@ config:
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Launcher: {}
   Kubernetes: {}
+  Chronicle:
+    # Chronicle configuration -- see [Posit Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html)
+    Enabled: false
