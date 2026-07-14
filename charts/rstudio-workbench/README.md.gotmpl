@@ -452,7 +452,26 @@ launcher:
           effect: "NoSchedule"
 ```
 
-## Chronicle Agent
+## Chronicle
+
+Starting with Workbench 2026.06, Chronicle is built into Workbench and can be enabled by setting the following values:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+```
+
+For more information on running Chronicle within Workbench, see the [Workbench Chronicle documentation](https://docs.posit.co/ide/server-pro/admin/auditing_and_monitoring/chronicle.html).
+
+### Deprecated Chronicle Agent
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+Use the `config` options described above to enable Chronicle.
+:::
 
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
@@ -486,7 +505,11 @@ initContainers:
 
 For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
-### Chronicle Workbench API Key
+#### Chronicle Workbench API Key
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+:::
 
 > [!WARNING]
 > The Workbench API is currently in preview. See

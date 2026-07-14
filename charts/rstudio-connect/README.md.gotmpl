@@ -88,7 +88,26 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
-## Chronicle Agent
+## Chronicle
+
+Starting with Connect 2026.06, Chronicle is built into Connect and can be enabled by setting the following values:
+
+```yaml
+config:
+  Chronicle:
+    Enabled: true
+    LocalStorageEnabled: true
+    LocalStorageLocation: /var/lib/posit-chronicle/data
+```
+
+For more information on running Chronicle within Connect, see the [Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html).
+
+### Deprecated Chronicle Agent
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+Use the `config` options described above to enable Chronicle.
+:::
 
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
@@ -127,7 +146,11 @@ initContainers:
 
 For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
-### Chronicle Connect API Key
+#### Chronicle Connect API Key
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+:::
 
 In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
 a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example

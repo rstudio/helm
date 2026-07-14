@@ -9,6 +9,8 @@ R and Python packages that Data Scientists need to create and share data product
 Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
 products using R and Python.
   {{- else if eq .Name "posit-chronicle" -}}
+> **Deprecated**: The posit-chronicle helm chart is deprecated and will be removed in a future release.
+
 [Posit Chronicle](https://docs.posit.co/chronicle/) helps data science managers and other stakeholders understand their
 organization's use of other Posit products, primarily Posit Connect and
 Workbench.
@@ -47,7 +49,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
-  
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::

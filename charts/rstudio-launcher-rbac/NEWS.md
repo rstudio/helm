@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.26
+
+- Update Chart.lock
+
 ## 0.2.25
 
 - Update chart icon to Posit icon
