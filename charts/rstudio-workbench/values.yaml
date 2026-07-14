@@ -92,9 +92,10 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 
+# DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:
-  # -- Creates a Chronicle agent sidecar container in the pod if true
+  # -- (DEPRECATED) Creates a Chronicle agent sidecar container in the pod if true
   enabled: false
   # -- Additional environment variables to set on the Chronicle agent container `env`
   env: []
@@ -602,6 +603,8 @@ config:
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
       audited-jobs: 1
+      chronicle-enabled: 0
+      metrics-enabled: 0
     launcher.conf:
       server:
         address: 127.0.0.1

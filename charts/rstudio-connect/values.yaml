@@ -251,9 +251,10 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+# DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:
-  # -- Creates a Chronicle agent sidecar container in the pod if true
+  # -- (DEPRECATED) Creates a Chronicle agent sidecar container in the pod if true
   enabled: false
   # -- Additional environment variables to set on the Chronicle agent container `env`
   env: []
@@ -507,3 +508,6 @@ config:
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Launcher: {}
   Kubernetes: {}
+  Chronicle:
+    # Chronicle configuration -- see [Posit Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html)
+    Enabled: false

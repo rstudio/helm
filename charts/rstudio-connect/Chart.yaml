@@ -1,6 +1,6 @@
 name: rstudio-connect
 description: Official Helm chart for Posit Connect
-version: 0.20.9
+version: 0.20.10
 apiVersion: v2
 appVersion: 2026.06.1
 icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
@@ -40,7 +40,6 @@ annotations:
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
     - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
-    - url: https://artifacthub.io/packages/helm/rstudio/posit-chronicle
 keywords:
   - "data science"
   - "machine learning"

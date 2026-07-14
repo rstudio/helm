@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.20.9](https://img.shields.io/badge/Version-0.20.9-informational?style=flat-square) ![AppVersion: 2026.06.1](https://img.shields.io/badge/AppVersion-2026.06.1-informational?style=flat-square)
+![Version: 0.20.10](https://img.shields.io/badge/Version-0.20.10-informational?style=flat-square) ![AppVersion: 2026.06.1](https://img.shields.io/badge/AppVersion-2026.06.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.9:
+To install the chart with the release name `my-release` at version 0.20.10:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.9
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.10
 ```
 
 To explore other chart versions, look at:
@@ -148,7 +148,26 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
-## Chronicle Agent
+## Chronicle
+
+Starting with Connect 2026.06, Chronicle is built into Connect and can be enabled by setting the following values:
+
+```yaml
+config:
+  Chronicle:
+    Enabled: true
+    LocalStorageEnabled: true
+    LocalStorageLocation: /var/lib/posit-chronicle/data
+```
+
+For more information on running Chronicle within Connect, see the [Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html).
+
+### Deprecated Chronicle Agent
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+Use the `config` options described above to enable Chronicle.
+:::
 
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
@@ -187,7 +206,11 @@ initContainers:
 
 For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
-### Chronicle Connect API Key
+#### Chronicle Connect API Key
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+:::
 
 In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
 a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example
@@ -294,7 +317,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
 | chronicleAgent.connectApiKey.value | string | `""` | Connect API key as a raw string to set as the `CHRONICLE_CONNECT_APIKEY` environment variable (not recommended) |
 | chronicleAgent.connectApiKey.valueFrom | object | `{}` | Connect API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_CONNECT_APIKEY` environment variable (recommended) |
-| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.enabled | DEPRECATED | `false` | Creates a Chronicle agent sidecar container in the pod if true |
 | chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
 | chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |

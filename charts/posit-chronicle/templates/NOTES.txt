@@ -1,3 +1,5 @@
+WARNING: The posit-chronicle Helm chart is DEPRECATED and will be removed in a future release.
+
 {{ include "posit-chronicle.fullname" . }} successfully deployed to namespace {{ .Release.Namespace }}
 
 Please visit https://docs.posit.co/chronicle/getting-started/installation/on-kubernetes.html#agent-sidecar for
