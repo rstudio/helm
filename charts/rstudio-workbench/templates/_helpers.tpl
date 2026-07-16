@@ -41,7 +41,10 @@ Rendered into the user-provisioning startup ConfigMap when sssd is active.
 */}}
 {{- define "rstudio-workbench.sssd.program" -}}
 [program:sssd]
-command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
+{{- /* SSSD ignores its config unless it is root:root mode 0600, but the mounted secret arrives
+       owned by a non-root group. Copy it into place with the right owner and permissions right
+       before starting the daemon (this runs as root, since sssd only runs in a root pod). */}}
+command=/bin/bash -c 'mkdir -p /etc/sssd/conf.d && for f in /mnt/user-provisioning/*; do [ -e "$f" ] && install -m 0600 "$f" /etc/sssd/conf.d/; done; exec /usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr'
 autorestart=false
 numprocs=1
 stdout_logfile=/dev/stdout
@@ -179,8 +182,10 @@ containers:
       mountPath: "/mnt/secret-configmap/rstudio/"
     {{- end }}
     {{- if and (include "rstudio-workbench.sssd.active" .) (or $sssd.conf .Values.config.userProvisioning) }}
+    {{- /* Not mounted straight to /etc/sssd/conf.d: the mount would arrive owned by a non-root
+           group, which SSSD rejects. The sssd program copies it there as root:root 0600. */}}
     - name: rstudio-user
-      mountPath: "/etc/sssd/conf.d/"
+      mountPath: "/mnt/user-provisioning/"
     {{- end }}
     - name: etc-rstudio
       mountPath: "/etc/rstudio"

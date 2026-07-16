@@ -337,7 +337,7 @@ tests:
     asserts:
       - equal:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].mountPath'
-          value: "/etc/sssd/conf.d/"
+          value: "/mnt/user-provisioning/"
       - equal:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].name'
           value: "rstudio-user"
