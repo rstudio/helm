@@ -21,6 +21,9 @@ tests:
       - matchRegex:
           path: data['sssd.conf']
           pattern: "/usr/sbin/sssd -i -c /etc/sssd/sssd.conf"
+      - matchRegex:
+          path: data['sssd.conf']
+          pattern: "install -m 0600 .* /etc/sssd/conf.d/"
 
   - it: does not start the sssd daemon when runAsRoot is false
     template: configmap-startup.yaml
@@ -100,7 +103,7 @@ tests:
     asserts:
       - equal:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user")].mountPath'
-          value: "/etc/sssd/conf.d/"
+          value: "/mnt/user-provisioning/"
       - equal:
           path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="rstudio-user-startup")].mountPath'
           value: "/startup/user-provisioning"
