@@ -38,7 +38,7 @@ jobs:
         if: steps.project-url.outputs.project != 'none'
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
         with:
-          app-id: ${{ secrets.POSIT_PLATFORM_APP_ID }}
+          client-id: ${{ secrets.POSIT_PLATFORM_CLIENT_ID }}
           private-key: ${{ secrets.POSIT_PLATFORM_PEM }}
           owner: ${{ steps.project-url.outputs.ORG }}
           permission-organization-projects: write
