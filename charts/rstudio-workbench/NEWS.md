@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.4
+
+- Bump Workbench version to 2026.07.1
+
 ## 0.21.3
 
 - Fix SSSD/LDAP (and Active Directory) sign-in that broke under the rootless changes. The rootless setup made Kubernetes re-own the pod's mounted files to a non-root group, which included the SSSD config. SSSD ignores its config unless it is owned by `root:root` with `0600` permissions, so logins failed. The config is now given the correct owner and permissions before SSSD starts.
