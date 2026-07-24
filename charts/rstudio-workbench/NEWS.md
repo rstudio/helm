@@ -3,7 +3,7 @@
 
 ## 0.21.5
 
-- The session job template (`files/job.tpl`) now passes through the Linux capabilities the launcher requests for the session container (`.Job.container.capabilitiesAdd` / `.Job.container.capabilitiesDrop`), merging them into `launcher.templateValues.pod.containerSecurityContext`. Previously these were silently dropped, which broke rootless sessions (`launcher-kubernetes-identity=server-user-capabilities`) because `pwb-mkhomedir` requires `CAP_CHOWN`/`CAP_DAC_OVERRIDE`.
+- The session job template (`files/job.tpl`) now passes through the Linux capabilities the launcher requests for the session container (`.Job.container.capabilitiesAdd` / `.Job.container.capabilitiesDrop`), merging them into `launcher.templateValues.pod.containerSecurityContext`. Previously these were silently dropped.
 
 ## 0.21.4
 
