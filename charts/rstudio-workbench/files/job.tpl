@@ -271,9 +271,20 @@ spec:
               {{- toYaml $templateData.pod.env | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- with $templateData.pod.containerSecurityContext }}
+          {{- $containerSecurityContext := $templateData.pod.containerSecurityContext | default dict }}
+          {{- if or .Job.container.capabilitiesAdd .Job.container.capabilitiesDrop }}
+            {{- $capabilities := $containerSecurityContext.capabilities | default dict }}
+            {{- with .Job.container.capabilitiesAdd }}
+              {{- $_ := set $capabilities "add" (concat ($capabilities.add | default list) .) }}
+            {{- end }}
+            {{- with .Job.container.capabilitiesDrop }}
+              {{- $_ := set $capabilities "drop" (concat ($capabilities.drop | default list) .) }}
+            {{- end }}
+            {{- $_ := set $containerSecurityContext "capabilities" $capabilities }}
+          {{- end }}
+          {{- if $containerSecurityContext }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml $containerSecurityContext | nindent 12 }}
           {{- end }}
           {{- $exposedPorts := list }}
           {{- range .Job.exposedPorts }}

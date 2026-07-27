@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.21.5
+
+- The session job template (`files/job.tpl`) now passes through the Linux capabilities the launcher requests for the session container (`.Job.container.capabilitiesAdd` / `.Job.container.capabilitiesDrop`), merging them into `launcher.templateValues.pod.containerSecurityContext`. Previously these were silently dropped.
+
 ## 0.21.4
 
 - Bump Workbench version to 2026.07.1
