@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.11
+
+- Bump Connect version to 2026.07.0
+
 ## 0.20.10
 
 - **DEPRECATED**: The `chronicleAgent` configuration is deprecated and will be removed in a future release.
