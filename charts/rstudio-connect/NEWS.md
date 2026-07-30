@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.20.12
+
+- `sharedStorage.subPath` now applies to content pods run by the direct
+  Kubernetes runner (`backends.kubernetes.enabled`), so content stored under a
+  subdirectory of a shared PersistentVolumeClaim is found correctly. The chart
+  maps it to `Kubernetes.DataDirPVCSubPath`. Requires Connect 2026.08.0 or later.
+
 ## 0.20.11
 
 - Bump Connect version to 2026.07.0

@@ -30,7 +30,10 @@ sharedStorage:
   selector: {}
   # -- the volumeName passed along to the persistentVolumeClaim. Optional
   volumeName: ""
-  # -- an optional subPath for the volume mount
+  # -- an optional subPath for the volume mount. Also applied to content pod
+  # mounts for the launcher and the direct Kubernetes runner
+  # (backends.kubernetes.enabled). The direct runner requires Connect 2026.08.0
+  # or later. Must be a relative path.
   subPath: ""
 rbac:
   # -- Whether to create rbac. (also depends on launcher.enabled = true or backends.kubernetes.enabled = true)

@@ -564,6 +564,147 @@ tests:
           path: data["rstudio-connect.gcfg"]
           pattern: "DataDirPVCName"
 
+  # Test that sharedStorage.subPath propagates to the direct Kubernetes runner config
+  - it: should configure DataDirPVCSubPath when sharedStorage.subPath is set
+    template: configmap.yaml
+    set:
+      versionOverride: "2026.08.0"
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        mountContent: true
+        subPath: rstudio-connect-data
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DataDirPVCSubPath = rstudio-connect-data"
+
+  - it: should not configure DataDirPVCSubPath when sharedStorage.subPath is empty
+    template: configmap.yaml
+    set:
+      versionOverride: "2026.08.0"
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        mountContent: true
+    documentIndex: 0
+    asserts:
+      - notMatchRegex:
+          path: data["rstudio-connect.gcfg"]
+          pattern: "DataDirPVCSubPath"
+
+  # Test chart-layer guards for sharedStorage.subPath on the direct Kubernetes runner
+  - it: should fail when sharedStorage.subPath is set on a Connect version without support
+    template: NOTES.txt
+    set:
+      versionOverride: "2026.07.0"
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        subPath: rstudio-connect-data
+    asserts:
+      - failedTemplate:
+          errorPattern: "sharedStorage.subPath.*requires Connect.*2026.08.0"
+
+  - it: should fail when sharedStorage.subPath is an absolute path
+    template: NOTES.txt
+    set:
+      versionOverride: "2026.08.0"
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        subPath: /rstudio-connect-data
+    asserts:
+      - failedTemplate:
+          errorPattern: "sharedStorage.subPath.*must be a relative path"
+
+  - it: should fail when sharedStorage.subPath contains a parent reference
+    template: NOTES.txt
+    set:
+      versionOverride: "2026.08.0"
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        subPath: ../evil
+    asserts:
+      - failedTemplate:
+          errorPattern: "sharedStorage.subPath.*must be a relative path"
+
+  - it: should not fail when sharedStorage.subPath is a valid relative path on a supported version
+    template: NOTES.txt
+    set:
+      versionOverride: "2026.08.0"
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        subPath: rstudio-connect-data
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should not apply the direct-runner subPath guards to a launcher deployment
+    template: NOTES.txt
+    set:
+      launcher:
+        enabled: true
+      backends:
+        kubernetes:
+          enabled: false
+      sharedStorage:
+        create: true
+        mount: true
+        subPath: rstudio-connect-data
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail when sharedStorage.subPath is set but mountContent is false
+    template: NOTES.txt
+    set:
+      versionOverride: "2026.08.0"
+      launcher:
+        enabled: false
+      backends:
+        kubernetes:
+          enabled: true
+      sharedStorage:
+        create: true
+        mount: true
+        mountContent: false
+        subPath: rstudio-connect-data
+    asserts:
+      - failedTemplate:
+          errorPattern: "sharedStorage.subPath.*mountContent"
+
   # Test defaultInitContainer fields render on auto-generated init container
   - it: should apply imagePullPolicy, resources, and securityContext to init container
     template: configmap.yaml

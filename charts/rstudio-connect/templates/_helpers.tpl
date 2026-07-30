@@ -96,6 +96,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
+      {{- /* pass the shared storage subPath so content pods reference the same
+             location the Connect server mounts (rstudio/helm#916) */}}
+      {{- if .Values.sharedStorage.subPath }}
+        {{- $_ := set $kubernetesSettingsDict "DataDirPVCSubPath" .Values.sharedStorage.subPath }}
+      {{- end }}
     {{- end }}
     {{- $_ := set $kubernetesSettingsDict "DefaultResourceJobBase" (default "/etc/rstudio-connect/job.yaml" (dig "Kubernetes" "DefaultResourceJobBase" "" .Values.config)) }}
     {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
