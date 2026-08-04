@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.20.11](https://img.shields.io/badge/Version-0.20.11-informational?style=flat-square) ![AppVersion: 2026.07.0](https://img.shields.io/badge/AppVersion-2026.07.0-informational?style=flat-square)
+![Version: 0.20.12](https://img.shields.io/badge/Version-0.20.12-informational?style=flat-square) ![AppVersion: 2026.07.0](https://img.shields.io/badge/AppVersion-2026.07.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.11:
+To install the chart with the release name `my-release` at version 0.20.12:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.11
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.12
 ```
 
 To explore other chart versions, look at:
@@ -424,7 +424,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | sharedStorage.requests.storage | string | `"10Gi"` | The volume of storage to request for this persistent volume claim |
 | sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | The type of storage to use. Must allow ReadWriteMany |
-| sharedStorage.subPath | string | `""` | an optional subPath for the volume mount |
+| sharedStorage.subPath | string | `""` | an optional subPath for the volume mount. Also applied to content pod mounts for the launcher and the direct Kubernetes runner (backends.kubernetes.enabled). The direct runner requires Connect 2026.08.0 or later. Must be a relative path. |
 | sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | Used to configure the container's startupProbe. Only included if enabled = true |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |

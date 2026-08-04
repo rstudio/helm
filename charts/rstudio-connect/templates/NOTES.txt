@@ -66,6 +66,23 @@ Please consider removing this configuration value.
   {{- fail "\n\nWhen backends.kubernetes is enabled, persistent storage must be provided.\nThis is usually done via a PersistentVolumeClaim (PVC) with `sharedStorage.create=true`, although there are other options."}}
 {{- end }}
 
+{{- /* Validate sharedStorage.subPath for the direct Kubernetes runner. Connect maps
+       this to `Kubernetes.DataDirPVCSubPath`, which older Connect versions reject as an
+       unknown setting, so fail here instead of letting the Connect pod crash-loop. */ -}}
+{{- if and .Values.backends.kubernetes.enabled .Values.sharedStorage.subPath }}
+  {{- if not .Values.sharedStorage.mountContent }}
+    {{- fail "\n\n`sharedStorage.subPath` has no effect on content pods when `sharedStorage.mountContent` is false. Set `sharedStorage.mountContent: true` so the direct Kubernetes runner mounts the data directory under the subpath, or unset `sharedStorage.subPath`." }}
+  {{- end }}
+  {{- $connectVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+  {{- if semverCompare "<2026.8.0" $connectVersion }}
+    {{- fail (printf "\n\n`sharedStorage.subPath` with `backends.kubernetes.enabled` requires Connect 2026.08.0 or later, but the configured version is %s.\nUpgrade Connect (or set `versionOverride`), or unset `sharedStorage.subPath`." $connectVersion) }}
+  {{- end }}
+  {{- /* Match the Kubernetes subPath rules Connect enforces: relative, no ".." element. */ -}}
+  {{- if or (hasPrefix "/" .Values.sharedStorage.subPath) (contains ".." .Values.sharedStorage.subPath) }}
+    {{- fail (printf "\n\n`sharedStorage.subPath` (%s) must be a relative path within the PersistentVolumeClaim and must not contain \"..\"." .Values.sharedStorage.subPath) }}
+  {{- end }}
+{{- end }}
+
 {{- if .Values.launcher.contentInitContainer }}
   {{- fail "\n\n`launcher.contentInitContainer` values are now stored at `launcher.defaultInitContainer`" }}
 {{- end }}
