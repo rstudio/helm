@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.4
+
+- Bump Package Manager version to 2026.08.0
+
 ## 0.20.3
 
 - Remove deprecated posit-chronicle from chart recommendations
