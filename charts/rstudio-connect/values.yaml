@@ -479,10 +479,10 @@ config:
     InitTimeout: 5m
   Logging:
     ServiceLog: STDOUT
-    ServiceLogLevel: INFO # INFO, WARNING or ERROR
-    ServiceLogFormat: TEXT # TEXT or JSON
+    ServiceLogLevel: INFO  # INFO, WARNING or ERROR
+    ServiceLogFormat: TEXT  # TEXT or JSON
     AccessLog: STDOUT
-    AccessLogFormat: COMMON # COMMON, COMBINED, or JSON
+    AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Launcher: {}
   Kubernetes: {}
   Chronicle:
