@@ -463,7 +463,7 @@ config:
     # For Off-Host Execution, Python versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/python/
     Executable:
-      - /opt/python/3.14.6/bin/python
+      - /opt/python/3.14.7/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.
@@ -479,10 +479,10 @@ config:
     InitTimeout: 5m
   Logging:
     ServiceLog: STDOUT
-    ServiceLogLevel: INFO  # INFO, WARNING or ERROR
-    ServiceLogFormat: TEXT  # TEXT or JSON
+    ServiceLogLevel: INFO # INFO, WARNING or ERROR
+    ServiceLogFormat: TEXT # TEXT or JSON
     AccessLog: STDOUT
-    AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
+    AccessLogFormat: COMMON # COMMON, COMBINED, or JSON
   Launcher: {}
   Kubernetes: {}
   Chronicle:
