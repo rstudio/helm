@@ -102,6 +102,39 @@ config:
 
 For more information on running Chronicle within Connect, see the [Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html).
 
+### Chronicle settings not exposed by Connect
+
+Connect rewrites Chronicle's configuration file on every start, so it cannot be edited directly.
+Use `chronicle.localConfig` for anything `config.Chronicle` does not expose. Chronicle applies it
+after the configuration Connect generates, so any key set here takes precedence.
+
+Keys are Chronicle's own sections and properties, not `config.Chronicle` keys — see the
+[Chronicle configuration
+reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html). Check
+the [Connect configuration
+reference](https://docs.posit.co/connect/admin/appendix/configuration/) for the Chronicle
+settings your Connect version exposes.
+
+```yaml
+chronicle:
+  localConfig:
+    Logging:
+      Level: DEBUG
+```
+
+Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
+however the cluster normally does it
+
+Setting this adds an init container that prepares Chronicle's configuration directory: Chronicle
+creates its socket there as the `posit-chronicle` user, so the directory has to be a writable
+volume rather than a read-only mount. It requires a pod running as root, which is Connect's
+default.
+
+::: {.callout-warning}
+Chronicle refuses to start on a property it does not recognize. Check every property exists in
+the Chronicle version bundled with the Connect you are deploying.
+:::
+
 ### Deprecated Chronicle Agent
 
 ::: {.callout-warning}

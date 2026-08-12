@@ -7,6 +7,11 @@ metadata:
 data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
+{{- /* Staged into Chronicle's config dir by the chronicle-config init container; see
+       deployment.yaml for why it is not mounted there directly. */}}
+{{- with .Values.chronicle.localConfig }}
+{{ include "rstudio-library.config.ini" (dict "chronicle-local.gcfg" .) | indent 2 }}
+{{- end }}
 {{- if .Values.backends.kubernetes.enabled }}
   job.yaml: |
 {{- include "rstudio-connect.jobBase" . | nindent 4 }}

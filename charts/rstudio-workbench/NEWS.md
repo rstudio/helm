@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.22.0
+
+- New `chronicle.localConfig` value for overriding the configuration of Chronicle bundled with Workbench, covering settings not exposed as `rserver.conf` keys.
+
 ## 0.21.5
 
 - The session job template (`files/job.tpl`) now passes through the Linux capabilities the launcher requests for the session container (`.Job.container.capabilitiesAdd` / `.Job.container.capabilitiesDrop`), merging them into `launcher.templateValues.pod.containerSecurityContext`. Previously these were silently dropped.

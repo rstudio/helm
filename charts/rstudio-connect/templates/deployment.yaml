@@ -88,10 +88,39 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or .Values.initContainers .Values.chronicleAgent.enabled }}
+      {{- if or .Values.initContainers .Values.chronicleAgent.enabled .Values.chronicle.localConfig }}
       initContainers:
       {{- with .Values.initContainers }}
       {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.chronicle.localConfig }}
+      {{- /* Seeds chronicle-local.gcfg into an emptyDir that the main container mounts as
+             Chronicle's config dir. A subPath mount there does not work: Connect writes its
+             generated config into that dir and Chronicle creates server.sock in it as
+             posit-chronicle, but the dir is absent from the image, so kubelet creates it
+             root-owned, Connect does not chown an existing dir, and Chronicle then fails with
+             "timeout waiting for Chronicle socket".
+
+             Uses the Connect image for the posit-chronicle user, so ownership is set by name
+             rather than a hardcoded uid. Chowning needs root, as Connect itself runs. */}}
+      - name: chronicle-config
+        {{- $chronicleInitVersion := .Values.versionOverride | default $.Chart.AppVersion }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default (printf "%s-%s" $chronicleInitVersion .Values.image.os) }}"
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        command:
+          - /bin/sh
+          - -c
+          - |
+            set -e
+            install -d -o posit-chronicle -g posit-chronicle -m 0700 /mnt/chronicle-config
+            install -o posit-chronicle -g posit-chronicle -m 0644 \
+              /mnt/chronicle-configmap/chronicle-local.gcfg \
+              /mnt/chronicle-config/chronicle-local.gcfg
+        volumeMounts:
+          - name: rstudio-connect-config
+            mountPath: /mnt/chronicle-configmap
+          - name: chronicle-config
+            mountPath: /mnt/chronicle-config
       {{- end }}
       {{- if .Values.chronicleAgent.enabled }}
       - name: chronicle-agent
@@ -193,6 +222,10 @@ spec:
           - name: rstudio-connect-config
             mountPath: "/etc/rstudio-connect/rstudio-connect.gcfg"
             subPath: "rstudio-connect.gcfg"
+          {{- if .Values.chronicle.localConfig }}
+          - name: chronicle-config
+            mountPath: "/etc/rstudio-connect/chronicle"
+          {{- end }}
           {{- if .Values.backends.kubernetes.enabled }}
           - name: rstudio-connect-config
             mountPath: {{ default "/etc/rstudio-connect/job.yaml" (dig "Kubernetes" "DefaultResourceJobBase" "" .Values.config) | quote }}
@@ -282,6 +315,11 @@ spec:
       - name: rstudio-connect-config
         configMap:
           name: {{ include "rstudio-connect.fullname" . }}-config
+      {{- if .Values.chronicle.localConfig }}
+      {{- /* Chronicle's config dir, writable so Chronicle can create its socket there. */}}
+      - name: chronicle-config
+        emptyDir: {}
+      {{- end }}
       {{- if or .Values.sharedStorage.create .Values.sharedStorage.mount }}
       - name: rstudio-connect-data
         persistentVolumeClaim:

@@ -1,0 +1,74 @@
+suite: Bundled Chronicle configuration
+templates:
+  - configmap.yaml
+  - configmap-prestart.yaml
+  - deployment.yaml
+tests:
+  - it: should not emit a chronicle-local.gcfg by default
+    template: configmap.yaml
+    documentIndex: 0
+    asserts:
+      - notExists:
+          path: 'data["chronicle-local.gcfg"]'
+
+  - it: should not add the chronicle-config init container or volume by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="chronicle-config")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="chronicle-config")]'
+
+  - it: should render chronicle.localConfig as a gcfg file with section headers
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+          S3Storage:
+            Enabled: true
+            Bucket: my-chronicle-bucket
+            Region: us-east-2
+    asserts:
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: '\[Logging\]\nLevel=DEBUG'
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: 'Bucket=my-chronicle-bucket'
+
+  # Chronicle's config dir must be writable by posit-chronicle for its socket. A plain subPath
+  # mount leaves it root-owned and Chronicle fails to start, hence the emptyDir + init container.
+  - it: should stage the override into an emptyDir owned by posit-chronicle
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+    asserts:
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: chronicle-config
+            emptyDir: {}
+          any: true
+      - contains:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")].volumeMounts'
+          content:
+            name: chronicle-config
+            mountPath: /mnt/chronicle-config
+          any: true
+      - matchRegex:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")].command[2]'
+          pattern: 'install -d -o posit-chronicle -g posit-chronicle'
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: chronicle-config
+            mountPath: "/etc/rstudio-connect/chronicle"
+          any: true

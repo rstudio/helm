@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.20.12](https://img.shields.io/badge/Version-0.20.12-informational?style=flat-square) ![AppVersion: 2026.07.0](https://img.shields.io/badge/AppVersion-2026.07.0-informational?style=flat-square)
+![Version: 0.21.0](https://img.shields.io/badge/Version-0.21.0-informational?style=flat-square) ![AppVersion: 2026.07.0](https://img.shields.io/badge/AppVersion-2026.07.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.12:
+To install the chart with the release name `my-release` at version 0.21.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.12
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.21.0
 ```
 
 To explore other chart versions, look at:
@@ -161,6 +161,39 @@ config:
 ```
 
 For more information on running Chronicle within Connect, see the [Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html).
+
+### Chronicle settings not exposed by Connect
+
+Connect rewrites Chronicle's configuration file on every start, so it cannot be edited directly.
+Use `chronicle.localConfig` for anything `config.Chronicle` does not expose. Chronicle applies it
+after the configuration Connect generates, so any key set here takes precedence.
+
+Keys are Chronicle's own sections and properties, not `config.Chronicle` keys — see the
+[Chronicle configuration
+reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html). Check
+the [Connect configuration
+reference](https://docs.posit.co/connect/admin/appendix/configuration/) for the Chronicle
+settings your Connect version exposes.
+
+```yaml
+chronicle:
+  localConfig:
+    Logging:
+      Level: DEBUG
+```
+
+Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
+however the cluster normally does — IRSA, an instance profile, or `AWS_*` via `pod.env`.
+
+Setting this adds an init container that prepares Chronicle's configuration directory: Chronicle
+creates its socket there as the `posit-chronicle` user, so the directory has to be a writable
+volume rather than a read-only mount. It requires a pod running as root, which is Connect's
+default.
+
+::: {.callout-warning}
+Chronicle refuses to start on a property it does not recognize. Check every property exists in
+the Chronicle version bundled with the Connect you are deploying.
+:::
 
 ### Deprecated Chronicle Agent
 
@@ -312,6 +345,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | backends.kubernetes.defaultResourceServiceBase | object | `{}` | defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's Service in Kubernetes. Conceptually this is similar to a Kustomize base. Connect then applies any required Service configuration on-top of the overlay base to produce a final Service definition. https://kubernetes.io/docs/concepts/services-networking/service/ https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays |
 | backends.kubernetes.enabled | bool | `true` | Whether to enable off-host execution for running content-jobs in remote Kubernetes pods. |
 | backends.kubernetes.namespace | string | `""` | The namespace to launch connect-content jobs into. Uses the Release namespace by default |
+| chronicle.localConfig | object | `{}` | Overrides for Chronicle, rendered as a `chronicle-local.gcfg` and applied after    the configuration Connect generates. Keys are Chronicle's own `.gcfg` sections and    properties    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).    Use it for anything `config.Chronicle` does not expose. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
