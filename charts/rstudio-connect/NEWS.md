@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.13
+
+- Bump Connect version to 2026.08.0
+
 ## 0.20.12
 
 - `sharedStorage.subPath` now applies to content pods run by the direct
