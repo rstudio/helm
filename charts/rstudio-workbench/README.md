@@ -549,7 +549,7 @@ chronicle:
 ```
 
 Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
-however the cluster normally does — IRSA, an instance profile, or `AWS_*` via `pod.env`.
+however the cluster normally does it.
 
 ::: {.callout-warning}
 Chronicle refuses to start on a property it does not recognize. Check every property exists in

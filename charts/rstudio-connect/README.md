@@ -183,7 +183,7 @@ chronicle:
 ```
 
 Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
-however the cluster normally does — IRSA, an instance profile, or `AWS_*` via `pod.env`.
+however the cluster normally does it
 
 Setting this adds an init container that prepares Chronicle's configuration directory: Chronicle
 creates its socket there as the `posit-chronicle` user, so the directory has to be a writable
