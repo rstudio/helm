@@ -94,6 +94,16 @@ spec:
       {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.chronicle.localConfig }}
+      {{- /* This init container chowns to posit-chronicle, so it needs the pod to run as root.
+             Fail at template time rather than let it fail at Init:Error: pod.securityContext
+             is what the init container actually inherits (it has no securityContext of its
+             own), unlike .Values.securityContext, which only applies to the connect
+             container. */}}
+      {{- $podRunAsNonRoot := dig "runAsNonRoot" false .Values.pod.securityContext }}
+      {{- $podRunAsUser := dig "runAsUser" nil .Values.pod.securityContext }}
+      {{- if or $podRunAsNonRoot (and $podRunAsUser (ne (int $podRunAsUser) 0)) }}
+      {{- fail "chronicle.localConfig requires the Connect pod to run as root: the chronicle-config init container chowns /etc/rstudio-connect/chronicle for posit-chronicle. Remove pod.securityContext.runAsNonRoot / a non-zero pod.securityContext.runAsUser, or unset chronicle.localConfig." }}
+      {{- end }}
       {{- /* Seeds chronicle-local.gcfg into an emptyDir that the main container mounts as
              Chronicle's config dir. A subPath mount there does not work: Connect writes its
              generated config into that dir and Chronicle creates server.sock in it as
@@ -102,7 +112,7 @@ spec:
              "timeout waiting for Chronicle socket".
 
              Uses the Connect image for the posit-chronicle user, so ownership is set by name
-             rather than a hardcoded uid. Chowning needs root, as Connect itself runs. */}}
+             rather than a hardcoded uid. */}}
       - name: chronicle-config
         {{- $chronicleInitVersion := .Values.versionOverride | default $.Chart.AppVersion }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default (printf "%s-%s" $chronicleInitVersion .Values.image.os) }}"
