@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.6
+
+- Bump Workbench version to 2026.08.0
+
 
 ## 0.21.5
 
