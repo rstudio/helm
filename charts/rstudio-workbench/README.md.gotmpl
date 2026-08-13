@@ -493,8 +493,8 @@ config:
       chronicle-storage-location: /path/to/chronicle/data
 ```
 
-Unlike Connect's built-in Chronicle, Workbench's Chronicle only supports local/shared filesystem storage; it does
-not have an S3 storage option.
+Workbench does not expose an S3 storage option as an `rserver.conf` key; use `chronicle.localConfig` for S3
+storage instead, as described in [Chronicle settings not exposed by Workbench](#chronicle-settings-not-exposed-by-workbench).
 
 To also have Chronicle collect user information, the admin-level Workbench API must be enabled by additionally
 setting `workbench-api-admin-enabled`:
