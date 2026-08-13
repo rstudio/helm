@@ -232,6 +232,18 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+# Settings for the Chronicle bundled with Connect. Unrelated to the deprecated `chronicleAgent`
+# sidecar below.
+chronicle:
+  # -- Overrides for Chronicle, rendered as a `chronicle-local.gcfg` and applied after
+  #    the configuration Connect generates. Keys are Chronicle's own `.gcfg` sections and
+  #    properties
+  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).
+  #    Use it for anything `config.Chronicle` does not expose.
+  localConfig: {}
+  # Logging:
+  #   Level: DEBUG
+
 # DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:

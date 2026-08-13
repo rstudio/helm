@@ -142,6 +142,13 @@ data:
 {{- else }}
   {{- $overrideDict = mergeOverwrite (dict "rserver.conf" (dict "auth-pam-sessions-enabled" 1)) $overrideDict }}
 {{- end }}
+{{- /* Renders chronicle.localConfig as a chronicle-local.gcfg. Needs no mount of its own: this
+       ConfigMap lands at /mnt/configmap/rstudio, which is on XDG_CONFIG_DIRS, where rserver
+       finds the override and symlinks it beside the config it generates. Deep-merges with any
+       config.server entry of the same name, winning on conflicts. */}}
+{{- with .Values.chronicle.localConfig }}
+  {{- $overrideDict = mergeOverwrite $overrideDict (dict "chronicle-local.gcfg" .) }}
+{{- end }}
 {{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
 {{- $profilesConfig := .Values.config.profiles }}

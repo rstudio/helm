@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.0
+
+- New `chronicle.localConfig` value for overriding the configuration of the Chronicle bundled with Connect, covering settings `config.Chronicle` does not expose.
+
 ## 0.20.13
 
 - Bump Connect version to 2026.08.0
