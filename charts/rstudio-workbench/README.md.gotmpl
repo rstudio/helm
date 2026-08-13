@@ -454,7 +454,8 @@ launcher:
 
 ## Chronicle
 
-Starting with Workbench 2026.06, Chronicle is built into Workbench and can be enabled by setting the following values:
+Starting with Workbench 2026.06, Chronicle is built into Workbench and can be enabled by setting the following values.
+Note that Workbench will not start if `chronicle-enabled` is set without `metrics-enabled`.
 
 ```yaml
 config:
@@ -462,6 +463,49 @@ config:
     rserver.conf:
       chronicle-enabled: 1
       metrics-enabled: 1
+```
+
+### Chronicle storage
+
+By default, Chronicle writes its data under Workbench's shared-storage path
+(`<server-shared-storage-path>/chronicle`, which defaults to `/var/lib/rstudio-server/shared-storage/chronicle`).
+To persist that data across pod restarts, back it with a PersistentVolumeClaim using `sharedStorage`, which this
+chart mounts at `/var/lib/rstudio-server` by default:
+
+```yaml
+sharedStorage:
+  create: true
+
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+```
+
+Without persistent `sharedStorage`, Chronicle's data lives on the pod's ephemeral filesystem and is lost on
+restart. To store Chronicle's data at a different location instead, set `chronicle-storage-location`:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-storage-location: /path/to/chronicle/data
+```
+
+Unlike Connect's built-in Chronicle, Workbench's Chronicle only supports local/shared filesystem storage; it does
+not have an S3 storage option.
+
+To also have Chronicle collect user information, the admin-level Workbench API must be enabled by additionally
+setting `workbench-api-admin-enabled`:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+      workbench-api-admin-enabled: 1
 ```
 
 For more information on running Chronicle within Workbench, see the [Workbench Chronicle documentation](https://docs.posit.co/ide/server-pro/admin/auditing_and_monitoring/chronicle.html).

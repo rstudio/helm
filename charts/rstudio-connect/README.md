@@ -150,15 +150,80 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 ## Chronicle
 
-Starting with Connect 2026.06, Chronicle is built into Connect and can be enabled by setting the following values:
+Starting with Connect 2026.06, Chronicle is built into Connect and can be enabled by setting `config.Chronicle.Enabled: true`.
+Chronicle also requires Connect's Prometheus metrics endpoint, which this chart enables by default (`prometheus.enabled: true`).
+At least one storage backend -- local or S3 -- must also be configured, or Chronicle will fail to start.
+
+### Chronicle local storage
+
+Chronicle's data directory must be separate from Connect's own data directory (`sharedStorage`), so a dedicated
+volume should be mounted for it. The following example creates a PersistentVolumeClaim via `extraObjects` and
+mounts it into the Connect pod with `pod.volumes` / `pod.volumeMounts`:
 
 ```yaml
+extraObjects:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: my-release-chronicle-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+
+pod:
+  volumes:
+    - name: chronicle-data
+      persistentVolumeClaim:
+        claimName: my-release-chronicle-data
+  volumeMounts:
+    - name: chronicle-data
+      mountPath: /var/lib/posit-chronicle/data
+
 config:
   Chronicle:
     Enabled: true
     LocalStorageEnabled: true
     LocalStorageLocation: /var/lib/posit-chronicle/data
 ```
+
+If persistence isn't needed (for example, local testing), `LocalStorageEnabled: true` alone is enough --
+Chronicle will write to its default path (`/var/lib/posit-chronicle/data`) on the pod's ephemeral filesystem, and
+that data is lost on restart.
+
+If you run with `replicas > 1`, or use off-host execution (`backends.kubernetes.enabled` or `launcher.enabled`) on
+a platform other than AWS, the volume must support `ReadWriteMany` so every pod can share the same data. On AWS,
+prefer S3 storage instead so no shared volume is needed.
+
+### Chronicle S3 storage
+
+Alternatively, Chronicle can write directly to an S3 bucket, which avoids the need for shared storage entirely:
+
+```yaml
+config:
+  Chronicle:
+    Enabled: true
+    S3StorageEnabled: true
+    S3Bucket: my-chronicle-bucket
+    S3Region: us-east-1
+```
+
+`S3Bucket` and `S3Region` are both required when `S3StorageEnabled` is set. Chronicle uses the standard AWS
+credential chain to access the bucket; on EKS, [IAM Roles for Service
+Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) can be attached to
+the chart's service account:
+
+```yaml
+rbac:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
+```
+
+Whichever credentials Chronicle uses need `s3:GetObject`, `s3:ListBucket`, `s3:PutObject`, and `s3:DeleteObject`
+permissions on the bucket (and prefix, if `S3Prefix` is set).
 
 For more information on running Chronicle within Connect, see the [Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html).
 
