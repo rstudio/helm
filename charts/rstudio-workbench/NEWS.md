@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.0
+
+- New `chronicle.localConfig` value for overriding the configuration of Chronicle bundled with Workbench, covering settings not exposed as `rserver.conf` keys.
+
 ## 0.21.7
 
 - Bump Workbench version to 2026.08.1
@@ -7,7 +11,6 @@
 ## 0.21.6
 
 - Bump Workbench version to 2026.08.0
-
 
 ## 0.21.5
 

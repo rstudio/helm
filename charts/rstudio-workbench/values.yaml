@@ -92,6 +92,24 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 
+# Settings for the Chronicle bundled with Workbench. Unrelated to the deprecated
+# `chronicleAgent` sidecar below.
+chronicle:
+  # -- Overrides for the bundled Chronicle, rendered as a `chronicle-local.gcfg` and applied
+  #    after the configuration Workbench generates. Keys are Chronicle's own `.gcfg` sections and
+  #    properties
+  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).
+  #    Use it for anything Workbench does not expose as an `rserver.conf` key, such as S3 storage.
+  localConfig: {}
+  # LocalStorage:
+  #   Enabled: false
+  # S3Storage:
+  #   Enabled: true
+  #   Bucket: my-chronicle-bucket
+  #   Region: us-east-2
+  # Logging:
+  #   Level: DEBUG
+
 # DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:

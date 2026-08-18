@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.21.7](https://img.shields.io/badge/Version-0.21.7-informational?style=flat-square) ![AppVersion: 2026.08.1](https://img.shields.io/badge/AppVersion-2026.08.1-informational?style=flat-square)
+![Version: 0.22.0](https://img.shields.io/badge/Version-0.22.0-informational?style=flat-square) ![AppVersion: 2026.08.1](https://img.shields.io/badge/AppVersion-2026.08.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.21.7:
+To install the chart with the release name `my-release` at version 0.22.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.21.7
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.22.0
 ```
 
 To explore other chart versions, look at:
@@ -508,7 +508,8 @@ launcher:
 
 ## Chronicle
 
-Starting with Workbench 2026.06, Chronicle is built into Workbench and can be enabled by setting the following values:
+Starting with Workbench 2026.06, Chronicle is built into Workbench and can be enabled by setting the following values.
+Note that Workbench will not start if `chronicle-enabled` is set without `metrics-enabled`.
 
 ```yaml
 config:
@@ -518,7 +519,86 @@ config:
       metrics-enabled: 1
 ```
 
+### Chronicle storage
+
+By default, Chronicle writes its data under Workbench's shared-storage path
+(`<server-shared-storage-path>/chronicle`, which defaults to `/var/lib/rstudio-server/shared-storage/chronicle`).
+To persist that data across pod restarts, back it with a PersistentVolumeClaim using `sharedStorage`, which this
+chart mounts at `/var/lib/rstudio-server` by default:
+
+```yaml
+sharedStorage:
+  create: true
+
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+```
+
+Without persistent `sharedStorage`, Chronicle's data lives on the pod's ephemeral filesystem and is lost on
+restart. To store Chronicle's data at a different location instead, set `chronicle-storage-location`:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-storage-location: /path/to/chronicle/data
+```
+
+Workbench does not expose an S3 storage option as an `rserver.conf` key; use `chronicle.localConfig` for S3
+storage instead, as described in [Chronicle settings not exposed by Workbench](#chronicle-settings-not-exposed-by-workbench).
+
+To also have Chronicle collect user information, the admin-level Workbench API must be enabled by additionally
+setting `workbench-api-admin-enabled`:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+      workbench-api-admin-enabled: 1
+```
+
 For more information on running Chronicle within Workbench, see the [Workbench Chronicle documentation](https://docs.posit.co/ide/server-pro/admin/auditing_and_monitoring/chronicle.html).
+
+### Chronicle settings not exposed by Workbench
+
+Workbench rewrites Chronicle's configuration file on every start, so it cannot be edited
+directly. Use `chronicle.localConfig` for anything Workbench does not expose as an
+`rserver.conf` key. Chronicle applies it after the configuration Workbench generated, so any key
+set here takes precedence.
+
+Keys are Chronicle's own sections and properties, not `rserver.conf` keys — see the [Chronicle
+configuration
+reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html).
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+
+chronicle:
+  localConfig:
+    LocalStorage:
+      Enabled: false
+    S3Storage:
+      Enabled: true
+      Bucket: my-chronicle-bucket
+      Region: us-east-2
+```
+
+Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
+however the cluster normally does it.
+
+::: {.callout-warning}
+Chronicle refuses to start on a property it does not recognize. Check every property exists in
+the Chronicle version bundled with the Workbench you are deploying.
+:::
 
 ### Deprecated Chronicle Agent
 
@@ -644,6 +724,7 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
 | args | list | the image's built-in arguments | args is the pod container's run arguments. When unset, the container's default arguments are used. |
+| chronicle.localConfig | object | `{}` | Overrides for the bundled Chronicle, rendered as a `chronicle-local.gcfg` and applied    after the configuration Workbench generates. Keys are Chronicle's own `.gcfg` sections and    properties    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).    Use it for anything Workbench does not expose as an `rserver.conf` key, such as S3 storage. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.enabled | DEPRECATED | `false` | Creates a Chronicle agent sidecar container in the pod if true |

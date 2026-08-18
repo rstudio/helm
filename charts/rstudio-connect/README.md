@@ -1,6 +1,6 @@
 # Posit Connect
 
-![Version: 0.20.13](https://img.shields.io/badge/Version-0.20.13-informational?style=flat-square) ![AppVersion: 2026.08.0](https://img.shields.io/badge/AppVersion-2026.08.0-informational?style=flat-square)
+![Version: 0.21.0](https://img.shields.io/badge/Version-0.21.0-informational?style=flat-square) ![AppVersion: 2026.08.0](https://img.shields.io/badge/AppVersion-2026.08.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
@@ -30,11 +30,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.13:
+To install the chart with the release name `my-release` at version 0.21.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.20.13
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.21.0
 ```
 
 To explore other chart versions, look at:
@@ -150,9 +150,38 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 ## Chronicle
 
-Starting with Connect 2026.06, Chronicle is built into Connect and can be enabled by setting the following values:
+Starting with Connect 2026.06, Chronicle is built into Connect and can be enabled by setting `config.Chronicle.Enabled: true`.
+Chronicle also requires Connect's Prometheus metrics endpoint, which this chart enables by default (`prometheus.enabled: true`).
+At least one storage backend -- local or S3 -- must also be configured, or Chronicle will fail to start.
+
+### Chronicle local storage
+
+Chronicle's data directory must be separate from Connect's own data directory (`sharedStorage`), so a dedicated
+volume should be mounted for it. The following example creates a PersistentVolumeClaim via `extraObjects` and
+mounts it into the Connect pod with `pod.volumes` / `pod.volumeMounts`:
 
 ```yaml
+extraObjects:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: my-release-chronicle-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+
+pod:
+  volumes:
+    - name: chronicle-data
+      persistentVolumeClaim:
+        claimName: my-release-chronicle-data
+  volumeMounts:
+    - name: chronicle-data
+      mountPath: /var/lib/posit-chronicle/data
+
 config:
   Chronicle:
     Enabled: true
@@ -160,7 +189,76 @@ config:
     LocalStorageLocation: /var/lib/posit-chronicle/data
 ```
 
+If persistence isn't needed (for example, local testing), `LocalStorageEnabled: true` alone is enough --
+Chronicle will write to its default path (`/var/lib/posit-chronicle/data`) on the pod's ephemeral filesystem, and
+that data is lost on restart.
+
+If you run with `replicas > 1`, or use off-host execution (`backends.kubernetes.enabled` or `launcher.enabled`) on
+a platform other than AWS, the volume must support `ReadWriteMany` so every pod can share the same data. On AWS,
+prefer S3 storage instead so no shared volume is needed.
+
+### Chronicle S3 storage
+
+Alternatively, Chronicle can write directly to an S3 bucket, which avoids the need for shared storage entirely:
+
+```yaml
+config:
+  Chronicle:
+    Enabled: true
+    S3StorageEnabled: true
+    S3Bucket: my-chronicle-bucket
+    S3Region: us-east-1
+```
+
+`S3Bucket` and `S3Region` are both required when `S3StorageEnabled` is set. Chronicle uses the standard AWS
+credential chain to access the bucket; on EKS, [IAM Roles for Service
+Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) can be attached to
+the chart's service account:
+
+```yaml
+rbac:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
+```
+
+Whichever credentials Chronicle uses need `s3:GetObject`, `s3:ListBucket`, `s3:PutObject`, and `s3:DeleteObject`
+permissions on the bucket (and prefix, if `S3Prefix` is set).
+
 For more information on running Chronicle within Connect, see the [Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html).
+
+### Chronicle settings not exposed by Connect
+
+Connect rewrites Chronicle's configuration file on every start, so it cannot be edited directly.
+Use `chronicle.localConfig` for anything `config.Chronicle` does not expose. Chronicle applies it
+after the configuration Connect generates, so any key set here takes precedence.
+
+Keys are Chronicle's own sections and properties, not `config.Chronicle` keys — see the
+[Chronicle configuration
+reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html). Check
+the [Connect configuration
+reference](https://docs.posit.co/connect/admin/appendix/configuration/) for the Chronicle
+settings your Connect version exposes.
+
+```yaml
+chronicle:
+  localConfig:
+    Logging:
+      Level: DEBUG
+```
+
+Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
+however the cluster normally does it
+
+Setting this adds an init container that prepares Chronicle's configuration directory: Chronicle
+creates its socket there as the `posit-chronicle` user, so the directory has to be a writable
+volume rather than a read-only mount. It requires a pod running as root, which is Connect's
+default.
+
+::: {.callout-warning}
+Chronicle refuses to start on a property it does not recognize. Check every property exists in
+the Chronicle version bundled with the Connect you are deploying.
+:::
 
 ### Deprecated Chronicle Agent
 
@@ -312,6 +410,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | backends.kubernetes.defaultResourceServiceBase | object | `{}` | defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's Service in Kubernetes. Conceptually this is similar to a Kustomize base. Connect then applies any required Service configuration on-top of the overlay base to produce a final Service definition. https://kubernetes.io/docs/concepts/services-networking/service/ https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays |
 | backends.kubernetes.enabled | bool | `true` | Whether to enable off-host execution for running content-jobs in remote Kubernetes pods. |
 | backends.kubernetes.namespace | string | `""` | The namespace to launch connect-content jobs into. Uses the Release namespace by default |
+| chronicle.localConfig | object | `{}` | Overrides for Chronicle, rendered as a `chronicle-local.gcfg` and applied after    the configuration Connect generates. Keys are Chronicle's own `.gcfg` sections and    properties    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).    Use it for anything `config.Chronicle` does not expose. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
