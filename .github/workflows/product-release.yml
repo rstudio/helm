@@ -151,8 +151,8 @@ jobs:
           CHART_NAME: ${{ steps.chart.outputs.name }}
           PYTHON_VERSION: ${{ inputs.python_version }}
         run: |
-          yq -i \
-            ".config.Python.Executable = [\"/opt/python/${PYTHON_VERSION}/bin/python\"]" \
+          sed -i -E \
+            "s#^([[:space:]]*- /opt/python/)[0-9]+\.[0-9]+\.[0-9]+(/bin/python)\$#\1${PYTHON_VERSION}\2#" \
             "charts/${CHART_NAME}/values.yaml"
 
       - name: Add NEWS.md entry
