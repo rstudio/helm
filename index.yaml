@@ -870,6 +870,61 @@ entries:
         - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
     apiVersion: v2
     appVersion: 2026.08.0
+    created: "2026-08-18T20:51:29.229671682Z"
+    dependencies:
+    - name: rstudio-library
+      repository: https://helm.rstudio.com
+      version: 0.1.36
+    description: Official Helm chart for Posit Connect
+    digest: bed7e5999ee336611f0a77a10e7e052c6ee4016b7dba8b312e24b3944cae4a0b
+    home: https://posit.co
+    icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - deploy
+    - rstudio
+    - posit
+    maintainers:
+    - email: docker@posit.co
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-connect
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-connect-0.21.0/rstudio-connect-0.21.0.tgz
+    version: 0.21.0
+  - annotations:
+      artifacthub.io/images: |
+        - name: connect
+          image: posit/connect:2026.08.0-ubuntu-24.04
+        - name: connect-content-init
+          image: posit/connect-content-init:2026.08.0
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: About Connect
+          url: https://posit.co/products/enterprise/connect/
+        - name: Connect Documentation
+          url: https://docs.posit.co/connect/
+        - name: Posit Helm Documentation
+          url: https://docs.posit.co/helm
+        - name: Container Images
+          url: https://github.com/posit-dev/images-connect
+        - name: Posit Community Forum
+          url: https://forum.posit.co/c/posit-professional-hosted
+        - name: GitHub Discussions
+          url: https://github.com/posit-dev/images/discussions
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
+    apiVersion: v2
+    appVersion: 2026.08.0
     created: "2026-08-12T23:09:34.090786879Z"
     dependencies:
     - name: rstudio-library
@@ -14845,6 +14900,64 @@ entries:
         - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
     apiVersion: v2
     appVersion: 2026.08.1
+    created: "2026-08-18T20:51:29.438769018Z"
+    dependencies:
+    - name: rstudio-library
+      repository: https://helm.rstudio.com
+      version: 0.1.35
+    description: Official Helm chart for Posit Workbench
+    digest: eea2cd206097e130a05a244ada7610d4b762d9832ee6e7442db220252ef1aa05
+    home: https://posit.co
+    icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - ide
+    - editor
+    - jupyter
+    - vscode
+    - rstudio
+    - posit
+    maintainers:
+    - email: docker@posit.co
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-workbench
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.22.0/rstudio-workbench-0.22.0.tgz
+    version: 0.22.0
+  - annotations:
+      artifacthub.io/images: |
+        - name: workbench
+          image: posit/workbench:2026.08.1-ubuntu-24.04
+        - name: workbench-session-init
+          image: posit/workbench-session-init:2026.08.1-ubuntu-24.04
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: About Workbench
+          url: https://posit.co/products/enterprise/workbench/
+        - name: Workbench Documentation
+          url: https://docs.posit.co/ide/server-pro/
+        - name: Posit Helm Documentation
+          url: https://docs.posit.co/helm
+        - name: Container Images
+          url: https://github.com/posit-dev/images-workbench
+        - name: Posit Community Forum
+          url: https://forum.posit.co/c/posit-professional-hosted
+        - name: GitHub Discussions
+          url: https://github.com/posit-dev/images/discussions
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-pm
+    apiVersion: v2
+    appVersion: 2026.08.1
     created: "2026-08-18T18:15:49.001456235Z"
     dependencies:
     - name: rstudio-library
@@ -22135,4 +22248,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2026-08-18T18:15:49.002659859Z"
+generated: "2026-08-18T20:51:29.439885345Z"
