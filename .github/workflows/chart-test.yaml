@@ -53,7 +53,8 @@ jobs:
         if: github.ref == 'refs/heads/main' && (steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure')
         uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c  # v3.0.3
         with:
-          payload-delimiter: "_"
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
             {
               "blocks": [
@@ -66,9 +67,6 @@ jobs:
                 }
               ]
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Fail the workflow if failed linting
         if: steps.ct-lint.outcome == 'failure' || steps.ct-lint-all.outcome == 'failure'
@@ -117,7 +115,8 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.unittest.outcome == 'failure'
         uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c  # v3.0.3
         with:
-          payload-delimiter: "_"
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
             {
               "blocks": [
@@ -130,9 +129,6 @@ jobs:
                 }
               ]
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Fail the workflow if failed unittest
         if: steps.unittest.outcome == 'failure'
@@ -246,7 +242,8 @@ jobs:
         if: github.ref == 'refs/heads/main' && (steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure')
         uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c  # v3.0.3
         with:
-          payload-delimiter: "_"
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
             {
               "blocks": [
@@ -259,9 +256,6 @@ jobs:
                 }
               ]
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Fail the workflow if failed installs
         if: steps.ct-install.outcome == 'failure' || steps.ct-install-all.outcome == 'failure' || steps.ct-install-fork.outcome == 'failure' || steps.ct-install-all-fork.outcome == 'failure'
