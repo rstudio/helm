@@ -11,10 +11,13 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Set up Helm
@@ -74,10 +77,13 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Set up Helm
@@ -149,10 +155,13 @@ jobs:
   install:
     runs-on: ubuntu-latest-4x
     needs: [detect-fork]
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Set up Helm
@@ -263,10 +272,13 @@ jobs:
 
   check-versions-connect:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Set up Helm

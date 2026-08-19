@@ -5,10 +5,14 @@ on:
 jobs:
   rebuild:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
+          persist-credentials: false
           ref: 'gh-pages'
           fetch-depth: 0
 
@@ -55,9 +59,12 @@ jobs:
           title: Rebuild index.yaml
 
       - name: Check outputs
+        env:
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
         run: |
-          echo "Created Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Created Pull Request Number - $PR_NUMBER"
+          echo "Pull Request URL - $PR_URL"
 
       - name: Notify Slack of index.yaml rebuild failure
         if: failure()

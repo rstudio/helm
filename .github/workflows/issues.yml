@@ -11,23 +11,26 @@ on:
 jobs:
   issues:
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Map label to project URL
         id: project-url
+        env:
+          LABEL_NAME: ${{ github.event.label.name }}
         run: |
-          if [ "${{ github.event.label.name }}" = "team: connect" ]; then
+          if [ "$LABEL_NAME" = "team: connect" ]; then
             echo "PROJECT=https://github.com/orgs/posit-dev/projects/23" >> "$GITHUB_OUTPUT"
             echo "ORG=posit-dev" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: workbench" ]; then
+          elif [ "$LABEL_NAME" = "team: workbench" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/92" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: package manager" ]; then
+          elif [ "$LABEL_NAME" = "team: package manager" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/48" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: chronicle" ]; then
+          elif [ "$LABEL_NAME" = "team: chronicle" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/134" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: launcher" ]; then
+          elif [ "$LABEL_NAME" = "team: launcher" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/222" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
           else
