@@ -100,6 +100,19 @@ jobs:
           CURRENT=$(yq '.appVersion' "charts/${CHART_NAME}/Chart.yaml")
           echo "app-version=$CURRENT" >> "$GITHUB_OUTPUT"
 
+      - name: Guard against appVersion downgrade
+        env:
+          CURRENT: ${{ steps.current.outputs.app-version }}
+          NEW: ${{ steps.app-version.outputs.value }}
+        run: |
+          # sort -V compares dot-separated numbers the way calver needs
+          # (e.g. 2026.08.9 < 2026.08.10, not true under plain string sort).
+          OLDEST=$(printf '%s\n%s\n' "$CURRENT" "$NEW" | sort -V | head -n1)
+          if [ "$OLDEST" = "$NEW" ] && [ "$NEW" != "$CURRENT" ]; then
+            echo "::error::New appVersion ($NEW) is older than current ($CURRENT); refusing to downgrade"
+            exit 1
+          fi
+
       - name: Skip (already up to date)
         if: steps.current.outputs.app-version == steps.app-version.outputs.value
         env:
