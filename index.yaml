@@ -10503,6 +10503,63 @@ entries:
   - annotations:
       artifacthub.io/images: |
         - name: package-manager
+          image: posit/package-manager:2026.09.0-ubuntu-24.04
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: About Package Manager
+          url: https://posit.co/products/enterprise/package-manager/
+        - name: Package Manager Documentation
+          url: https://docs.posit.co/rspm/
+        - name: Posit Helm Documentation
+          url: https://docs.posit.co/helm
+        - name: Container Images
+          url: https://github.com/posit-dev/images-package-manager
+        - name: Posit Community Forum
+          url: https://forum.posit.co/c/posit-professional-hosted
+        - name: GitHub Discussions
+          url: https://github.com/posit-dev/images/discussions
+        - name: About Posit Team
+          url: https://posit.co/products/enterprise/team/
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-connect
+        - url: https://artifacthub.io/packages/helm/rstudio/rstudio-workbench
+    apiVersion: v2
+    appVersion: 2026.09.0
+    created: "2026-09-09T20:10:27.260413656Z"
+    dependencies:
+    - name: rstudio-library
+      repository: https://helm.rstudio.com
+      version: 0.1.31
+    description: Official Helm chart for Posit Package Manager
+    digest: 565e70113d4189ff7cc77ffdebf936f9a0a4b88a5b14d0a7b7d241e6f6dfd379
+    home: https://posit.co
+    icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
+    keywords:
+    - data science
+    - machine learning
+    - r
+    - rstats
+    - python
+    - package
+    - cran
+    - pypi
+    - pip
+    - bioconductor
+    - rstudio
+    - posit
+    maintainers:
+    - email: docker@posit.co
+      name: sol-eng
+      url: https://github.com/sol-eng
+    name: rstudio-pm
+    sources:
+    - https://github.com/rstudio/helm
+    urls:
+    - https://github.com/rstudio/helm/releases/download/rstudio-pm-0.20.5/rstudio-pm-0.20.5.tgz
+    version: 0.20.5
+  - annotations:
+      artifacthub.io/images: |
+        - name: package-manager
           image: posit/package-manager:2026.08.0-ubuntu-24.04
       artifacthub.io/license: MIT
       artifacthub.io/links: |
@@ -22361,4 +22418,4 @@ entries:
     urls:
     - https://github.com/rstudio/helm/releases/download/rstudio-workbench-0.4.0-rc09/rstudio-workbench-0.4.0-rc09.tgz
     version: 0.4.0-rc09
-generated: "2026-08-27T20:15:21.221382422Z"
+generated: "2026-09-09T20:10:27.261064211Z"
