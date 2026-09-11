@@ -18,3 +18,5 @@ _publish.yml
 
 # helm packages
 *.tgz
+
+**/*.quarto_ipynb
