@@ -15,6 +15,21 @@
 > If you are upgrading from an earlier version, read the
 > [image migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) first.
 
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
+
 ## Usage
 
 1. Install [Helm](https://helm.sh). Please refer to Helm's [documentation](https://helm.sh/docs/) for more information on getting started.
