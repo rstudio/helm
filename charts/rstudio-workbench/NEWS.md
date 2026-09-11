@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.2
+
+- Bump Workbench version to 2026.09.0
+
 ## 0.22.1
 
 - Bump Workbench version to 2026.08.2
