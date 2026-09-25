@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.23.0
+
+- Config files whose behavior depends on the order of their sections or entries can now be written
+  as a list, putting `- ` in front of each section or entry, and are rendered in the order written.
+  This covers `config.server.profiles`, `config.server.launcher\.*\.resources\.conf`,
+  `config.profiles.launcher\.*\.profiles\.conf`, and `config.session.repos\.conf`:
+
+  ```yaml
+  config:
+    server:
+      profiles:
+        - "*":
+            max-memory-mb: 1024
+        - "@analysts":
+            max-memory-mb: 4096
+    session:
+      repos.conf:
+        - Internal: https://pkgs.example.com/internal
+        - CRAN: https://packagemanager.posit.co/cran/latest
+  ```
+
+- **DEPRECATED**: writing those files as a map. A map is rendered in alphabetical order, which
+  silently changes what these files do, and nothing in `values.yaml` shows it. The map form still
+  works and now prints a `WARNING` in `NOTES.txt` once a file holds more than one section or entry.
+  It will be removed in a future chart release. The raw string form (`profiles: |`) keeps the
+  written order and is unaffected.
+
 ## 0.22.2
 
 - Bump Workbench version to 2026.09.0

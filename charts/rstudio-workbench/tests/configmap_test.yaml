@@ -458,3 +458,181 @@ tests:
       - matchRegex:
           path: data["rserver.conf"]
           pattern: "(?m)^user-provisioning-enabled=0$"
+
+  # -- Ordered (list form) config files. See https://github.com/rstudio/helm/issues/944
+  - it: should render config.server order-sensitive files in the order written
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles:
+            - jsmith:
+                max-memory-mb: 8192
+            - "12345":
+                max-memory-mb: 8192
+            - "@contractors":
+                max-memory-mb: 2048
+            - "@analysts":
+                max-memory-mb: 4096
+            - "*":
+                max-memory-mb: 1024
+          launcher.kubernetes.resources.conf:
+            - small:
+                name: Small
+                cpus: 1
+            - large:
+                name: Large
+                cpus: 8
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [12345]
+            max-memory-mb=8192
+
+            [@contractors]
+            max-memory-mb=2048
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [*]
+            max-memory-mb=1024
+      - equal:
+          path: data["launcher.kubernetes.resources.conf"]
+          value: |
+            [small]
+            cpus=1
+            name=Small
+
+            [large]
+            cpus=8
+            name=Large
+
+  - it: should sort config.server order-sensitive files by name when written as a map
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles:
+            jsmith:
+              max-memory-mb: 8192
+            "@analysts":
+              max-memory-mb: 4096
+            "*":
+              max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-memory-mb=1024
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [jsmith]
+            max-memory-mb=8192
+
+  - it: should render a raw string config.server file verbatim
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should render config.session repos.conf in the order written
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://packagemanager.posit.co/cran/latest
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://packagemanager.posit.co/cran/latest
+
+  - it: should keep rendering r-versions records separated by blank lines
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          r-versions:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+            - Path: /opt/R/4.0.2
+              Label: Old
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Label=Latest
+            Path=/opt/R/4.4.1
+
+            Label=Old
+            Path=/opt/R/4.0.2
+
+  - it: should render config.profiles sections in the order written, merging the default everyone section
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        useTemplates: false
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - jsmith:
+                max-cpus: 8
+            - "@analysts":
+                max-cpus: 4
+            - "*":
+                max-cpus: 1
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[jsmith\\]\\nmax-cpus=8\\n\\n\\[@analysts\\]\\nmax-cpus=4\\n\\n\\[\\*\\]\\n"
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[\\*\\]\\nallow-unknown-images=1\\ncontainer-images=posit/workbench-session:.*\\ndefault-container-image=posit/workbench-session:.*\\njob-json-overrides=.*\\nmax-cpus=1"
+
+  - it: should prepend an everyone section to ordered config.profiles that omits one
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        useTemplates: false
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - jsmith:
+                max-cpus: 8
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[\\*\\]\\nallow-unknown-images=1\\ncontainer-images=.*\\ndefault-container-image=.*\\njob-json-overrides=.*\\n\\n\\[jsmith\\]\\nmax-cpus=8"

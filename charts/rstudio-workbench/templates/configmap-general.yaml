@@ -151,8 +151,26 @@ data:
 {{- end }}
 {{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
-{{- $profilesConfig := .Values.config.profiles }}
-{{- $profilesConfig = mergeOverwrite (dict "launcher.kubernetes.profiles.conf" $defaultProfilesConfig) $profilesConfig }}
+{{- $profilesConfig := .Values.config.profiles | deepCopy }}
+{{- /* Apply the default [*] session image settings to launcher.kubernetes.profiles.conf. When it is
+       written as an ordered list, mergeOverwrite would drop the defaults along with the map, so
+       merge them into the [*] entry in place instead (prepending one if the admin wrote none). */}}
+{{- $writtenProfiles := get $profilesConfig "launcher.kubernetes.profiles.conf" }}
+{{- if kindIs "slice" $writtenProfiles }}
+  {{- $hasEveryone := false }}
+  {{- range $item := $writtenProfiles }}
+    {{- if hasKey $item "*" }}
+      {{- $hasEveryone = true }}
+      {{- $_ := set $item "*" (mergeOverwrite (deepCopy $defaultProfiles) (get $item "*")) }}
+    {{- end }}
+  {{- end }}
+  {{- if not $hasEveryone }}
+    {{- $writtenProfiles = prepend $writtenProfiles (dict "*" $defaultProfiles) }}
+  {{- end }}
+  {{- $_ := set $profilesConfig "launcher.kubernetes.profiles.conf" $writtenProfiles }}
+{{- else }}
+  {{- $profilesConfig = mergeOverwrite (dict "launcher.kubernetes.profiles.conf" $defaultProfilesConfig) $profilesConfig }}
+{{- end }}
 {{- $useNewerOverrides := and (not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf")) (not .Values.launcher.useTemplates) }}
 {{- $jobJsonFilePath := "/mnt/job-json-overrides-new/" }}
 {{- /* $defaultOverrides should be empty from above if we are using templates */ -}}

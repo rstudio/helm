@@ -22,6 +22,51 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 ```
 {{- end }}
 
+{{- /* Files whose behavior depends on the order of their sections or entries. Rendering these
+       from a map sorts them by name, silently changing what they do, so the map form is
+       deprecated in favor of the ordered list form. A raw string keeps the written order too,
+       so only the map form is flagged, and only once it holds more than one section or entry --
+       below that there is no order to lose. */}}
+{{- $unordered := list }}
+{{- range $file, $contents := .Values.config.server }}
+  {{- if and (kindIs "map" $contents) (gt (len (keys $contents)) 1) (or (eq $file "profiles") (regexMatch "^launcher\\..+\\.resources\\.conf$" $file)) }}
+    {{- $unordered = append $unordered (printf "config.server.%s" ($file | replace "." "\\.")) }}
+  {{- end }}
+{{- end }}
+{{- range $file, $contents := .Values.config.profiles }}
+  {{- if and (kindIs "map" $contents) (gt (len (keys $contents)) 1) (regexMatch "^launcher\\..+\\.profiles\\.conf$" $file) }}
+    {{- $unordered = append $unordered (printf "config.profiles.%s" ($file | replace "." "\\.")) }}
+  {{- end }}
+{{- end }}
+{{- range $file, $contents := .Values.config.session }}
+  {{- if and (kindIs "map" $contents) (gt (len (keys $contents)) 1) (eq $file "repos.conf") }}
+    {{- $unordered = append $unordered (printf "config.session.%s" ($file | replace "." "\\.")) }}
+  {{- end }}
+{{- end }}
+{{- if $unordered }}
+
+WARNING: the following configuration files are written as maps, which does not keep the order you wrote them in
+{{- range $unordered | sortAlpha }}
+  - `.Values.{{ . }}`
+{{- end }}
+  Workbench reads these files in order, so sorting their sections by name changes how they behave.
+  Write them as a list instead, putting `- ` in front of each section or entry:
+
+    config:
+      server:
+        profiles:
+          - "*":
+              max-memory-mb: 1024
+          - "@analysts":
+              max-memory-mb: 4096
+      session:
+        repos.conf:
+          - Internal: https://pkgs.example.com/internal
+          - CRAN: https://packagemanager.posit.co/cran/latest
+
+  The map form still works for now, but will be removed in a future chart release.
+{{- end }}
+
 {{- if hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
 
 WARNING: `.Values.config.server.launcher\.kubernetes\.profiles\.conf` is deprecated
@@ -41,8 +86,10 @@ Please consider removing this configuration value.
 
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
   {{- if hasKey .Values.config.profiles "launcher.kubernetes.profiles.conf" }}
-    {{- range $k,$v :=  (get .Values.config.profiles "launcher.kubernetes.profiles.conf") }}
-      {{- if hasKey $v "job-json-overrides" }}
+    {{- $normalized := dict }}
+    {{- include "rstudio-library.config.entries" (dict "data" (get .Values.config.profiles "launcher.kubernetes.profiles.conf") "result" $normalized) }}
+    {{- range $entry := $normalized.entries }}
+      {{- if hasKey $entry.config "job-json-overrides" }}
         {{- fail "\n\n`profiles` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`.\n\nNote: `launcher.useTemplates=true` was made the default in chart version 0.9.0" }}
       {{- end }}
     {{- end }}

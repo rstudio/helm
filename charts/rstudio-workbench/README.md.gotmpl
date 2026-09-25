@@ -286,14 +286,32 @@ pip can be configured with `config.session.pip.conf`:
 
 #### R repositories
 
-R package repositories can be configured with `config.session.repos.conf`:
+R package repositories can be configured with `config.session.repos.conf`. R reads the file in
+order and uses that order to break ties when a package version is in more than one repository, so
+write the repositories as a list, putting `- ` in front of each one:
 
 ```yaml
 config:
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      - Internal: https://pkgs.example.com/internal
+      - CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
 ```
+
+Becomes:
+
+_/etc/rstudio/repos.conf_
+
+```ini
+Internal=https://pkgs.example.com/internal
+CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+```
+
+:::{.callout-warning}
+Writing `repos.conf` as a map is deprecated and will be removed in a future chart release. A map
+does not keep the order you wrote it in: the chart renders map keys alphabetically, so an internal
+repository can't be put ahead of CRAN.
+:::
 
 For more information about configuring CRAN repositories in Workbench, see the [Posit Workbench Administrator Guide's - Package Installation > CRAN repositories](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories) section.
 
@@ -356,6 +374,16 @@ Sections define whether a set of configurations is applied to a user's jobs base
 
 The product reads configuration from top to bottom and "last-in-wins" for a given configuration value.
 
+Because these files are read in order, write their sections as a list, putting `- ` in front of
+each section header. A map does not keep the order you wrote it in: the chart renders map keys
+alphabetically, so, for example, a user named `12345` would lose their own settings to every group
+they belong to. Writing an order-sensitive file as a map is deprecated and will be removed in a
+future chart release.
+
+This applies to `/etc/rstudio/profiles`, `launcher.*.profiles.conf`, and
+`launcher.*.resources.conf` (where the session launcher lists resource profiles in file order and
+pre-selects the first one).
+
 ### `/etc/rstudio/profiles`
 
 The `/etc/rstudio/profiles` file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the [Posit Workbench Administrator Guide - User and Group Profiles](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html) page for more information.
@@ -366,9 +394,11 @@ In the `values.yaml`, define the content of `/etc/rstudio/profiles` in `config.s
 config:
   server:
     profiles:
-      "*":
-        session-limit: 5
-        session-timeout-minutes: 60
+      - "*":
+          session-limit: 5
+          session-timeout-minutes: 60
+      - "@analysts":
+          session-limit: 10
 ```
 
 Becomes:
@@ -379,6 +409,9 @@ _/etc/rstudio/profiles_
 [*]
 session-limit=5
 session-timeout-minutes=60
+
+[@analysts]
+session-limit=10
 ```
 
 ### `/etc/rstudio/launcher.kubernetes.profiles.conf`
@@ -401,14 +434,14 @@ For example:
 config:
   profiles:
     launcher.kubernetes.profiles.conf:
-      "*":
-        some-key:
-          - value1
-          - value2
-      myuser:
-        some-key:
-          - value4
-          - value5
+      - "*":
+          some-key:
+            - value1
+            - value2
+      - myuser:
+          some-key:
+            - value4
+            - value5
 ```
 
 Becomes:
