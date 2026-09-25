@@ -475,3 +475,53 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "Entries of 'repos.conf' written as a list must each be a map"
+
+  - it: should render many options within an ordered section
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "@analysts":
+                max-memory-mb: 4096
+                max-cpus: 4
+                session-limit: 10
+            - "*":
+                max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [@analysts]
+            max-cpus=4
+            max-memory-mb=4096
+            session-limit=10
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should render a list item holding several sections as sections, not as a record
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            # "@contractors" is missing its own "- ", so it lands in the same item
+            - "@analysts":
+                max-cpus: 4
+              "@contractors":
+                max-cpus: 2
+            - "*":
+                max-cpus: 1
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [@analysts]
+            max-cpus=4
+
+            [@contractors]
+            max-cpus=2
+
+            [*]
+            max-cpus=1

@@ -6,8 +6,9 @@
   renders them in the order written rather than sorted by name. A single-entry item becomes a
   `[name]` section when its value is a map, and a `name=value` line when its value is a scalar.
   A list item with more than one key still renders as a blank-line separated record, which is what
-  `/etc/rstudio/r-versions` expects. Previously a list of single-entry maps rendered broken lines
-  such as `*=map[max-memory-mb:1024]`, with no section headers.
+  `/etc/rstudio/r-versions` expects, unless one of its keys names a section - most often a list item
+  that is missing its own `- `. Previously a list of single-entry maps rendered broken lines such as
+  `*=map[max-memory-mb:1024]`, with no section headers.
 - `rstudio-library.profiles.ini.advanced`, `rstudio-library.profiles.ini.singleFile`, and
   `rstudio-library.profiles.json-from-overrides-config` accept the same ordered list form for a
   profiles file's sections, including its `job-json-overrides` handling.

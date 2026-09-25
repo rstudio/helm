@@ -108,10 +108,12 @@
       depends on the order of their sections or entries should use the list form
     - a list, rendered in the order it was written. Each item is a map, and is
       rendered as either:
-        - one ordered entry, when the item has a single key: a [name] section if
-          its value is a map, otherwise a name=value line
-        - one record of fields followed by a blank line, when the item has more
-          than one key (the shape /etc/rstudio/r-versions expects)
+        - one record of fields followed by a blank line, when the item holds more
+          than one key and none of them name a section (the shape
+          /etc/rstudio/r-versions expects)
+        - otherwise, one ordered entry per key: a [name] section if its value is a
+          map, and a name=value line if not. Keys within an item are still sorted,
+          so write one key per item to control the order
 */ -}}
 {{- define "rstudio-library.config.ini" -}}
 {{- range $file, $keys := . -}}
@@ -123,13 +125,24 @@
   {{- if not (kindIs "map" $item) }}
     {{- fail (print "\n\nEntries of '" $file "' written as a list must each be a map. Instead got '" (kindOf $item) "' : '" (print $item) "'") }}
   {{- end }}
-  {{- if eq (len (keys $item)) 1 }}
-    {{- include "rstudio-library.config.ini.entry" $item }}
-  {{- else }}
+  {{- /* A map value names a section, so an item holding one is a group of sections rather than a
+         record of fields -- most often a list item that is missing its own "- ". Rendering it as
+         a record would silently emit lines like "name=map[key:value]". */ -}}
+  {{- $isRecord := gt (len (keys $item)) 1 }}
+  {{- range $key, $val := $item }}
+    {{- if kindIs "map" $val }}
+      {{- $isRecord = false }}
+    {{- end }}
+  {{- end }}
+  {{- if $isRecord }}
     {{- range $key, $val := $item }}
       {{- printf "%s=%s" (toString $key) (toString $val) | nindent 2 }}
     {{- end }}
     {{- printf "" | nindent 0 }}
+  {{- else }}
+    {{- range $key, $val := $item }}
+      {{- include "rstudio-library.config.ini.entry" (dict (toString $key) $val) }}
+    {{- end }}
   {{- end }}
 {{- end }}
 {{- else }}
