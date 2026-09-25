@@ -380,3 +380,36 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should fail when one profiles list entry holds several sections
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "@analysts":
+                  default-cpus: 4
+                "@contractors":
+                  default-cpus: 2
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "An entry written as a list holds 2 keys: @analysts, @contractors"
+
+  - it: should still comma-join a list inside a profiles section
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "*":
+                  some-key:
+                    - value1
+                    - value2
+          jobJsonDefaults: []
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [*]
+            some-key=value1,value2

@@ -474,7 +474,7 @@ tests:
             - https://packagemanager.posit.co/cran/latest
     asserts:
       - failedTemplate:
-          errorPattern: "Entries of 'repos.conf' written as a list must each be a map"
+          errorPattern: "entry 1 of 'repos.conf' must be a map of a name and its value"
 
   - it: should render many options within an ordered section
     set:
@@ -500,13 +500,13 @@ tests:
             [*]
             max-memory-mb=1024
 
-  - it: should render a list item holding several sections as sections, not as a record
+  - it: should fail when one list entry holds several sections
     set:
       testConfig:
         ini:
           filename: profiles
           config:
-            # "@contractors" is missing its own "- ", so it lands in the same item
+            # "@contractors" is missing its own "- ", so it lands in the same entry
             - "@analysts":
                 max-cpus: 4
               "@contractors":
@@ -514,14 +514,115 @@ tests:
             - "*":
                 max-cpus: 1
     asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'profiles' holds more than one key: @analysts, @contractors"
+
+  - it: should fail when a list entry mixes a section and a bare value
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "@analysts":
+                max-cpus: 4
+              some-key: some-value
+    asserts:
+      - failedTemplate:
+          errorPattern: "These name sections: @analysts"
+
+  - it: should fail when a list entry is empty
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'profiles' is empty"
+
+  - it: should still render a multi-field record, which names no section
+    set:
+      testConfig:
+        ini:
+          filename: r-versions
+          config:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+              Module: r/4.4.1
+    asserts:
       - equal:
-          path: data["profiles"]
+          path: data["r-versions"]
           value: |
-            [@analysts]
-            max-cpus=4
+            Label=Latest
+            Module=r/4.4.1
+            Path=/opt/R/4.4.1
 
-            [@contractors]
-            max-cpus=2
+  - it: should fail when an option inside a section is a map
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            section1: null
+            "*":
+              limits:
+                cpu: 1
+                mem: 2
+    asserts:
+      - failedTemplate:
+          errorPattern: "'limits' in section \\[\\*\\] of 'profiles' is a map"
 
-            [*]
-            max-cpus=1
+  - it: should fail when an option inside a section is a list
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            section1: null
+            "*":
+              container-images:
+                - imageA
+                - imageB
+    asserts:
+      - failedTemplate:
+          errorPattern: "'container-images' in section \\[\\*\\] of 'profiles' is a list"
+      - failedTemplate:
+          errorPattern: "write them as one value"
+
+  - it: should still allow a list of maps at the top level of a file
+    set:
+      testConfig:
+        ini:
+          filename: launcher.conf
+          config:
+            section1: null
+            cluster:
+              - name: Cluster1
+              - name: Cluster2
+    asserts:
+      - equal:
+          path: data["launcher.conf"]
+          value: |
+            [cluster]
+            name=Cluster1
+
+            [cluster]
+            name=Cluster2
+
+  - it: should still allow a list of scalars at the top level of a file
+    set:
+      testConfig:
+        ini:
+          filename: some.conf
+          config:
+            section1: null
+            repeated-key:
+              - a
+              - b
+    asserts:
+      - equal:
+          path: data["some.conf"]
+          value: |
+            repeated-key=a
+            repeated-key=b
