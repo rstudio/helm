@@ -43,20 +43,51 @@
 {{- end }}
 {{- end }}
 
-{{- define "rstudio-library.config.ini" -}}
-{{- range $file, $keys := . -}}
-{{- printf "%s: |" $file | nindent 0 }}
-{{- if kindIs "string" $keys }}
-  {{- $keys | nindent 2 }}
+{{- /*
+  Normalizes config-file contents into an ordered list of entries.
+
+  Accepts either form:
+    - a map of {name: value}, which Go templates iterate in sorted key order
+    - a list of single-entry maps, which is iterated in the order it was written
+
+  Templates cannot return values, so the caller passes a dict to write into:
+    data: the contents to normalize
+    result: a dict, which this sets an "entries" key on. Each entry is a dict
+            with a "name" (string) and a "config" (the value written under it)
+*/ -}}
+{{- define "rstudio-library.config.entries" -}}
+{{- $entries := list }}
+{{- $data := default (dict) .data }}
+{{- if kindIs "slice" $data }}
+  {{- range $item := $data }}
+    {{- if not (kindIs "map" $item) }}
+      {{- fail (print "\n\nEntries written as a list must each be a map of a single name and its value. Instead got '" (kindOf $item) "' : '" (print $item) "'") }}
+    {{- end }}
+    {{- range $name, $config := $item }}
+      {{- $entries = append $entries (dict "name" (toString $name) "config" $config) }}
+    {{- end }}
+  {{- end }}
 {{- else }}
-{{- range $parent, $child := $keys -}}
-  {{/* ini files may have multiple sections with the same name */}}
+  {{- range $name, $config := $data }}
+    {{- $entries = append $entries (dict "name" (toString $name) "config" $config) }}
+  {{- end }}
+{{- end }}
+{{- $_ := set .result "entries" $entries }}
+{{- end -}}
+
+{{- /*
+  Renders a single ini entry, passed as a dict of {name: value}:
+    - a map value becomes a [name] section followed by its key=value pairs
+    - a list of maps becomes repeated [name] sections (ini files may have more
+      than one section with the same name)
+    - anything else becomes a bare name=value line
+*/ -}}
+{{- define "rstudio-library.config.ini.entry" -}}
+{{- range $parent, $child := . -}}
   {{- $sections := ( (kindIs "slice" $child) | ternary $child ( list $child ))}}
   {{- range $i, $section := $sections -}}
     {{- if kindIs "map" $section }}
-      {{- if not ( kindIs "slice" $keys ) -}}
-        {{- printf "[%s]" (toString $parent) | nindent 2 }}
-      {{- end }}
+      {{- printf "[%s]" (toString $parent) | nindent 2 }}
       {{- range $key, $val := $section }}
         {{- printf "%s=%s" (toString $key) (toString $val) | nindent 2 }}
       {{- end }}
@@ -65,6 +96,45 @@
       {{- printf "%s=%s" (toString $parent) (toString $section) | nindent 2 }}
     {{- end }}
   {{- end }}
+{{- end }}
+{{- end }}
+
+{{- /*
+  Takes a map of {filename: contents} and renders each as an ini file.
+
+  Contents may be:
+    - a raw string, rendered verbatim
+    - a map of {name: value}, rendered in sorted key order. Files whose behavior
+      depends on the order of their sections or entries should use the list form
+    - a list, rendered in the order it was written. Each item is a map, and is
+      rendered as either:
+        - one ordered entry, when the item has a single key: a [name] section if
+          its value is a map, otherwise a name=value line
+        - one record of fields followed by a blank line, when the item has more
+          than one key (the shape /etc/rstudio/r-versions expects)
+*/ -}}
+{{- define "rstudio-library.config.ini" -}}
+{{- range $file, $keys := . -}}
+{{- printf "%s: |" $file | nindent 0 }}
+{{- if kindIs "string" $keys }}
+  {{- $keys | nindent 2 }}
+{{- else if kindIs "slice" $keys }}
+{{- range $item := $keys -}}
+  {{- if not (kindIs "map" $item) }}
+    {{- fail (print "\n\nEntries of '" $file "' written as a list must each be a map. Instead got '" (kindOf $item) "' : '" (print $item) "'") }}
+  {{- end }}
+  {{- if eq (len (keys $item)) 1 }}
+    {{- include "rstudio-library.config.ini.entry" $item }}
+  {{- else }}
+    {{- range $key, $val := $item }}
+      {{- printf "%s=%s" (toString $key) (toString $val) | nindent 2 }}
+    {{- end }}
+    {{- printf "" | nindent 0 }}
+  {{- end }}
+{{- end }}
+{{- else }}
+{{- range $parent, $child := $keys -}}
+  {{- include "rstudio-library.config.ini.entry" (dict (toString $parent) $child) }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.38
+
+- `rstudio-library.config.ini` now accepts a file's contents as a list of single-entry maps, and
+  renders them in the order written rather than sorted by name. A single-entry item becomes a
+  `[name]` section when its value is a map, and a `name=value` line when its value is a scalar.
+  A list item with more than one key still renders as a blank-line separated record, which is what
+  `/etc/rstudio/r-versions` expects. Previously a list of single-entry maps rendered broken lines
+  such as `*=map[max-memory-mb:1024]`, with no section headers.
+- `rstudio-library.profiles.ini.advanced`, `rstudio-library.profiles.ini.singleFile`, and
+  `rstudio-library.profiles.json-from-overrides-config` accept the same ordered list form for a
+  profiles file's sections, including its `job-json-overrides` handling.
+- New `rstudio-library.config.entries` helper, which normalizes either form into an ordered list of
+  entries.
+
 ## 0.1.37
 
 - **DEPRECATED**: Chronicle agent helpers are deprecated.

@@ -1,6 +1,6 @@
 dependencies:
 - name: rstudio-library
   repository: file://../../charts/rstudio-library
-  version: 0.1.37
-digest: sha256:d2c41673ebb1b0dfb2c5548e34d62727906636a7ae40a18fbf35cc5fedb53351
-generated: "2026-06-18T14:27:05.729695-04:00"
+  version: 0.1.38
+digest: sha256:c4509e159bcf8fdb934a720ebc558bafad7db2687414568b81c76183563b6e9d
+generated: "2026-09-24T17:46:06.957171-07:00"

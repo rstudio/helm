@@ -295,3 +295,183 @@ tests:
       - matchRegex:
           path: data["empty.ini"]
           pattern: "\\[empty_section\\]"
+
+  # ========================================
+  # INI Ordered List Form Tests
+  # ========================================
+  - it: should render ini sections from a list in the order written
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - jsmith:
+                max-memory-mb: 8192
+            - "12345":
+                max-memory-mb: 8192
+            - "@contractors":
+                max-memory-mb: 2048
+            - "@analysts":
+                max-memory-mb: 4096
+            - "*":
+                max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [12345]
+            max-memory-mb=8192
+
+            [@contractors]
+            max-memory-mb=2048
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should render sectionless ini entries from a list in the order written
+    set:
+      testConfig:
+        ini:
+          filename: repos.conf
+          config:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://packagemanager.posit.co/cran/latest
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://packagemanager.posit.co/cran/latest
+
+  - it: should render resource profiles from a list in the order written
+    set:
+      testConfig:
+        ini:
+          filename: launcher.kubernetes.resources.conf
+          config:
+            - small:
+                name: Small
+                cpus: 1
+            - large:
+                name: Large
+                cpus: 8
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.resources.conf"]
+          value: |
+            [small]
+            cpus=1
+            name=Small
+
+            [large]
+            cpus=8
+            name=Large
+
+  - it: should render multi-field list items as blank-line separated records
+    set:
+      testConfig:
+        ini:
+          filename: r-versions
+          config:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+            - Path: /opt/R/4.0.2
+              Label: Old
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Label=Latest
+            Path=/opt/R/4.4.1
+
+            Label=Old
+            Path=/opt/R/4.0.2
+
+  - it: should sort ini sections by name when written as a map
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            # the test chart's values.yaml default, cleared so the map is exactly what is written
+            section1: null
+            jsmith:
+              max-memory-mb: 8192
+            "@analysts":
+              max-memory-mb: 4096
+            "*":
+              max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-memory-mb=1024
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [jsmith]
+            max-memory-mb=8192
+
+  - it: should render a raw string ini file verbatim
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should still repeat a section name given a list of maps under one key
+    set:
+      testConfig:
+        ini:
+          filename: launcher.conf
+          config:
+            section1: null
+            cluster:
+              - name: Cluster1
+                type: Kubernetes
+              - name: Cluster2
+                type: Kubernetes
+    asserts:
+      - equal:
+          path: data["launcher.conf"]
+          value: |
+            [cluster]
+            name=Cluster1
+            type=Kubernetes
+
+            [cluster]
+            name=Cluster2
+            type=Kubernetes
+
+  - it: should fail when a list entry is not a map
+    set:
+      testConfig:
+        ini:
+          filename: repos.conf
+          config:
+            - https://packagemanager.posit.co/cran/latest
+    asserts:
+      - failedTemplate:
+          errorPattern: "Entries of 'repos.conf' written as a list must each be a map"
