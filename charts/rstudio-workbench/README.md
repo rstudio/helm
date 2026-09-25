@@ -438,6 +438,11 @@ This applies to `/etc/rstudio/profiles`, `launcher.*.profiles.conf`, and
 `launcher.*.resources.conf` (where the session launcher lists resource profiles in file order and
 pre-selects the first one).
 
+Only the sections are ordered. The options written inside a section are still rendered
+alphabetically, which is what these files expect - they are resolved section by section, not
+option by option. A file that depends on the order of options within a section needs the raw
+string form.
+
 ### `/etc/rstudio/profiles`
 
 The `/etc/rstudio/profiles` file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the [Posit Workbench Administrator Guide - User and Group Profiles](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html) page for more information.
