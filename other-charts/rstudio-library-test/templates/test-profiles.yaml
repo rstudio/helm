@@ -19,7 +19,7 @@ data:
 {{- end }}
 
 {{- /* Test profiles.ini.singleFile */}}
-{{- if and .Values.testProfiles.singleFile (kindIs "map" .Values.testProfiles.singleFile) }}
+{{- if and .Values.testProfiles.singleFile (or (kindIs "map" .Values.testProfiles.singleFile) (kindIs "slice" .Values.testProfiles.singleFile)) }}
 ---
 apiVersion: v1
 kind: ConfigMap

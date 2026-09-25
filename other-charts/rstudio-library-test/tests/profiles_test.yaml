@@ -119,6 +119,151 @@ tests:
           path: data["launcher.kubernetes.profiles.conf"]
           pattern: "default-cpus=2"
 
+  - it: should render advanced profiles sections from a list in the order written
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - jsmith:
+                  default-cpus: 8
+              - "@contractors":
+                  default-cpus: 2
+              - "@analysts":
+                  default-cpus: 4
+              - "*":
+                  default-cpus: 1
+          jobJsonDefaults: []
+          filePath: /etc/rstudio/
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [jsmith]
+            default-cpus=8
+
+            [@contractors]
+            default-cpus=2
+
+            [@analysts]
+            default-cpus=4
+
+            [*]
+            default-cpus=1
+
+  - it: should sort advanced profiles sections by name when written as a map
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              # the test chart's values.yaml default, cleared so the map is exactly what is written
+              testuser: null
+              jsmith:
+                default-cpus: 8
+              "@analysts":
+                default-cpus: 4
+              "*":
+                default-cpus: 1
+          jobJsonDefaults: []
+          filePath: /etc/rstudio/
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [*]
+            default-cpus=1
+
+            [@analysts]
+            default-cpus=4
+
+            [jsmith]
+            default-cpus=8
+
+  - it: should prepend jobJsonDefaults to each ordered section that sets its own overrides
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "@contractors":
+                  job-json-overrides:
+                    - name: contractorNode
+                      target: /spec/template/spec/nodeSelector
+                      json:
+                        tier: contractor
+              - "*":
+                  default-cpus: 1
+          jobJsonDefaults:
+            - name: sharedVolume
+              target: /spec/template/spec/volumes/-
+              json:
+                name: shared
+          filePath: /etc/rstudio/
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [@contractors]
+            job-json-overrides="/spec/template/spec/volumes/-":"/etc/rstudio/sharedVolume.json","/spec/template/spec/nodeSelector":"/etc/rstudio/contractorNode.json"
+
+            [*]
+            default-cpus=1
+            job-json-overrides="/spec/template/spec/volumes/-":"/etc/rstudio/sharedVolume.json"
+
+  - it: should add an everyone section for jobJsonDefaults when the ordered list has none
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - jsmith:
+                  default-cpus: 8
+          jobJsonDefaults:
+            - name: sharedVolume
+              target: /spec/template/spec/volumes/-
+              json:
+                name: shared
+          filePath: /etc/rstudio/
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [*]
+            job-json-overrides="/spec/template/spec/volumes/-":"/etc/rstudio/sharedVolume.json"
+
+            [jsmith]
+            default-cpus=8
+
+  - it: should fail when advanced profiles content is neither a map nor a list
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf: "not-a-map"
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "must be a 'map' of section headers and configuration, or a 'slice' of single-entry maps"
+
+  - it: should render single file sections from a list in the order written
+    set:
+      testProfiles:
+        singleFile:
+          - user1:
+              setting: value1
+          - "*":
+              setting: value2
+    asserts:
+      - equal:
+          path: data["profiles.conf"]
+          value: |
+            [user1]
+            setting=value1
+
+            [*]
+            setting=value2
+
   # ========================================
   # profiles.json-from-overrides-config Tests
   # ========================================
@@ -235,3 +380,36 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should fail when one profiles list entry holds several sections
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "@analysts":
+                  default-cpus: 4
+                "@contractors":
+                  default-cpus: 2
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "An entry written as a list holds 2 keys: @analysts, @contractors"
+
+  - it: should still comma-join a list inside a profiles section
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "*":
+                  some-key:
+                    - value1
+                    - value2
+          jobJsonDefaults: []
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [*]
+            some-key=value1,value2

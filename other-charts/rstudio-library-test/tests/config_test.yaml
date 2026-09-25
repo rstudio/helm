@@ -295,3 +295,334 @@ tests:
       - matchRegex:
           path: data["empty.ini"]
           pattern: "\\[empty_section\\]"
+
+  # ========================================
+  # INI Ordered List Form Tests
+  # ========================================
+  - it: should render ini sections from a list in the order written
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - jsmith:
+                max-memory-mb: 8192
+            - "12345":
+                max-memory-mb: 8192
+            - "@contractors":
+                max-memory-mb: 2048
+            - "@analysts":
+                max-memory-mb: 4096
+            - "*":
+                max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [12345]
+            max-memory-mb=8192
+
+            [@contractors]
+            max-memory-mb=2048
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should render sectionless ini entries from a list in the order written
+    set:
+      testConfig:
+        ini:
+          filename: repos.conf
+          config:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://packagemanager.posit.co/cran/latest
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://packagemanager.posit.co/cran/latest
+
+  - it: should render resource profiles from a list in the order written
+    set:
+      testConfig:
+        ini:
+          filename: launcher.kubernetes.resources.conf
+          config:
+            - small:
+                name: Small
+                cpus: 1
+            - large:
+                name: Large
+                cpus: 8
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.resources.conf"]
+          value: |
+            [small]
+            cpus=1
+            name=Small
+
+            [large]
+            cpus=8
+            name=Large
+
+  - it: should render multi-field list items as blank-line separated records
+    set:
+      testConfig:
+        ini:
+          filename: r-versions
+          config:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+            - Path: /opt/R/4.0.2
+              Label: Old
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Label=Latest
+            Path=/opt/R/4.4.1
+
+            Label=Old
+            Path=/opt/R/4.0.2
+
+  - it: should sort ini sections by name when written as a map
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            # the test chart's values.yaml default, cleared so the map is exactly what is written
+            section1: null
+            jsmith:
+              max-memory-mb: 8192
+            "@analysts":
+              max-memory-mb: 4096
+            "*":
+              max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-memory-mb=1024
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [jsmith]
+            max-memory-mb=8192
+
+  - it: should render a raw string ini file verbatim
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should still repeat a section name given a list of maps under one key
+    set:
+      testConfig:
+        ini:
+          filename: launcher.conf
+          config:
+            section1: null
+            cluster:
+              - name: Cluster1
+                type: Kubernetes
+              - name: Cluster2
+                type: Kubernetes
+    asserts:
+      - equal:
+          path: data["launcher.conf"]
+          value: |
+            [cluster]
+            name=Cluster1
+            type=Kubernetes
+
+            [cluster]
+            name=Cluster2
+            type=Kubernetes
+
+  - it: should fail when a list entry is not a map
+    set:
+      testConfig:
+        ini:
+          filename: repos.conf
+          config:
+            - https://packagemanager.posit.co/cran/latest
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'repos.conf' must be a map of a name and its value"
+
+  - it: should render many options within an ordered section
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "@analysts":
+                max-memory-mb: 4096
+                max-cpus: 4
+                session-limit: 10
+            - "*":
+                max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [@analysts]
+            max-cpus=4
+            max-memory-mb=4096
+            session-limit=10
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should fail when one list entry holds several sections
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            # "@contractors" is missing its own "- ", so it lands in the same entry
+            - "@analysts":
+                max-cpus: 4
+              "@contractors":
+                max-cpus: 2
+            - "*":
+                max-cpus: 1
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'profiles' holds more than one key: @analysts, @contractors"
+
+  - it: should fail when a list entry mixes a section and a bare value
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "@analysts":
+                max-cpus: 4
+              some-key: some-value
+    asserts:
+      - failedTemplate:
+          errorPattern: "These name sections: @analysts"
+
+  - it: should fail when a list entry is empty
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'profiles' is empty"
+
+  - it: should still render a multi-field record, which names no section
+    set:
+      testConfig:
+        ini:
+          filename: r-versions
+          config:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+              Module: r/4.4.1
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Label=Latest
+            Module=r/4.4.1
+            Path=/opt/R/4.4.1
+
+  - it: should fail when an option inside a section is a map
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            section1: null
+            "*":
+              limits:
+                cpu: 1
+                mem: 2
+    asserts:
+      - failedTemplate:
+          errorPattern: "'limits' in section \\[\\*\\] of 'profiles' is a map"
+
+  - it: should fail when an option inside a section is a list
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            section1: null
+            "*":
+              container-images:
+                - imageA
+                - imageB
+    asserts:
+      - failedTemplate:
+          errorPattern: "'container-images' in section \\[\\*\\] of 'profiles' is a list"
+      - failedTemplate:
+          errorPattern: "write them as one value"
+
+  - it: should still allow a list of maps at the top level of a file
+    set:
+      testConfig:
+        ini:
+          filename: launcher.conf
+          config:
+            section1: null
+            cluster:
+              - name: Cluster1
+              - name: Cluster2
+    asserts:
+      - equal:
+          path: data["launcher.conf"]
+          value: |
+            [cluster]
+            name=Cluster1
+
+            [cluster]
+            name=Cluster2
+
+  - it: should still allow a list of scalars at the top level of a file
+    set:
+      testConfig:
+        ini:
+          filename: some.conf
+          config:
+            section1: null
+            repeated-key:
+              - a
+              - b
+    asserts:
+      - equal:
+          path: data["some.conf"]
+          value: |
+            repeated-key=a
+            repeated-key=b

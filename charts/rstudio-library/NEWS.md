@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.38
+
+- `rstudio-library.config.ini` now accepts a file's contents as a list of single-entry maps, and
+  renders them in the order written rather than sorted by name. A single-entry item becomes a
+  `[name]` section when its value is a map, and a `name=value` line when its value is a scalar.
+  A list entry with more than one key still renders as a blank-line separated record, which is what
+  `/etc/rstudio/r-versions` expects. Previously a list of single-entry maps rendered broken lines
+  such as `*=map[max-memory-mb:1024]`, with no section headers.
+- A list entry that is empty, or that names a section alongside any other key, now fails with a
+  message naming the sections and showing the `- ` placement to fix it. The most common cause is a
+  section that is missing its own `- `, which would otherwise render as `name=map[key:value]`.
+- An option inside a section must now be a single value. ini files have no nesting, so a map or a
+  list there had no representation and rendered as `key=map[a:1]` or `key=[a b]`. This applies to
+  both the map and the list form. Lists at the top level of a file are unaffected: a list of maps
+  still repeats a section, and a list of values still repeats a key.
+  `rstudio-library.profiles.ini` is also unaffected, since it defines a meaning for a list inside a
+  section (it comma-joins).
+- `rstudio-library.profiles.ini.advanced`, `rstudio-library.profiles.ini.singleFile`, and
+  `rstudio-library.profiles.json-from-overrides-config` accept the same ordered list form for a
+  profiles file's sections, including its `job-json-overrides` handling.
+- New `rstudio-library.config.entries` helper, which normalizes either form into an ordered list of
+  entries.
+
 ## 0.1.37
 
 - **DEPRECATED**: Chronicle agent helpers are deprecated.
