@@ -463,9 +463,11 @@ config:
   Authentication:
     Provider: password
   'RPackageRepository "CRAN"':
-    URL: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
   'RPackageRepository "RSPM"':
-    URL: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
+  'PythonPackageRepository "PyPI"':
+    URL: https://packagemanager.posit.co/pypi/latest/simple
   Server:
     Address: http://localhost:3939
     DataDir: /var/lib/rstudio-connect
