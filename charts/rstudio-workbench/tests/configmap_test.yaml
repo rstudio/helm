@@ -577,7 +577,30 @@ tests:
             Internal=https://pkgs.example.com/internal
             CRAN=https://packagemanager.posit.co/cran/latest
 
-  - it: should keep rendering r-versions records separated by blank lines
+  # r-versions is DCF, not ini, so it has to be written as a string. See #948.
+  - it: should pass an r-versions string through unchanged
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          r-versions: |
+            Path: /opt/R/4.4.1
+            Label: Latest
+
+            Path: /opt/R/4.0.2
+            Label: Old
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Path: /opt/R/4.4.1
+            Label: Latest
+
+            Path: /opt/R/4.0.2
+            Label: Old
+
+  - it: should fail when r-versions is written as a list of records
     template: configmap-session.yaml
     documentIndex: 0
     set:
@@ -586,17 +609,9 @@ tests:
           r-versions:
             - Path: /opt/R/4.4.1
               Label: Latest
-            - Path: /opt/R/4.0.2
-              Label: Old
     asserts:
-      - equal:
-          path: data["r-versions"]
-          value: |
-            Label=Latest
-            Path=/opt/R/4.4.1
-
-            Label=Old
-            Path=/opt/R/4.0.2
+      - failedTemplate:
+          errorPattern: "entry 1 of 'r-versions' holds more than one key"
 
   - it: should render config.profiles sections in the order written, merging the default everyone section
     template: configmap-general.yaml

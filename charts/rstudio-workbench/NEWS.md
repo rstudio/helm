@@ -21,6 +21,14 @@
         - CRAN: https://packagemanager.posit.co/cran/latest
   ```
 
+- **BREAKING**: a file written as a list must give each section or entry its own `- `, holding a
+  single key. This rejects two shapes that previously rendered something unusable: several sections
+  crammed into one entry (a missing `- `), which rendered as `name=map[key:value]`; and a multi-field
+  record, which was only ever used for `config.session.r-versions` and emitted `Key=Value` where
+  Workbench parses that file as DCF (`Key: Value`) - see
+  https://github.com/rstudio/helm/issues/948. Write `r-versions` as a string (`r-versions: |`),
+  which is passed through unchanged. An option inside a section must also be a single value, since
+  ini files have no nesting.
 - **DEPRECATED**: writing those files as a map. A map is rendered in alphabetical order, which
   silently changes what these files do, and nothing in `values.yaml` shows it. The map form still
   works and now prints a `WARNING` in `NOTES.txt` once a file holds more than one section or entry.
