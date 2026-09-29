@@ -385,7 +385,7 @@ tests:
       - failedTemplate:
           errorPattern: "entry 1 of 'r-versions' holds more than one key: Label, Path"
       - failedTemplate:
-          errorPattern: "write the whole file as a string"
+          errorPattern: "If the file needs more than one record"
 
   - it: should pass a multi-field record file through as a string
     set:

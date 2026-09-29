@@ -154,7 +154,7 @@
     {{- range $n := $names }}
       {{- $hint = print $hint "\n    - " ($n | quote) ":\n        ..." }}
     {{- end }}
-    {{- fail (print "\n\n" $where " holds more than one key: " (join ", " $names) "\n\nEach entry names one section or one value, so that they keep the order they\nwere written in. Put '- ' in front of each one:\n\n  " $file ":" $hint "\n\nIf this file instead needs several fields in one record, such as\n/etc/rstudio/r-versions, write the whole file as a string (" $file ": |).\nStrings are passed through unchanged.\n") }}
+    {{- fail (print "\n\n" $where " holds more than one key: " (join ", " $names) "\n\nEach entry names one section or one value, so that they keep the order they\nwere written in. Put '- ' in front of each one:\n\n  " $file ":" $hint "\n\nOne entry per field gives one record. If the file needs more than one record,\nseparated by blank lines, this renderer cannot express that -- write the whole\nfile as a string (" $file ": |), which is passed through unchanged.\n") }}
   {{- end }}
   {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" $item) }}
 {{- end }}
