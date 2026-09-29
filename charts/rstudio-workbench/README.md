@@ -523,7 +523,7 @@ The `/etc/rstudio/launcher.kubernetes.profiles.conf` contains the configuration 
     - value2
   ```
 
-- The `[*]` section has arrays "appended" to user and group sections, along with "defaults" defined by the chart.
+- The `[*]` section receives the "defaults" defined by the chart (the session image settings), and its `job-json-overrides` are prepended to every other section that defines its own. Other keys are not merged across sections - a user or group section overrides `[*]` for that key, which is how the product resolves profiles.
 
 For example:
 
@@ -547,9 +547,10 @@ _/etc/rstudio/launcher.kubernetes.profiles.conf_
 
 ```ini
 [*]
-some-key: value1,value2
+some-key=value1,value2
+
 [myuser]
-some-key: value1,value2,value3,value4
+some-key=value4,value5
 ```
 
 :::{.callout-note}
