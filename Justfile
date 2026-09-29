@@ -49,14 +49,40 @@ lint:
 
 snapshot-rsw:
   #!/bin/bash
-  set -xe
+  set -e
 
-  helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" | sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' > charts/rstudio-workbench/snapshot/default.yaml
+  # The snapshots are named after the values files in `lint/`, which is where
+  # the lint-only scenarios live. `ci/` belongs to chart-testing (`ct lint` /
+  # `ct install`) and is deliberately not snapshotted.
+  #
+  # `global.secureCookieKey` and `launcherPem` are tables (`.value` /
+  # `.existingSecret`), so they have to be set through their `.value` key.
+  # Pinning them keeps the render deterministic: without them the chart
+  # generates a fresh cookie key and RSA launcher key on every run.
+  pin=(--set global.secureCookieKey.value=abc --set launcherPem.value=abc)
+  outdir=charts/rstudio-workbench/snapshot
+  failed=0
 
-  for file in `ls ./charts/rstudio-workbench/ci/*.yaml`; do
-    filename=$(basename $file)
-    helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" -f $file | sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' > charts/rstudio-workbench/snapshot/$filename
+  render() {
+    local out="$1"; shift
+    echo "==> $out"
+    if ! helm template -n rstudio ./charts/rstudio-workbench "${pin[@]}" "$@" > "$out.tmp"; then
+      echo "ERROR: helm template failed for $out (snapshot not updated)" >&2
+      rm -f "$out.tmp"
+      failed=1
+      return
+    fi
+    sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' "$out.tmp" > "$out"
+    rm -f "$out.tmp"
+  }
+
+  render "$outdir/default.yaml"
+
+  for file in ./charts/rstudio-workbench/lint/*.yaml; do
+    render "$outdir/$(basename "$file")" -f "$file"
   done
+
+  exit $failed
 
 snapshot-rsw-lock:
   #!/bin/bash
@@ -67,13 +93,31 @@ snapshot-rsw-lock:
 
 snapshot-rsw-diff:
   #!/bin/bash
-  set -x
-  for file in `ls ./charts/rstudio-workbench/snapshot/*.yaml`; do
-    echo Diffing $file
-    if [[ `diff -q $file $file.lock` ]]; then
-        {{ DIFF }} $file $file.lock
+  outdir=charts/rstudio-workbench/snapshot
+  differed=0
+
+  for lock in "$outdir"/*.yaml.lock; do
+    file="${lock%.lock}"
+    if [[ ! -f "$file" ]]; then
+      echo "MISSING: $file was not generated (run \`just snapshot-rsw\` first)"
+      differed=1
+      continue
+    fi
+    if ! diff -q "$file" "$lock" > /dev/null; then
+      echo "DIFF: $file"
+      {{ DIFF }} "$lock" "$file"
+      differed=1
     fi
   done
+
+  for file in "$outdir"/*.yaml; do
+    [[ -f "$file.lock" ]] || { echo "UNTRACKED: $file has no .lock baseline"; differed=1; }
+  done
+
+  if [[ $differed -eq 0 ]]; then
+    echo "All snapshots match their .lock baselines"
+  fi
+  exit $differed
 
 test chart='all':
   #!/usr/bin/env bash
