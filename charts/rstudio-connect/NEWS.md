@@ -2,7 +2,7 @@
 
 ## 0.21.3
 
-- The default `config` uses `packagemanager.posit.co` and Ubuntu 24.04 (`noble`) binaries for R packages. Previously, it used `packagemanager.rstudio.com` and Ubuntu 22.04 (`jammy`).
+- The default `config` uses `packagemanager.posit.co` and Ubuntu 24.04 (`noble`) binaries for R packages.
 - The default `config` sets `PythonPackageRepository "PyPI"` to the public Posit Package Manager PyPI mirror. This setting requires Connect 2026.05.0 or later.
 
 ## 0.21.2
