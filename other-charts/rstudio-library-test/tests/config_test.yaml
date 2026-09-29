@@ -373,7 +373,7 @@ tests:
             cpus=8
             name=Large
 
-  - it: should render multi-field list items as blank-line separated records
+  - it: should fail when a list entry holds more than one key
     set:
       testConfig:
         ini:
@@ -381,17 +381,32 @@ tests:
           config:
             - Path: /opt/R/4.4.1
               Label: Latest
-            - Path: /opt/R/4.0.2
-              Label: Old
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'r-versions' holds more than one key: Label, Path"
+      - failedTemplate:
+          errorPattern: "write the whole file as a string"
+
+  - it: should pass a multi-field record file through as a string
+    set:
+      testConfig:
+        ini:
+          filename: r-versions
+          config: |
+            Path: /opt/R/4.4.1
+            Label: Latest
+
+            Path: /opt/R/4.0.2
+            Label: Old
     asserts:
       - equal:
           path: data["r-versions"]
           value: |
-            Label=Latest
-            Path=/opt/R/4.4.1
+            Path: /opt/R/4.4.1
+            Label: Latest
 
-            Label=Old
-            Path=/opt/R/4.0.2
+            Path: /opt/R/4.0.2
+            Label: Old
 
   - it: should sort ini sections by name when written as a map
     set:
@@ -528,7 +543,7 @@ tests:
               some-key: some-value
     asserts:
       - failedTemplate:
-          errorPattern: "These name sections: @analysts"
+          errorPattern: "entry 1 of 'profiles' holds more than one key: @analysts, some-key"
 
   - it: should fail when a list entry is empty
     set:
@@ -541,22 +556,6 @@ tests:
       - failedTemplate:
           errorPattern: "entry 1 of 'profiles' is empty"
 
-  - it: should still render a multi-field record, which names no section
-    set:
-      testConfig:
-        ini:
-          filename: r-versions
-          config:
-            - Path: /opt/R/4.4.1
-              Label: Latest
-              Module: r/4.4.1
-    asserts:
-      - equal:
-          path: data["r-versions"]
-          value: |
-            Label=Latest
-            Module=r/4.4.1
-            Path=/opt/R/4.4.1
 
   - it: should fail when an option inside a section is a map
     set:

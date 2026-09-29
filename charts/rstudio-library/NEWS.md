@@ -3,14 +3,18 @@
 ## 0.1.38
 
 - `rstudio-library.config.ini` now accepts a file's contents as a list of single-entry maps, and
-  renders them in the order written rather than sorted by name. A single-entry item becomes a
-  `[name]` section when its value is a map, and a `name=value` line when its value is a scalar.
-  A list entry with more than one key still renders as a blank-line separated record, which is what
-  `/etc/rstudio/r-versions` expects. Previously a list of single-entry maps rendered broken lines
-  such as `*=map[max-memory-mb:1024]`, with no section headers.
-- A list entry that is empty, or that names a section alongside any other key, now fails with a
-  message naming the sections and showing the `- ` placement to fix it. The most common cause is a
-  section that is missing its own `- `, which would otherwise render as `name=map[key:value]`.
+  renders them in the order written rather than sorted by name. An entry becomes a `[name]` section
+  when its value is a map, and a `name=value` line when it is not. Previously a list of
+  single-entry maps rendered broken lines such as `*=map[max-memory-mb:1024]`, with no section
+  headers.
+- **BREAKING**: a list entry must hold exactly one key. An empty entry, or an entry with more than
+  one key, now fails with a message naming the keys and showing the `- ` placement to fix it. The
+  usual cause is a section missing its own `- `, which previously rendered as `name=map[key:value]`.
+  Multi-key entries used to render as a blank-line separated record, intended for
+  `/etc/rstudio/r-versions`; that never produced a file Workbench could read, because it emitted
+  `Key=Value` where the file is parsed as DCF (`Key: Value`) - see
+  https://github.com/rstudio/helm/issues/948. Write such files as a string instead, which is passed
+  through unchanged.
 - An option inside a section must now be a single value. ini files have no nesting, so a map or a
   list there had no representation and rendered as `key=map[a:1]` or `key=[a b]`. This applies to
   both the map and the list form. Lists at the top level of a file are unaffected: a list of maps

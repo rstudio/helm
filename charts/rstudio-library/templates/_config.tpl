@@ -129,13 +129,10 @@
     - a raw string, rendered verbatim
     - a map of {name: value}, rendered in sorted key order. Files whose behavior
       depends on the order of their sections or entries should use the list form
-    - a list, rendered in the order it was written. Each entry is a non-empty map:
-        - a key whose value is a map names a section, and must be the only key in
-          its entry, so that sections keep the order they were written in
-        - otherwise the entry is a record of fields, rendered as name=value lines
-          followed by a blank line (the shape /etc/rstudio/r-versions expects)
-      Keys within one entry are sorted, so the order of a list is the order of its
-      sections and entries, not of the options inside them
+    - a list, rendered in the order it was written. Each entry is a map holding
+      exactly one key: a [name] section when its value is a map, and a name=value
+      line when it is not. Options within a section are still sorted, so a list
+      orders its sections and entries, not the options inside them
 */ -}}
 {{- define "rstudio-library.config.ini" -}}
 {{- range $file, $keys := . -}}
@@ -150,34 +147,16 @@
   {{- end }}
   {{- $names := keys $item | sortAlpha }}
   {{- if eq (len $names) 0 }}
-    {{- fail (print "\n\n" $where " is empty. Every entry written as a list must be a map of a name and its value.") }}
-  {{- end }}
-  {{- /* A map value names a section, so it has to be the only key in its entry. Otherwise the
-         sections in one entry would be sorted against each other, losing the order the list is
-         there to preserve -- and before this check, they rendered as "name=map[key:value]".
-         Almost always a list entry that is missing its own "- ". */ -}}
-  {{- $sections := list }}
-  {{- range $key, $val := $item }}
-    {{- if kindIs "map" $val }}
-      {{- $sections = append $sections (toString $key) }}
-    {{- end }}
-  {{- end }}
-  {{- if and $sections (gt (len $names) 1) }}
-    {{- $hint := "" }}
-    {{- range $s := $sections }}
-      {{- $hint = print $hint "\n    - " ($s | quote) ":\n        ..." }}
-    {{- end }}
-    {{- fail (print "\n\n" $where " holds more than one key: " (join ", " $names) "\n\nA key whose value is a section must be the only key in its entry, so that the\nsections keep the order they were written in. These name sections: " (join ", " $sections) "\n\nPut '- ' in front of each one:\n\n  " $file ":" $hint "\n") }}
+    {{- fail (print "\n\n" $where " is empty. Every entry written as a list must be a map of a single name and its value.") }}
   {{- end }}
   {{- if gt (len $names) 1 }}
-    {{- /* a record of fields, the shape /etc/rstudio/r-versions expects */ -}}
-    {{- range $key, $val := $item }}
-      {{- printf "%s=%s" (toString $key) (toString $val) | nindent 2 }}
+    {{- $hint := "" }}
+    {{- range $n := $names }}
+      {{- $hint = print $hint "\n    - " ($n | quote) ":\n        ..." }}
     {{- end }}
-    {{- printf "" | nindent 0 }}
-  {{- else }}
-    {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" $item) }}
+    {{- fail (print "\n\n" $where " holds more than one key: " (join ", " $names) "\n\nEach entry names one section or one value, so that they keep the order they\nwere written in. Put '- ' in front of each one:\n\n  " $file ":" $hint "\n\nIf this file instead needs several fields in one record, such as\n/etc/rstudio/r-versions, write the whole file as a string (" $file ": |).\nStrings are passed through unchanged.\n") }}
   {{- end }}
+  {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" $item) }}
 {{- end }}
 {{- else }}
 {{- range $parent, $child := $keys -}}
