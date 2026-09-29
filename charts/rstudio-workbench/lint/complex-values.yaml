@@ -146,8 +146,8 @@ config:
     pam: 0644
   session:
     repos.conf:
-      RSPM: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
-      CRAN: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+      RSPM: https://packagemanager.posit.co/cran/__linux__/noble/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
     rsession.conf: {}
     notifications.conf: {}
     r-versions:
