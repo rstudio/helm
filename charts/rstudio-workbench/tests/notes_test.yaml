@@ -134,16 +134,62 @@ tests:
       - notMatchRegexRaw:
           pattern: "WARNING: the following configuration files are written as maps"
 
-  - it: should not warn for a single-entry map, which has no order to lose
+  - it: should warn for a single-entry map too, now that the gate is gone
     set:
       config:
         server:
           profiles:
             "*":
               max-memory-mb: 1024
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+
+  # Workbench discards repos.conf entirely when nothing is named CRAN
+  - it: should warn when repos.conf has no CRAN entry
+    set:
+      config:
         session:
           repos.conf:
-            CRAN: https://packagemanager.posit.co/cran/latest
+            - Internal: https://pkgs.example.com/internal
+    asserts:
+      - matchRegexRaw:
+          pattern: "has no `CRAN` entry"
+      - matchRegexRaw:
+          pattern: "Workbench ignores the whole file"
+
+  - it: should not warn when a repos.conf list includes CRAN
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://mirror.example.com/cran
     asserts:
       - notMatchRegexRaw:
-          pattern: "WARNING: the following configuration files are written as maps"
+          pattern: "has no `CRAN` entry"
+
+  - it: should not warn when a repos.conf string includes CRAN
+    set:
+      config:
+        session:
+          repos.conf: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://mirror.example.com/cran
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "has no `CRAN` entry"
+
+  - it: should not warn about CRAN when repos.conf is suppressed
+    set:
+      config:
+        session:
+          repos.conf: null
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "has no `CRAN` entry"
+
+  - it: should not warn about CRAN on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "has no `CRAN` entry"

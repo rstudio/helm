@@ -25,21 +25,20 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 {{- /* Files whose behavior depends on the order of their sections or entries. Rendering these
        from a map sorts them by name, silently changing what they do, so the map form is
        deprecated in favor of the ordered list form. A raw string keeps the written order too,
-       so only the map form is flagged, and only once it holds more than one section or entry --
-       below that there is no order to lose. */}}
+       so only the map form is flagged. */}}
 {{- $unordered := list }}
 {{- range $file, $contents := .Values.config.server }}
-  {{- if and (kindIs "map" $contents) (gt (len (keys $contents)) 1) (or (eq $file "profiles") (regexMatch "^launcher\\..+\\.resources\\.conf$" $file)) }}
+  {{- if and (kindIs "map" $contents) (or (eq $file "profiles") (regexMatch "^launcher\\..+\\.resources\\.conf$" $file)) }}
     {{- $unordered = append $unordered (printf "config.server.%s" ($file | replace "." "\\.")) }}
   {{- end }}
 {{- end }}
 {{- range $file, $contents := .Values.config.profiles }}
-  {{- if and (kindIs "map" $contents) (gt (len (keys $contents)) 1) (regexMatch "^launcher\\..+\\.profiles\\.conf$" $file) }}
+  {{- if and (kindIs "map" $contents) (regexMatch "^launcher\\..+\\.profiles\\.conf$" $file) }}
     {{- $unordered = append $unordered (printf "config.profiles.%s" ($file | replace "." "\\.")) }}
   {{- end }}
 {{- end }}
 {{- range $file, $contents := .Values.config.session }}
-  {{- if and (kindIs "map" $contents) (gt (len (keys $contents)) 1) (eq $file "repos.conf") }}
+  {{- if and (kindIs "map" $contents) (eq $file "repos.conf") }}
     {{- $unordered = append $unordered (printf "config.session.%s" ($file | replace "." "\\.")) }}
   {{- end }}
 {{- end }}
@@ -65,6 +64,43 @@ WARNING: the following configuration files are written as maps, which does not k
           - CRAN: https://packagemanager.posit.co/cran/latest
 
   The map form still works for now, but will be removed in a future chart release.
+{{- end }}
+
+{{- /* Workbench discards repos.conf entirely when it has no entry named CRAN
+       (SessionOptions.cpp, parseReposConfig), taking the admin's own repositories with it.
+       Nothing in the rendered file shows this, so check for the key in whichever form
+       the file was written. */}}
+{{- if hasKey .Values.config.session "repos.conf" }}
+  {{- $repos := get .Values.config.session "repos.conf" }}
+  {{- $hasCran := false }}
+  {{- if kindIs "string" $repos }}
+    {{- $hasCran = regexMatch "(?m)^[ \t]*CRAN[ \t]*=" $repos }}
+  {{- else if kindIs "slice" $repos }}
+    {{- range $item := $repos }}
+      {{- if and (kindIs "map" $item) (hasKey $item "CRAN") }}
+        {{- $hasCran = true }}
+      {{- end }}
+    {{- end }}
+  {{- else if kindIs "map" $repos }}
+    {{- $hasCran = hasKey $repos "CRAN" }}
+  {{- end }}
+  {{- if and $repos (not $hasCran) }}
+
+WARNING: `.Values.config.session.repos\.conf` has no `CRAN` entry
+  - Workbench ignores the whole file when no entry is named `CRAN`, so none of these repositories
+    will be used, and the session log will show "is missing CRAN entry".
+  - Name one of your repositories `CRAN`. It does not have to be CRAN itself - point it at your
+    own mirror if that is what you want sessions to use:
+
+    config:
+      session:
+        repos.conf:
+          - Internal: https://pkgs.example.com/internal
+          - CRAN: https://mirror.example.com/cran
+
+  - To configure repositories somewhere else instead, set `config.session.repos\.conf: null` and
+    the chart will not render the file at all.
+  {{- end }}
 {{- end }}
 
 {{- if hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}

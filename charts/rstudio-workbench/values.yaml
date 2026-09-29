@@ -581,8 +581,11 @@ config:
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   # Each file's contents may be a map, a raw string, or - for files read in order, such as `repos.conf` - a list of single-entry maps. See README for more information.
   session:
+    # Written as a list because repos.conf is read in order. Supplying your own
+    # replaces this default entirely, and it must include a CRAN entry - Workbench
+    # ignores the whole file without one.
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      - CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
     rsession.conf: {}
     notifications.conf: {}
     rstudio-prefs.json: |
