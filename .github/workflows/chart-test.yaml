@@ -153,7 +153,7 @@ jobs:
         run: echo "is-fork=$IS_FORK" >> "$GITHUB_OUTPUT"
 
   install:
-    runs-on: ubuntu-latest-4x
+    runs-on: ubuntu-latest-amd64-4-core
     needs: [detect-fork]
     permissions:
       contents: read
