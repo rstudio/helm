@@ -716,3 +716,41 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
 {{- end -}}
+
+{{- /*
+  Renders `config.session`, choosing a renderer per file rather than treating every file as ini.
+  The files in that directory are not all the same format:
+
+    - `r-versions` and `notifications.conf` are DCF: `Key: Value`, with records separated by a
+      blank line. Rendered as ini they came out as `Key=Value`, which Workbench cannot parse -- it
+      falls back to a legacy mode and logs "does not point to a valid directory" per line, so the
+      file is silently ignored. See https://github.com/rstudio/helm/issues/948
+    - `*.json` files are JSON.
+    - everything else (`repos.conf`, `rsession.conf`, `pip.conf`, ...) is ini.
+
+  A raw string is always passed through unchanged, so it stays with the ini renderer: the JSON
+  renderer would re-encode it with `toPrettyJson` and turn `{}` into the quoted string `"{}"`.
+*/ -}}
+{{- define "rstudio-workbench.config.sessionFiles" -}}
+{{- $dcfNames := list "r-versions" "notifications.conf" }}
+{{- $ini := dict }}
+{{- $dcf := dict }}
+{{- $json := dict }}
+{{- range $file, $contents := . }}
+  {{- if kindIs "string" $contents }}
+    {{- $_ := set $ini $file $contents }}
+  {{- else if empty $contents }}
+    {{- /* nothing to render either way; keep it with ini so output is unchanged */ -}}
+    {{- $_ := set $ini $file $contents }}
+  {{- else if has $file $dcfNames }}
+    {{- $_ := set $dcf $file $contents }}
+  {{- else if hasSuffix ".json" $file }}
+    {{- $_ := set $json $file $contents }}
+  {{- else }}
+    {{- $_ := set $ini $file $contents }}
+  {{- end }}
+{{- end }}
+{{- if $ini }}{{- include "rstudio-library.config.ini" $ini }}{{- end }}
+{{- if $dcf }}{{- include "rstudio-library.config.dcf" $dcf }}{{- end }}
+{{- if $json }}{{- include "rstudio-library.config.json" $json }}{{- end }}
+{{- end }}

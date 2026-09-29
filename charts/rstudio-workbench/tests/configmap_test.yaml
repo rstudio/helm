@@ -600,19 +600,6 @@ tests:
             Path: /opt/R/4.0.2
             Label: Old
 
-  - it: should fail when r-versions is written as a list of records
-    template: configmap-session.yaml
-    documentIndex: 0
-    set:
-      config:
-        session:
-          r-versions:
-            - Path: /opt/R/4.4.1
-              Label: Latest
-    asserts:
-      - failedTemplate:
-          errorPattern: "entry 1 of 'r-versions' holds more than one key"
-
   - it: should render config.profiles sections in the order written, merging the default everyone section
     template: configmap-general.yaml
     documentIndex: 0
@@ -651,3 +638,86 @@ tests:
       - matchRegex:
           path: data["launcher.kubernetes.profiles.conf"]
           pattern: "\\[\\*\\]\\nallow-unknown-images=1\\ncontainer-images=.*\\ndefault-container-image=.*\\njob-json-overrides=.*\\n\\n\\[jsmith\\]\\nmax-cpus=8"
+
+  # -- config.session files are routed by format, not by value shape. See #948
+  - it: should render r-versions as DCF when written as records
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          r-versions:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+            - Path: /opt/R/4.0.2
+              Label: Old
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Label: Latest
+            Path: /opt/R/4.4.1
+
+            Label: Old
+            Path: /opt/R/4.0.2
+
+  - it: should render notifications.conf as DCF
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          notifications.conf:
+            - StartTime: 2026-01-01
+              EndTime: 2026-01-02
+              Message: Maintenance window
+    asserts:
+      - matchRegex:
+          path: data["notifications.conf"]
+          pattern: "StartTime: 2026-01-01"
+      - notMatchRegex:
+          path: data["notifications.conf"]
+          pattern: "StartTime="
+
+  - it: should render a structured json session file as JSON
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          rstudio-prefs.json:
+            save_workspace: never
+    asserts:
+      - matchRegex:
+          path: data["rstudio-prefs.json"]
+          pattern: '"save_workspace": "never"'
+
+  - it: should pass a json session file written as a string through unchanged
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          rstudio-prefs.json: |
+            {"save_workspace": "never"}
+    asserts:
+      - equal:
+          path: data["rstudio-prefs.json"]
+          value: |
+            {"save_workspace": "never"}
+
+  - it: should still render repos.conf as ini
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://packagemanager.posit.co/cran/latest
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://packagemanager.posit.co/cran/latest

@@ -21,6 +21,13 @@
         - CRAN: https://packagemanager.posit.co/cran/latest
   ```
 
+- `config.session` files are now rendered according to their format rather than the shape of the
+  value written. `r-versions` and `notifications.conf` are DCF (`Key: Value`, records separated by
+  a blank line), `*.json` files are JSON, and everything else stays ini. Previously all of them
+  were rendered as ini, so `r-versions` came out as `Key=Value` and Workbench discarded it,
+  logging `does not point to a valid directory` for each line. Resolves
+  https://github.com/rstudio/helm/issues/948. A file written as a raw string is still passed
+  through unchanged.
 - **BREAKING**: a file written as a list must give each section or entry its own `- `, holding a
   single key. This rejects two shapes that previously rendered something unusable: several sections
   crammed into one entry (a missing `- `), which rendered as `name=map[key:value]`; and a multi-field
