@@ -369,6 +369,33 @@ repository can't be put ahead of CRAN.
 
 For more information about configuring CRAN repositories in Workbench, see the [Posit Workbench Administrator Guide's - Package Installation > CRAN repositories](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories) section.
 
+#### R versions
+
+`/etc/rstudio/r-versions` is not an ini file. It is DCF: `Key: Value`, with a blank line between
+each R version. Write it as a string, which the chart passes through unchanged:
+
+```yaml
+config:
+  session:
+    r-versions: |
+      Path: /opt/R/4.1.3
+      Label: Custom 4.1.3
+      Repo: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+
+      Path: /opt/R/4.2.3
+      Label: Custom 4.2.3
+```
+
+:::{.callout-important}
+Use `Key: Value`, not `Key=Value`. Writing this file as a map or a list makes the chart render it
+with `=`, which Workbench cannot parse - it silently registers no R versions and logs
+`does not point to a valid directory` for each line. See
+[#948](https://github.com/rstudio/helm/issues/948). Writing it as a list is rejected by the chart;
+writing it as a map is not, so take care with the separator.
+:::
+
+See [Extended R version definitions](https://docs.posit.co/ide/server-pro/admin/r/using_multiple_versions_of_r.html#extended-r-version-definitions) in the Administrator Guide for the full list of fields.
+
 ## User provisioning
 
 Provisioning users in Workbench containers is challenging. Session images create users automatically (with

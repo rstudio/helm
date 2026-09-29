@@ -29,6 +29,9 @@
   https://github.com/rstudio/helm/issues/948. Write `r-versions` as a string (`r-versions: |`),
   which is passed through unchanged. An option inside a section must also be a single value, since
   ini files have no nesting.
+- Fixed: with more than one `config.pam` file, the pam `volumeMounts` were emitted in Go map order,
+  so `helm template` was not reproducible and the Deployment's pod template changed between renders
+  with no configuration change. They are now sorted by file name.
 - **DEPRECATED**: writing those files as a map. A map is rendered in alphabetical order, which
   silently changes what these files do, and nothing in `values.yaml` shows it. The map form still
   works and now prints a `WARNING` in `NOTES.txt` once a file holds more than one section or entry.
