@@ -344,11 +344,22 @@ config:
 A raw string also works, and is passed through unchanged.
 
 :::{.callout-note}
-`config.session` files are rendered according to their format, not the shape of the value you
-write. `r-versions` and `notifications.conf` are DCF, `*.json` files are JSON, and everything else
-(`repos.conf`, `rsession.conf`, `pip.conf`, ...) is ini. Before chart 0.23.0 every file was
-rendered as ini, so `r-versions` came out with `=` and Workbench ignored it entirely - see
-[#948](https://github.com/rstudio/helm/issues/948).
+Configuration files are rendered according to their format, not the shape of the value you write.
+`r-versions` and `notifications.conf` are DCF, `*.json` files are JSON, and everything else the
+chart recognizes (`rserver.conf`, `repos.conf`, `rsession.conf`, `pip.conf`, ...) is ini. Before
+chart 0.23.0 every `config.session` file was rendered as ini, so `r-versions` came out with `=`
+and Workbench ignored it entirely - see [#948](https://github.com/rstudio/helm/issues/948).
+
+A file the chart does not recognize is rendered as ini and prints a warning on install, since ini
+is a guess for a file it knows nothing about. Give that file's contents as text to render it
+exactly as written:
+
+```yaml
+config:
+  session:
+    my-file: |
+      whatever the file needs to say
+```
 :::
 
 See [Extended R version definitions](https://docs.posit.co/ide/server-pro/admin/r/using_multiple_versions_of_r.html#extended-r-version-definitions) in the Administrator Guide for the full list of fields.

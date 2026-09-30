@@ -149,7 +149,7 @@ data:
 {{- with .Values.chronicle.localConfig }}
   {{- $overrideDict = mergeOverwrite $overrideDict (dict "chronicle-local.gcfg" .) }}
 {{- end }}
-{{ include "rstudio-library.config.ini" $overrideDict | indent 2 }}
+{{ include "rstudio-workbench.config.files" (dict "scope" "server" "data" $overrideDict) | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
 {{- $profilesConfig := .Values.config.profiles | deepCopy }}
 {{- /* Apply the default [*] session image settings to launcher.kubernetes.profiles.conf. When it is

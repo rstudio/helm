@@ -32,17 +32,20 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
        are JSON; a list is how you legitimately write those. */}}
 {{- $wantsList := list }}
 {{- $wantsMap := list }}
+{{- $assumedIni := list }}
 {{- range $scope := (list "server" "session" "profiles") }}
   {{- range $file, $contents := (get $.Values.config $scope) }}
     {{- $path := printf "config.%s.%s" $scope ($file | replace "." "\\.") }}
-    {{- $ordered := include "rstudio-workbench.config.orderSensitive" (dict "file" $file "scope" $scope) }}
-    {{- $nonIni := (eq $scope "session") | ternary (include "rstudio-workbench.config.nonIni" (dict "file" $file)) "" }}
-    {{- if not $nonIni }}
+    {{- $kind := include "rstudio-workbench.config.fileKind" (dict "scope" $scope "file" $file) }}
+    {{- $ordered := eq $kind "ordered_ini" }}
+    {{- if has $kind (list "ini" "ordered_ini") }}
       {{- if and $ordered (kindIs "map" $contents) }}
         {{- $wantsList = append $wantsList $path }}
       {{- else if and (not $ordered) (kindIs "slice" $contents) }}
         {{- $wantsMap = append $wantsMap $path }}
       {{- end }}
+    {{- else if and (eq $kind "unknown") (or (kindIs "map" $contents) (kindIs "slice" $contents)) }}
+      {{- $assumedIni = append $assumedIni $path }}
     {{- end }}
   {{- end }}
 {{- end }}
@@ -77,6 +80,23 @@ WARNING: the following configuration files are written as lists, which replaces 
   which the launcher needs.
 
   Write them as a map unless you specifically need to control the order of their sections.
+{{- end }}
+
+{{- if $assumedIni }}
+
+WARNING: the chart does not recognize the following configuration files
+{{- range $assumedIni | sortAlpha }}
+  - `.Values.{{ . }}`
+{{- end }}
+  They will be rendered as ini: `Key=Value` under `[section]` headings. If that is not the right
+  format, give the file's contents as text instead and the chart will use them as they are:
+
+    config:
+      session:
+        my-file: |
+          whatever the file needs to say
+
+  Open an issue if this is a file the chart should know how to build.
 {{- end }}
 
 {{- /* Workbench discards repos.conf entirely when it has no entry named CRAN

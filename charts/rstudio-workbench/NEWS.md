@@ -54,6 +54,14 @@
   the launcher needs. Write those files as a map unless you need to control section order. Files
   that are not ini (`r-versions`, `notifications.conf`, `*.json`) are exempt, since a list is how
   you legitimately write those.
+- `config.server` files are now rendered by format too, the same way `config.session` already is.
+  A single table in the chart gives each configuration file its format, and both ConfigMaps read
+  from it. `config.server.*.json` files written as a map are now rendered as JSON rather than ini.
+- The chart now warns when a configuration file it does not recognize is written as a map or a
+  list. Such a file is still rendered as ini, which is what the chart has always done, but ini is
+  a guess for a file the chart knows nothing about, and a wrong guess renders a file that looks
+  fine and is ignored by the product. Give the file's contents as text to render it exactly as
+  written. `Renviron.site` is recognized as ini and does not warn.
 - **DEPRECATED**: writing those files as a map. A map is rendered in alphabetical order, which
   silently changes what these files do, and nothing in `values.yaml` shows it. The map form still
   works and now prints a `WARNING` in `NOTES.txt` once a file holds more than one section or entry.

@@ -254,3 +254,48 @@ tests:
     asserts:
       - notMatchRegexRaw:
           pattern: "written as lists"
+
+  # -- A file matching no row in rstudio-workbench.config.fileTable still renders as ini, which is
+  # a guess; the chart says so rather than guessing quietly.
+  - it: should warn when a file the chart does not recognize is written as a map
+    set:
+      config:
+        session:
+          my-thing:
+            FOO: bar
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the chart does not recognize the following configuration files"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.session\\.my-thing`"
+
+  - it: should not warn when an unrecognized file is given as text
+    set:
+      config:
+        session:
+          my-thing: |
+            FOO=bar
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "does not recognize the following"
+
+  - it: should not warn for files the table does list
+    set:
+      config:
+        server:
+          otel.conf:
+            exporter: otlp
+        session:
+          Renviron.site:
+            TZ: UTC
+          r-versions:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "does not recognize the following"
+
+  - it: should not warn about unrecognized files on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "does not recognize the following"

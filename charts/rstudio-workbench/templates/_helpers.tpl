@@ -718,35 +718,87 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- /*
-  Renders `config.session`, choosing a renderer per file rather than treating every file as ini.
-  The files in that directory are not all the same format:
+  ==========================================================================
+  Config file table - the one place that knows anything about config filenames
+  ==========================================================================
 
-    - `r-versions` and `notifications.conf` are DCF: `Key: Value`, with records separated by a
-      blank line. Rendered as ini they came out as `Key=Value`, which Workbench cannot parse -- it
-      falls back to a legacy mode and logs "does not point to a valid directory" per line, so the
-      file is silently ignored. See https://github.com/rstudio/helm/issues/948
-    - `*.json` files are JSON.
-    - everything else (`repos.conf`, `rsession.conf`, `pip.conf`, ...) is ini.
+  One row per file: scope | filename pattern | kind. The first matching row wins.
 
-  A raw string is always passed through unchanged, so it stays with the ini renderer: the JSON
-  renderer would re-encode it with `toPrettyJson` and turn `{}` into the quoted string `"{}"`.
+    scope    config.server / config.session / config.profiles, or * for any
+    pattern  regex matched against the filename
+    kind     ini          Key=Value under [section] headings. Nothing depends on
+                          the order of the sections, so a map is the right form.
+             ordered_ini  ini whose behavior depends on the order of its sections
+                          or entries, so it wants the list form.
+             dcf          Key: Value, records separated by a blank line
+             json         JSON
+
+  A file matching no row is "unknown". Its contents are best given as a string,
+  which is passed through untouched whatever the format. Written as a map or a
+  list it is still built as ini, because that is what the chart has always done,
+  but NOTES.txt says so: guessing ini for a file we do not recognize is how
+  `r-versions` came out as `Key=Value`, which Workbench silently ignores (#948).
+
+  Consumers: configmap-general.yaml and configmap-session.yaml pick the renderer,
+  NOTES.txt raises the two form warnings. Add a file here and all of them follow.
 */ -}}
-{{- define "rstudio-workbench.config.sessionFiles" -}}
+{{- define "rstudio-workbench.config.fileTable" -}}
+server   | ^profiles$                      | ordered_ini
+server   | ^launcher\..+\.resources\.conf$ | ordered_ini
+profiles | ^launcher\..+\.profiles\.conf$  | ordered_ini
+*        | ^repos\.conf$                   | ordered_ini
+*        | ^r-versions$                    | dcf
+*        | ^notifications\.conf$           | dcf
+*        | \.json$                         | json
+*        | ^chronicle-local\.gcfg$         | ini
+*        | ^Renviron\.site$                | ini
+*        | \.conf$                         | ini
+{{- end -}}
+
+{{- /*
+  Looks a file up in the table. Takes `scope` and `file`; returns its kind, or
+  "unknown" when no row matches.
+*/ -}}
+{{- define "rstudio-workbench.config.fileKind" -}}
+{{- $scope := .scope -}}
+{{- $file := .file -}}
+{{- $hit := "" -}}
+{{- range $line := splitList "\n" (include "rstudio-workbench.config.fileTable" .) -}}
+  {{- if and (not $hit) (contains "|" $line) -}}
+    {{- $col := splitList "|" $line -}}
+    {{- if and (or (eq (trim (index $col 0)) "*") (eq (trim (index $col 0)) $scope)) (regexMatch (trim (index $col 1)) $file) -}}
+      {{- $hit = trim (index $col 2) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $hit | default "unknown" -}}
+{{- end -}}
+
+{{- /*
+  Renders one config scope, picking a renderer per file from the table above rather than
+  treating every file as ini. The files in these directories are not all the same format:
+  `r-versions` and `notifications.conf` are DCF, `*.json` files are JSON, and the rest of
+  what the chart recognizes is ini.
+
+  Takes `scope` and `data`. A file the table does not list falls back to ini, which is
+  a guess; NOTES.txt warns about it so the guess is at least visible.
+*/ -}}
+{{- define "rstudio-workbench.config.files" -}}
+{{- $scope := .scope }}
 {{- $ini := dict }}
 {{- $dcf := dict }}
 {{- $json := dict }}
-{{- range $file, $contents := . }}
-  {{- if kindIs "string" $contents }}
+{{- range $file, $contents := .data }}
+  {{- $kind := include "rstudio-workbench.config.fileKind" (dict "scope" $scope "file" $file) }}
+  {{- if or (kindIs "string" $contents) (empty $contents) }}
+    {{- /* Already the finished file. Every renderer has to pass a string through untouched and
+           the ini one does; the JSON one would re-encode it and turn `{}` into `"{}"`. Empty
+           renders to nothing whichever bucket it lands in. */ -}}
     {{- $_ := set $ini $file $contents }}
-  {{- else if empty $contents }}
-    {{- /* nothing to render either way; keep it with ini so output is unchanged */ -}}
-    {{- $_ := set $ini $file $contents }}
-  {{- else if include "rstudio-workbench.config.nonIni" (dict "file" $file) }}
-    {{- if hasSuffix ".json" $file }}
-      {{- $_ := set $json $file $contents }}
-    {{- else }}
-      {{- $_ := set $dcf $file $contents }}
-    {{- end }}
+  {{- else if eq $kind "dcf" }}
+    {{- $_ := set $dcf $file $contents }}
+  {{- else if eq $kind "json" }}
+    {{- $_ := set $json $file $contents }}
   {{- else }}
     {{- $_ := set $ini $file $contents }}
   {{- end }}
@@ -755,30 +807,3 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if $dcf }}{{- include "rstudio-library.config.dcf" $dcf }}{{- end }}
 {{- if $json }}{{- include "rstudio-library.config.json" $json }}{{- end }}
 {{- end }}
-
-{{- /*
-  Filename dispatch, in one place. Three consumers: `configmap-session.yaml` picks a renderer,
-  and `NOTES.txt` raises both of the form warnings. Keeping the lists here is what stops them
-  drifting apart.
-*/ -}}
-
-{{- /* Files whose behavior depends on the order of their sections or entries. These want the
-       list form; a map sorts them by name and silently changes what they do. */ -}}
-{{- define "rstudio-workbench.config.orderSensitive" -}}
-{{- $file := .file -}}
-{{- $scope := .scope -}}
-{{- if eq $scope "server" -}}
-  {{- or (eq $file "profiles") (regexMatch "^launcher\\..+\\.resources\\.conf$" $file) | ternary "yes" "" -}}
-{{- else if eq $scope "profiles" -}}
-  {{- regexMatch "^launcher\\..+\\.profiles\\.conf$" $file | ternary "yes" "" -}}
-{{- else if eq $scope "session" -}}
-  {{- eq $file "repos.conf" | ternary "yes" "" -}}
-{{- end -}}
-{{- end -}}
-
-{{- /* Session files that are not ini. `r-versions` and `notifications.conf` are DCF; `.json` is
-       JSON. These legitimately take a list, so the ini form warnings must not apply to them. */ -}}
-{{- define "rstudio-workbench.config.nonIni" -}}
-{{- $file := .file -}}
-{{- or (has $file (list "r-versions" "notifications.conf")) (hasSuffix ".json" $file) | ternary "yes" "" -}}
-{{- end -}}
