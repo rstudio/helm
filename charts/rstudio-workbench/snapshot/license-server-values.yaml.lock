@@ -5,6 +5,7 @@ kind: ServiceAccount
 metadata:
   name: release-name-rstudio-workbench
   namespace: rstudio
+
 ---
 # Source: rstudio-workbench/templates/configmap-secret.yaml
 apiVersion: v1
@@ -19,6 +20,8 @@ stringData:
     
   secure-cookie-key: |
     abc
+    
+
 ---
 # Source: rstudio-workbench/templates/configmap-general.yaml
 apiVersion: v1
@@ -56,7 +59,6 @@ data:
     default-session-cluster=Kubernetes
     jupyter-exe=/usr/local/bin/jupyter
     labs-enabled=1
-    notebooks-enabled=1
   launcher.conf: |
     [cluster]
     name=Kubernetes
@@ -73,38 +75,65 @@ data:
   
   launcher.kubernetes.conf: |
     kubernetes-namespace=rstudio
+    use-templating=1
   logging.conf: |
     [*]
     log-level=info
     logger-type=stderr
   
+  positron-user-settings.json: |
+    {
+      "terminal.integrated.defaultProfile.linux": "bash",
+      "extensions.autoUpdate": false,
+      "extensions.autoCheckUpdates": false,
+      "quarto.path": "/usr/lib/rstudio-server/bin/quarto/bin/quarto",
+      "python.interpreters.exclude": [
+          "/usr/bin",
+          "/bin"
+      ],
+      "python.environmentProviders.enable": {
+          "Conda": false
+      }
+    }
+    
+  positron.conf: |
+    enabled=1
+    session-timeout-kill-hours=12
   rserver.conf: |
     admin-enabled=1
+    audited-jobs=1
     auth-pam-sessions-enabled=1
+    chronicle-enabled=0
     launcher-address=127.0.0.1
     launcher-default-cluster=Kubernetes
     launcher-port=5559
+    launcher-sessions-auto-update=1
     launcher-sessions-callback-address=http://release-name-rstudio-workbench.rstudio.svc.cluster.local:80
     launcher-sessions-enabled=1
-    monitor-graphite-client-id=rstudio
-    monitor-graphite-enabled=1
-    monitor-graphite-host=127.0.0.1
-    monitor-graphite-port=9109
+    launcher-sessions-init-container-image-name=posit/workbench-session-init
+    launcher-sessions-init-container-image-tag=2026.09.0
+    metrics-enabled=1
+    metrics-port=8989
     server-health-check-enabled=1
     server-license-type=remote
     server-project-sharing=1
+    server-user=rstudio-server
     www-port=8787
   vscode-user-settings.json: |
     {
-          "terminal.integrated.shell.linux": "/bin/bash",
+          "terminal.integrated.defaultProfile.linux": "bash",
           "extensions.autoUpdate": false,
           "extensions.autoCheckUpdates": false
     }
     
   vscode.conf: |
-    args=--verbose --host=0.0.0.0
     enabled=1
-    exe=/opt/code-server/bin/code-server
+    session-timeout-kill-hours=12
+  vscode.extensions.conf: |
+    quarto.quarto
+    posit.shiny
+    posit.publisher
+    
 
   
   
@@ -112,58 +141,441 @@ data:
   
     [*]
     allow-unknown-images=1
-    container-images=rstudio/r-session-complete:ubuntu2204-2023.06.0
-    default-container-image=rstudio/r-session-complete:ubuntu2204-2023.06.0
-    job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json"
+    container-images=posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
+    default-container-image=posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
   
   
   
   
   
   launcher-mounts: |
+  
+
 ---
 # Source: rstudio-workbench/templates/configmap-general.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: release-name-rstudio-workbench-overrides-new
+  name: release-name-rstudio-workbench-templates
   namespace: rstudio
 data:
+  rstudio-library-templates-data.tpl: |
+    {{- define "rstudio-library.templates.data" -}}
+    {"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"}],"volumes":[{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"}]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}
+    {{- end }}
+  job.tpl: |
+    # Version: 2.5.0
+    # DO NOT MODIFY the "Version: " key
+    # Helm Version: v1
+    {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        {{- with .Job.metadata.job.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+        {{- with $templateData.job.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+      labels:
+        app.kubernetes.io/managed-by: "launcher"
+        {{- with .Job.instanceId }}
+        launcher-instance-id: {{ toYaml . }}
+        {{- end }}
+        {{- with .Job.metadata.job.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+        {{- with $templateData.job.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+      generateName: {{ toYaml .Job.generateName }}
+    spec:
+      {{- if $templateData.job.ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished: {{ $templateData.job.ttlSecondsAfterFinished }}
+      {{- end }}
+      backoffLimit: 0
+      template:
+        metadata:
+          annotations:
+            {{- if .Job.tags }}
+            {{- $i := 0 }}
+            {{- range .Job.tags }}
+            USER_TAG_{{ $i }}: {{ toYaml . | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- $i = add $i 1 }}
+            {{- end }}
+            {{- end }}
+            {{- if not $templateData.pod.suppressStdinAnnotation }}
+            stdin: {{ toYaml .Job.stdin | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            user: {{ toYaml .Job.user }}
+            name: {{ toYaml .Job.name | indent 8 | trimPrefix (repeat 8 " ") }}
+            service_ports: {{ toYaml .Job.servicePortsJson | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- if .Job.metadata }}
+            user_metadata: {{ toJson .Job.metadata | toYaml | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- with .Job.metadata.pod.annotations }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
+            {{- with $templateData.pod.annotations }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
+          labels:
+            {{- with .Job.instanceId }}
+            launcher-instance-id: {{ toYaml . }}
+            {{- end }}
+            {{- with .Job.metadata.pod.labels }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
+            {{- with $templateData.pod.labels }}
+            {{- range $key, $val := . }}
+            {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+            {{- end }}
+            {{- end }}
+          generateName: {{ toYaml .Job.generateName }}
+        spec:
+          {{- if .Job.host }}
+          nodeName: {{ toYaml .Job.host }}
+          {{- end }}
+          enableServiceLinks: {{ if hasKey $templateData.pod "enableServiceLinks" }}{{ $templateData.pod.enableServiceLinks }}{{ else }}false{{ end }}
+          restartPolicy: Never
+          {{- if or $templateData.pod.serviceAccountName .Job.serviceAccountName }}
+          serviceAccountName: {{ .Job.serviceAccountName | default $templateData.pod.serviceAccountName | quote }}
+          {{- end }}
+          {{- with $templateData.pod.hostAliases }}
+          hostAliases:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          shareProcessNamespace: {{ .Job.shareProcessNamespace }}
+          {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumes) 0) }}
+          volumes:
+            {{- range .Job.volumes }}
+            - {{ nindent 10 (toYaml .) | trim -}}
+            {{- end }}
+            {{- range $templateData.pod.volumes }}
+            - {{ nindent 10 (toYaml .) | trim -}}
+            {{- end }}
+          {{- end }}
+          {{- with $templateData.pod.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with $templateData.pod.affinity }}
+          affinity:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- if or (ne (len .Job.placementConstraints) 0) (and $templateData.pod.nodeSelector (ne (len $templateData.pod.nodeSelector) 0)) }}
+          nodeSelector:
+            {{- range .Job.placementConstraints }}
+            {{ .name }}: {{ toYaml .value }}
+            {{- end }}
+            {{- range $key,$val := $templateData.pod.nodeSelector }}
+            {{ $key }}: {{- toYaml $val | nindent 10 }}
+            {{- end }}
+          {{- end }}
+          {{- with $templateData.pod.priorityClassName }}
+          priorityClassName:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- $securityContext := $templateData.pod.defaultSecurityContext }}
+          {{- if .Job.container.runAsUserId }}
+            {{- $_ := set $securityContext "runAsUser" .Job.container.runAsUserId }}
+          {{- end }}
+          {{- if .Job.container.runAsGroupId }}
+            {{- $_ := set $securityContext "runAsGroup" .Job.container.runAsGroupId }}
+          {{- end }}
+          {{- if .Job.container.supplementalGroupIds }}
+            {{- $groupIds := list }}
+            {{- range .Job.container.supplementalGroupIds }}
+              {{- $groupIds = append $groupIds . }}
+            {{- end }}
+            {{- $_ := set $securityContext "supplementalGroups" (cat "[" ($groupIds | join ", ") "]") }}
+            {{- $securityContext := mergeOverwrite $securityContext $templateData.pod.securityContext }}
+          {{- end }}
+          {{- if $securityContext }}
+          securityContext:
+            {{- range $key, $val := $securityContext }}
+            {{ $key }}: {{ $val }}
+            {{- end }}
+          {{- end }}
+          {{- with $templateData.pod.imagePullSecrets }}
+          imagePullSecrets: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          initContainers:
+            {{- with .Job.initContainers }}
+            {{- range . }}
+            - name: {{ toYaml .name }}
+              image: {{ toYaml .image }}
+              {{- $isShell := false }}
+              {{- if .command }}
+              command: ['/bin/sh']
+              {{- $isShell = true }}
+              {{- else if .exe }}
+              command: [{{ toYaml .exe }}]
+              {{- $isShell = false }}
+              {{- end }}
+              {{- if or .args $isShell }}
+              args:
+                {{- if $isShell }}
+                - '-c'
+                {{- if .args }}
+                - {{ .args | join " " | cat .command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- else }}
+                - {{ .command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- end }}
+                {{- else }}
+                {{- range .args }}
+                - {{ toYaml . | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if .environment }}
+              env:
+                {{- range .environment }}
+                - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
+                  value: {{ toYaml .value | indent 14 | trimPrefix (repeat 14 " ") }}
+                {{- end }}
+              {{- end }}
+              {{- if .mounts }}
+              volumeMounts:
+                {{- range .mounts }}
+                - {{ nindent 14 (toYaml .) | trim -}}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- with .Job.metadata.pod.initContainers }}
+            {{- range . }}
+            - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
+            {{- end }}
+            {{- end }}
+            {{- with $templateData.pod.initContainers }}
+              {{- range . }}
+            - {{ toYaml . | indent 10 | trimPrefix (repeat 10 " ") }}
+              {{- end }}
+            {{- end }}
+          containers:
+            - name: rs-launcher-container
+              image: {{ toYaml .Job.container.image }}
+              {{- with $templateData.pod.imagePullPolicy }}
+              imagePullPolicy: {{- . | nindent 12 }}
+              {{- end }}
+              {{- $isShell := false }}
+              {{- if $templateData.pod.command }}
+              command: {{- toYaml $templateData.pod.command | nindent 12 }}
+                {{- if .Job.command }}{{- $isShell = true }}{{- end }}
+              {{- else if .Job.command }}
+              command: ['/bin/sh']
+              {{- $isShell = true }}
+              {{- else }}
+              command: [{{ toYaml .Job.exe }}]
+              {{- $isShell = false }}
+              {{- end }}
+              {{- if .Job.stdin }}
+              stdin: true
+              {{- else }}
+              stdin: false
+              {{- end }}
+              stdinOnce: true
+              {{- if .Job.workingDirectory }}
+              workingDir: {{ toYaml .Job.workingDirectory }}
+              {{- end }}
+              {{- if or (ne (len .Job.args) 0) $isShell }}
+              args:
+                {{- if $isShell }}
+                - '-c'
+                {{- if ne (len .Job.args) 0 }}
+                - {{ .Job.args | join " " | cat .Job.command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- else }}
+                - {{ .Job.command | toYaml | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- end }}
+                {{- else }}
+                {{- range .Job.args }}
+                - {{ toYaml . | indent 12 | trimPrefix (repeat 12 " ") }}
+                {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- $secrets := list }}
+              {{- range .Job.config }}
+                {{- if eq .name "secret" }}
+                  {{- $packedSecret := .value }}
+                  {{- $secret := dict }}
+                  {{- $_ := set $secret "secret" (splitList ":" $packedSecret | first) }}
+                  {{- $_ := set $secret "key" (slice (splitList ":" $packedSecret) 1 2 | first) }}
+                  {{- $_ := set $secret "name" (splitList ":" $packedSecret | last) }}
+                  {{- $secrets = append $secrets $secret }}
+                {{- end }}
+              {{- end }}
+              {{- if or (ne (len .Job.environment) 0) (ne (len $secrets) 0) (ne (len $templateData.pod.env) 0) }}
+              env:
+                {{- range .Job.environment }}
+                - name: {{ toYaml .name | indent 14 | trimPrefix (repeat 14 " ") }}
+                  value: {{ toYaml .value | indent 14 | trimPrefix (repeat 14 " ") }}
+                {{- end }}
+                {{- range $secrets }}
+                - name: {{ get . "name"}}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ get . "secret" }}
+                      key: {{ get . "key" }}
+                {{- end }}
+                {{- if $templateData.pod.env }}
+                  {{- toYaml $templateData.pod.env | nindent 12 }}
+                {{- end }}
+              {{- end }}
+              {{- $containerSecurityContext := $templateData.pod.containerSecurityContext | default dict }}
+              {{- if or .Job.container.capabilitiesAdd .Job.container.capabilitiesDrop }}
+                {{- $capabilities := $containerSecurityContext.capabilities | default dict }}
+                {{- with .Job.container.capabilitiesAdd }}
+                  {{- $_ := set $capabilities "add" (concat ($capabilities.add | default list) .) }}
+                {{- end }}
+                {{- with .Job.container.capabilitiesDrop }}
+                  {{- $_ := set $capabilities "drop" (concat ($capabilities.drop | default list) .) }}
+                {{- end }}
+                {{- $_ := set $containerSecurityContext "capabilities" $capabilities }}
+              {{- end }}
+              {{- if $containerSecurityContext }}
+              securityContext:
+                {{- toYaml $containerSecurityContext | nindent 12 }}
+              {{- end }}
+              {{- $exposedPorts := list }}
+              {{- range .Job.exposedPorts }}
+                {{- if .publishedPort }}
+                  {{- $exposedPorts = append $exposedPorts . }}
+                {{- end }}
+              {{- end }}
+              {{- if ne (len $exposedPorts) 0 }}
+              ports:
+                {{- range $exposedPorts }}
+                - containerPort: {{ .targetPort }}
+                  hostPort: {{ .publishedPort }}
+                {{- end }}
+              {{- end }}
+              {{- $limits := dict }}
+              {{- $requests := dict }}
+              {{- range .Job.resourceLimits }}
+                {{- if eq .type "cpuCount" }}
+                  {{- $_ := set $limits "cpu" .value }}
+                {{- else if eq .type "CPU Request" }}
+                  {{- $_ := set $requests "cpu" .value }}
+                {{- else if eq .type "memory" }}
+                  {{- $_ := set $limits "memory" (printf "%s%s" .value "M") }}
+                {{- else if eq .type "Memory Request" }}
+                  {{- $_ := set $requests "memory" (printf "%s%s" .value "M") }}
+                {{- else if eq .type "NVIDIA GPUs" }}
+                  {{- $val := float64 .value }}
+                  {{- if ne $val 0.0 }}
+                    {{- $_ := set $limits "nvidia.com/gpu" $val }}
+                  {{- end }}
+                {{- else if eq .type "AMD GPUs" }}
+                  {{- $val := float64 .value }}
+                  {{- if ne $val 0.0 }}
+                    {{- $_ := set $limits "amd.com/gpu" $val }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if any (ne (len $requests) 0) (ne (len $limits) 0) (ne (len $templateData.pod.ephemeralStorage) 0) }}
+              resources:
+                {{- if any (ne (len $requests) 0) (ne (len $templateData.pod.ephemeralStorage.request) 0) }}
+                requests:
+                  {{- range $key, $val := $requests }}
+                  {{ $key }}: {{ toYaml $val }}
+                  {{- end }}
+                  {{- if gt (len $templateData.pod.ephemeralStorage.request) 0 }}
+                  ephemeral-storage: {{ $templateData.pod.ephemeralStorage.request }}
+                  {{- end }}
+                {{- end }}
+                {{- if any (ne (len $limits) 0) (ne (len $templateData.pod.ephemeralStorage.limit) 0) }}
+                limits:
+                  {{- range $key, $val := $limits }}
+                  {{ $key }}: {{ toYaml $val }}
+                  {{- end }}
+                  {{- if gt (len $templateData.pod.ephemeralStorage.limit) 0 }}
+                  ephemeral-storage: {{ $templateData.pod.ephemeralStorage.limit }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+              {{- if or (ne (len .Job.volumes) 0) (ne (len $templateData.pod.volumeMounts) 0) }}
+              volumeMounts:
+                {{- range .Job.volumeMounts }}
+                - {{ nindent 14 (toYaml .) | trim -}}
+                {{- end }}
+                {{- range $templateData.pod.volumeMounts }}
+                - {{ nindent 14 (toYaml .) | trim -}}
+                {{- end }}
+              {{- end }}
+            {{- with $templateData.pod.extraContainers }}
+              {{- toYaml . | nindent 8 }}
+            {{- end }}
     
-  defaultSessionVolume.json: |
-    {
-      "configMap": {
-        "defaultMode": 420,
-        "name": "release-name-rstudio-workbench-session"
-      },
-      "name": "session-config"
-    }
-  defaultSessionVolumeMount.json: |
-    {
-      "mountPath": "/mnt/session-configmap/rstudio",
-      "name": "session-config"
-    }
----
-# Source: rstudio-workbench/templates/configmap-graphite-exporter.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: release-name-rstudio-workbench-graphite
-  namespace: rstudio
-data:
-  graphite-mapping.yaml: |-
-    mappings:
-    - match: "rstudio\\.([\\w-]+)\\.system\\.load\\.(.*)"
-      match_type: regex
-      name: "rstudio_system_load"
+  service.tpl: |
+    # Version: 2.5.0
+    # DO NOT MODIFY the "Version: " key
+    # Helm Version: v1
+    {{- $templateData := include "rstudio-library.templates.data" nil | mustFromJson }}
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: {{ .Job.serviceName }}
+      annotations:
+        {{- with .Job.metadata.service.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
+        {{- with $templateData.service.annotations }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 4 | trimPrefix (repeat 4 " ") }}
+        {{- end }}
+        {{- end }}
       labels:
-        host: "$1"
-        duration: "$2"
-    - match: "rstudio\\.([\\w-]+)\\.(.*)"
-      match_type: regex
-      name: "rstudio_$2"
-      labels:
-        host: "$1"
+        app.kubernetes.io/managed-by: "launcher"
+        job-name: {{ toYaml .Job.id }}
+        {{- with .Job.instanceId }}
+        launcher-instance-id: {{ toYaml . }}
+        {{- end }}
+        {{- with .Job.metadata.service.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
+        {{- with $templateData.service.labels }}
+        {{- range $key, $val := . }}
+        {{ $key }}: {{ toYaml $val | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- end }}
+        {{- end }}
+    spec:
+      ports:
+        {{- $i := 0 }}
+        {{- range .Job.exposedPorts }}
+        {{- if not .publishedPort }}
+        - name: {{ printf "port%d" $i }}
+          protocol: {{ .protocol }}
+          port: {{ .targetPort }}
+          targetPort: {{ .targetPort }}
+          {{- $i = add $i 1 }}
+        {{- end }}
+        {{- end }}
+      selector:
+        job-name: {{toYaml .Job.id }}
+      clusterIP: ''
+      type: {{ $templateData.service.type }}
+    
+
 ---
 # Source: rstudio-workbench/templates/configmap-prestart.yaml
 apiVersion: v1
@@ -187,6 +599,14 @@ data:
       _logf 'Ensuring %s exists' "${dyn_dir}"
       mkdir -p "${dyn_dir}"
     
+      if [[ -f "${launcher_pem}" ]]; then
+        # fsGroup adds group-read (0640) to the secret mount, which rserver rejects for
+        # launcher.pem. Read the key from a private 0600 copy instead; dyn_dir precedes
+        # the secret mount in XDG_CONFIG_DIRS.
+        _logf 'Copying %s to %s with mode 0600' "${launcher_pem}" "${dyn_dir}/launcher.pem"
+        install -m 0600 "${launcher_pem}" "${dyn_dir}/launcher.pem"
+      fi
+    
       if [[ ! -s "${launcher_pub}" ]] && [[ -f "${launcher_pem}" ]]; then
         _logf 'Generating %s from %s' "${launcher_pub}" "${launcher_pem}"
         openssl rsa -in "${launcher_pem}" -outform PEM -pubout -out "${launcher_pub}" 2>&1 | _indent
@@ -199,17 +619,7 @@ data:
       if [[ -n "$RSW_LOAD_BALANCING" ]]; then
         _logf "Enabling load-balancing by making sure that the /mnt/load-balancer/rstudio/load-balancer file exists"
         mkdir -p /mnt/load-balancer/rstudio/
-        echo -e "balancer=sessions\nwww-host-name=$(hostname -i)" > /mnt/load-balancer/rstudio/load-balancer
-      fi
-    
-      _logf 'Preparing dirs'
-      mkdir -p \
-        /var/lib/rstudio-server/monitor/log
-      
-      if [ -d "/var/lib/rstudio-server/Local" ]; then
-        chown -v -R \
-        rstudio-server:rstudio-server \
-        /var/lib/rstudio-server/Local 2>&1 | _indent
+        echo -e "delete-node-on-exit=1\nwww-host-name=$(hostname -i)" > /mnt/load-balancer/rstudio/load-balancer
       fi
     
       _writeEtcRstudioReadme
@@ -244,7 +654,7 @@ data:
     the XDG_CONFIG_DIRS environment variable defined in the Helm chart. The currently
     defined directories are:
     
-    $(echo "$XDG_CONFIG_DIRS" | sed 's/:/\n/g')
+    $(echo "$XDG_CONFIG_DIRS" | tr ':' '\n')
     $HERE$
       ) > /etc/rstudio/README
     }
@@ -258,24 +668,20 @@ data:
     
     main() {
       local startup_script="${1:-/usr/lib/rstudio-server/bin/rstudio-launcher}"
-      local dyn_dir='/mnt/dynamic/rstudio'
-    
-      local cacert='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-      local host="${KUBERNETES_SERVICE_HOST}"
-      if [[ "${host}" == *:* ]]; then
-        host="[${host}]"
-      fi
-      local k8s_url="https://${host}:${KUBERNETES_SERVICE_PORT}"
-    
-      _logf 'Loading service account token'
-      local sa_token
-      sa_token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-    
-      _logf 'Ensuring %s exists' "${dyn_dir}"
-      mkdir -p "${dyn_dir}"
     
       # Empty if enabled, set to "disabled" by default
       if [[ -z "${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}" ]]; then
+        local cacert='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+        local host="${KUBERNETES_SERVICE_HOST}"
+        if [[ "${host}" == *:* ]]; then
+          host="[${host}]"
+        fi
+        local k8s_url="https://${host}:${KUBERNETES_SERVICE_PORT}"
+    
+        _logf 'Loading service account token'
+        local sa_token
+        sa_token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    
         _logf 'Checking kubernetes health via %s' "${k8s_url}"
         # shellcheck disable=SC2086
         curl ${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS} \
@@ -288,24 +694,14 @@ data:
         printf '\n'
       fi
     
-      _logf 'Configuring certs'
-      cp -v "${cacert}" ${dyn_dir}/k8s-cert 2>&1 | _indent
-      mkdir -p /usr/local/share/ca-certificates/Kubernetes
-      cp -v \
-        ${dyn_dir}/k8s-cert \
-        /usr/local/share/ca-certificates/Kubernetes/cert-Kubernetes.crt 2>&1 | _indent
-    
-      _logf 'Updating CA certificates'
-      PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-        update-ca-certificates 2>&1 | _indent
-    
+      # Create the Local scratch dir setgid + group-writable (2775). In root mode this prestart runs as
+      # root but the launcher drops to the non-root serviceAccountUser; the dir inherits the
+      # rstudio-server group from the setgid parent, so the launcher can write to it via group
+      # permission without any root-only ownership change. In rootless mode the process already
+      # is serviceAccountUser. The Kubernetes scratch dir is mounted as an fsGroup-owned emptyDir by
+      # the chart, so it arrives group-writable and must not be chmod-ed here (a non-owner chmod EPERMs).
       _logf 'Preparing dirs'
-      mkdir -p \
-        /var/lib/rstudio-launcher/Local \
-        /var/lib/rstudio-launcher/Kubernetes
-      chown -v -R \
-        rstudio-server:rstudio-server \
-        /var/lib/rstudio-launcher/Local 2>&1 | _indent
+      install -d -m 2775 /var/lib/rstudio-launcher/Local
     
       _logf 'Replacing process with %s' "${startup_script}"
       exec "${startup_script}"
@@ -327,6 +723,8 @@ data:
     }
     
     main "${@}"
+    
+
 ---
 # Source: rstudio-workbench/templates/configmap-session.yaml
 apiVersion: v1
@@ -338,9 +736,12 @@ data:
   
   notifications.conf: |
   repos.conf: |
-    RSPM=https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
+    CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
   rsession.conf: |
   rstudio-prefs.json: |
+    {}
+    
+
 ---
 # Source: rstudio-workbench/templates/configmap-startup.yaml
 apiVersion: v1
@@ -358,6 +759,7 @@ data:
     stdout_logfile_maxbytes=0
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
+
 ---
 # Source: rstudio-workbench/templates/configmap-startup.yaml
 apiVersion: v1
@@ -375,6 +777,7 @@ data:
     stdout_logfile_maxbytes=0
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
+
 ---
 # Source: rstudio-workbench/templates/configmap-startup.yaml
 apiVersion: v1
@@ -386,7 +789,7 @@ data:
   
   sssd.conf: |
     [program:sssd]
-    command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
+    command=/bin/bash -c 'mkdir -p /etc/sssd/conf.d && for f in /mnt/user-provisioning/*; do [ -e "$f" ] && install -m 0600 "$f" /etc/sssd/conf.d/; done; exec /usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr'
     autorestart=false
     numprocs=1
     stdout_logfile=/dev/stdout
@@ -395,6 +798,7 @@ data:
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
     stderr_logfile_backups=0
+
 ---
 # Source: rstudio-workbench/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -465,6 +869,7 @@ rules:
       - "pods"
     verbs:
       - "get"
+
 ---
 # Source: rstudio-workbench/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -480,6 +885,7 @@ subjects:
   - kind: ServiceAccount
     name: release-name-rstudio-workbench
     namespace: rstudio
+
 ---
 # Source: rstudio-workbench/templates/svc.yaml
 apiVersion: v1
@@ -491,12 +897,10 @@ metadata:
     helm.sh/chart: rstudio-workbench-VERSION
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "2023.06.0"
+    app.kubernetes.io/version: "2026.09.0"
     app.kubernetes.io/managed-by: Helm
-  annotations:
-    
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: rstudio-workbench
     app.kubernetes.io/instance: release-name
@@ -506,7 +910,9 @@ spec:
     port: 80
     targetPort: 8787
   - name: metrics
-    port: 9108
+    targetPort: metrics
+    port: 8989
+
 ---
 # Source: rstudio-workbench/templates/deployment.yaml
 apiVersion: apps/v1
@@ -529,14 +935,13 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: c12b9929a7922d54f148c71605ec3462ea537c0b3de93863017e55de6b38a57e
-        checksum/config-graphite: 9e9249a6820fceccee72ec5c0811fe22cc8a91eabd085164826ff92b3d693b36
-        checksum/config-prestart: 88c121990a2291900c2e9e4dda1cecda9614a767ee6c6c05068bcadd0f8e97e9
+        checksum/config-general: 7f2505a99c0fdcbd5aef10d4007e9aac913cc28f91c5008608bbe58fc2c926a7
+        checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
-        checksum/config-session: dec54acfb2c889c81f4e3fe30eeefa38dd28126194d584d801f56774527442e7
+        checksum/config-session: 9ef1204bdb98f009c987668c37a09197705ef115789725cd915ab808a67e2d6b
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
-        prometheus.io/port: "9108"
+        prometheus.io/port: "8989"
         
       labels:
         app.kubernetes.io/name: rstudio-workbench
@@ -544,10 +949,15 @@ spec:
     spec:
       
       serviceAccountName: release-name-rstudio-workbench
-      shareProcessNamespace: false      
+      shareProcessNamespace: false
+      securityContext:
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+        runAsUser: 0
+      terminationGracePeriodSeconds: 120      
       containers:
       - name: rstudio
-        image: "rstudio/rstudio-workbench:ubuntu2204-2023.06.0"
+        image: "posit/workbench:2026.09.0-ubuntu-24.04"
         env:
         - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
           value: "-fsSL"
@@ -566,6 +976,8 @@ spec:
         ports:
         - containerPort: 8787
           name: http
+        - containerPort: 8989
+          name: metrics
         securityContext:
           {}
         volumeMounts:
@@ -579,6 +991,8 @@ spec:
             mountPath: "/mnt/secret-configmap/rstudio/"
           - name: etc-rstudio
             mountPath: "/etc/rstudio"
+          - name: mnt-dynamic
+            mountPath: "/mnt/dynamic"
           - name: rstudio-rsw-startup
             mountPath: "/startup/base"
           - name: rstudio-launcher-startup
@@ -586,38 +1000,32 @@ spec:
           - name: rstudio-user-startup
             mountPath: "/startup/user-provisioning"
           
-          - name: rstudio-job-overrides-new
-            mountPath: "/mnt/job-json-overrides-new"
+          - name: launcher-kubernetes-scratch
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes"
+          # mount into the default scratch-path... what if it gets changed?
+          - name: session-templates
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/rstudio-library-templates-data.tpl"
+            subPath: "rstudio-library-templates-data.tpl"
+          - name: session-templates
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/job.tpl"
+            subPath: "job.tpl"
+          - name: session-templates
+            mountPath: "/var/lib/rstudio-launcher/Kubernetes/service.tpl"
+            subPath: "service.tpl"
         resources:
-          limits:
         readinessProbe:
                 failureThreshold: 3
                 httpGet:
                   path: /health-check
                   port: 8787
-                initialDelaySeconds: 3
+                initialDelaySeconds: 10
                 periodSeconds: 3
                 successThreshold: 1
                 timeoutSeconds: 1
-      - name: exporter
-        image: "prom/graphite-exporter:v0.9.0"
-        imagePullPolicy: "IfNotPresent"
-        args:
-          - "--graphite.mapping-config=/mnt/graphite/graphite-mapping.yaml"
-        volumeMounts:
-          - name: graphite-exporter-config
-            mountPath: "/mnt/graphite/"
-        ports:
-        - containerPort: 9108
-          name: metrics
-        securityContext:
-          {}
       volumes:
-      - name: rstudio-job-overrides-new
-        configMap:
-          name: release-name-rstudio-workbench-overrides-new
-          defaultMode: 420
       - name: etc-rstudio
+        emptyDir: {}
+      - name: mnt-dynamic
         emptyDir: {}
       - name: rstudio-config
         configMap:
@@ -639,120 +1047,29 @@ spec:
         configMap:
           name: release-name-rstudio-workbench-start-launcher
           defaultMode: 493
+      - name: launcher-kubernetes-scratch
+        emptyDir: {}
       - name: rstudio-user-startup
         configMap:
           name: release-name-rstudio-workbench-start-user
           defaultMode: 493
       - name: rstudio-secret
-        secret:
-          secretName: release-name-rstudio-workbench-secret
-          defaultMode: 384
+        projected:
+          sources:
+          - secret:
+              name: release-name-rstudio-workbench-secret
+              items:
+              - key: launcher.pem
+                path: launcher.pem
+                mode: 384
+          - secret:
+              name: release-name-rstudio-workbench-secret
+              items:
+              - key: secure-cookie-key
+                path: secure-cookie-key
+                mode: 384
       
-      - name: graphite-exporter-config
+      - name: session-templates
         configMap:
-          name: release-name-rstudio-workbench-graphite
+          name: release-name-rstudio-workbench-templates
           defaultMode: 420
----
-# Source: rstudio-workbench/templates/tests/test-verify-installation.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: release-name-rstudio-workbench-test
-  annotations:
-   "helm.sh/hook": test
-spec:
-  
-  serviceAccountName: release-name-rstudio-workbench
-  shareProcessNamespace: false
-  restartPolicy: Never
-  
-  containers:
-  - name: rstudio
-    image: "rstudio/rstudio-workbench:ubuntu2204-2023.06.0"
-    env:
-    - name: DIAGNOSTIC_DIR
-      value: "/var/log/rstudio"
-    - name: DIAGNOSTIC_ONLY
-      value: "true"
-    - name: DIAGNOSTIC_ENABLE
-      value: "true"
-    - name: RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK_ARGS
-      value: "-fsSL"
-    - name: RSTUDIO_LAUNCHER_NAMESPACE
-      value: "rstudio"
-    
-    - name: RSW_LICENSE_SERVER
-      value: "http://my-license-server.example.com:9999"
-    - name: RSW_LAUNCHER
-      value: "true"
-    - name: RSW_TESTUSER
-      value: "rstudio"
-    - name: RSW_TESTUSER_UID
-      value: "10000"
-    - name: RSW_TESTUSER_PASSWD
-      value: "rstudio"
-    - name: XDG_CONFIG_DIRS
-      value: "/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"
-    imagePullPolicy: "IfNotPresent"
-    ports:
-    - containerPort: 8787
-      name: http
-    securityContext:
-      {}
-    volumeMounts:
-      - name: rstudio-prestart
-        mountPath: "/scripts/"
-      - name: rstudio-config
-        mountPath: "/mnt/configmap/rstudio/"
-      - name: rstudio-session-config
-        mountPath: "/mnt/session-configmap/rstudio/"
-      - name: rstudio-secret
-        mountPath: "/mnt/secret-configmap/rstudio/"
-      - name: etc-rstudio
-        mountPath: "/etc/rstudio"
-      - name: rstudio-rsw-startup
-        mountPath: "/startup/base"
-      - name: rstudio-launcher-startup
-        mountPath: "/startup/launcher"
-      - name: rstudio-user-startup
-        mountPath: "/startup/user-provisioning"
-      
-      - name: rstudio-job-overrides-new
-        mountPath: "/mnt/job-json-overrides-new"
-    resources:
-      limits:
-  volumes:
-  - name: rstudio-job-overrides-new
-    configMap:
-      name: release-name-rstudio-workbench-overrides-new
-      defaultMode: 420
-  - name: etc-rstudio
-    emptyDir: {}
-  - name: rstudio-config
-    configMap:
-      name: release-name-rstudio-workbench-config
-      defaultMode: 420
-  - name: rstudio-session-config
-    configMap:
-      name: release-name-rstudio-workbench-session
-      defaultMode: 420
-  - name: rstudio-prestart
-    configMap:
-      name: release-name-rstudio-workbench-prestart
-      defaultMode: 493
-  - name: rstudio-rsw-startup
-    configMap:
-      name: release-name-rstudio-workbench-start-rsw
-      defaultMode: 493
-  - name: rstudio-launcher-startup
-    configMap:
-      name: release-name-rstudio-workbench-start-launcher
-      defaultMode: 493
-  - name: rstudio-user-startup
-    configMap:
-      name: release-name-rstudio-workbench-start-user
-      defaultMode: 493
-  - name: rstudio-secret
-    secret:
-      secretName: release-name-rstudio-workbench-secret
-      defaultMode: 384

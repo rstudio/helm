@@ -501,6 +501,64 @@ tests:
       - equal:
           path: 'spec.template.spec.volumes[?(@.name=="rstudio-pam")].configMap.defaultMode'
           value: 0600
+  - it: should mount pam files in sorted order so the pod spec is stable across renders
+    template: deployment.yaml
+    set:
+      config:
+        pam:
+          h.conf: {}
+          d.conf: {}
+          k.conf: {}
+          a.conf: {}
+          l.conf: {}
+          j.conf: {}
+          c.conf: {}
+          f.conf: {}
+          b.conf: {}
+          i.conf: {}
+          g.conf: {}
+          e.conf: {}
+    # More than eight keys, so the unsorted map order is actually shuffled; with
+    # fewer, sprig `keys` often comes back sorted by chance and the test cannot fail.
+    # A filter path only yields its first match, so assert by position. If mounts
+    # are added ahead of rstudio-pam, shift these indices.
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[8].subPath'
+          value: a.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[9].subPath'
+          value: b.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[10].subPath'
+          value: c.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[11].subPath'
+          value: d.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[12].subPath'
+          value: e.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[13].subPath'
+          value: f.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[14].subPath'
+          value: g.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[15].subPath'
+          value: h.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[16].subPath'
+          value: i.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[17].subPath'
+          value: j.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[18].subPath'
+          value: k.conf
+      - equal:
+          path: 'spec.template.spec.containers[0].volumeMounts[19].subPath'
+          value: l.conf
   - it: should not specify a volumeMount and a volume for pam if config.pam is not defined
     template: deployment.yaml
     set:
