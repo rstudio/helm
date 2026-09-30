@@ -34,7 +34,7 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 {{- $wantsMap := list }}
 {{- $assumedIni := list }}
 {{- range $scope := (list "server" "session" "profiles") }}
-  {{- range $file, $contents := (get $.Values.config $scope) }}
+  {{- range $file, $contents := (get $.Values.config $scope | default dict) }}
     {{- $path := printf "config.%s.%s" $scope ($file | replace "." "\\.") }}
     {{- $format := include "rstudio-workbench.config.fileFormat" (dict "scope" $scope "file" $file) }}
     {{- $ordered := include "rstudio-workbench.config.fileOrdered" (dict "scope" $scope "file" $file) }}
@@ -146,7 +146,7 @@ Please consider removing this configuration value.
 {{- end }}
 
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
-  {{- if hasKey .Values.config.profiles "launcher.kubernetes.profiles.conf" }}
+  {{- if hasKey (default (dict) .Values.config.profiles) "launcher.kubernetes.profiles.conf" }}
     {{- $normalized := dict }}
     {{- include "rstudio-library.config.entries" (dict "data" (get .Values.config.profiles "launcher.kubernetes.profiles.conf") "result" $normalized) }}
     {{- range $entry := $normalized.entries }}

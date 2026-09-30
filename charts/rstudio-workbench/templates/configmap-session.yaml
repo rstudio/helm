@@ -14,12 +14,16 @@
   {{- $_ := set $repos "CRAN" (include "rstudio-workbench.config.defaultCran" .) }}
 {{- else if and $repos (kindIs "slice" $repos) }}
   {{- $hasCran := false }}
+  {{- $allMaps := true }}
   {{- range $item := $repos }}
-    {{- if and (kindIs "map" $item) (hasKey $item "CRAN") }}
+    {{- if not (kindIs "map" $item) }}
+      {{- $allMaps = false }}
+    {{- else if hasKey $item "CRAN" }}
       {{- $hasCran = true }}
     {{- end }}
   {{- end }}
-  {{- if not $hasCran }}
+  {{- /* an entry that is not a map is the renderer's error to report; its message is the useful one */}}
+  {{- if and $allMaps (not $hasCran) }}
     {{- fail "\n\nconfig.session.repos.conf has no entry named CRAN.\n\nWorkbench ignores the whole file without one, so none of these repositories would be\nused. Written as a list, repos.conf replaces the chart's default CRAN entry, so it must\nname its own. It does not have to be CRAN itself - name your own mirror CRAN if that\nis what sessions should use:\n\n  config:\n    session:\n      repos.conf:\n        - CRAN: https://mirror.example.com/cran\n        - Internal: https://pkgs.example.com/internal\n\nTo configure repositories somewhere else instead, set config.session.repos.conf: null\nand the chart will not render the file at all.\n" }}
   {{- end }}
 {{- end }}
@@ -44,7 +48,7 @@ metadata:
 spec:
   encryptedData:
     data:
-      {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 6 }}
+      {{- include "rstudio-library.config.ini.files" (dict "files" .Values.config.sessionSecret "multi" "repeat") | nindent 6 }}
 {{- else }}
 apiVersion: v1
 kind: Secret
@@ -52,7 +56,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-session-secret
   namespace: {{ $.Release.Namespace }}
 stringData:
-  {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 2 }}
+  {{- include "rstudio-library.config.ini.files" (dict "files" .Values.config.sessionSecret "multi" "repeat") | nindent 2 }}
 {{- end }}
 {{- end }}
 
@@ -86,7 +90,7 @@ metadata:
 spec:
   encryptedData:
     data:
-      {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 6 }}
+      {{- include "rstudio-library.config.ini.files" (dict "files" .Values.config.sessionSecret "multi" "repeat") | nindent 6 }}
 {{- else }}
 apiVersion: v1
 kind: Secret
@@ -94,7 +98,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-session-secret
   namespace: {{ $targetNamespace }}
 stringData:
-  {{- include "rstudio-library.config.ini" .Values.config.sessionSecret | nindent 2 }}
+  {{- include "rstudio-library.config.ini.files" (dict "files" .Values.config.sessionSecret "multi" "repeat") | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

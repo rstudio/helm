@@ -205,9 +205,16 @@ The files are converted into configuration files in the necessary format via go-
 ```yaml
 config:
   server:
-    rserver.conf: |
+    logging.conf: |
       verbatim-file=format
 ```
+
+A string is used as the whole file, so it also replaces whatever the chart would have added to that
+file. That matters for the files the chart merges its own settings into: `launcher.conf` (the
+`[server]` `secure-cookie-key-file` entry when `pod.runAsRoot` is `false`), `launcher.kubernetes.conf`
+(`kubernetes-namespace` and `use-templating`) and `positron.conf` (`exe` when the Positron init
+container is enabled) accept a string but you must include those settings yourself; `rserver.conf`
+must be a map. `config.profiles` files must be a map or a list, not a string.
 
 The names of files are dynamically used, so you can add new files as needed. Beware that some files have default values,
 so moving them can have adverse effects. Also, if you use a different mounting paradigm, you need to change
@@ -258,7 +265,7 @@ the `XDG_CONFIG_DIRS` environment variable.
   - `supervisord` service / unit definition `.conf` files.
   - Use the `.ini` file format by default.
   - Mounted at:<br> `/startup/custom`
-  - As with all configuration files above, you can override with a verbatim string if desired:
+  - As with all configuration files above (other than `config.profiles`), you can override with a verbatim string if desired:
   - Located at:<br> `config.startupCustom.<< name of file >>` Helm values:
     ```yaml
     config:
@@ -282,6 +289,22 @@ pip can be configured with `config.session.pip.conf`:
         "global":
           index-url: https://packagemanager.posit.co/pypi/latest/simple
           trusted-host: packagemanager.posit.co
+  ```
+
+`pip.conf` is read by pip, not by Workbench, and pip writes an option with several values (such as
+`extra-index-url`) as one value continued over indented lines. The chart does not produce that
+form, and a repeated key makes pip refuse the whole file, so a list of values in `pip.conf` fails
+the render. Write the file as a string instead:
+
+  ```yaml
+  config:
+    session:
+      pip.conf: |
+        [global]
+        index-url = https://packagemanager.posit.co/pypi/latest/simple
+        extra-index-url =
+            https://pkgs.example.com/internal/simple
+            https://pkgs.example.com/other/simple
   ```
 
 #### R repositories
@@ -434,9 +457,9 @@ each section header. A map does not keep the order you wrote it in: the chart re
 alphabetically, so, for example, a user named `12345` would lose their own settings to every group
 they belong to. The map form still renders, sorted, and the chart warns about it.
 
-This applies to `/etc/rstudio/profiles`, `launcher.*.profiles.conf`, and
-`launcher.*.resources.conf` (where the session launcher lists resource profiles in file order and
-pre-selects the first one).
+This applies to `/etc/rstudio/profiles`, `launcher.*.profiles.conf` (under `config.profiles`, or
+the deprecated `config.server` location), and `launcher.*.resources.conf` (where the session
+launcher lists resource profiles in file order and pre-selects the first one).
 
 Which form to use is decided by the file, not by preference: **an order-sensitive file wants a
 list, every other ini file wants a map.** Helm merges a map with the chart's defaults for a file

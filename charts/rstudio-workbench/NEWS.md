@@ -5,8 +5,8 @@
 - Config files whose behavior depends on the order of their sections or entries can now be written
   as a list, putting `- ` in front of each section or entry, and are rendered in the order written.
   This covers `config.server.profiles`, `config.server.launcher\.*\.resources\.conf`,
-  `config.profiles.launcher\.*\.profiles\.conf` (and its deprecated `config.server` location), and
-  `config.session.repos\.conf`:
+  `config.profiles.launcher\.*\.profiles\.conf` (and the deprecated `config.server` location of
+  those files), and `config.session.repos\.conf`:
 
   ```yaml
   config:
@@ -27,9 +27,9 @@
   form is not going away; it is simply the wrong form for these four files. The raw string form
   (`profiles: |`) keeps the written order and is unaffected.
 - A list of values for one option is now written the way the file's parser expects. Files read by
-  boost `program_options` - `rserver.conf`, `rsession.conf`, `launcher.*.conf`, `jupyter.conf`,
-  `vscode.conf`, `positron.conf` - repeat the key, one line per value, as the chart always did at
-  the top level of a file:
+  boost `program_options` - `rserver.conf`, `rsession.conf`, the `launcher.<cluster>.conf` plugin
+  files, `jupyter.conf`, `vscode.conf`, `positron.conf` - repeat the key, one line per value, as
+  the chart always did at the top level of a file:
 
   ```yaml
   config:
@@ -42,7 +42,17 @@
   Files read by boost `property_tree`, which rejects a repeated key - `profiles`, `launcher.conf`,
   `logging.conf`, `repos.conf`, and the `launcher.*.resources.conf` and `launcher.*.profiles.conf`
   files - comma-join them (`container-images=a,b`), as `config.profiles` always did. Either way the
-  same applies inside a `[section]`, where a list previously rendered as `key=[a b]`.
+  same applies inside a `[section]`, where a list previously rendered as `key=[a b]`. An empty list
+  (`container-images: []`) renders nothing rather than `container-images=[]`.
+
+  `config.session.pip\.conf` is the exception: pip is not Workbench, and it writes several values
+  as one value continued over indented lines, which the chart does not produce. A repeated key
+  makes pip refuse the whole file, so a list of values in `pip.conf` now fails the render with a
+  message saying to write the file as a string. It previously rendered `extra-index-url=[a b]`.
+
+  `config.secret`, `config.sessionSecret`, `config.startupCustom` and `config.startupUserProvisioning`
+  keep repeating the key at the top level of a file, as before. `config.sssd.conf` comma-joins
+  (`domains=a,b`), which is sssd's own syntax; it previously rendered `domains=[a b]`.
 - `config.session` files are now rendered according to their format rather than the shape of the
   value written. `r-versions` and `notifications.conf` are DCF (`Key: Value`, records separated by
   a blank line), `*.json` files are JSON, and everything else stays ini. Previously all of them
@@ -71,12 +81,18 @@
   you write as a map still gets the chart's `CRAN` entry when it has none, as it did when the
   default was a map. A list replaces the default, so it must name a `CRAN` entry itself - Workbench
   ignores the whole file without one - and the chart now fails if it does not. A string without a
-  `CRAN=` line prints a `WARNING` instead.
+  `CRAN=` line prints a `WARNING` instead. With a map, Helm itself also logs `destination for
+  rstudio-workbench.config.session.repos.conf is a table. Ignoring non-table value (...)` on every
+  command: that is the chart's default list being set aside in favor of your map, it is harmless,
+  and it goes away once the file is written as a list.
 - `config.server.rserver\.conf`, `launcher\.conf`, `launcher\.kubernetes\.conf`, and
   `positron\.conf` written as a list now fail with a message saying to write them as a map. The
   chart merges its own settings into these files, which a list silently dropped - `launcher\.conf`
   lost the `[server]` section the launcher needs. `rserver\.conf` written as a string now fails with
-  the same message instead of a template type error.
+  the same message instead of a template type error. The other three still accept a string, which
+  is used as the whole file and so replaces those settings too (`kubernetes-namespace` and
+  `use-templating`, the rootless `secure-cookie-key-file`, the Positron `exe`); the message and
+  README now say so, where before they only said a string was accepted.
 - Fixed: with more than one `config.pam` file, the pam `volumeMounts` were emitted in Go map order,
   so `helm template` was not reproducible and the Deployment's pod template changed between renders
   with no configuration change. They are now sorted by file name.

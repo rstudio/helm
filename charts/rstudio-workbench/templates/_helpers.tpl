@@ -745,6 +745,10 @@ https://packagemanager.posit.co/cran/__linux__/jammy/latest
                           server-add-header)
                gcfg       Go gcfg, as ini with repeated keys
                renviron   R's Renviron, as ini with repeated keys
+               pip        Python configparser (pip.conf is not read by Workbench at all). Several
+                          values are written as a newline-continued value, which this chart does
+                          not produce, and a repeated key makes pip refuse the whole file, so a
+                          list of values fails with "write the file as a string"
                dcf        Key: Value, records separated by a blank line
                json       JSON
     ordered  yes when the file's behavior depends on the order of its sections or entries, so it
@@ -758,14 +762,16 @@ https://packagemanager.posit.co/cran/__linux__/jammy/latest
 
   Consumers: configmap-general.yaml and configmap-session.yaml pick the renderer, NOTES.txt
   raises the form warnings. Add a file here and all of them follow. Not every scope goes through
-  here: config.secret, config.sessionSecret, config.sssd.conf and config.startupCustom call
-  rstudio-library.config.ini directly, comma-joining lists and getting no NOTES warnings.
+  here, and none of these get NOTES warnings: config.secret, config.sessionSecret,
+  config.startupCustom and config.startupUserProvisioning render as ini with repeated keys (what
+  the chart always did for them), and config.sssd.conf as ini with comma-joined lists (sssd's own
+  syntax for several values).
 */ -}}
 {{- define "rstudio-workbench.config.fileTable" -}}
 server   | ^profiles$                           | ini_ptree | yes
 server   | ^launcher\..+\.resources\.conf$      | ini_ptree | yes
 profiles | ^launcher\..+\.profiles\.conf$       | ini_ptree | yes
-server   | ^launcher\.kubernetes\.profiles\.conf$ | ini_ptree | yes
+server   | ^launcher\..+\.profiles\.conf$       | ini_ptree | yes
 *        | ^repos\.conf$                        | ini_ptree | yes
 *        | ^launcher\.conf$                     | ini_ptree | no
 *        | ^logging\.conf$                      | ini_ptree | no
@@ -774,6 +780,7 @@ server   | ^launcher\.kubernetes\.profiles\.conf$ | ini_ptree | yes
 *        | \.json$                              | json      | no
 *        | ^chronicle-local\.gcfg$              | gcfg      | no
 *        | ^Renviron\.site$                     | renviron  | no
+session  | ^pip\.conf$                          | pip       | no
 *        | \.conf$                              | ini_popt  | no
 {{- end -}}
 
@@ -839,10 +846,11 @@ server   | ^launcher\.kubernetes\.profiles\.conf$ | ini_ptree | yes
   {{- end }}
 {{- end }}
 {{- /* One file at a time, in the sorted order rstudio-library.config.ini would use, so that each
-       gets its own way of writing several values. */ -}}
+       gets its own way of writing several values: ini_ptree comma-joins, pip refuses, everything
+       else (ini_popt, gcfg, renviron, unknown) repeats the key. */ -}}
 {{- range $file := keys $ini | sortAlpha }}
   {{- $format := include "rstudio-workbench.config.fileFormat" (dict "scope" $scope "file" $file) }}
-  {{- $multi := eq $format "ini_ptree" | ternary "join" "repeat" }}
+  {{- $multi := get (dict "ini_ptree" "join" "pip" "reject") $format | default "repeat" }}
   {{- include "rstudio-library.config.ini.files" (dict "files" (dict $file (get $ini $file)) "multi" $multi) }}
 {{- end }}
 {{- if $dcf }}{{- include "rstudio-library.config.dcf" $dcf }}{{- end }}

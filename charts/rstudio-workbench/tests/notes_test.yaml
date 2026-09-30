@@ -357,3 +357,27 @@ tests:
     asserts:
       - notMatchRegexRaw:
           pattern: "does not recognize the following"
+
+  - it: should warn about the map form for a non-kubernetes launcher profiles file in config.server
+    set:
+      config:
+        server:
+          launcher.slurm.profiles.conf:
+            "*":
+              max-cpus: 1
+    asserts:
+      - matchRegexRaw:
+          pattern: "written as maps(.|\\n)*config\\.server\\.launcher\\\\.slurm\\\\.profiles\\\\.conf"
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not warn about pip.conf written as a map
+    set:
+      config:
+        session:
+          pip.conf:
+            global:
+              index-url: https://a/simple
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: the (following configuration files|chart does not recognize)"

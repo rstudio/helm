@@ -1,13 +1,18 @@
 {{- /* The chart adds its own settings to these files by merging a map over what was written.
        rserver.conf must be a map for that merge to work at all. The rest may be a string, which
-       is taken as the whole file, but a list would silently drop the chart's settings - which
-       for launcher.conf includes the [server] section the launcher needs to start. Nothing in
-       them depends on order, so there is no reason to write them as a list. */}}
+       is taken as the whole file - and so replaces the chart's settings too, which the message
+       says. A list would silently drop them, which for launcher.conf includes the [server]
+       section the launcher needs to start. Nothing in them depends on order, so there is no
+       reason to write them as a list. */}}
+{{- $stringReplaces := dict
+      "launcher.conf" "the [server] secure-cookie-key-file setting the chart adds when pod.runAsRoot is false"
+      "launcher.kubernetes.conf" "the kubernetes-namespace and use-templating settings the chart adds"
+      "positron.conf" "the exe setting the chart adds when the Positron init container is enabled" }}
 {{- range $file := list "rserver.conf" "launcher.conf" "launcher.kubernetes.conf" "positron.conf" }}
   {{- $contents := get $.Values.config.server $file }}
   {{- $allowed := eq $file "rserver.conf" | ternary (list "map") (list "map" "string") }}
   {{- if and $contents (not (has (kindOf $contents) $allowed)) }}
-    {{- $orString := eq $file "rserver.conf" | ternary "" "\nA string is also accepted, and is used as the whole file.\n" }}
+    {{- $orString := eq $file "rserver.conf" | ternary "" (print "\nA string is also accepted and is used as the whole file, so it replaces\n" (get $stringReplaces $file) "; include those yourself if you still want them.\n") }}
     {{- fail (print "\n\nconfig.server." $file " is a " (kindOf $contents) ", but must be a map of options.\n\nThe chart merges its own settings into " $file ", which only works on a map.\nNothing in the file depends on order, so write it as a map:\n\n  config:\n    server:\n      " $file ":\n        option-name: value\n" $orString) }}
   {{- end }}
 {{- end }}
@@ -164,7 +169,7 @@ data:
 {{- end }}
 {{ include "rstudio-workbench.config.files" (dict "scope" "server" "data" $overrideDict) | indent 2 }}
 {{/* helper variables to make things here a bit more sane */}}
-{{- $profilesConfig := .Values.config.profiles | deepCopy }}
+{{- $profilesConfig := default (dict) .Values.config.profiles | deepCopy }}
 {{- /* Apply the default [*] session image settings to launcher.kubernetes.profiles.conf. When it is
        written as an ordered list, mergeOverwrite would drop the defaults along with the map, so
        merge them into the [*] entry in place instead (prepending one if the admin wrote none). */}}
@@ -172,8 +177,9 @@ data:
 {{- if kindIs "slice" $writtenProfiles }}
   {{- $hasEveryone := false }}
   {{- range $item := $writtenProfiles }}
-    {{- /* anything but a map is left for rstudio-library.config.entries to reject */}}
-    {{- if and (kindIs "map" $item) (hasKey $item "*") }}
+    {{- /* anything but a map, and a [*] whose body is not a map, is left for the profiles helper
+           to reject with its own message */}}
+    {{- if and (kindIs "map" $item) (hasKey $item "*") (kindIs "map" (get $item "*")) }}
       {{- $hasEveryone = true }}
       {{- $_ := set $item "*" (mergeOverwrite (deepCopy $defaultProfiles) (get $item "*")) }}
     {{- end }}
