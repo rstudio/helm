@@ -721,3 +721,41 @@ tests:
           value: |
             Internal=https://pkgs.example.com/internal
             CRAN=https://packagemanager.posit.co/cran/latest
+
+  # -- Guard: the README tells admins to write these files as a list, and Helm *replaces* a list
+  # rather than merging it. So none of them may gain a chart default without someone deciding what
+  # happens to admins who already use the list form. If this fails, that decision is now due.
+  - it: should ship no chart default for the files documented as lists
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - notExists:
+          path: data["profiles"]
+      - notExists:
+          path: data["launcher.kubernetes.resources.conf"]
+      - notExists:
+          path: data["launcher.local.resources.conf"]
+      - notExists:
+          path: data["launcher.slurm.resources.conf"]
+
+  # config.session.repos.conf is the exception: it does ship a default, deliberately as a list so
+  # the map form warns. An admin's own value replaces it, which is why NOTES.txt guards for CRAN.
+  - it: should ship the repos.conf default as a list, not a map
+    template: configmap-session.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+
+  # config.profiles does receive chart defaults, so the list form has to merge rather than replace.
+  # Covered by "should render config.profiles sections in the order written" above; this pins that
+  # the defaults exist, so that test cannot silently become vacuous.
+  - it: should ship chart defaults for config.profiles
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "default-container-image=posit/workbench-session:"
