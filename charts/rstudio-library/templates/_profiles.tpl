@@ -175,3 +175,11 @@
 {{- include "rstudio-library.profiles.apply-everyone-and-default-to-others" (dict "file" $file "data" $keys "default" $jobJsonDefaults "filePath" $filePath) }}
 {{- end }}
 {{- end }}
+
+{{/*
+  DEPRECATED: the previous name of rstudio-library.profiles.ini, which takes the same dict. Kept
+  until rstudio-connect adopts the new name; it will then be removed.
+*/}}
+{{- define "rstudio-library.profiles.ini.advanced" -}}
+{{- include "rstudio-library.profiles.ini" . }}
+{{- end }}

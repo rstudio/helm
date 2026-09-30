@@ -5,7 +5,7 @@ Outputs profile configurations to ConfigMaps for testing.
 
 {{- if .Values.testProfiles }}
 
-{{- /* Test profiles.ini.advanced */}}
+{{- /* Test profiles.ini */}}
 {{- if and .Values.testProfiles.advanced (kindIs "map" .Values.testProfiles.advanced) }}
 ---
 apiVersion: v1
@@ -19,6 +19,23 @@ data:
       "data" .Values.testProfiles.advanced.data
       "jobJsonDefaults" (default (list) .Values.testProfiles.advanced.jobJsonDefaults)
       "filePath" (default "" .Values.testProfiles.advanced.filePath)
+  ) | nindent 2 }}
+{{- end }}
+
+{{- /* Test the deprecated profiles.ini.advanced alias */}}
+{{- if and .Values.testProfiles.deprecatedAdvanced (kindIs "map" .Values.testProfiles.deprecatedAdvanced) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-profiles-deprecated-advanced
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- include "rstudio-library.profiles.ini.advanced" (dict
+      "data" .Values.testProfiles.deprecatedAdvanced.data
+      "jobJsonDefaults" (default (list) .Values.testProfiles.deprecatedAdvanced.jobJsonDefaults)
+      "filePath" (default "" .Values.testProfiles.deprecatedAdvanced.filePath)
   ) | nindent 2 }}
 {{- end }}
 

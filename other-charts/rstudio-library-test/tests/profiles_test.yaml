@@ -288,3 +288,28 @@ tests:
           value: |
             [*]
             some-key=value1,value2
+
+  - it: should render through the deprecated profiles.ini.advanced alias
+    set:
+      testProfiles:
+        deprecatedAdvanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "@analysts":
+                  default-cpus: 4
+              - "*":
+                  default-cpus: 1
+          jobJsonDefaults: []
+          filePath: /etc/rstudio/
+    asserts:
+      - equal:
+          path: metadata.name
+          value: test-profiles-deprecated-advanced
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [@analysts]
+            default-cpus=4
+
+            [*]
+            default-cpus=1
