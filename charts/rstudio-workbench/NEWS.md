@@ -48,6 +48,12 @@
   before the first one. Nothing reads it - the file is parsed with an ini parser that skips blank
   lines - but it changes the rendered file, so the config checksum shifts and pods restart once on
   upgrade.
+- The chart now warns when an order-agnostic ini file is written as a *list*. Helm merges a map
+  with the chart's defaults for a file but replaces them with a list, so the list form silently
+  drops any default the chart ships - `launcher\.conf` would lose its `[server]` section, which
+  the launcher needs. Write those files as a map unless you need to control section order. Files
+  that are not ini (`r-versions`, `notifications.conf`, `*.json`) are exempt, since a list is how
+  you legitimately write those.
 - **DEPRECATED**: writing those files as a map. A map is rendered in alphabetical order, which
   silently changes what these files do, and nothing in `values.yaml` shows it. The map form still
   works and now prints a `WARNING` in `NOTES.txt` once a file holds more than one section or entry.

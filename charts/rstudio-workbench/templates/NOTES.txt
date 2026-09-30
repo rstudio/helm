@@ -22,30 +22,34 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 ```
 {{- end }}
 
-{{- /* Files whose behavior depends on the order of their sections or entries. Rendering these
-       from a map sorts them by name, silently changing what they do, so the map form is
-       deprecated in favor of the ordered list form. A raw string keeps the written order too,
-       so only the map form is flagged. */}}
-{{- $unordered := list }}
-{{- range $file, $contents := .Values.config.server }}
-  {{- if and (kindIs "map" $contents) (or (eq $file "profiles") (regexMatch "^launcher\\..+\\.resources\\.conf$" $file)) }}
-    {{- $unordered = append $unordered (printf "config.server.%s" ($file | replace "." "\\.")) }}
+{{- /* Two form warnings, both keyed off the filename dispatch in _helpers.tpl.
+
+       An order-sensitive file wants the list form: a map sorts its sections by name, silently
+       changing what the file does. An order-agnostic file wants the map form: Helm merges a map
+       with the chart's defaults for that file, but *replaces* them with a list.
+
+       Only ini files are considered. r-versions and notifications.conf are DCF and .json files
+       are JSON; a list is how you legitimately write those. */}}
+{{- $wantsList := list }}
+{{- $wantsMap := list }}
+{{- range $scope := (list "server" "session" "profiles") }}
+  {{- range $file, $contents := (get $.Values.config $scope) }}
+    {{- $path := printf "config.%s.%s" $scope ($file | replace "." "\\.") }}
+    {{- $ordered := include "rstudio-workbench.config.orderSensitive" (dict "file" $file "scope" $scope) }}
+    {{- $nonIni := (eq $scope "session") | ternary (include "rstudio-workbench.config.nonIni" (dict "file" $file)) "" }}
+    {{- if not $nonIni }}
+      {{- if and $ordered (kindIs "map" $contents) }}
+        {{- $wantsList = append $wantsList $path }}
+      {{- else if and (not $ordered) (kindIs "slice" $contents) }}
+        {{- $wantsMap = append $wantsMap $path }}
+      {{- end }}
+    {{- end }}
   {{- end }}
 {{- end }}
-{{- range $file, $contents := .Values.config.profiles }}
-  {{- if and (kindIs "map" $contents) (regexMatch "^launcher\\..+\\.profiles\\.conf$" $file) }}
-    {{- $unordered = append $unordered (printf "config.profiles.%s" ($file | replace "." "\\.")) }}
-  {{- end }}
-{{- end }}
-{{- range $file, $contents := .Values.config.session }}
-  {{- if and (kindIs "map" $contents) (eq $file "repos.conf") }}
-    {{- $unordered = append $unordered (printf "config.session.%s" ($file | replace "." "\\.")) }}
-  {{- end }}
-{{- end }}
-{{- if $unordered }}
+{{- if $wantsList }}
 
 WARNING: the following configuration files are written as maps, which does not keep the order you wrote them in
-{{- range $unordered | sortAlpha }}
+{{- range $wantsList | sortAlpha }}
   - `.Values.{{ . }}`
 {{- end }}
   Workbench reads these files in order, so sorting their sections by name changes how they behave.
@@ -58,12 +62,21 @@ WARNING: the following configuration files are written as maps, which does not k
               max-memory-mb: 1024
           - "@analysts":
               max-memory-mb: 4096
-      session:
-        repos.conf:
-          - Internal: https://pkgs.example.com/internal
-          - CRAN: https://packagemanager.posit.co/cran/latest
 
   The map form still works for now, but will be removed in a future chart release.
+{{- end }}
+{{- if $wantsMap }}
+
+WARNING: the following configuration files are written as lists, which replaces the chart's defaults for them
+{{- range $wantsMap | sortAlpha }}
+  - `.Values.{{ . }}`
+{{- end }}
+  Nothing in these files depends on the order of their sections, and Helm merges a map with the
+  chart's defaults while a list replaces them. Written as a list, any default the chart ships for
+  these files is silently dropped - for example `launcher\.conf` loses its `[server]` section,
+  which the launcher needs.
+
+  Write them as a map unless you specifically need to control the order of their sections.
 {{- end }}
 
 {{- /* Workbench discards repos.conf entirely when it has no entry named CRAN

@@ -732,7 +732,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   renderer would re-encode it with `toPrettyJson` and turn `{}` into the quoted string `"{}"`.
 */ -}}
 {{- define "rstudio-workbench.config.sessionFiles" -}}
-{{- $dcfNames := list "r-versions" "notifications.conf" }}
 {{- $ini := dict }}
 {{- $dcf := dict }}
 {{- $json := dict }}
@@ -742,10 +741,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- else if empty $contents }}
     {{- /* nothing to render either way; keep it with ini so output is unchanged */ -}}
     {{- $_ := set $ini $file $contents }}
-  {{- else if has $file $dcfNames }}
-    {{- $_ := set $dcf $file $contents }}
-  {{- else if hasSuffix ".json" $file }}
-    {{- $_ := set $json $file $contents }}
+  {{- else if include "rstudio-workbench.config.nonIni" (dict "file" $file) }}
+    {{- if hasSuffix ".json" $file }}
+      {{- $_ := set $json $file $contents }}
+    {{- else }}
+      {{- $_ := set $dcf $file $contents }}
+    {{- end }}
   {{- else }}
     {{- $_ := set $ini $file $contents }}
   {{- end }}
@@ -754,3 +755,30 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if $dcf }}{{- include "rstudio-library.config.dcf" $dcf }}{{- end }}
 {{- if $json }}{{- include "rstudio-library.config.json" $json }}{{- end }}
 {{- end }}
+
+{{- /*
+  Filename dispatch, in one place. Three consumers: `configmap-session.yaml` picks a renderer,
+  and `NOTES.txt` raises both of the form warnings. Keeping the lists here is what stops them
+  drifting apart.
+*/ -}}
+
+{{- /* Files whose behavior depends on the order of their sections or entries. These want the
+       list form; a map sorts them by name and silently changes what they do. */ -}}
+{{- define "rstudio-workbench.config.orderSensitive" -}}
+{{- $file := .file -}}
+{{- $scope := .scope -}}
+{{- if eq $scope "server" -}}
+  {{- or (eq $file "profiles") (regexMatch "^launcher\\..+\\.resources\\.conf$" $file) | ternary "yes" "" -}}
+{{- else if eq $scope "profiles" -}}
+  {{- regexMatch "^launcher\\..+\\.profiles\\.conf$" $file | ternary "yes" "" -}}
+{{- else if eq $scope "session" -}}
+  {{- eq $file "repos.conf" | ternary "yes" "" -}}
+{{- end -}}
+{{- end -}}
+
+{{- /* Session files that are not ini. `r-versions` and `notifications.conf` are DCF; `.json` is
+       JSON. These legitimately take a list, so the ini form warnings must not apply to them. */ -}}
+{{- define "rstudio-workbench.config.nonIni" -}}
+{{- $file := .file -}}
+{{- or (has $file (list "r-versions" "notifications.conf")) (hasSuffix ".json" $file) | ternary "yes" "" -}}
+{{- end -}}

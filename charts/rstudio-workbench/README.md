@@ -476,6 +476,12 @@ This applies to `/etc/rstudio/profiles`, `launcher.*.profiles.conf`, and
 `launcher.*.resources.conf` (where the session launcher lists resource profiles in file order and
 pre-selects the first one).
 
+Which form to use is decided by the file, not by preference: **an order-sensitive file wants a
+list, every other ini file wants a map.** Helm merges a map with the chart's defaults for a file
+but replaces them with a list, so writing an order-agnostic file as a list silently drops whatever
+the chart ships for it. The chart warns in both directions. Files that are not ini - `r-versions`,
+`notifications.conf`, and `*.json` - are exempt, since a list is how you legitimately write those.
+
 Only the sections are ordered. The options written inside a section are still rendered
 alphabetically, which is what these files expect - they are resolved section by section, not
 option by option. A file that depends on the order of options within a section needs the raw

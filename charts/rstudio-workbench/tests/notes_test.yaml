@@ -200,3 +200,57 @@ tests:
     asserts:
       - notMatchRegexRaw:
           pattern: "WARNING: the following configuration files are written as maps"
+
+  # -- The inverse warning: an order-agnostic ini file written as a list replaces the chart's
+  # defaults for that file rather than merging with them.
+  - it: should warn when an order-agnostic ini file is written as a list
+    set:
+      config:
+        server:
+          launcher.conf:
+            - cluster:
+                name: Cluster1
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as lists"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.server\\.launcher\\\\\\.conf`"
+
+  - it: should not warn when an order-agnostic ini file is written as a map
+    set:
+      config:
+        server:
+          logging.conf:
+            "*":
+              log-level: warn
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  # r-versions and notifications.conf are DCF, and .json files are JSON; a list is how you
+  # legitimately write those, so the ini form warnings must not apply to them.
+  - it: should not warn about the list form for a DCF session file
+    set:
+      config:
+        session:
+          r-versions:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not warn about the list form for a json session file
+    set:
+      config:
+        session:
+          rstudio-prefs.json:
+            save_workspace: never
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not warn about the list form on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
