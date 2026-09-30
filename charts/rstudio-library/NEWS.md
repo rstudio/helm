@@ -1,5 +1,65 @@
 # Changelog
 
+## 0.1.38
+
+- `rstudio-library.config.ini` now accepts a file's contents as a list of single-entry maps, and
+  renders them in the order written rather than sorted by name. An entry becomes a `[name]` section
+  when its value is a map, and a `name=value` line when it is not. Previously a list of
+  single-entry maps rendered broken lines such as `*=map[max-memory-mb:1024]`, with no section
+  headers.
+- New `rstudio-library.config.ini.files`, which takes `files` (the map of `{filename: contents}`
+  that `rstudio-library.config.ini` takes) and an optional `multi`. `multi` chooses how a list of
+  values is written, at every depth of the file:
+  - `join` (the default, and what `rstudio-library.config.ini` does) comma-joins them on one line:
+    `cpu-affinity: [1, 2, 5]` renders as `cpu-affinity=1,2,5`. This is how files read by boost
+    `property_tree`, which rejects a repeated key, express several values.
+  - `repeat` writes one line per value, repeating the key: `www-allow-origin: [a, b]` renders as
+    `www-allow-origin=a` and `www-allow-origin=b`. This is how files read by boost
+    `program_options` express an option given more than once; there a comma is part of the value.
+  - `reject` fails with a message saying to write the file as a string. For files whose parser
+    takes several values in a form this renderer does not write (pip's newline-continued values,
+    for one), so that a list cannot quietly render a file the parser refuses.
+
+  A list of *maps* still means several sections with the same name, under any option. An empty
+  list of values renders nothing; it previously rendered `key=` or `key=[]`.
+- **BREAKING**: `rstudio-library.config.ini` comma-joins a list of values at the top level of a
+  file, where it previously repeated the key. Use `rstudio-library.config.ini.files` with
+  `multi: repeat` to keep repeated keys.
+- **BREAKING**: a list entry must hold exactly one key. An empty entry, or an entry with more than
+  one key, now fails with a message naming the keys and showing the `- ` placement to fix it. The
+  usual cause is a section missing its own `- `, which previously rendered as `name=map[key:value]`.
+  Multi-key entries used to render as a blank-line separated record, intended for
+  `/etc/rstudio/r-versions`; that never produced a file Workbench could read, because it emitted
+  `Key=Value` where the file is parsed as DCF (`Key: Value`) - see
+  https://github.com/rstudio/helm/issues/948. Write such files as a string instead, which is passed
+  through unchanged.
+- A list entry with no value (`- "*":` with nothing under it) now fails. It previously rendered as a
+  bare `*=<nil>` line.
+- An option's value must be a single value or a list of single values. ini files have no nesting,
+  so a map, or a list holding maps or lists, has no representation and rendered as `key=map[a:1]`;
+  these now fail. This applies to both the map and the list form.
+- New `rstudio-library.config.entries` helper, which normalizes either form into an ordered list of
+  entries.
+- `rstudio-library.config.dcf` accepts a file's contents as a list of maps, one record per entry
+  in the order written, and fails on a list entry that is not a map, which used to render as
+  `0: value`.
+- **BREAKING**: `rstudio-library.profiles.ini.advanced` is renamed to `rstudio-library.profiles.ini`,
+  which takes the same dict and now also accepts a profiles file's sections as an ordered list,
+  including its `job-json-overrides` handling. Note that `rstudio-library.profiles.ini` previously
+  named a different helper, which took a map of `{filename: contents}`; that helper,
+  `rstudio-library.profiles.ini.singleFile`, and `rstudio-library.profiles.ini.collapse-array` are
+  removed. Profiles files render through `rstudio-library.config.ini` like every other ini file,
+  and the `job-json-overrides` encoding - a chart-level idea rather than an ini one - moved into
+  `rstudio-library.profiles.apply-everyone-and-default-to-others`, which already rewrote those
+  entries.
+- **DEPRECATED**: `rstudio-library.profiles.ini.advanced` remains as an alias of
+  `rstudio-library.profiles.ini`, so that `rstudio-connect` can adopt the new name on its own
+  schedule. It will be removed once `rstudio-connect` has migrated.
+- `rstudio-library.profiles.json-from-overrides-config` accepts the ordered list form for a
+  profiles file's sections.
+- `rstudio-library.profiles.apply-everyone-and-default-to-others` now takes a `file` key and renders
+  the whole file, rather than its caller emitting the `name: |` header.
+
 ## 0.1.37
 
 - **DEPRECATED**: Chronicle agent helpers are deprecated.
