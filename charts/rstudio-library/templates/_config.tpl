@@ -92,6 +92,11 @@
     repeat  one line per value, repeating the key (www-allow-origin=a, www-allow-origin=b). This
             is how files read by boost program_options express an option that may be given more
             than once; there a comma is part of the value
+    reject  fail. For files whose parser writes several values some other way that this renderer
+            does not produce (pip.conf's newline-continued values, for one), so that neither of
+            the above can quietly render a file the parser will refuse. The message says to
+            write the file as a string
+  An empty list renders nothing, whichever `multi` is in force; the caller skips it.
 
   Takes a dict: file, section (may be empty), key, value, multi.
 */ -}}
@@ -109,7 +114,9 @@
     {{- end }}
     {{- $values = append $values (toString $item) }}
   {{- end }}
-  {{- if eq .multi "repeat" }}
+  {{- if eq .multi "reject" }}
+    {{- fail (print "\n\n'" (toString .key) "' " $where " is a list of values, but this chart cannot write several\nvalues for one option in the way " .file " expects, so it would render a file its parser\nrefuses. Write the whole file as a string (" .file ": |), which is passed through unchanged.\n") }}
+  {{- else if eq .multi "repeat" }}
     {{- $lines := list }}
     {{- range $v := $values }}
       {{- $lines = append $lines (printf "%s=%s" (toString $.key) $v) }}
@@ -158,11 +165,14 @@
     {{- range $section := $sections }}
       {{- printf "[%s]" (toString $parent) | nindent 2 }}
       {{- range $key, $val := $section }}
-        {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" $parent "key" $key "value" $val "multi" $multi) | nindent 2 }}
+        {{- /* an empty list is no values, so no line */ -}}
+        {{- if not (and (kindIs "slice" $val) (empty $val)) }}
+          {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" $parent "key" $key "value" $val "multi" $multi) | nindent 2 }}
+        {{- end }}
       {{- end }}
       {{- printf "" | nindent 0 }}
     {{- end }}
-  {{- else }}
+  {{- else if not (and (kindIs "slice" $child) (empty $child)) }}
     {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" "" "key" $parent "value" $child "multi" $multi) | nindent 2 }}
   {{- end }}
 {{- end }}
@@ -188,13 +198,13 @@
 {{- /*
   rstudio-library.config.ini, with options. Takes a dict:
     files: a map of {filename: contents}, as rstudio-library.config.ini takes
-    multi: optional. "join" (the default) or "repeat": how a list of values is written, at every
-           depth. See rstudio-library.config.ini.value
+    multi: optional. "join" (the default), "repeat" or "reject": how a list of values is written,
+           at every depth. See rstudio-library.config.ini.value
 */ -}}
 {{- define "rstudio-library.config.ini.files" -}}
 {{- $multi := default "join" .multi }}
-{{- if not (has $multi (list "join" "repeat")) }}
-  {{- fail (print "\n\nrstudio-library.config.ini.files: multi must be 'join' or 'repeat'. Instead got '" $multi "'") }}
+{{- if not (has $multi (list "join" "repeat" "reject")) }}
+  {{- fail (print "\n\nrstudio-library.config.ini.files: multi must be 'join', 'repeat' or 'reject'. Instead got '" $multi "'") }}
 {{- end }}
 {{- range $file, $keys := .files -}}
 {{- printf "%s: |" $file | nindent 0 }}
@@ -215,13 +225,13 @@
     {{- range $n := $names }}
       {{- $hint = print $hint "\n    - " ($n | quote) ":\n        ..." }}
     {{- end }}
-    {{- fail (print "\n\n" $where " holds more than one key: " (join ", " $names) "\n\nEach entry names one section or one value, so that they keep the order they\nwere written in. Put '- ' in front of each one:\n\n  " $file ":" $hint "\n\nOne entry per field gives one record. If the file needs more than one record,\nseparated by blank lines, this renderer cannot express that -- write the whole\nfile as a string (" $file ": |), which is passed through unchanged.\n") }}
+    {{- fail (print "\n\n" $where " holds more than one key: " (join ", " $names) "\n\nEach entry names one section or one value, so that they keep the order they\nwere written in. Put '- ' in front of each one:\n\n  " $file ":" $hint "\n") }}
   {{- end }}
   {{- /* Helm drops a null-valued key from a map, but a null survives inside a list, where it
          would render as "name=<nil>". */ -}}
   {{- range $name, $config := $item }}
     {{- if kindIs "invalid" $config }}
-      {{- fail (print "\n\n" $where " ('" (toString $name) "') has no value. Write a section's options under it,\nor give it a value (" (toString $name | quote) ": \"\" for an empty one).\n") }}
+      {{- fail (print "\n\n" $where " ('" (toString $name) "') has no value. Write a section's options under it\n(- " (toString $name | quote) ": {} for an empty section), or give the entry a value\n(- " (toString $name | quote) ": \"\" for an empty one).\n") }}
     {{- end }}
   {{- end }}
   {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" $item "multi" $multi) }}
@@ -234,6 +244,12 @@
 {{- end }}
 {{- end }}
 
+{{- /*
+  Takes a map of {filename: contents} and renders each as a DCF file: `Key: Value` lines, with a
+  blank line between records. Contents may be a raw string (verbatim), a map of fields (one
+  record, or one record per map-valued key), or a list of maps (one record per entry, in the
+  order written).
+*/ -}}
 {{- define "rstudio-library.config.dcf" -}}
 {{- range $file, $keys := $ -}}
   {{- printf "%s: |" $file | nindent 0 }}
@@ -241,6 +257,9 @@
     {{- $keys | nindent 2 }}
   {{- else }}
     {{- range $parent, $child := $keys -}}
+      {{- if and (kindIs "slice" $keys) (not (kindIs "map" $child)) }}
+        {{- fail (print "\n\nentry " (add $parent 1) " of '" $file "' must be a map of fields (Key: Value), which is one DCF record.\nInstead got '" (kindOf $child) "' : '" (print $child) "'") }}
+      {{- end }}
       {{- if kindIs "map" $child }}
         {{- range $key, $val := $child }}
           {{- if kindIs "map" $val }}

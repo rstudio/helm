@@ -385,7 +385,7 @@ tests:
       - failedTemplate:
           errorPattern: "entry 1 of 'r-versions' holds more than one key: Label, Path"
       - failedTemplate:
-          errorPattern: "If the file needs more than one record"
+          errorPattern: "Put '- ' in front of each one"
 
   - it: should pass a multi-field record file through as a string
     set:
@@ -721,7 +721,7 @@ tests:
             option: [a, b]
     asserts:
       - failedTemplate:
-          errorPattern: "multi must be 'join' or 'repeat'"
+          errorPattern: "multi must be 'join', 'repeat' or 'reject'"
 
   - it: should fail when a list entry has no value
     set:
@@ -735,3 +735,102 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "entry 1 of 'profiles' \\('\\*'\\) has no value"
+      - failedTemplate:
+          errorPattern: '- "\*": \{\} for an empty section'
+
+  - it: should fail a list of values with multi reject
+    set:
+      testConfig:
+        ini:
+          filename: pip.conf
+          multi: reject
+          config:
+            section1: null
+            global:
+              index-url: https://a/simple
+              extra-index-url: [https://b/simple, https://c/simple]
+    asserts:
+      - failedTemplate:
+          errorPattern: "'extra-index-url' in section \\[global\\] of 'pip.conf' is a list of values"
+      - failedTemplate:
+          errorPattern: "Write the whole file as a string \\(pip.conf: \\|\\)"
+
+  - it: should still render single values with multi reject
+    set:
+      testConfig:
+        ini:
+          filename: pip.conf
+          multi: reject
+          config:
+            section1: null
+            global:
+              index-url: https://a/simple
+    asserts:
+      - equal:
+          path: data["pip.conf"]
+          value: |
+            [global]
+            index-url=https://a/simple
+
+  - it: should render nothing for an empty list of values
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            section1: null
+            "*":
+              container-images: []
+              max-cpus: 1
+            top-level-empty: []
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-cpus=1
+
+  - it: should render nothing for an empty list of values with multi repeat
+    set:
+      testConfig:
+        ini:
+          filename: rserver.conf
+          multi: repeat
+          config:
+            section1: null
+            www-allow-origin: []
+            www-port: 8787
+    asserts:
+      - equal:
+          path: data["rserver.conf"]
+          value: |
+            www-port=8787
+
+  - it: should render dcf records from a list of maps in the order written
+    set:
+      testConfig:
+        dcf:
+          filename: r-versions
+          config:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+            - Path: /opt/R/4.0.2
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Label: Latest
+            Path: /opt/R/4.4.1
+
+            Path: /opt/R/4.0.2
+
+  - it: should fail when a dcf list entry is not a map
+    set:
+      testConfig:
+        dcf:
+          filename: r-versions
+          config:
+            - /opt/R/4.4.1
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'r-versions' must be a map of fields \\(Key: Value\\), which is one DCF record"
