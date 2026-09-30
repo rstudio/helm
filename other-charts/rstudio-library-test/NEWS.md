@@ -2,7 +2,9 @@
 
 ## 0.1.2
 
-- Exercise the ordered list form of `rstudio-library.config.ini` and the profiles helpers
+- Exercise the ordered list form of `rstudio-library.config.ini` and the profiles helpers, the
+  `multi` option of `rstudio-library.config.ini.files`, and the deprecated
+  `rstudio-library.profiles.ini.advanced` alias
 
 ## 0.1.1
 
