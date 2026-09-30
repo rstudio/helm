@@ -84,27 +84,16 @@
 {{- end -}}
 
 {{- /*
-  Renders a single ini entry.
+  Renders one value. ini files have no nesting, so a map has no representation, and neither does
+  a list holding maps or lists. A list of single values is several values for one option, which
+  files express in one of two ways, chosen by the caller through `multi`:
+    join    one line, comma-joined (resource-profiles=a,b,c). The default. This is how files
+            read by boost property_tree express several values, since it rejects a repeated key
+    repeat  one line per value, repeating the key (www-allow-origin=a, www-allow-origin=b). This
+            is how files read by boost program_options express an option that may be given more
+            than once; there a comma is part of the value
 
-  Takes a dict:
-    file: the file name, used in error messages
-    entry: a map of {name: value}, where the value is either
-      - a map, which becomes a [name] section followed by its key=value pairs
-      - a list of maps, which becomes repeated [name] sections (ini files may
-        have more than one section with the same name)
-      - anything else, which becomes a bare name=value line
-
-  An option inside a section must be a single value. ini has no nesting, so a map
-  or a list there has no representation and used to render as "key=map[a:1]" or
-  "key=[a b]". (rstudio-library.profiles.ini does define a meaning for a list --
-  it comma-joins -- which is why it does not share this helper.)
-*/ -}}
-{{- /*
-  Renders one value. A list of single values is comma-joined, which is how these files express
-  several values for one option (resource-profiles=a,b,c, cpu-affinity=1,2,5). A map has no
-  representation -- ini files have no nesting -- and so does a list holding maps or lists.
-
-  Takes a dict: file, section (may be empty), key, value.
+  Takes a dict: file, section (may be empty), key, value, multi.
 */ -}}
 {{- define "rstudio-library.config.ini.value" -}}
 {{- $where := .section | empty | ternary (printf "of '%s'" .file) (printf "in section [%s] of '%s'" (toString .section) .file) }}
@@ -113,24 +102,45 @@
   {{- fail (print "\n\n'" (toString .key) "' " $where " is a map, but ini files have no\nnesting, so this would have rendered as '" (toString .key) "=" (toString $val) "'.\n") }}
 {{- end }}
 {{- if kindIs "slice" $val }}
-  {{- $joined := list }}
+  {{- $values := list }}
   {{- range $item := $val }}
     {{- if or (kindIs "map" $item) (kindIs "slice" $item) }}
-      {{- fail (print "\n\n'" (toString $.key) "' " $where " is a list holding a " (kindOf $item) ".\nThe values of an option are joined with commas, so each one must be a single value.\n") }}
+      {{- fail (print "\n\n'" (toString $.key) "' " $where " is a list holding a " (kindOf $item) ".\nEach of an option's values must be a single value.\n") }}
     {{- end }}
-    {{- $joined = append $joined (toString $item) }}
+    {{- $values = append $values (toString $item) }}
   {{- end }}
-  {{- printf "%s=%s" (toString .key) (join "," $joined) }}
+  {{- if eq .multi "repeat" }}
+    {{- $lines := list }}
+    {{- range $v := $values }}
+      {{- $lines = append $lines (printf "%s=%s" (toString $.key) $v) }}
+    {{- end }}
+    {{- join "\n" $lines }}
+  {{- else }}
+    {{- printf "%s=%s" (toString .key) (join "," $values) }}
+  {{- end }}
 {{- else }}
   {{- printf "%s=%s" (toString .key) (toString $val) }}
 {{- end }}
 {{- end }}
 
+{{- /*
+  Renders a single ini entry.
+
+  Takes a dict:
+    file: the file name, used in error messages
+    multi: how a list of values is written; see rstudio-library.config.ini.value
+    entry: a map of {name: value}, where the value is either
+      - a map, which becomes a [name] section followed by its key=value pairs
+      - a list of maps, which becomes repeated [name] sections (ini files may
+        have more than one section with the same name)
+      - anything else, which becomes a name=value line
+*/ -}}
 {{- define "rstudio-library.config.ini.entry" -}}
 {{- $file := .file }}
+{{- $multi := .multi }}
 {{- range $parent, $child := .entry -}}
   {{- /* A list of maps is several sections with the same name; ini files may repeat a section.
-         Any other list is several values for one option, and is comma-joined. */ -}}
+         Any other list is several values for one option. */ -}}
   {{- $sections := list }}
   {{- if kindIs "map" $child }}
     {{- $sections = list $child }}
@@ -148,18 +158,19 @@
     {{- range $section := $sections }}
       {{- printf "[%s]" (toString $parent) | nindent 2 }}
       {{- range $key, $val := $section }}
-        {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" $parent "key" $key "value" $val) | nindent 2 }}
+        {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" $parent "key" $key "value" $val "multi" $multi) | nindent 2 }}
       {{- end }}
       {{- printf "" | nindent 0 }}
     {{- end }}
   {{- else }}
-    {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" "" "key" $parent "value" $child) | nindent 2 }}
+    {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" "" "key" $parent "value" $child "multi" $multi) | nindent 2 }}
   {{- end }}
 {{- end }}
 {{- end }}
 
 {{- /*
-  Takes a map of {filename: contents} and renders each as an ini file.
+  Takes a map of {filename: contents} and renders each as an ini file, comma-joining a list of
+  values. Use rstudio-library.config.ini.files to repeat the key instead.
 
   Contents may be:
     - a raw string, rendered verbatim
@@ -171,7 +182,21 @@
       orders its sections and entries, not the options inside them
 */ -}}
 {{- define "rstudio-library.config.ini" -}}
-{{- range $file, $keys := . -}}
+{{- include "rstudio-library.config.ini.files" (dict "files" .) }}
+{{- end }}
+
+{{- /*
+  rstudio-library.config.ini, with options. Takes a dict:
+    files: a map of {filename: contents}, as rstudio-library.config.ini takes
+    multi: optional. "join" (the default) or "repeat": how a list of values is written, at every
+           depth. See rstudio-library.config.ini.value
+*/ -}}
+{{- define "rstudio-library.config.ini.files" -}}
+{{- $multi := default "join" .multi }}
+{{- if not (has $multi (list "join" "repeat")) }}
+  {{- fail (print "\n\nrstudio-library.config.ini.files: multi must be 'join' or 'repeat'. Instead got '" $multi "'") }}
+{{- end }}
+{{- range $file, $keys := .files -}}
 {{- printf "%s: |" $file | nindent 0 }}
 {{- if kindIs "string" $keys }}
   {{- $keys | nindent 2 }}
@@ -192,11 +217,18 @@
     {{- end }}
     {{- fail (print "\n\n" $where " holds more than one key: " (join ", " $names) "\n\nEach entry names one section or one value, so that they keep the order they\nwere written in. Put '- ' in front of each one:\n\n  " $file ":" $hint "\n\nOne entry per field gives one record. If the file needs more than one record,\nseparated by blank lines, this renderer cannot express that -- write the whole\nfile as a string (" $file ": |), which is passed through unchanged.\n") }}
   {{- end }}
-  {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" $item) }}
+  {{- /* Helm drops a null-valued key from a map, but a null survives inside a list, where it
+         would render as "name=<nil>". */ -}}
+  {{- range $name, $config := $item }}
+    {{- if kindIs "invalid" $config }}
+      {{- fail (print "\n\n" $where " ('" (toString $name) "') has no value. Write a section's options under it,\nor give it a value (" (toString $name | quote) ": \"\" for an empty one).\n") }}
+    {{- end }}
+  {{- end }}
+  {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" $item "multi" $multi) }}
 {{- end }}
 {{- else }}
 {{- range $parent, $child := $keys -}}
-  {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" (dict (toString $parent) $child)) }}
+  {{- include "rstudio-library.config.ini.entry" (dict "file" $file "entry" (dict (toString $parent) $child) "multi" $multi) }}
 {{- end }}
 {{- end }}
 {{- end }}

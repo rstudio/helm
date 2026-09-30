@@ -26,7 +26,11 @@ metadata:
   labels:
     {{- include "rstudio-library-test.labels" . | nindent 4 }}
 data:
+  {{- if .Values.testConfig.ini.multi }}
+  {{- include "rstudio-library.config.ini.files" (dict "files" (dict .Values.testConfig.ini.filename .Values.testConfig.ini.config) "multi" .Values.testConfig.ini.multi) | nindent 2 }}
+  {{- else }}
   {{- include "rstudio-library.config.ini" (dict .Values.testConfig.ini.filename .Values.testConfig.ini.config) | nindent 2 }}
+  {{- end }}
 {{- end }}
 
 {{- if .Values.testConfig.dcf }}

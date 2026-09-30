@@ -640,3 +640,98 @@ tests:
           path: data["some.conf"]
           value: |
             repeated-key=a,b
+
+  - it: should repeat the key for a list of values at the top level with multi repeat
+    set:
+      testConfig:
+        ini:
+          filename: rserver.conf
+          multi: repeat
+          config:
+            section1: null
+            www-allow-origin:
+              - a.example.com
+              - b.example.com
+            www-enable-origin-check: 1
+    asserts:
+      - equal:
+          path: data["rserver.conf"]
+          value: |
+            www-allow-origin=a.example.com
+            www-allow-origin=b.example.com
+            www-enable-origin-check=1
+
+  - it: should keep commas inside a repeated value with multi repeat
+    set:
+      testConfig:
+        ini:
+          filename: rserver.conf
+          multi: repeat
+          config:
+            - server-add-header:
+                - "X-Frame-Options: DENY"
+                - "X-Custom: a,b"
+    asserts:
+      - equal:
+          path: data["rserver.conf"]
+          value: |
+            server-add-header=X-Frame-Options: DENY
+            server-add-header=X-Custom: a,b
+
+  - it: should repeat the key inside a section with multi repeat
+    set:
+      testConfig:
+        ini:
+          filename: some.conf
+          multi: repeat
+          config:
+            - main:
+                option: [a, b]
+    asserts:
+      - equal:
+          path: data["some.conf"]
+          value: |
+            [main]
+            option=a
+            option=b
+
+  - it: should comma-join with multi join
+    set:
+      testConfig:
+        ini:
+          filename: some.conf
+          multi: join
+          config:
+            section1: null
+            option: [a, b]
+    asserts:
+      - equal:
+          path: data["some.conf"]
+          value: |
+            option=a,b
+
+  - it: should fail when multi is neither join nor repeat
+    set:
+      testConfig:
+        ini:
+          filename: some.conf
+          multi: split
+          config:
+            section1: null
+            option: [a, b]
+    asserts:
+      - failedTemplate:
+          errorPattern: "multi must be 'join' or 'repeat'"
+
+  - it: should fail when a list entry has no value
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "*":
+            - "@admins":
+                max-cpus: 4
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'profiles' \\('\\*'\\) has no value"
