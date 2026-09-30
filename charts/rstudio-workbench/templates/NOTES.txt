@@ -36,15 +36,15 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 {{- range $scope := (list "server" "session" "profiles") }}
   {{- range $file, $contents := (get $.Values.config $scope) }}
     {{- $path := printf "config.%s.%s" $scope ($file | replace "." "\\.") }}
-    {{- $kind := include "rstudio-workbench.config.fileKind" (dict "scope" $scope "file" $file) }}
-    {{- $ordered := eq $kind "ordered_ini" }}
-    {{- if has $kind (list "ini" "ordered_ini") }}
+    {{- $format := include "rstudio-workbench.config.fileFormat" (dict "scope" $scope "file" $file) }}
+    {{- $ordered := include "rstudio-workbench.config.fileOrdered" (dict "scope" $scope "file" $file) }}
+    {{- if not (has $format (list "dcf" "json" "unknown")) }}
       {{- if and $ordered (kindIs "map" $contents) }}
         {{- $wantsList = append $wantsList $path }}
       {{- else if and (not $ordered) (kindIs "slice" $contents) }}
         {{- $wantsMap = append $wantsMap $path }}
       {{- end }}
-    {{- else if and (eq $kind "unknown") (or (kindIs "map" $contents) (kindIs "slice" $contents)) }}
+    {{- else if and (eq $format "unknown") (or (kindIs "map" $contents) (kindIs "slice" $contents)) }}
       {{- $assumedIni = append $assumedIni $path }}
     {{- end }}
   {{- end }}
@@ -66,20 +66,24 @@ WARNING: the following configuration files are written as maps, which does not k
           - "@analysts":
               max-memory-mb: 4096
 
-  The map form still works for now, but will be removed in a future chart release.
+  A map is fine for every other config file; these are the ones where the order matters.
+  {{- $repos := get .Values.config.session "repos.conf" }}
+  {{- if and (kindIs "map" $repos) (not (hasKey $repos "CRAN")) }}
+
+  `repos\.conf` has no `CRAN` entry, so the chart added its default one. A list replaces the
+  chart's default, so name a `CRAN` entry yourself when you convert it.
+  {{- end }}
 {{- end }}
 {{- if $wantsMap }}
 
-WARNING: the following configuration files are written as lists, which replaces the chart's defaults for them
+WARNING: the following configuration files are written as lists, which replaces the chart's defaults for them instead of merging with them
 {{- range $wantsMap | sortAlpha }}
   - `.Values.{{ . }}`
 {{- end }}
-  Nothing in these files depends on the order of their sections, and Helm merges a map with the
-  chart's defaults while a list replaces them. Written as a list, any default the chart ships for
-  these files is silently dropped - for example `launcher\.conf` loses its `[server]` section,
-  which the launcher needs.
-
-  Write them as a map unless you specifically need to control the order of their sections.
+  Helm merges a map with the chart's defaults for a file, but a list replaces them: any default the
+  chart ships for these files is dropped, and only what you wrote is rendered. Nothing in these
+  files depends on the order of their sections, so write them as a map unless you specifically
+  need to control that order - and then include any chart defaults you still want in your list.
 {{- end }}
 
 {{- if $assumedIni }}
@@ -101,23 +105,11 @@ WARNING: the chart does not recognize the following configuration files
 
 {{- /* Workbench discards repos.conf entirely when it has no entry named CRAN
        (SessionOptions.cpp, parseReposConfig), taking the admin's own repositories with it.
-       Nothing in the rendered file shows this, so check for the key in whichever form
-       the file was written. */}}
-{{- if hasKey .Values.config.session "repos.conf" }}
-  {{- $repos := get .Values.config.session "repos.conf" }}
-  {{- $hasCran := false }}
-  {{- if kindIs "string" $repos }}
-    {{- $hasCran = regexMatch "(?m)^[ \t]*CRAN[ \t]*=" $repos }}
-  {{- else if kindIs "slice" $repos }}
-    {{- range $item := $repos }}
-      {{- if and (kindIs "map" $item) (hasKey $item "CRAN") }}
-        {{- $hasCran = true }}
-      {{- end }}
-    {{- end }}
-  {{- else if kindIs "map" $repos }}
-    {{- $hasCran = hasKey $repos "CRAN" }}
-  {{- end }}
-  {{- if and $repos (not $hasCran) }}
+       configmap-session.yaml fails for the map and list forms; a string is passed through
+       untouched, so only warn for it. */}}
+{{- $repos := get .Values.config.session "repos.conf" }}
+{{- if kindIs "string" $repos }}
+  {{- if and $repos (not (regexMatch "(?m)^[ \t]*CRAN[ \t]*=" $repos)) }}
 
 WARNING: `.Values.config.session.repos\.conf` has no `CRAN` entry
   - Workbench ignores the whole file when no entry is named `CRAN`, so none of these repositories
@@ -127,9 +119,9 @@ WARNING: `.Values.config.session.repos\.conf` has no `CRAN` entry
 
     config:
       session:
-        repos.conf:
-          - Internal: https://pkgs.example.com/internal
-          - CRAN: https://mirror.example.com/cran
+        repos.conf: |
+          CRAN=https://mirror.example.com/cran
+          Internal=https://pkgs.example.com/internal
 
   - To configure repositories somewhere else instead, set `config.session.repos\.conf: null` and
     the chart will not render the file at all.

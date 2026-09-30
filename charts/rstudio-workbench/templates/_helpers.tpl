@@ -718,70 +718,105 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- /*
+  The CRAN entry of the chart's default repos.conf, which values.yaml writes as a list. A map
+  written by the admin replaces that list rather than merging with it, so configmap-session.yaml
+  adds this back to a map with no CRAN, as the chart did when the default was a map. Must match
+  values.yaml; tests/configmap_test.yaml asserts both render the same URL.
+*/ -}}
+{{- define "rstudio-workbench.config.defaultCran" -}}
+https://packagemanager.posit.co/cran/__linux__/jammy/latest
+{{- end -}}
+
+{{- /*
   ==========================================================================
   Config file table - the one place that knows anything about config filenames
   ==========================================================================
 
-  One row per file: scope | filename pattern | kind. The first matching row wins.
+  One row per file: scope | filename pattern | format | ordered. The first matching row wins.
 
     scope    config.server / config.session / config.profiles, or * for any
     pattern  regex matched against the filename
-    kind     ini          Key=Value under [section] headings. Nothing depends on
-                          the order of the sections, so a map is the right form.
-             ordered_ini  ini whose behavior depends on the order of its sections
-                          or entries, so it wants the list form.
-             dcf          Key: Value, records separated by a blank line
-             json         JSON
+    format   which parser Workbench reads the file with, which decides both the renderer and
+             how an option with several values is written:
+               ini_ptree  boost property_tree read_ini. [section] headings; a repeated key is an
+                          error, so a list of values is comma-joined (a,b,c)
+               ini_popt   boost program_options. A list of values repeats the key, one line per
+                          value, and a comma is part of the value (www-allow-origin,
+                          server-add-header)
+               gcfg       Go gcfg, as ini with repeated keys
+               renviron   R's Renviron, as ini with repeated keys
+               dcf        Key: Value, records separated by a blank line
+               json       JSON
+    ordered  yes when the file's behavior depends on the order of its sections or entries, so it
+             wants the list form. Read only by NOTES.txt
 
-  A file matching no row is "unknown". Its contents are best given as a string,
-  which is passed through untouched whatever the format. Written as a map or a
-  list it is still built as ini, because that is what the chart has always done,
-  but NOTES.txt says so: guessing ini for a file we do not recognize is how
-  `r-versions` came out as `Key=Value`, which Workbench silently ignores (#948).
+  A file matching no row is "unknown". Its contents are best given as a string, which is passed
+  through untouched whatever the format. Written as a map or a list it is still built as ini with
+  repeated keys, because that is what the chart has always done, but NOTES.txt says so: guessing
+  ini for a file we do not recognize is how `r-versions` came out as `Key=Value`, which Workbench
+  silently ignores (#948).
 
-  Consumers: configmap-general.yaml and configmap-session.yaml pick the renderer,
-  NOTES.txt raises the two form warnings. Add a file here and all of them follow.
+  Consumers: configmap-general.yaml and configmap-session.yaml pick the renderer, NOTES.txt
+  raises the form warnings. Add a file here and all of them follow. Not every scope goes through
+  here: config.secret, config.sessionSecret, config.sssd.conf and config.startupCustom call
+  rstudio-library.config.ini directly, comma-joining lists and getting no NOTES warnings.
 */ -}}
 {{- define "rstudio-workbench.config.fileTable" -}}
-server   | ^profiles$                      | ordered_ini
-server   | ^launcher\..+\.resources\.conf$ | ordered_ini
-profiles | ^launcher\..+\.profiles\.conf$  | ordered_ini
-*        | ^repos\.conf$                   | ordered_ini
-*        | ^r-versions$                    | dcf
-*        | ^notifications\.conf$           | dcf
-*        | \.json$                         | json
-*        | ^chronicle-local\.gcfg$         | ini
-*        | ^Renviron\.site$                | ini
-*        | \.conf$                         | ini
+server   | ^profiles$                           | ini_ptree | yes
+server   | ^launcher\..+\.resources\.conf$      | ini_ptree | yes
+profiles | ^launcher\..+\.profiles\.conf$       | ini_ptree | yes
+server   | ^launcher\.kubernetes\.profiles\.conf$ | ini_ptree | yes
+*        | ^repos\.conf$                        | ini_ptree | yes
+*        | ^launcher\.conf$                     | ini_ptree | no
+*        | ^logging\.conf$                      | ini_ptree | no
+*        | ^r-versions$                          | dcf       | no
+*        | ^notifications\.conf$                | dcf       | no
+*        | \.json$                              | json      | no
+*        | ^chronicle-local\.gcfg$              | gcfg      | no
+*        | ^Renviron\.site$                     | renviron  | no
+*        | \.conf$                              | ini_popt  | no
 {{- end -}}
 
 {{- /*
-  Looks a file up in the table. Takes `scope` and `file`; returns its kind, or
-  "unknown" when no row matches.
+  Looks a file up in the table. Takes `scope`, `file`, and `column` (2 for format, 3 for
+  ordered); returns that column of the first matching row, or "" when no row matches.
 */ -}}
-{{- define "rstudio-workbench.config.fileKind" -}}
+{{- define "rstudio-workbench.config.fileLookup" -}}
 {{- $scope := .scope -}}
 {{- $file := .file -}}
+{{- $column := .column -}}
 {{- $hit := "" -}}
+{{- $found := false -}}
 {{- range $line := splitList "\n" (include "rstudio-workbench.config.fileTable" .) -}}
-  {{- if and (not $hit) (contains "|" $line) -}}
+  {{- if and (not $found) (contains "|" $line) -}}
     {{- $col := splitList "|" $line -}}
     {{- if and (or (eq (trim (index $col 0)) "*") (eq (trim (index $col 0)) $scope)) (regexMatch (trim (index $col 1)) $file) -}}
-      {{- $hit = trim (index $col 2) -}}
+      {{- $found = true -}}
+      {{- $hit = trim (index $col $column) -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- $hit | default "unknown" -}}
+{{- $hit -}}
+{{- end -}}
+
+{{- /* The file's format from the table, or "unknown". Takes `scope` and `file`. */ -}}
+{{- define "rstudio-workbench.config.fileFormat" -}}
+{{- include "rstudio-workbench.config.fileLookup" (dict "scope" .scope "file" .file "column" 2) | default "unknown" -}}
+{{- end -}}
+
+{{- /* "yes" when the table marks the file as ordered, otherwise "". Takes `scope` and `file`. */ -}}
+{{- define "rstudio-workbench.config.fileOrdered" -}}
+{{- if eq (include "rstudio-workbench.config.fileLookup" (dict "scope" .scope "file" .file "column" 3)) "yes" }}yes{{ end -}}
 {{- end -}}
 
 {{- /*
   Renders one config scope, picking a renderer per file from the table above rather than
   treating every file as ini. The files in these directories are not all the same format:
   `r-versions` and `notifications.conf` are DCF, `*.json` files are JSON, and the rest of
-  what the chart recognizes is ini.
+  what the chart recognizes is ini of one flavor or another.
 
-  Takes `scope` and `data`. A file the table does not list falls back to ini, which is
-  a guess; NOTES.txt warns about it so the guess is at least visible.
+  Takes `scope` and `data`. A file the table does not list falls back to ini with repeated
+  keys, which is a guess; NOTES.txt warns about it so the guess is at least visible.
 */ -}}
 {{- define "rstudio-workbench.config.files" -}}
 {{- $scope := .scope }}
@@ -789,21 +824,27 @@ profiles | ^launcher\..+\.profiles\.conf$  | ordered_ini
 {{- $dcf := dict }}
 {{- $json := dict }}
 {{- range $file, $contents := .data }}
-  {{- $kind := include "rstudio-workbench.config.fileKind" (dict "scope" $scope "file" $file) }}
+  {{- $format := include "rstudio-workbench.config.fileFormat" (dict "scope" $scope "file" $file) }}
   {{- if or (kindIs "string" $contents) (empty $contents) }}
     {{- /* Already the finished file. Every renderer has to pass a string through untouched and
            the ini one does; the JSON one would re-encode it and turn `{}` into `"{}"`. Empty
            renders to nothing whichever bucket it lands in. */ -}}
     {{- $_ := set $ini $file $contents }}
-  {{- else if eq $kind "dcf" }}
+  {{- else if eq $format "dcf" }}
     {{- $_ := set $dcf $file $contents }}
-  {{- else if eq $kind "json" }}
+  {{- else if eq $format "json" }}
     {{- $_ := set $json $file $contents }}
   {{- else }}
     {{- $_ := set $ini $file $contents }}
   {{- end }}
 {{- end }}
-{{- if $ini }}{{- include "rstudio-library.config.ini" $ini }}{{- end }}
+{{- /* One file at a time, in the sorted order rstudio-library.config.ini would use, so that each
+       gets its own way of writing several values. */ -}}
+{{- range $file := keys $ini | sortAlpha }}
+  {{- $format := include "rstudio-workbench.config.fileFormat" (dict "scope" $scope "file" $file) }}
+  {{- $multi := eq $format "ini_ptree" | ternary "join" "repeat" }}
+  {{- include "rstudio-library.config.ini.files" (dict "files" (dict $file (get $ini $file)) "multi" $multi) }}
+{{- end }}
 {{- if $dcf }}{{- include "rstudio-library.config.dcf" $dcf }}{{- end }}
 {{- if $json }}{{- include "rstudio-library.config.json" $json }}{{- end }}
 {{- end }}

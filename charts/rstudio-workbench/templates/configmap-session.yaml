@@ -1,3 +1,28 @@
+{{- /* Workbench discards repos.conf entirely when it has no entry named CRAN
+       (SessionOptions.cpp, parseReposConfig), taking the admin's own repositories with it, and
+       nothing in the rendered file shows it.
+       - A map is the form repos.conf had when the chart's default was a map, and Helm merged the
+         two, so the default CRAN entry was always there. The default is now a list, which a map
+         replaces, so add the entry back to keep that working. NOTES.txt still warns that the
+         map form sorts the entries.
+       - A list replaces the default by design, so it has to name CRAN itself. Fail rather than
+         render a file Workbench will ignore.
+       - A string is passed through untouched; NOTES.txt warns about it instead. */}}
+{{- $sessionConfig := .Values.config.session | deepCopy }}
+{{- $repos := get $sessionConfig "repos.conf" }}
+{{- if and $repos (kindIs "map" $repos) (not (hasKey $repos "CRAN")) }}
+  {{- $_ := set $repos "CRAN" (include "rstudio-workbench.config.defaultCran" .) }}
+{{- else if and $repos (kindIs "slice" $repos) }}
+  {{- $hasCran := false }}
+  {{- range $item := $repos }}
+    {{- if and (kindIs "map" $item) (hasKey $item "CRAN") }}
+      {{- $hasCran = true }}
+    {{- end }}
+  {{- end }}
+  {{- if not $hasCran }}
+    {{- fail "\n\nconfig.session.repos.conf has no entry named CRAN.\n\nWorkbench ignores the whole file without one, so none of these repositories would be\nused. Written as a list, repos.conf replaces the chart's default CRAN entry, so it must\nname its own. It does not have to be CRAN itself - name your own mirror CRAN if that\nis what sessions should use:\n\n  config:\n    session:\n      repos.conf:\n        - CRAN: https://mirror.example.com/cran\n        - Internal: https://pkgs.example.com/internal\n\nTo configure repositories somewhere else instead, set config.session.repos.conf: null\nand the chart will not render the file at all.\n" }}
+  {{- end }}
+{{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -5,7 +30,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-session
   namespace: {{ $.Release.Namespace }}
 data:
-  {{- include "rstudio-workbench.config.files" (dict "scope" "session" "data" .Values.config.session) | nindent 2 }}
+  {{- include "rstudio-workbench.config.files" (dict "scope" "session" "data" $sessionConfig) | nindent 2 }}
 {{- if .Values.config.sessionSecret }}
 ---
 {{- if .Values.sealedSecret.enabled }}
@@ -47,7 +72,7 @@ metadata:
   name: {{ include "rstudio-workbench.fullname" . }}-session
   namespace: {{ $targetNamespace }}
 data:
-  {{- include "rstudio-workbench.config.files" (dict "scope" "session" "data" .Values.config.session) | nindent 2 }}
+  {{- include "rstudio-workbench.config.files" (dict "scope" "session" "data" $sessionConfig) | nindent 2 }}
 {{- if .Values.config.sessionSecret }}
 ---
 {{- if .Values.sealedSecret.enabled }}
