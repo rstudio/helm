@@ -43,6 +43,11 @@
   replaces it instead of merging with it. Previously a map default merged with a map you supplied,
   which quietly added the chart's CRAN entry to your repositories. Include a `CRAN` entry in your
   own list - Workbench ignores the whole file without one. The chart now warns when it is missing.
+- `launcher.*.profiles.conf` no longer starts with a blank line. Profiles files now render through
+  the same helper as every other ini file, which places the blank line between sections rather than
+  before the first one. Nothing reads it - the file is parsed with an ini parser that skips blank
+  lines - but it changes the rendered file, so the config checksum shifts and pods restart once on
+  upgrade.
 - **DEPRECATED**: writing those files as a map. A map is rendered in alphabetical order, which
   silently changes what these files do, and nothing in `values.yaml` shows it. The map form still
   works and now prints a `WARNING` in `NOTES.txt` once a file holds more than one section or entry.
