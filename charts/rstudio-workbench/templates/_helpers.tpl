@@ -210,8 +210,7 @@ containers:
       mountPath: "/startup/custom"
     {{- end }}
     {{- if .Values.config.pam }}
-      {{- /* sortAlpha: sprig keys returns Go map order, which varies between renders */}}
-      {{- range $i, $pamFileName := keys .Values.config.pam | sortAlpha }}
+      {{- range $i, $pamFileName := keys .Values.config.pam }}
     - name: rstudio-pam
       mountPath: "/etc/pam.d/{{ $pamFileName }}"
       subPath: "{{ $pamFileName }}"

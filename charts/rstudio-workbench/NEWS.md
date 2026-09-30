@@ -93,9 +93,6 @@
   is used as the whole file and so replaces those settings too (`kubernetes-namespace` and
   `use-templating`, the rootless `secure-cookie-key-file`, the Positron `exe`); the message and
   README now say so, where before they only said a string was accepted.
-- Fixed: with more than one `config.pam` file, the pam `volumeMounts` were emitted in Go map order,
-  so `helm template` was not reproducible and the Deployment's pod template changed between renders
-  with no configuration change. They are now sorted by file name.
 - `launcher.*.profiles.conf` no longer starts with a blank line. Profiles files now render through
   the same helper as every other ini file, which places the blank line between sections rather than
   before the first one. Nothing reads it - the file is parsed with an ini parser that skips blank
