@@ -764,3 +764,169 @@ tests:
       - matchRegex:
           path: data["launcher.kubernetes.profiles.conf"]
           pattern: "default-container-image=posit/workbench-session:"
+
+  # -- Files the chart merges its own settings into must be maps
+  - it: should fail with a clear message when rserver.conf is a list
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          rserver.conf:
+            - www-port: 8787
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.rserver.conf is a slice, but must be a map of options"
+
+  - it: should fail with a clear message when rserver.conf is a string
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          rserver.conf: |
+            www-port=8787
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.rserver.conf is a string, but must be a map of options"
+
+  - it: should fail rather than drop the chart's [server] section when launcher.conf is a list
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          launcher.conf:
+            - cluster:
+                name: Kubernetes
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.conf is a slice(.|\\n)*A string is also accepted"
+
+  - it: should fail rather than drop the chart's namespace when launcher.kubernetes.conf is a list
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          launcher.kubernetes.conf:
+            - kubernetes-namespace: other
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.kubernetes.conf is a slice"
+
+  - it: should pass a launcher.conf string through
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.conf: |
+            [server]
+            address=127.0.0.1
+    asserts:
+      - equal:
+          path: data["launcher.conf"]
+          value: |
+            [server]
+            address=127.0.0.1
+
+  - it: should report a non-map profiles list entry with the library's message
+    template: configmap-general.yaml
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - oops
+    asserts:
+      - failedTemplate:
+          errorPattern: "Every entry written as a list must be a map"
+
+  # -- repos.conf must name CRAN; Workbench discards the whole file otherwise
+  - it: should fail when a repos.conf list has no CRAN entry
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.repos.conf has no entry named CRAN"
+
+  - it: should render a repos.conf list with CRAN in the order written
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://mirror.example.com/cran
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://mirror.example.com/cran
+
+  - it: should not render repos.conf when it is null
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf: null
+    asserts:
+      - notExists:
+          path: data["repos.conf"]
+
+  # -- How several values are written follows the file's format in the table
+  - it: should comma-join a list of values in an ini_ptree file
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          logging.conf:
+            "*":
+              log-level: info
+              some-option: [a, b]
+    asserts:
+      - matchRegex:
+          path: data["logging.conf"]
+          pattern: "(?m)^some-option=a,b$"
+
+  - it: should repeat the key for a list of values in an unrecognized file
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          custom.ini:
+            option: [a, b]
+    asserts:
+      - equal:
+          path: data["custom.ini"]
+          value: |
+            option=a
+            option=b
+
+  - it: should render the deprecated server-scope launcher.kubernetes.profiles.conf in the order written
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            - "@analysts":
+                max-cpus: 4
+            - "*":
+                max-cpus: 1
+                container-images: [a, b]
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [@analysts]
+            max-cpus=4
+
+            [*]
+            container-images=a,b
+            max-cpus=1

@@ -145,13 +145,14 @@ tests:
       - matchRegexRaw:
           pattern: "WARNING: the following configuration files are written as maps"
 
-  # Workbench discards repos.conf entirely when nothing is named CRAN
-  - it: should warn when repos.conf has no CRAN entry
+  # Workbench discards repos.conf entirely when nothing is named CRAN. A map gets the chart's
+  # CRAN entry and a list fails in configmap-session.yaml, so only a string reaches this warning.
+  - it: should warn when a repos.conf string has no CRAN entry
     set:
       config:
         session:
-          repos.conf:
-            - Internal: https://pkgs.example.com/internal
+          repos.conf: |
+            Internal=https://pkgs.example.com/internal
     asserts:
       - matchRegexRaw:
           pattern: "has no `CRAN` entry"
@@ -189,6 +190,63 @@ tests:
       - notMatchRegexRaw:
           pattern: "has no `CRAN` entry"
 
+  - it: should note that the chart added CRAN to a repos.conf map without one
+    set:
+      config:
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com/internal
+    asserts:
+      - matchRegexRaw:
+          pattern: "written as maps"
+      - matchRegexRaw:
+          pattern: "has no `CRAN` entry, so the chart added its default one"
+
+  - it: should not note an added CRAN when a repos.conf map has its own
+    set:
+      config:
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com/internal
+            CRAN: https://mirror.example.com/cran
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "chart added its default one"
+
+  # The deprecated server-scope location of launcher.kubernetes.profiles.conf is read in order too
+  - it: should warn when the server-scope launcher.kubernetes.profiles.conf is written as a map
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            "*":
+              max-cpus: 1
+    asserts:
+      - matchRegexRaw:
+          pattern: "written as maps(.|\\n)*config\\.server\\.launcher\\\\\\.kubernetes\\\\\\.profiles\\\\\\.conf"
+
+  - it: should not say a list replaces defaults for the server-scope launcher.kubernetes.profiles.conf
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            - "*":
+                max-cpus: 1
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not promise to remove the map form
+    set:
+      config:
+        server:
+          profiles:
+            "*":
+              max-memory-mb: 1024
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "will be removed"
+
   - it: should not warn about CRAN on a default install
     asserts:
       - notMatchRegexRaw:
@@ -207,14 +265,14 @@ tests:
     set:
       config:
         server:
-          launcher.conf:
-            - cluster:
-                name: Cluster1
+          logging.conf:
+            - "*":
+                log-level: warn
     asserts:
       - matchRegexRaw:
           pattern: "WARNING: the following configuration files are written as lists"
       - matchRegexRaw:
-          pattern: "`\\.Values\\.config\\.server\\.launcher\\\\\\.conf`"
+          pattern: "`\\.Values\\.config\\.server\\.logging\\\\\\.conf`"
 
   - it: should not warn when an order-agnostic ini file is written as a map
     set:
