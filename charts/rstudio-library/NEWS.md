@@ -16,8 +16,12 @@
   - `repeat` writes one line per value, repeating the key: `www-allow-origin: [a, b]` renders as
     `www-allow-origin=a` and `www-allow-origin=b`. This is how files read by boost
     `program_options` express an option given more than once; there a comma is part of the value.
+  - `reject` fails with a message saying to write the file as a string. For files whose parser
+    takes several values in a form this renderer does not write (pip's newline-continued values,
+    for one), so that a list cannot quietly render a file the parser refuses.
 
-  A list of *maps* still means several sections with the same name, under either option.
+  A list of *maps* still means several sections with the same name, under any option. An empty
+  list of values renders nothing; it previously rendered `key=` or `key=[]`.
 - **BREAKING**: `rstudio-library.config.ini` comma-joins a list of values at the top level of a
   file, where it previously repeated the key. Use `rstudio-library.config.ini.files` with
   `multi: repeat` to keep repeated keys.
@@ -36,6 +40,9 @@
   these now fail. This applies to both the map and the list form.
 - New `rstudio-library.config.entries` helper, which normalizes either form into an ordered list of
   entries.
+- `rstudio-library.config.dcf` accepts a file's contents as a list of maps, one record per entry
+  in the order written, and fails on a list entry that is not a map, which used to render as
+  `0: value`.
 - **BREAKING**: `rstudio-library.profiles.ini.advanced` is renamed to `rstudio-library.profiles.ini`,
   which takes the same dict and now also accepts a profiles file's sections as an ordered list,
   including its `job-json-overrides` handling. Note that `rstudio-library.profiles.ini` previously
