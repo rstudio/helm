@@ -27,3 +27,6 @@
 ci/
 lint/
 tests/
+
+# developer tooling
+Makefile

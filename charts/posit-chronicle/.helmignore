@@ -30,3 +30,6 @@ tests/
 
 # helm unittest debug files
 .debug/
+
+# developer tooling
+Makefile

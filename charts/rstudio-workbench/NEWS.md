@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.3
+
+- Fixed the document separator emitted by `templates/configmap-secret.yaml` when `sealedSecret.enabled=true`. The template produced `---apiVersion: bitnami.com/v1alpha1` on a single line, which is not a valid YAML document separator; `helm lint --strict` under Helm 4 rejected it. The rendered manifests are unchanged (only the `checksum/config-secret` pod annotation differs, since it hashes the rendered file).
+
 ## 0.22.2
 
 - Bump Workbench version to 2026.09.0

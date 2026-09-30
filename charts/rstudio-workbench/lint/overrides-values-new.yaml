@@ -1,3 +1,9 @@
+# job-json-overrides under config.profiles is the legacy mechanism, and the chart
+# fails if it is combined with launcher.useTemplates, which has defaulted to true
+# since chart 0.9.0. Opt back out so this fixture exercises what it was written for.
+launcher:
+  useTemplates: false
+
 license:
   key: real
 replicas: 1
