@@ -26,6 +26,20 @@
   profiles file's sections, including its `job-json-overrides` handling.
 - New `rstudio-library.config.entries` helper, which normalizes either form into an ordered list of
   entries.
+- A list of values is now comma-joined, at every depth: `cpu-affinity: [1, 2, 5]` renders as
+  `cpu-affinity=1,2,5`. This is how these files express several values for one option
+  (`resource-profiles=a,b,c`). Previously a list was rejected as an option's value, and produced
+  repeated keys at a file's top level. A list of *maps* still means several sections with the same
+  name, which is unchanged. A list holding maps or lists elsewhere now fails.
+- **BREAKING**: `rstudio-library.profiles.ini.advanced` is renamed to `rstudio-library.profiles.ini`.
+  It is now the only profiles helper: `rstudio-library.profiles.ini.singleFile`, the previous
+  `rstudio-library.profiles.ini`, and `rstudio-library.profiles.ini.collapse-array` are removed.
+  Profiles files render through `rstudio-library.config.ini` like every other ini file, and the
+  `job-json-overrides` encoding - a chart-level idea rather than an ini one - moved into
+  `rstudio-library.profiles.apply-everyone-and-default-to-others`, which already rewrote those
+  entries. Consumers must update their `include` when they adopt this version.
+- `rstudio-library.profiles.apply-everyone-and-default-to-others` now takes a `file` key and renders
+  the whole file, rather than its caller emitting the `name: |` header.
 
 ## 0.1.37
 

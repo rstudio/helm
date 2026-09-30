@@ -99,25 +99,61 @@
   "key=[a b]". (rstudio-library.profiles.ini does define a meaning for a list --
   it comma-joins -- which is why it does not share this helper.)
 */ -}}
+{{- /*
+  Renders one value. A list of single values is comma-joined, which is how these files express
+  several values for one option (resource-profiles=a,b,c, cpu-affinity=1,2,5). A map has no
+  representation -- ini files have no nesting -- and so does a list holding maps or lists.
+
+  Takes a dict: file, section (may be empty), key, value.
+*/ -}}
+{{- define "rstudio-library.config.ini.value" -}}
+{{- $where := .section | empty | ternary (printf "of '%s'" .file) (printf "in section [%s] of '%s'" (toString .section) .file) }}
+{{- $val := .value }}
+{{- if kindIs "map" $val }}
+  {{- fail (print "\n\n'" (toString .key) "' " $where " is a map, but ini files have no\nnesting, so this would have rendered as '" (toString .key) "=" (toString $val) "'.\n") }}
+{{- end }}
+{{- if kindIs "slice" $val }}
+  {{- $joined := list }}
+  {{- range $item := $val }}
+    {{- if or (kindIs "map" $item) (kindIs "slice" $item) }}
+      {{- fail (print "\n\n'" (toString $.key) "' " $where " is a list holding a " (kindOf $item) ".\nThe values of an option are joined with commas, so each one must be a single value.\n") }}
+    {{- end }}
+    {{- $joined = append $joined (toString $item) }}
+  {{- end }}
+  {{- printf "%s=%s" (toString .key) (join "," $joined) }}
+{{- else }}
+  {{- printf "%s=%s" (toString .key) (toString $val) }}
+{{- end }}
+{{- end }}
+
 {{- define "rstudio-library.config.ini.entry" -}}
 {{- $file := .file }}
 {{- range $parent, $child := .entry -}}
-  {{- $sections := ( (kindIs "slice" $child) | ternary $child ( list $child ))}}
-  {{- range $i, $section := $sections -}}
-    {{- if kindIs "map" $section }}
+  {{- /* A list of maps is several sections with the same name; ini files may repeat a section.
+         Any other list is several values for one option, and is comma-joined. */ -}}
+  {{- $sections := list }}
+  {{- if kindIs "map" $child }}
+    {{- $sections = list $child }}
+  {{- else if kindIs "slice" $child }}
+    {{- range $item := $child }}
+      {{- if kindIs "map" $item }}
+        {{- $sections = append $sections $item }}
+      {{- end }}
+    {{- end }}
+    {{- if and $sections (ne (len $sections) (len $child)) }}
+      {{- fail (print "\n\n'" (toString $parent) "' of '" $file "' is a list mixing sections with plain values.\nA list of maps is repeated sections; any other list is one option's values.\n") }}
+    {{- end }}
+  {{- end }}
+  {{- if $sections }}
+    {{- range $section := $sections }}
       {{- printf "[%s]" (toString $parent) | nindent 2 }}
       {{- range $key, $val := $section }}
-        {{- if or (kindIs "map" $val) (kindIs "slice" $val) }}
-          {{- $kind := (kindIs "map" $val) | ternary "a map" "a list" }}
-          {{- $fix := (kindIs "map" $val) | ternary "" "\n\nIf the file expects several values, write them as one value, such as \"a,b\"." }}
-          {{- fail (print "\n\n'" (toString $key) "' in section [" (toString $parent) "] of '" $file "' is " $kind ", but an option\ninside a section must be a single value. ini files have no nesting, so this\nwould have rendered as '" (toString $key) "=" (toString $val) "'." $fix "\n") }}
-        {{- end }}
-        {{- printf "%s=%s" (toString $key) (toString $val) | nindent 2 }}
+        {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" $parent "key" $key "value" $val) | nindent 2 }}
       {{- end }}
       {{- printf "" | nindent 0 }}
-    {{- else }}
-      {{- printf "%s=%s" (toString $parent) (toString $section) | nindent 2 }}
     {{- end }}
+  {{- else }}
+    {{- include "rstudio-library.config.ini.value" (dict "file" $file "section" "" "key" $parent "value" $child) | nindent 2 }}
   {{- end }}
 {{- end }}
 {{- end }}

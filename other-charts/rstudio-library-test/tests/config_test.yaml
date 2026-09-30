@@ -572,7 +572,7 @@ tests:
       - failedTemplate:
           errorPattern: "'limits' in section \\[\\*\\] of 'profiles' is a map"
 
-  - it: should fail when an option inside a section is a list
+  - it: should comma-join a list of values inside a section
     set:
       testConfig:
         ini:
@@ -584,10 +584,26 @@ tests:
                 - imageA
                 - imageB
     asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            container-images=imageA,imageB
+
+  - it: should fail when a list of values holds a map
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            section1: null
+            "*":
+              some-key:
+                - a
+                - nested: 1
+    asserts:
       - failedTemplate:
-          errorPattern: "'container-images' in section \\[\\*\\] of 'profiles' is a list"
-      - failedTemplate:
-          errorPattern: "write them as one value"
+          errorPattern: "is a list holding a map"
 
   - it: should still allow a list of maps at the top level of a file
     set:
@@ -609,7 +625,7 @@ tests:
             [cluster]
             name=Cluster2
 
-  - it: should still allow a list of scalars at the top level of a file
+  - it: should comma-join a list of values at the top level of a file
     set:
       testConfig:
         ini:
@@ -623,5 +639,4 @@ tests:
       - equal:
           path: data["some.conf"]
           value: |
-            repeated-key=a
-            repeated-key=b
+            repeated-key=a,b
