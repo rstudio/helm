@@ -193,3 +193,10 @@ tests:
     asserts:
       - notMatchRegexRaw:
           pattern: "has no `CRAN` entry"
+
+  # Derives from NOTES.txt's own list rather than restating it: if a map default is ever added for
+  # an order-sensitive file, a default install starts warning about the chart's own values.
+  - it: should not warn about the map form on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"

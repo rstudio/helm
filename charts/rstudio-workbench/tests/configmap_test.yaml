@@ -725,6 +725,11 @@ tests:
   # -- Guard: the README tells admins to write these files as a list, and Helm *replaces* a list
   # rather than merging it. So none of them may gain a chart default without someone deciding what
   # happens to admins who already use the list form. If this fails, that decision is now due.
+  #
+  # The file list below restates NOTES.txt's order-sensitive patterns, which is the source of truth
+  # — keep them in step. A *map* default would also be caught automatically by "should not warn
+  # about the map form on a default install" in notes_test.yaml; this catches a *list* default too,
+  # which warns about nothing and so would otherwise be silent.
   - it: should ship no chart default for the files documented as lists
     template: configmap-general.yaml
     documentIndex: 0
