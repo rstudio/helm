@@ -458,3 +458,635 @@ tests:
       - matchRegex:
           path: data["rserver.conf"]
           pattern: "(?m)^user-provisioning-enabled=0$"
+
+  # -- Ordered (list form) config files. See https://github.com/rstudio/helm/issues/944
+  - it: should render config.server order-sensitive files in the order written
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles:
+            - jsmith:
+                max-memory-mb: 8192
+            - "12345":
+                max-memory-mb: 8192
+            - "@contractors":
+                max-memory-mb: 2048
+            - "@analysts":
+                max-memory-mb: 4096
+            - "*":
+                max-memory-mb: 1024
+          launcher.kubernetes.resources.conf:
+            - small:
+                name: Small
+                cpus: 1
+            - large:
+                name: Large
+                cpus: 8
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [12345]
+            max-memory-mb=8192
+
+            [@contractors]
+            max-memory-mb=2048
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [*]
+            max-memory-mb=1024
+      - equal:
+          path: data["launcher.kubernetes.resources.conf"]
+          value: |
+            [small]
+            cpus=1
+            name=Small
+
+            [large]
+            cpus=8
+            name=Large
+
+  - it: should sort config.server order-sensitive files by name when written as a map
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles:
+            jsmith:
+              max-memory-mb: 8192
+            "@analysts":
+              max-memory-mb: 4096
+            "*":
+              max-memory-mb: 1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-memory-mb=1024
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [jsmith]
+            max-memory-mb=8192
+
+  - it: should render a raw string config.server file verbatim
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [jsmith]
+            max-memory-mb=8192
+
+            [*]
+            max-memory-mb=1024
+
+  - it: should render config.session repos.conf in the order written
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://packagemanager.posit.co/cran/latest
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://packagemanager.posit.co/cran/latest
+
+  # r-versions is DCF, not ini, so it has to be written as a string. See #948.
+  - it: should pass an r-versions string through unchanged
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          r-versions: |
+            Path: /opt/R/4.4.1
+            Label: Latest
+
+            Path: /opt/R/4.0.2
+            Label: Old
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Path: /opt/R/4.4.1
+            Label: Latest
+
+            Path: /opt/R/4.0.2
+            Label: Old
+
+  - it: should render config.profiles sections in the order written, merging the default everyone section
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        useTemplates: false
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - jsmith:
+                max-cpus: 8
+            - "@analysts":
+                max-cpus: 4
+            - "*":
+                max-cpus: 1
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[jsmith\\]\\nmax-cpus=8\\n\\n\\[@analysts\\]\\nmax-cpus=4\\n\\n\\[\\*\\]\\n"
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[\\*\\]\\nallow-unknown-images=1\\ncontainer-images=posit/workbench-session:.*\\ndefault-container-image=posit/workbench-session:.*\\njob-json-overrides=.*\\nmax-cpus=1"
+
+  - it: should prepend an everyone section to ordered config.profiles that omits one
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        useTemplates: false
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - jsmith:
+                max-cpus: 8
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "\\[\\*\\]\\nallow-unknown-images=1\\ncontainer-images=.*\\ndefault-container-image=.*\\njob-json-overrides=.*\\n\\n\\[jsmith\\]\\nmax-cpus=8"
+
+  # -- config.session files are routed by format, not by value shape. See #948
+  - it: should render r-versions as DCF when written as records
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          r-versions:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+            - Path: /opt/R/4.0.2
+              Label: Old
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Label: Latest
+            Path: /opt/R/4.4.1
+
+            Label: Old
+            Path: /opt/R/4.0.2
+
+  - it: should render notifications.conf as DCF
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          notifications.conf:
+            - StartTime: 2026-01-01
+              EndTime: 2026-01-02
+              Message: Maintenance window
+    asserts:
+      - matchRegex:
+          path: data["notifications.conf"]
+          pattern: "StartTime: 2026-01-01"
+      - notMatchRegex:
+          path: data["notifications.conf"]
+          pattern: "StartTime="
+
+  - it: should render a structured json session file as JSON
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          rstudio-prefs.json:
+            save_workspace: never
+    asserts:
+      - matchRegex:
+          path: data["rstudio-prefs.json"]
+          pattern: '"save_workspace": "never"'
+
+  - it: should pass a json session file written as a string through unchanged
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          rstudio-prefs.json: |
+            {"save_workspace": "never"}
+    asserts:
+      - equal:
+          path: data["rstudio-prefs.json"]
+          value: |
+            {"save_workspace": "never"}
+
+  - it: should still render repos.conf as ini
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://packagemanager.posit.co/cran/latest
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://packagemanager.posit.co/cran/latest
+
+  # -- Guard: the README tells admins to write these files as a list, and Helm *replaces* a list
+  # rather than merging it. So none of them may gain a chart default without someone deciding what
+  # happens to admins who already use the list form. If this fails, that decision is now due.
+  #
+  # The file list below restates NOTES.txt's order-sensitive patterns, which is the source of truth
+  # — keep them in step. A *map* default would also be caught automatically by "should not warn
+  # about the map form on a default install" in notes_test.yaml; this catches a *list* default too,
+  # which warns about nothing and so would otherwise be silent.
+  - it: should ship no chart default for the files documented as lists
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - notExists:
+          path: data["profiles"]
+      - notExists:
+          path: data["launcher.kubernetes.resources.conf"]
+      - notExists:
+          path: data["launcher.local.resources.conf"]
+      - notExists:
+          path: data["launcher.slurm.resources.conf"]
+
+  # config.session.repos.conf is the exception: it does ship a default, deliberately as a list so
+  # the map form warns. An admin's own value replaces it, which is why NOTES.txt guards for CRAN.
+  - it: should ship the repos.conf default as a list, not a map
+    template: configmap-session.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+
+  # config.profiles does receive chart defaults, so the list form has to merge rather than replace.
+  # Covered by "should render config.profiles sections in the order written" above; this pins that
+  # the defaults exist, so that test cannot silently become vacuous.
+  - it: should ship chart defaults for config.profiles
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "default-container-image=posit/workbench-session:"
+
+  # -- Files the chart merges its own settings into must be maps
+  - it: should fail with a clear message when rserver.conf is a list
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          rserver.conf:
+            - www-port: 8787
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.rserver.conf is a slice, but must be a map of options"
+
+  - it: should fail with a clear message when rserver.conf is a string
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          rserver.conf: |
+            www-port=8787
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.rserver.conf is a string, but must be a map of options"
+
+  - it: should fail rather than drop the chart's [server] section when launcher.conf is a list
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          launcher.conf:
+            - cluster:
+                name: Kubernetes
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.conf is a slice(.|\\n)*A string is also accepted"
+
+  - it: should fail rather than drop the chart's namespace when launcher.kubernetes.conf is a list
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          launcher.kubernetes.conf:
+            - kubernetes-namespace: other
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.kubernetes.conf is a slice"
+
+  - it: should pass a launcher.conf string through
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.conf: |
+            [server]
+            address=127.0.0.1
+    asserts:
+      - equal:
+          path: data["launcher.conf"]
+          value: |
+            [server]
+            address=127.0.0.1
+
+  - it: should report a non-map profiles list entry with the library's message
+    template: configmap-general.yaml
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - oops
+    asserts:
+      - failedTemplate:
+          errorPattern: "Every entry written as a list must be a map"
+
+  # -- repos.conf must name CRAN; Workbench discards the whole file otherwise
+  - it: should fail when a repos.conf list has no CRAN entry
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.repos.conf has no entry named CRAN"
+
+  - it: should render a repos.conf list with CRAN in the order written
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://mirror.example.com/cran
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://mirror.example.com/cran
+
+  - it: should not render repos.conf when it is null
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf: null
+    asserts:
+      - notExists:
+          path: data["repos.conf"]
+
+  # -- How several values are written follows the file's format in the table
+  - it: should comma-join a list of values in an ini_ptree file
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          logging.conf:
+            "*":
+              log-level: info
+              some-option: [a, b]
+    asserts:
+      - matchRegex:
+          path: data["logging.conf"]
+          pattern: "(?m)^some-option=a,b$"
+
+  - it: should repeat the key for a list of values in an unrecognized file
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          custom.ini:
+            option: [a, b]
+    asserts:
+      - equal:
+          path: data["custom.ini"]
+          value: |
+            option=a
+            option=b
+
+  - it: should render the deprecated server-scope launcher.kubernetes.profiles.conf in the order written
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            - "@analysts":
+                max-cpus: 4
+            - "*":
+                max-cpus: 1
+                container-images: [a, b]
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [@analysts]
+            max-cpus=4
+
+            [*]
+            container-images=a,b
+            max-cpus=1
+
+  # -- Every launcher.<cluster>.profiles.conf is the same file format, in either scope
+  - it: should render a non-kubernetes launcher profiles file in config.server like config.profiles
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.slurm.profiles.conf:
+            "*":
+              max-cpus: 1
+              some-list: [a, b]
+    asserts:
+      - equal:
+          path: data["launcher.slurm.profiles.conf"]
+          value: |
+            [*]
+            max-cpus=1
+            some-list=a,b
+
+  # -- A string for a file the chart merges settings into replaces those settings. Pinned so the
+  # message and README, which say so, stay true.
+  - it: should let a launcher.kubernetes.conf string replace the chart's namespace setting
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.kubernetes.conf: |
+            use-templating=0
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.conf"]
+          value: |
+            use-templating=0
+      - notMatchRegex:
+          path: data["launcher.kubernetes.conf"]
+          pattern: "kubernetes-namespace"
+
+  - it: should say what a string replaces when launcher.kubernetes.conf is a list
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          launcher.kubernetes.conf:
+              - kubernetes-namespace: other
+    asserts:
+      - failedTemplate:
+          errorPattern: "A string is also accepted and is used as the whole file, so it replaces"
+      - failedTemplate:
+          errorPattern: "kubernetes-namespace and use-templating"
+
+  - it: should not offer a string for rserver.conf
+    template: configmap-general.yaml
+    set:
+      config:
+        server:
+          rserver.conf:
+            - www-port: 8787
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.rserver.conf is a slice, but must be a map of options"
+
+  # -- pip.conf is not a Workbench file; a repeated key makes pip refuse it
+  - it: should fail a list of values in pip.conf
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          pip.conf:
+            global:
+              extra-index-url: [https://b/simple, https://c/simple]
+    asserts:
+      - failedTemplate:
+          errorPattern: "'extra-index-url' in section \\[global\\] of 'pip.conf' is a list of values"
+      - failedTemplate:
+          errorPattern: "Write the whole file as a string \\(pip.conf: \\|\\)"
+
+  - it: should report a non-map everyone section in an ordered profiles file with the profiles message
+    template: configmap-general.yaml
+    set:
+      launcher:
+        useTemplates: false
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - "*": oops
+    asserts:
+      - failedTemplate:
+          errorPattern: "\\[\\*\\] section must be a 'map' of config values. Instead got 'string' : 'oops'"
+
+  - it: should render the default profiles when config.profiles is null
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        profiles: null
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "(?m)^\\[\\*\\]$"
+
+  - it: should report a bare scalar in a repos.conf list as a shape error, not a missing CRAN
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          repos.conf:
+            - https://packagemanager.posit.co/cran/latest
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'repos.conf' must be a map of a name and its value"
+
+  - it: should fail a DCF list entry that is not a map
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          r-versions:
+            - /opt/R/4.4.1
+    asserts:
+      - failedTemplate:
+          errorPattern: "entry 1 of 'r-versions' must be a map of fields"
+
+  - it: should render nothing for an empty list of values
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles:
+            - "*":
+                container-images: []
+                max-cpus: 1
+          rserver.conf:
+            www-allow-origin: []
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-cpus=1
+      - notMatchRegex:
+          path: data["rserver.conf"]
+          pattern: "www-allow-origin"
+
+  # -- The scopes that do not go through the file table keep main's repeated keys, except sssd
+  - it: should repeat the key for a list of values in config.secret, as before
+    template: configmap-secret.yaml
+    documentIndex: 0
+    set:
+      config:
+        secret:
+          database.conf:
+            provider: postgresql
+            some-multi: [a, b]
+    asserts:
+      - matchRegex:
+          path: stringData["database.conf"]
+          pattern: "(?m)^some-multi=a\\nsome-multi=b$"

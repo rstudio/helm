@@ -1,0 +1,213 @@
+suite: Workbench legacy config shapes
+# Config written the way it was before the ordered list form existed (chart 0.22 and earlier)
+# must render exactly as it did then. Each expected value below was rendered from `main` before
+# #945/#953. The two known, intended differences are not pinned here: launcher.*.profiles.conf
+# lost a leading blank line, and r-versions written as records became valid DCF (#948).
+templates:
+  - configmap-general.yaml
+  - configmap-session.yaml
+tests:
+  # rserver.conf is read by boost program_options, where www-allow-origin and server-add-header
+  # are multitoken: several values repeat the key, and a comma is part of the value.
+  - it: should repeat the key for a list of values in rserver.conf
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          rserver.conf:
+            www-enable-origin-check: 1
+            www-allow-origin: [a.example.com, b.example.com]
+            server-add-header: ["X-Frame-Options: DENY", "X-Custom: 1"]
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^server-add-header=X-Frame-Options: DENY\\nserver-add-header=X-Custom: 1$"
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^www-allow-origin=a.example.com\\nwww-allow-origin=b.example.com\\nwww-enable-origin-check=1$"
+
+  # The two tests below pin the same URL: the first as values.yaml ships it, the second as the
+  # template adds it back (rstudio-workbench.config.defaultCran). Update both together.
+  - it: should render the chart's default CRAN entry
+    template: configmap-session.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+
+  - it: should add the chart's CRAN entry to a repos.conf map without one
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com/internal
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+            Internal=https://pkgs.example.com/internal
+
+  - it: should add the CRAN entry in the second namespace's session ConfigMap too
+    template: configmap-session.yaml
+    documentIndex: 1
+    set:
+      launcher:
+        namespace: sessions
+      config:
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com/internal
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: sessions
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+            Internal=https://pkgs.example.com/internal
+
+  - it: should keep the admin's own CRAN entry in a repos.conf map
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            RSPM: https://packagemanager.example.com/cran/latest
+            CRAN: https://mirror.example.com/cran
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://mirror.example.com/cran
+            RSPM=https://packagemanager.example.com/cran/latest
+
+  - it: should render a profiles map sorted, as before
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles:
+            "*":
+              session-limit: 5
+              session-timeout-minutes: 60
+            "@analysts":
+              session-limit: 10
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            session-limit=5
+            session-timeout-minutes=60
+
+            [@analysts]
+            session-limit=10
+
+  - it: should repeat a section for a list of maps in launcher.conf, merged with the defaults
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.conf:
+            cluster:
+              - name: Kubernetes
+                type: Kubernetes
+              - name: Local
+                type: Local
+    asserts:
+      - equal:
+          path: data["launcher.conf"]
+          value: |
+            [cluster]
+            name=Kubernetes
+            type=Kubernetes
+
+            [cluster]
+            name=Local
+            type=Local
+
+            [server]
+            address=127.0.0.1
+            admin-group=rstudio-server
+            authorization-enabled=1
+            enable-debug-logging=0
+            port=5559
+            server-user=rstudio-server
+            thread-pool-size=4
+
+  - it: should render a pip.conf map as before
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          pip.conf:
+            "global":
+              index-url: https://packagemanager.posit.co/pypi/latest/simple
+              trusted-host: packagemanager.posit.co
+    asserts:
+      - equal:
+          path: data["pip.conf"]
+          value: |
+            [global]
+            index-url=https://packagemanager.posit.co/pypi/latest/simple
+            trusted-host=packagemanager.posit.co
+
+  - it: should merge map-form server files with their chart defaults, as before
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          logging.conf:
+            "*":
+              log-level: debug
+            "@rserver":
+              log-level: info
+          jupyter.conf:
+            jupyter-exe: /opt/python/bin/jupyter
+          vscode.conf:
+            enabled: 0
+          launcher.kubernetes.resources.conf:
+            small:
+              name: Small
+              cpus: 1
+              mem-mb: 512
+    asserts:
+      - equal:
+          path: data["logging.conf"]
+          value: |
+            [*]
+            log-level=debug
+            logger-type=stderr
+
+            [@rserver]
+            log-level=info
+      - equal:
+          path: data["jupyter.conf"]
+          value: |
+            default-session-cluster=Kubernetes
+            jupyter-exe=/opt/python/bin/jupyter
+            labs-enabled=1
+      - equal:
+          path: data["vscode.conf"]
+          value: |
+            enabled=0
+            session-timeout-kill-hours=12
+      - equal:
+          path: data["launcher.kubernetes.resources.conf"]
+          value: |
+            [small]
+            cpus=1
+            mem-mb=512
+            name=Small

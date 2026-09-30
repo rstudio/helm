@@ -22,6 +22,112 @@ kubectl -n {{ $.Release.Namespace }} get secret {{ include "rstudio-workbench.fu
 ```
 {{- end }}
 
+{{- /* Two form warnings, both keyed off the filename dispatch in _helpers.tpl.
+
+       An order-sensitive file wants the list form: a map sorts its sections by name, silently
+       changing what the file does. An order-agnostic file wants the map form: Helm merges a map
+       with the chart's defaults for that file, but *replaces* them with a list.
+
+       Only ini files are considered. r-versions and notifications.conf are DCF and .json files
+       are JSON; a list is how you legitimately write those. */}}
+{{- $wantsList := list }}
+{{- $wantsMap := list }}
+{{- $assumedIni := list }}
+{{- range $scope := (list "server" "session" "profiles") }}
+  {{- range $file, $contents := (get $.Values.config $scope | default dict) }}
+    {{- $path := printf "config.%s.%s" $scope ($file | replace "." "\\.") }}
+    {{- $format := include "rstudio-workbench.config.fileFormat" (dict "scope" $scope "file" $file) }}
+    {{- $ordered := include "rstudio-workbench.config.fileOrdered" (dict "scope" $scope "file" $file) }}
+    {{- if not (has $format (list "dcf" "json" "unknown")) }}
+      {{- if and $ordered (kindIs "map" $contents) }}
+        {{- $wantsList = append $wantsList $path }}
+      {{- else if and (not $ordered) (kindIs "slice" $contents) }}
+        {{- $wantsMap = append $wantsMap $path }}
+      {{- end }}
+    {{- else if and (eq $format "unknown") (or (kindIs "map" $contents) (kindIs "slice" $contents)) }}
+      {{- $assumedIni = append $assumedIni $path }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- if $wantsList }}
+
+WARNING: the following configuration files are written as maps, which does not keep the order you wrote them in
+{{- range $wantsList | sortAlpha }}
+  - `.Values.{{ . }}`
+{{- end }}
+  Workbench reads these files in order, so sorting their sections by name changes how they behave.
+  Write them as a list instead, putting `- ` in front of each section or entry:
+
+    config:
+      server:
+        profiles:
+          - "*":
+              max-memory-mb: 1024
+          - "@analysts":
+              max-memory-mb: 4096
+
+  A map is fine for every other config file; these are the ones where the order matters.
+  {{- $repos := get .Values.config.session "repos.conf" }}
+  {{- if and (kindIs "map" $repos) (not (hasKey $repos "CRAN")) }}
+
+  `repos\.conf` has no `CRAN` entry, so the chart added its default one. A list replaces the
+  chart's default, so name a `CRAN` entry yourself when you convert it.
+  {{- end }}
+{{- end }}
+{{- if $wantsMap }}
+
+WARNING: the following configuration files are written as lists, which replaces the chart's defaults for them instead of merging with them
+{{- range $wantsMap | sortAlpha }}
+  - `.Values.{{ . }}`
+{{- end }}
+  Helm merges a map with the chart's defaults for a file, but a list replaces them: any default the
+  chart ships for these files is dropped, and only what you wrote is rendered. Nothing in these
+  files depends on the order of their sections, so write them as a map unless you specifically
+  need to control that order - and then include any chart defaults you still want in your list.
+{{- end }}
+
+{{- if $assumedIni }}
+
+WARNING: the chart does not recognize the following configuration files
+{{- range $assumedIni | sortAlpha }}
+  - `.Values.{{ . }}`
+{{- end }}
+  They will be rendered as ini: `Key=Value` under `[section]` headings. If that is not the right
+  format, give the file's contents as text instead and the chart will use them as they are:
+
+    config:
+      session:
+        my-file: |
+          whatever the file needs to say
+
+  Open an issue if this is a file the chart should know how to build.
+{{- end }}
+
+{{- /* Workbench discards repos.conf entirely when it has no entry named CRAN
+       (SessionOptions.cpp, parseReposConfig), taking the admin's own repositories with it.
+       configmap-session.yaml fails for the map and list forms; a string is passed through
+       untouched, so only warn for it. */}}
+{{- $repos := get .Values.config.session "repos.conf" }}
+{{- if kindIs "string" $repos }}
+  {{- if and $repos (not (regexMatch "(?m)^[ \t]*CRAN[ \t]*=" $repos)) }}
+
+WARNING: `.Values.config.session.repos\.conf` has no `CRAN` entry
+  - Workbench ignores the whole file when no entry is named `CRAN`, so none of these repositories
+    will be used, and the session log will show "is missing CRAN entry".
+  - Name one of your repositories `CRAN`. It does not have to be CRAN itself - point it at your
+    own mirror if that is what you want sessions to use:
+
+    config:
+      session:
+        repos.conf: |
+          CRAN=https://mirror.example.com/cran
+          Internal=https://pkgs.example.com/internal
+
+  - To configure repositories somewhere else instead, set `config.session.repos\.conf: null` and
+    the chart will not render the file at all.
+  {{- end }}
+{{- end }}
+
 {{- if hasKey .Values.config.server "launcher.kubernetes.profiles.conf" }}
 
 WARNING: `.Values.config.server.launcher\.kubernetes\.profiles\.conf` is deprecated
@@ -40,9 +146,11 @@ Please consider removing this configuration value.
 {{- end }}
 
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
-  {{- if hasKey .Values.config.profiles "launcher.kubernetes.profiles.conf" }}
-    {{- range $k,$v :=  (get .Values.config.profiles "launcher.kubernetes.profiles.conf") }}
-      {{- if hasKey $v "job-json-overrides" }}
+  {{- if hasKey (default (dict) .Values.config.profiles) "launcher.kubernetes.profiles.conf" }}
+    {{- $normalized := dict }}
+    {{- include "rstudio-library.config.entries" (dict "data" (get .Values.config.profiles "launcher.kubernetes.profiles.conf") "result" $normalized) }}
+    {{- range $entry := $normalized.entries }}
+      {{- if hasKey $entry.config "job-json-overrides" }}
         {{- fail "\n\n`profiles` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`.\n\nNote: `launcher.useTemplates=true` was made the default in chart version 0.9.0" }}
       {{- end }}
     {{- end }}

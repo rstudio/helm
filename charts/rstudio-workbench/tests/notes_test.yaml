@@ -51,3 +51,333 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "session.image.tagPrefix.*has been removed.*session.image.os"
+
+  # -- Order-sensitive config files written as maps. See https://github.com/rstudio/helm/issues/944
+  - it: should warn when order-sensitive config files are written as maps
+    set:
+      config:
+        server:
+          profiles:
+            "*":
+              max-memory-mb: 1024
+            "@analysts":
+              max-memory-mb: 4096
+          launcher.kubernetes.resources.conf:
+            small:
+              cpus: 1
+            large:
+              cpus: 8
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            "*":
+              max-cpus: 1
+            jsmith:
+              max-cpus: 8
+        session:
+          repos.conf:
+            CRAN: https://packagemanager.posit.co/cran/latest
+            Internal: https://pkgs.example.com/internal
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.server\\.profiles`"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.server\\.launcher\\\\\\.kubernetes\\\\\\.resources\\\\\\.conf`"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.profiles\\.launcher\\\\\\.kubernetes\\\\\\.profiles\\\\\\.conf`"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.session\\.repos\\\\\\.conf`"
+
+  - it: should not warn when order-sensitive config files are written as lists
+    set:
+      config:
+        server:
+          profiles:
+            - "*":
+                max-memory-mb: 1024
+          launcher.kubernetes.resources.conf:
+            - small:
+                cpus: 1
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - "*":
+                max-cpus: 1
+        session:
+          repos.conf:
+            - CRAN: https://packagemanager.posit.co/cran/latest
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+
+  - it: should not warn when an order-sensitive config file is written as a raw string
+    set:
+      config:
+        server:
+          profiles: |
+            [*]
+            max-memory-mb=1024
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+
+  - it: should not warn for config files whose order does not matter
+    set:
+      config:
+        server:
+          rserver.conf:
+            www-port: 8787
+        session:
+          rsession.conf:
+            session-timeout-minutes: 60
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+
+  - it: should warn for a single-entry map too, now that the gate is gone
+    set:
+      config:
+        server:
+          profiles:
+            "*":
+              max-memory-mb: 1024
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+
+  # Workbench discards repos.conf entirely when nothing is named CRAN. A map gets the chart's
+  # CRAN entry and a list fails in configmap-session.yaml, so only a string reaches this warning.
+  - it: should warn when a repos.conf string has no CRAN entry
+    set:
+      config:
+        session:
+          repos.conf: |
+            Internal=https://pkgs.example.com/internal
+    asserts:
+      - matchRegexRaw:
+          pattern: "has no `CRAN` entry"
+      - matchRegexRaw:
+          pattern: "Workbench ignores the whole file"
+
+  - it: should not warn when a repos.conf list includes CRAN
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://mirror.example.com/cran
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "has no `CRAN` entry"
+
+  - it: should not warn when a repos.conf string includes CRAN
+    set:
+      config:
+        session:
+          repos.conf: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://mirror.example.com/cran
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "has no `CRAN` entry"
+
+  - it: should not warn about CRAN when repos.conf is suppressed
+    set:
+      config:
+        session:
+          repos.conf: null
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "has no `CRAN` entry"
+
+  - it: should note that the chart added CRAN to a repos.conf map without one
+    set:
+      config:
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com/internal
+    asserts:
+      - matchRegexRaw:
+          pattern: "written as maps"
+      - matchRegexRaw:
+          pattern: "has no `CRAN` entry, so the chart added its default one"
+
+  - it: should not note an added CRAN when a repos.conf map has its own
+    set:
+      config:
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com/internal
+            CRAN: https://mirror.example.com/cran
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "chart added its default one"
+
+  # The deprecated server-scope location of launcher.kubernetes.profiles.conf is read in order too
+  - it: should warn when the server-scope launcher.kubernetes.profiles.conf is written as a map
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            "*":
+              max-cpus: 1
+    asserts:
+      - matchRegexRaw:
+          pattern: "written as maps(.|\\n)*config\\.server\\.launcher\\\\\\.kubernetes\\\\\\.profiles\\\\\\.conf"
+
+  - it: should not say a list replaces defaults for the server-scope launcher.kubernetes.profiles.conf
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            - "*":
+                max-cpus: 1
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not promise to remove the map form
+    set:
+      config:
+        server:
+          profiles:
+            "*":
+              max-memory-mb: 1024
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "will be removed"
+
+  - it: should not warn about CRAN on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "has no `CRAN` entry"
+
+  # Derives from NOTES.txt's own list rather than restating it: if a map default is ever added for
+  # an order-sensitive file, a default install starts warning about the chart's own values.
+  - it: should not warn about the map form on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+
+  # -- The inverse warning: an order-agnostic ini file written as a list replaces the chart's
+  # defaults for that file rather than merging with them.
+  - it: should warn when an order-agnostic ini file is written as a list
+    set:
+      config:
+        server:
+          logging.conf:
+            - "*":
+                log-level: warn
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as lists"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.server\\.logging\\\\\\.conf`"
+
+  - it: should not warn when an order-agnostic ini file is written as a map
+    set:
+      config:
+        server:
+          logging.conf:
+            "*":
+              log-level: warn
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  # r-versions and notifications.conf are DCF, and .json files are JSON; a list is how you
+  # legitimately write those, so the ini form warnings must not apply to them.
+  - it: should not warn about the list form for a DCF session file
+    set:
+      config:
+        session:
+          r-versions:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not warn about the list form for a json session file
+    set:
+      config:
+        session:
+          rstudio-prefs.json:
+            save_workspace: never
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not warn about the list form on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  # -- A file matching no row in rstudio-workbench.config.fileTable still renders as ini, which is
+  # a guess; the chart says so rather than guessing quietly.
+  - it: should warn when a file the chart does not recognize is written as a map
+    set:
+      config:
+        session:
+          my-thing:
+            FOO: bar
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the chart does not recognize the following configuration files"
+      - matchRegexRaw:
+          pattern: "`\\.Values\\.config\\.session\\.my-thing`"
+
+  - it: should not warn when an unrecognized file is given as text
+    set:
+      config:
+        session:
+          my-thing: |
+            FOO=bar
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "does not recognize the following"
+
+  - it: should not warn for files the table does list
+    set:
+      config:
+        server:
+          otel.conf:
+            exporter: otlp
+        session:
+          Renviron.site:
+            TZ: UTC
+          r-versions:
+            - Path: /opt/R/4.4.1
+              Label: Latest
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "does not recognize the following"
+
+  - it: should not warn about unrecognized files on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "does not recognize the following"
+
+  - it: should warn about the map form for a non-kubernetes launcher profiles file in config.server
+    set:
+      config:
+        server:
+          launcher.slurm.profiles.conf:
+            "*":
+              max-cpus: 1
+    asserts:
+      - matchRegexRaw:
+          pattern: "written as maps(.|\\n)*config\\.server\\.launcher\\\\.slurm\\\\.profiles\\\\.conf"
+      - notMatchRegexRaw:
+          pattern: "written as lists"
+
+  - it: should not warn about pip.conf written as a map
+    set:
+      config:
+        session:
+          pip.conf:
+            global:
+              index-url: https://a/simple
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: the (following configuration files|chart does not recognize)"
