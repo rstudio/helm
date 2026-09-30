@@ -92,6 +92,17 @@ jobs:
 
           echo "value=$APP_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Require pre-1.0.0 chart
+        env:
+          CHART_NAME: ${{ steps.chart.outputs.name }}
+        run: |
+          CHART_VERSION=$(yq -r '.version' "charts/${CHART_NAME}/Chart.yaml")
+          MAJOR=${CHART_VERSION%%.*}
+          if ! [[ "$MAJOR" =~ ^[0-9]+$ ]] || [ "$MAJOR" -ge 1 ]; then
+            echo "::error::Product releases require a chart version below 1.0.0; found ${CHART_VERSION}"
+            exit 1
+          fi
+
       - name: Check current appVersion
         id: current
         env:

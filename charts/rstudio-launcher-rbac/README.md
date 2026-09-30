@@ -4,6 +4,21 @@
 
 #### _RBAC definition for the RStudio Job Launcher_
 
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
+
 ## For production
 
 To ensure a stable production deployment:
