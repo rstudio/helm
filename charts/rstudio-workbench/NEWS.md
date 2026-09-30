@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.4
+
+- Mount `config.pam` files in sorted order. Previously the order of the `rstudio-pam` volume mounts could change from one render to the next when more than one PAM file was configured, which changed the pod spec and could restart Workbench pods on a `helm upgrade` with no configuration change.
+
 ## 0.22.3
 
 - Fixed the document separator emitted by `templates/configmap-secret.yaml` when `sealedSecret.enabled=true`. The template produced `---apiVersion: bitnami.com/v1alpha1` on a single line, which is not a valid YAML document separator; `helm lint --strict` under Helm 4 rejected it. The rendered manifests are unchanged (only the `checksum/config-secret` pod annotation differs, since it hashes the rendered file).
