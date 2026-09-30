@@ -362,16 +362,22 @@ CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
 ```
 
 :::{.callout-warning}
-Writing `repos.conf` as a map is deprecated and will be removed in a future chart release. A map
-does not keep the order you wrote it in: the chart renders map keys alphabetically, so an internal
-repository can't be put ahead of CRAN.
+A map does not keep the order you wrote it in: the chart renders map keys alphabetically, so an
+internal repository can't be put ahead of CRAN, and the chart warns when `repos.conf` is a map.
 :::
 
 :::{.callout-important}
-Your `repos.conf` **replaces** the chart default rather than merging with it, and it must contain an
-entry named `CRAN`. Workbench ignores the whole file when nothing is named `CRAN`, so the other
-repositories are lost too - the only sign is `is missing CRAN entry` in the session log. The entry
-does not have to be CRAN itself; point it at your own mirror if that is what sessions should use.
+`repos.conf` must contain an entry named `CRAN`. Workbench ignores the whole file when nothing is
+named `CRAN`, so the other repositories are lost too - the only sign is `is missing CRAN entry` in
+the session log. The entry does not have to be CRAN itself; point it at your own mirror if that is
+what sessions should use.
+
+- Written as a **list**, your `repos.conf` **replaces** the chart default, so it must name `CRAN`
+  itself. The chart fails if it does not.
+- Written as a **map** with no `CRAN` entry, it gets the chart's default `CRAN` entry added, as it
+  always has.
+- Written as a **string**, it is used as-is, and the chart warns if it has no `CRAN=` line.
+
 To configure repositories somewhere else entirely, set `config.session.repos\.conf: null` and the
 chart renders no file.
 :::
@@ -480,8 +486,7 @@ The product reads configuration from top to bottom and "last-in-wins" for a give
 Because these files are read in order, write their sections as a list, putting `- ` in front of
 each section header. A map does not keep the order you wrote it in: the chart renders map keys
 alphabetically, so, for example, a user named `12345` would lose their own settings to every group
-they belong to. Writing an order-sensitive file as a map is deprecated and will be removed in a
-future chart release.
+they belong to. The map form still renders, sorted, and the chart warns about it.
 
 This applies to `/etc/rstudio/profiles`, `launcher.*.profiles.conf`, and
 `launcher.*.resources.conf` (where the session launcher lists resource profiles in file order and
@@ -489,8 +494,10 @@ pre-selects the first one).
 
 Which form to use is decided by the file, not by preference: **an order-sensitive file wants a
 list, every other ini file wants a map.** Helm merges a map with the chart's defaults for a file
-but replaces them with a list, so writing an order-agnostic file as a list silently drops whatever
-the chart ships for it. The chart warns in both directions. Files that are not ini - `r-versions`,
+but replaces them with a list, so writing an order-agnostic file as a list drops whatever the
+chart ships for it. The chart warns in both directions, and fails outright for `rserver.conf`,
+`launcher.conf`, `launcher.kubernetes.conf`, and `positron.conf` written as a list, since the chart
+merges settings of its own into those. Files that are not ini - `r-versions`,
 `notifications.conf`, and `*.json` - are exempt, since a list is how you legitimately write those.
 
 Only the sections are ordered. The options written inside a section are still rendered

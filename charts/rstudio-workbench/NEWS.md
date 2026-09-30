@@ -5,7 +5,8 @@
 - Config files whose behavior depends on the order of their sections or entries can now be written
   as a list, putting `- ` in front of each section or entry, and are rendered in the order written.
   This covers `config.server.profiles`, `config.server.launcher\.*\.resources\.conf`,
-  `config.profiles.launcher\.*\.profiles\.conf`, and `config.session.repos\.conf`:
+  `config.profiles.launcher\.*\.profiles\.conf` (and its deprecated `config.server` location), and
+  `config.session.repos\.conf`:
 
   ```yaml
   config:
@@ -21,6 +22,27 @@
         - CRAN: https://packagemanager.posit.co/cran/latest
   ```
 
+  Written as a map, these files are still rendered as before - sorted by name - and the chart now
+  prints a `WARNING` in `NOTES.txt` saying so, since sorting silently changes what they do. The map
+  form is not going away; it is simply the wrong form for these four files. The raw string form
+  (`profiles: |`) keeps the written order and is unaffected.
+- A list of values for one option is now written the way the file's parser expects. Files read by
+  boost `program_options` - `rserver.conf`, `rsession.conf`, `launcher.*.conf`, `jupyter.conf`,
+  `vscode.conf`, `positron.conf` - repeat the key, one line per value, as the chart always did at
+  the top level of a file:
+
+  ```yaml
+  config:
+    server:
+      rserver.conf:
+        www-allow-origin: [a.example.com, b.example.com]   # www-allow-origin=a.example.com
+                                                           # www-allow-origin=b.example.com
+  ```
+
+  Files read by boost `property_tree`, which rejects a repeated key - `profiles`, `launcher.conf`,
+  `logging.conf`, `repos.conf`, and the `launcher.*.resources.conf` and `launcher.*.profiles.conf`
+  files - comma-join them (`container-images=a,b`), as `config.profiles` always did. Either way the
+  same applies inside a `[section]`, where a list previously rendered as `key=[a b]`.
 - `config.session` files are now rendered according to their format rather than the shape of the
   value written. `r-versions` and `notifications.conf` are DCF (`Key: Value`, records separated by
   a blank line), `*.json` files are JSON, and everything else stays ini. Previously all of them
@@ -28,45 +50,54 @@
   logging `does not point to a valid directory` for each line. Resolves
   https://github.com/rstudio/helm/issues/948. A file written as a raw string is still passed
   through unchanged.
+
+  **Your R version list may change on upgrade.** If you wrote `r-versions` as a list of records,
+  Workbench has been ignoring it and scanning for R on its own; it now reads your entries. Entries
+  whose `Path` no longer exists are logged and skipped. The same goes for `*.json` session files
+  written as a map, which Workbench has been ignoring as invalid JSON.
 - **BREAKING**: a file written as a list must give each section or entry its own `- `, holding a
-  single key. This rejects two shapes that previously rendered something unusable: several sections
+  single key. This rejects shapes that previously rendered something unusable: several sections
   crammed into one entry (a missing `- `), which rendered as `name=map[key:value]`; and a multi-field
   record, which was only ever used for `config.session.r-versions` and emitted `Key=Value` where
-  Workbench parses that file as DCF (`Key: Value`) - see
-  https://github.com/rstudio/helm/issues/948. Write `r-versions` as a string (`r-versions: |`),
-  which is passed through unchanged. An option inside a section must also be a single value, since
-  ini files have no nesting.
+  Workbench parses that file as DCF (`Key: Value`) - see https://github.com/rstudio/helm/issues/948.
+  Write `r-versions` as a string (`r-versions: |`), which is passed through unchanged. An entry with
+  no value (`- "*":` with nothing under it) also fails; it rendered as `*=<nil>`.
+- **BREAKING**: a list entry holding several options in a file without sections, such as
+  `rsession.conf: [{session-timeout-minutes: 60, session-save-action-default: none}]`, now fails
+  where it used to render one line per option. Write the file as a map instead.
+- **BREAKING**: an option's value must be a single value or a list of single values. ini files have
+  no nesting, so a map there (`limits: {cpu: 1}`) rendered as `limits=map[cpu:1]`; it now fails.
+- `config.session.repos\.conf` now defaults to a list, so that its order is kept. A `repos.conf`
+  you write as a map still gets the chart's `CRAN` entry when it has none, as it did when the
+  default was a map. A list replaces the default, so it must name a `CRAN` entry itself - Workbench
+  ignores the whole file without one - and the chart now fails if it does not. A string without a
+  `CRAN=` line prints a `WARNING` instead.
+- `config.server.rserver\.conf`, `launcher\.conf`, `launcher\.kubernetes\.conf`, and
+  `positron\.conf` written as a list now fail with a message saying to write them as a map. The
+  chart merges its own settings into these files, which a list silently dropped - `launcher\.conf`
+  lost the `[server]` section the launcher needs. `rserver\.conf` written as a string now fails with
+  the same message instead of a template type error.
 - Fixed: with more than one `config.pam` file, the pam `volumeMounts` were emitted in Go map order,
   so `helm template` was not reproducible and the Deployment's pod template changed between renders
   with no configuration change. They are now sorted by file name.
-- **BREAKING**: the `config.session.repos\.conf` default is now a list, so supplying your own
-  replaces it instead of merging with it. Previously a map default merged with a map you supplied,
-  which quietly added the chart's CRAN entry to your repositories. Include a `CRAN` entry in your
-  own list - Workbench ignores the whole file without one. The chart now warns when it is missing.
 - `launcher.*.profiles.conf` no longer starts with a blank line. Profiles files now render through
   the same helper as every other ini file, which places the blank line between sections rather than
   before the first one. Nothing reads it - the file is parsed with an ini parser that skips blank
   lines - but it changes the rendered file, so the config checksum shifts and pods restart once on
   upgrade.
-- The chart now warns when an order-agnostic ini file is written as a *list*. Helm merges a map
-  with the chart's defaults for a file but replaces them with a list, so the list form silently
-  drops any default the chart ships - `launcher\.conf` would lose its `[server]` section, which
-  the launcher needs. Write those files as a map unless you need to control section order. Files
-  that are not ini (`r-versions`, `notifications.conf`, `*.json`) are exempt, since a list is how
-  you legitimately write those.
+- The chart now warns when any other ini file is written as a *list*. Helm merges a map with the
+  chart's defaults for a file but replaces them with a list, so the list form drops any default the
+  chart ships for that file. Write those files as a map unless you need to control section order.
+  Files that are not ini (`r-versions`, `notifications.conf`, `*.json`) are exempt, since a list is
+  how you legitimately write those.
 - `config.server` files are now rendered by format too, the same way `config.session` already is.
   A single table in the chart gives each configuration file its format, and both ConfigMaps read
   from it. `config.server.*.json` files written as a map are now rendered as JSON rather than ini.
 - The chart now warns when a configuration file it does not recognize is written as a map or a
-  list. Such a file is still rendered as ini, which is what the chart has always done, but ini is
-  a guess for a file the chart knows nothing about, and a wrong guess renders a file that looks
-  fine and is ignored by the product. Give the file's contents as text to render it exactly as
-  written. `Renviron.site` is recognized as ini and does not warn.
-- **DEPRECATED**: writing those files as a map. A map is rendered in alphabetical order, which
-  silently changes what these files do, and nothing in `values.yaml` shows it. The map form still
-  works and now prints a `WARNING` in `NOTES.txt` once a file holds more than one section or entry.
-  It will be removed in a future chart release. The raw string form (`profiles: |`) keeps the
-  written order and is unaffected.
+  list. Such a file is still rendered as ini with repeated keys, which is what the chart has always
+  done, but ini is a guess for a file the chart knows nothing about, and a wrong guess renders a
+  file that looks fine and is ignored by the product. Give the file's contents as text to render it
+  exactly as written. `Renviron.site` is recognized and does not warn.
 
 ## 0.22.2
 
