@@ -177,7 +177,7 @@ data:
 {{- $profilesDict := dict "data" ($profilesConfig | deepCopy) "filePath" ($jobJsonFilePath) "jobJsonDefaults" ($defaultOverrides) }}
 {{- if not (hasKey .Values.config.server "launcher.kubernetes.profiles.conf") }}
   {{/* generate the profiles configuration */}}
-  {{- include "rstudio-library.profiles.ini.advanced" $profilesDict | nindent 2 }}
+  {{- include "rstudio-library.profiles.ini" $profilesDict | nindent 2 }}
 {{- end }}
   {{- /* generate the server configuration (dcf files) minus launcher-mounts */}}
   {{- include "rstudio-library.config.dcf" ( omit .Values.config.serverDcf "launcher-mounts" ) | nindent 2 }}
