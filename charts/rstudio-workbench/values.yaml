@@ -581,7 +581,7 @@ config:
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
     rsession.conf: {}
     notifications.conf: {}
     rstudio-prefs.json: |
