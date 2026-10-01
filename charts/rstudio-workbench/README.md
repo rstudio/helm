@@ -346,7 +346,7 @@ R package repositories can be configured with `config.session.repos.conf`:
 config:
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
 ```
 
 For more information about configuring CRAN repositories in Workbench, see the [Posit Workbench Administrator Guide's - Package Installation > CRAN repositories](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories) section.
@@ -768,7 +768,7 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | config.secret | string | `nil` | a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
 | config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
-| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
+| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/noble/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
 | config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
 | config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |
