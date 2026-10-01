@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.22.4
+
+- Update the default session `repos.conf` CRAN URL to use `noble` (Ubuntu 24.04) instead of `jammy` (Ubuntu 22.04). The domain already uses `packagemanager.posit.co`. This matches the Ubuntu 24.04 default used elsewhere in the charts and ensures CRAN binary packages resolve against a current distribution. The rendered default changes, but any user-supplied `config.session.repos.conf.CRAN` value is unaffected.
+- Add a default `session-python-index-url` to `config.server.rserver.conf` pointing at Posit Public Package Manager (`https://packagemanager.posit.co/pypi/latest/simple`). Workbench injects this as `PIP_INDEX_URL`/`UV_INDEX_URL` for all session types, which is the recommended way to set the Python package index (vs. a per-session `pip.conf`/`uv.toml`).
+
 ## 0.22.3
 
 - Fixed the document separator emitted by `templates/configmap-secret.yaml` when `sealedSecret.enabled=true`. The template produced `---apiVersion: bitnami.com/v1alpha1` on a single line, which is not a valid YAML document separator; `helm lint --strict` under Helm 4 rejected it. The rendered manifests are unchanged (only the `checksum/config-secret` pod annotation differs, since it hashes the rendered file).

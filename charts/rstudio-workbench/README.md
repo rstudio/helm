@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.22.3](https://img.shields.io/badge/Version-0.22.3-informational?style=flat-square) ![AppVersion: 2026.09.0](https://img.shields.io/badge/AppVersion-2026.09.0-informational?style=flat-square)
+![Version: 0.22.4](https://img.shields.io/badge/Version-0.22.4-informational?style=flat-square) ![AppVersion: 2026.09.0](https://img.shields.io/badge/AppVersion-2026.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.22.3:
+To install the chart with the release name `my-release` at version 0.22.4:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.22.3
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.22.4
 ```
 
 To explore other chart versions, look at:
@@ -346,7 +346,7 @@ R package repositories can be configured with `config.session.repos.conf`:
 config:
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
 ```
 
 For more information about configuring CRAN repositories in Workbench, see the [Posit Workbench Administrator Guide's - Package Installation > CRAN repositories](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories) section.
@@ -768,7 +768,7 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | config.secret | string | `nil` | a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
 | config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
-| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
+| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/noble/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
 | config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
 | config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |

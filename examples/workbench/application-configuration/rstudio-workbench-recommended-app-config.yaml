@@ -27,9 +27,6 @@ sharedStorage:
   requests:
     storage: 1G
 
-launcher:
-  useTemplates: true # Required when specifying custom PyPI repos in `pip.conf`
-
 config:
   session:
     rsession.conf:
@@ -45,16 +42,15 @@ config:
       # installation time. If you have your own Posit Package Manager server
       # then replace with the URL. Note you can list multiple repos in 
       # `repos.conf` but you must include one repo named "CRAN".
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest # TODO: Change this URL to point to your own Package Manager CRAN URL if desired
-    pip.conf:
-      "global":
-        index-url: https://packagemanager.posit.co/pypi/latest/simple # TODO: Change this URL to point to your own Package Manager PyPI URL if desired
-        trusted-host: packagemanager.posit.co # TODO: Change this to match the domain name specified in `index-url`. Do NOT include http:// or https://
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest # TODO: Change this URL to point to your own Package Manager CRAN URL if desired
   server:
     rserver.conf:
       admin-enabled: 1 # More information at https://docs.posit.co/ide/server-pro/server_management/administrative_dashboard.html
       admin-group: "admingroup" # TODO: Specify Linux group(s) to give administrator privileges
       admin-superuser-group: "admin-superuser-group" # TODO: Specify Linux group(s) to give administrator superuser privileges
+      # Sets the default Python package index for all session types (RStudio Pro, Positron Pro, VS Code).
+      # Workbench injects it as PIP_INDEX_URL/UV_INDEX_URL, so pip and uv use it without a per-session pip.conf/uv.toml.
+      session-python-index-url: https://packagemanager.posit.co/pypi/latest/simple # TODO: Change this URL to point to your own Package Manager PyPI URL if desired
     jupyter.conf:
       # These settings apply to Jupyter Notebook and JupyterLab IDE sessions
       session-cull-minutes: 60 # TODO: Adjust based on your requirements

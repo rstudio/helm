@@ -581,7 +581,7 @@ config:
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
     rsession.conf: {}
     notifications.conf: {}
     rstudio-prefs.json: |
@@ -623,6 +623,10 @@ config:
       audited-jobs: 1
       chronicle-enabled: 0
       metrics-enabled: 0
+      # Sets the default Python package index for sessions. Workbench injects this as
+      # PIP_INDEX_URL/UV_INDEX_URL into all session types, so pip and uv use it without
+      # a per-tool pip.conf/uv.toml. https://docs.posit.co/ide/server-pro/admin/python/package_installation.html
+      session-python-index-url: https://packagemanager.posit.co/pypi/latest/simple
     launcher.conf:
       server:
         address: 127.0.0.1
