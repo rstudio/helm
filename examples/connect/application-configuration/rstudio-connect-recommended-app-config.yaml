@@ -20,19 +20,6 @@ sharedStorage:
     storage: 100G
 
 extraObjects:
-  # Required to set a custom PyPI repo
-  - apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: pip-config-connect
-    data:
-      # TODO: if using Posit Package Manager, edit the below to match your package manager python repo URL
-      pip.conf: |
-        [global]
-        timeout = 60
-        index-url = https://packagemanager.posit.co/pypi/latest/simple
-        trusted-host = packagemanager.posit.co
-
   # Required for authenticated R (not Python) repositories
   - apiVersion: v1
     kind: ConfigMap
@@ -48,11 +35,6 @@ launcher:
   templateValues:
     pod:
       volumes:
-        # Required to set a custom Python repo
-        - name: pip-config-volume
-          configMap:
-            name: pip-config-connect
-
         # Required for authenticated R and Python repositories
         # See the following documentation for more details:
         # https://packagemanager.posit.co/__docs__/admin/connect.html#authenticated-repositories
@@ -69,11 +51,6 @@ launcher:
             name: curlrc-config-connect
 
       volumeMounts:
-        # Required to set a custom Python repo
-        - mountPath: /etc/pip.conf
-          name: pip-config-volume
-          subPath: pip.conf
-
         # Required for authenticated R and Python repositories
         - mountPath: /etc/netrc
           name: netrc-config-volume
@@ -136,9 +113,18 @@ config:
     Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.
 
   "RPackageRepository \"CRAN\"":
-    URL: https://packagemanager.posit.co/cran/__linux__/jammy/latest # TODO: If using Package Manager change to match your package manager R repo url
-  # If using other R repos, add them here using the below format  
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest # TODO: If using Package Manager change to match your package manager R repo url
+  # If using other R repos, add them here using the below format
   # "RPackageRepository \"INTERNAL\"":
-  #   URL: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+  #   URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
+  # PythonPackageRepository sets the Python package index directly in Connect's
+  # configuration (Connect 2026.05.0 and later). This is the recommended way to
+  # point Connect at a Package Manager PyPI mirror and replaces mounting a pip.conf.
+  # https://docs.posit.co/connect/admin/integrations/package-manager/#configuring-connect-to-use-package-manager-for-python
+  "PythonPackageRepository \"PyPI\"":
+    URL: https://packagemanager.posit.co/pypi/latest/simple # TODO: If using Package Manager change to match your package manager Python repo url
+  # If using other Python repos, add them here using the below format
+  # "PythonPackageRepository \"INTERNAL\"":
+  #   URL: https://packagemanager.example.com/pypi/internal/simple
   Quarto:
     Enabled: true
