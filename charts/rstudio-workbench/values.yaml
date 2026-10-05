@@ -195,6 +195,10 @@ launcher:
       volumeMounts: []
       env: []
       imagePullPolicy: ""
+      # -- imagePullPolicy for the init containers the launcher adds to session pods (e.g. session-init, positron-init).
+      # Images tagged `:daily` or `:latest` (such as the Positron preview init image) always use `Always`.
+      # Leave empty to use the Kubernetes default.
+      initContainerImagePullPolicy: ""
       imagePullSecrets: []
       initContainers: []
       extraContainers: []

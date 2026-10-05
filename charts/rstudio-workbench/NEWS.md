@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.4
+
+- The session job template (`files/job.tpl`) now sets `imagePullPolicy` on the init containers the launcher adds to session pods. Images tagged `:daily` or `:latest` always get `Always`, so the Positron preview init image (`ghcr.io/posit-dev/workbench-positron-init-preview:daily`) no longer goes stale on each node. For other init containers, the new `launcher.templateValues.pod.initContainerImagePullPolicy` value sets the policy; leaving it empty keeps the Kubernetes default ([#949](https://github.com/rstudio/helm/issues/949)).
+
 ## 0.22.3
 
 - Fixed the document separator emitted by `templates/configmap-secret.yaml` when `sealedSecret.enabled=true`. The template produced `---apiVersion: bitnami.com/v1alpha1` on a single line, which is not a valid YAML document separator; `helm lint --strict` under Helm 4 rejected it. The rendered manifests are unchanged (only the `checksum/config-secret` pod annotation differs, since it hashes the rendered file).
