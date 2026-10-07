@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.5
+
+- Update the default session `repos.conf` CRAN URL to use `noble` (Ubuntu 24.04) instead of `jammy` (Ubuntu 22.04). The domain already uses `packagemanager.posit.co`. This matches the Ubuntu 24.04 default used elsewhere in the charts and ensures CRAN binary packages resolve against a current distribution. The rendered default changes, but any user-supplied `config.session.repos.conf.CRAN` value is unaffected.
+
 ## 0.22.4
 
 - The session job template (`files/job.tpl`) now sets `imagePullPolicy` on the init containers the launcher adds to session pods. Images tagged `:daily` or `:latest` always get `Always`, so the Positron preview init image (`ghcr.io/posit-dev/workbench-positron-init-preview:daily`) no longer goes stale on each node. For other init containers, the new `launcher.templateValues.pod.initContainerImagePullPolicy` value sets the policy; leaving it empty keeps the Kubernetes default ([#949](https://github.com/rstudio/helm/issues/949)).
