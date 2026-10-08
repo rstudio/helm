@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.6
+
+- Change the default readiness probe path from `/__ping__` to `/__cluster-health__`, because `/__ping__` now
+  returns 200 during startup and in offline mode. `/__cluster-health__` needs Package Manager 2026.06.0 or later;
+  on older images, set `readinessProbe.httpGet.path` back to `/__ping__`.
+
 ## 0.20.5
 
 - Bump Package Manager version to 2026.09.0
