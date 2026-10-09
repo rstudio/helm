@@ -4,7 +4,7 @@
 
 - Order-sensitive config files can be written as a list to keep their order. A map is always
   rendered sorted by name, which can change how Workbench reads these files: in `profiles`, for
-  example, the last matching section wins. The order-sensitive files are `config.server.profiles`,
+  example, the last matching section wins. The order-sensitive files are `profiles` (in `config.server` or `config.session`),
   `launcher.*.profiles.conf` (in `config.server` or `config.profiles`),
   `config.server.launcher.*.resources.conf` and `config.session.repos.conf`. Write each section or
   entry as a list item:
