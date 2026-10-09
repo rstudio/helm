@@ -132,9 +132,9 @@ tests:
           r-versions: {Path: /opt/R/4.4.1}
     asserts:
       - matchRegexRaw:
-          pattern: "WARNING: `.Values.config.session.r-versions` is written as a map, which renders as .ini, but r-versions is a DCF file that only the Workbench server reads. Write it in config.serverDcf"
+          pattern: "WARNING: `.Values.config.session.r-versions` won't work as written. config.session renders .ini files, and r-versions is a DCF file that only the Workbench server reads. Write it in config.serverDcf"
       - matchRegexRaw:
-          pattern: "WARNING: `.Values.config.server.r-versions` is written as a map"
+          pattern: "WARNING: `.Values.config.server.r-versions` won't work as written"
 
   - it: should warn about notifications.conf written as a map
     set:
@@ -143,7 +143,7 @@ tests:
           notifications.conf: {Message: hello}
     asserts:
       - matchRegexRaw:
-          pattern: "WARNING: `.Values.config.session.notifications.conf` is written as a map, which renders as .ini, but notifications.conf is a DCF file. Write the whole file as a string."
+          pattern: "WARNING: `.Values.config.session.notifications.conf` won't work as written. config.session renders .ini files, and notifications.conf is a DCF file. Write the whole file as a string."
 
   - it: should warn about json files written as maps, in config.session or config.server
     set:
@@ -154,9 +154,9 @@ tests:
           positron-user-settings.json: {a: 1}
     asserts:
       - matchRegexRaw:
-          pattern: "WARNING: `.Values.config.session.rstudio-prefs.json` is written as a map, which renders as .ini, but rstudio-prefs.json is a JSON file. Write the whole file as a string."
+          pattern: "WARNING: `.Values.config.session.rstudio-prefs.json` won't work as written. config.session renders .ini files, and rstudio-prefs.json is a JSON file. Write the whole file as a string."
       - matchRegexRaw:
-          pattern: "WARNING: `.Values.config.server.positron-user-settings.json` is written as a map"
+          pattern: "WARNING: `.Values.config.server.positron-user-settings.json` won't work as written"
 
   - it: should not warn about an empty map for a non-.ini file
     set:
@@ -165,7 +165,7 @@ tests:
           notifications.conf: {}
     asserts:
       - notMatchRegexRaw:
-          pattern: "notifications.conf` is written as a map"
+          pattern: "notifications.conf` won't work as written"
 
   - it: should not fail when config.profiles is null
     set:
@@ -190,3 +190,15 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "`profiles` has `job-json-overrides` defined"
+
+  - it: should warn about a resources file in config.profiles, pointing to config.server
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.resources.conf:
+            small: {cpus: 1}
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: `.Values.config.profiles.launcher.kubernetes.resources.conf` won't work as written. config.profiles is only for launcher.\\*.profiles.conf files.*Write launcher.kubernetes.resources.conf in config.server instead."
+      - notMatchRegexRaw:
+          pattern: "written as maps"

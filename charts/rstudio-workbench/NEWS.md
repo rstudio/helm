@@ -38,6 +38,12 @@
   map gets a NOTES warning.
 - NOTES warns when `notifications.conf` or a `*.json` file is written as a map, since those render
   as `.ini`. Write them as strings.
+- A file name may now appear in only one of `config.server`, `config.serverDcf` and
+  `config.profiles`. All three are written to the same ConfigMap, where a second copy used to
+  silently replace the first, so one of them was never used.
+- `config.profiles` is only for `launcher.*.profiles.conf` files. Any other file there, such as a
+  `launcher.*.resources.conf`, fails as a list and gets a NOTES warning as a map, pointing to
+  `config.server`.
 - Fixed NOTES failing when `config.profiles` is `null`.
 - Fixed the README's `config.profiles` example, which claimed that `[*]` arrays are appended into
   other sections. Only `job-json-overrides` are.
