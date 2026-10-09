@@ -728,19 +728,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- /*
   Table 1: files that aren't .ini. These sections render a map or a list as .ini, so these files
-  must be written as strings.
-    format: the file's format, for the error message
+  must be written as strings (an empty value, such as the notifications.conf: {} default, is fine).
+    message: the error, after "config.<scope>.<file>: "
 */ -}}
 {{- define "rstudio-workbench.config.nonIniFiles" -}}
 - scopes: [server, session]
   pattern: '^r-versions$'
-  format: DCF
+  message: >-
+    r-versions is a DCF file, not an .ini file. Write the whole file as a string
+    (r-versions: |), or move it to config.serverDcf as a list of records.
 - scopes: [server, session]
   pattern: '^notifications\.conf$'
-  format: DCF
+  message: >-
+    notifications.conf is a DCF file, not an .ini file. Write the whole file as a
+    string (notifications.conf: |). Sessions read it, so it stays in config.session.
 - scopes: [server, session]
   pattern: '\.json$'
-  format: JSON
+  message: >-
+    This is a JSON file, not an .ini file. Write the whole file as a string.
 {{- end }}
 
 {{- /*
@@ -824,9 +829,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- range $scope := list "server" "session" "profiles" }}
   {{- range $file, $content := (get $config $scope | default dict) }}
     {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
-    {{- /* an empty map or list renders an empty file, which is fine (notifications.conf: {} is a default) */}}
-    {{- if and $nonIni.format $content (not (kindIs "string" $content)) }}
-      {{- fail (printf "\n\nconfig.%s.%s is a %s file, not an .ini file. Write the whole file as a string." $scope $file $nonIni.format) }}
+    {{- if and $nonIni.message $content (not (kindIs "string" $content)) }}
+      {{- fail (printf "\n\nconfig.%s.%s: %s" $scope $file $nonIni.message) }}
     {{- end }}
     {{- if kindIs "slice" $content }}
       {{- if not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
