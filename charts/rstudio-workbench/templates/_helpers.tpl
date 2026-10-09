@@ -715,3 +715,172 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
 {{- end -}}
+
+{{- /*
+  The config.server, config.session and config.profiles sections render every file as .ini, the
+  same way whatever its name. Two tables describe the files that need more than that. They drive
+  only the checks in rstudio-workbench.config.validate and the NOTES warnings, never rendering.
+
+  Each row has:
+    pattern: a regular expression matched against the file name
+    scopes: (table 1 only) the keys under .Values.config the row applies to
+*/ -}}
+
+{{- /*
+  Table 1: rules for where a file can go and how it can be written. The first matching row wins.
+    allow: true, if the file is fine as written
+    message: otherwise, the error, after "config.<scope>.<file>: "
+    stringOk: true, if a string is fine (the file just isn't .ini, so a map or a list won't work)
+  An empty value, such as the notifications.conf: {} default, is always fine.
+*/ -}}
+{{- define "rstudio-workbench.config.fileRules" -}}
+- scopes: [profiles]
+  pattern: '^launcher\..+\.profiles\.conf$'
+  allow: true
+- scopes: [profiles]
+  pattern: '.*'  # any other file in config.profiles
+  message: >-
+    config.profiles only takes launcher.*.profiles.conf files. Move it to config.server.
+- scopes: [server]
+  pattern: '^notifications\.conf$'
+  message: >-
+    Sessions read notifications.conf, so move it to config.session, as a string
+    (notifications.conf: |).
+- scopes: [session]
+  pattern: '^notifications\.conf$'
+  stringOk: true
+  message: >-
+    notifications.conf is a DCF file, not an .ini file. Write the whole file as a string
+    (notifications.conf: |).
+- scopes: [server, session]
+  pattern: '^r-versions$'
+  stringOk: true
+  message: >-
+    r-versions is a DCF file, not an .ini file. Write the whole file as a string
+    (r-versions: |), or move it to config.serverDcf as a list of records.
+- scopes: [server, session]
+  pattern: '\.json$'
+  stringOk: true
+  message: >-
+    This is a JSON file, not an .ini file. Write the whole file as a string.
+{{- end }}
+
+{{- /*
+  Table 2: .ini files that depend on the order of their sections or entries, wherever they are
+  placed (where a file may go is table 1's job). Only these accept a list
+  (rstudio-library.config.ini's list form, which keeps the order written), and writing one as a
+  map gets a NOTES warning.
+    label: the file name as shown to users
+*/ -}}
+{{- define "rstudio-workbench.config.orderedFiles" -}}
+- pattern: '^profiles$'
+  label: profiles
+- pattern: '^launcher\..+\.profiles\.conf$'
+  label: launcher.*.profiles.conf
+- pattern: '^launcher\..+\.resources\.conf$'
+  label: launcher.*.resources.conf
+- pattern: '^repos\.conf$'
+  label: repos.conf
+{{- end }}
+
+{{- /*
+  Finds the row of a config file table that matches a file
+
+  Takes a dict:
+    table: the name of the table template
+    scope: the key under .Values.config
+    file: the file name
+  Returns the first matching row as YAML (use fromYaml), or an empty string. A row without scopes
+  matches in every section.
+*/ -}}
+{{- define "rstudio-workbench.config.match" -}}
+{{- $scope := .scope }}
+{{- $file := .file }}
+{{- $match := "" }}
+{{- range $row := (include .table . | fromYamlArray) }}
+  {{- if and (not $match) (or (not $row.scopes) (has $scope $row.scopes)) (regexMatch $row.pattern $file) }}
+    {{- $match = toYaml $row }}
+  {{- end }}
+{{- end }}
+{{- $match }}
+{{- end }}
+
+{{- /*
+  Checks the files in config.server, config.session, config.profiles and config.serverDcf, in
+  order, failing on the first problem:
+    1. Each file follows its rule in table 1.
+    2. A file name is in only one of config.server, config.serverDcf and config.profiles: all three
+       are written to the same ConfigMap, where the last copy silently wins.
+    3. Only order-sensitive .ini files (table 2) are written as a list. Every file with chart
+       defaults is order-agnostic, apart from the ones the chart merges into a list itself, so a
+       list never drops chart defaults.
+*/ -}}
+{{- define "rstudio-workbench.config.validate" -}}
+{{- $config := .Values.config }}
+{{- range $scope := list "server" "session" "profiles" }}
+  {{- range $file, $content := (get $config $scope | default dict) }}
+    {{- $rule := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.fileRules" "scope" $scope "file" $file) | fromYaml }}
+    {{- if and $rule.message (not $rule.allow) $content (not (and $rule.stringOk (kindIs "string" $content))) }}
+      {{- fail (printf "\n\nconfig.%s.%s: %s" $scope $file $rule.message) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $seen := dict }}
+{{- range $scope := list "server" "serverDcf" "profiles" }}
+  {{- range $file, $content := (get $config $scope | default dict) }}
+    {{- if not (kindIs "invalid" $content) }}
+      {{- if hasKey $seen $file }}
+        {{- fail (printf "\n\nconfig.%s.%s and config.%s.%s are both written to /mnt/configmap/rstudio/%s, so only one would be used (one of them may be a chart default). Set it in one place only." (get $seen $file) $file $scope $file $file) }}
+      {{- end }}
+      {{- $_ := set $seen $file $scope }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $accepted := list }}
+{{- range $row := (include "rstudio-workbench.config.orderedFiles" . | fromYamlArray) }}
+  {{- $accepted = append $accepted $row.label }}
+{{- end }}
+{{- range $scope := list "server" "session" "profiles" }}
+  {{- range $file, $content := (get $config $scope | default dict) }}
+    {{- if and (kindIs "slice" $content) (not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file))) }}
+      {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only order-sensitive files accept a list (%s). Write it as a map; to repeat a section, give that section a list of maps." $scope $file (join ", " $accepted)) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- /*
+  Renders the config.session ini files. repos.conf always gets a CRAN entry, because Workbench
+  ignores a repos.conf without one:
+    - absent: the file is just the default CRAN entry
+    - a map or a list without CRAN: the default CRAN entry is added (at the top of a list)
+    - null: no file
+    - a string: used as the whole file
+*/ -}}
+{{- define "rstudio-workbench.config.session" -}}
+{{- $session := deepCopy (default dict .Values.config.session) }}
+{{- $cran := "https://packagemanager.posit.co/cran/__linux__/noble/latest" }}
+{{- if not (hasKey $session "repos.conf") }}
+  {{- $_ := set $session "repos.conf" (dict "CRAN" $cran) }}
+{{- else }}
+  {{- $repos := get $session "repos.conf" }}
+  {{- if kindIs "invalid" $repos }}
+    {{- $_ := unset $session "repos.conf" }}
+  {{- else if kindIs "map" $repos }}
+    {{- if not (hasKey $repos "CRAN") }}
+      {{- $_ := set $repos "CRAN" $cran }}
+    {{- end }}
+  {{- else if kindIs "slice" $repos }}
+    {{- $named := false }}
+    {{- range $entry := $repos }}
+      {{- if and (kindIs "map" $entry) (hasKey $entry "CRAN") }}
+        {{- $named = true }}
+      {{- end }}
+    {{- end }}
+    {{- if not $named }}
+      {{- $_ := set $session "repos.conf" (prepend $repos (dict "CRAN" $cran)) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- include "rstudio-library.config.ini" $session }}
+{{- end }}

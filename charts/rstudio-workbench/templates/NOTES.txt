@@ -39,15 +39,54 @@ Please consider removing this configuration value.
 
 {{- end }}
 
+{{- $profiles := default (dict) .Values.config.profiles }}
 {{- if and .Values.launcher.useTemplates .Values.launcher.enabled }}
-  {{- if hasKey .Values.config.profiles "launcher.kubernetes.profiles.conf" }}
-    {{- range $k,$v :=  (get .Values.config.profiles "launcher.kubernetes.profiles.conf") }}
-      {{- if hasKey $v "job-json-overrides" }}
+  {{- $k8sProfiles := get $profiles "launcher.kubernetes.profiles.conf" }}
+  {{- if or (kindIs "map" $k8sProfiles) (kindIs "slice" $k8sProfiles) }}
+    {{- $s := dict }}
+    {{- include "rstudio-library.config.ini.entries" (dict "file" "launcher.kubernetes.profiles.conf" "content" $k8sProfiles "out" $s) }}
+    {{- range $section := $s.sections }}
+      {{- if hasKey $section.section "job-json-overrides" }}
         {{- fail "\n\n`profiles` has `job-json-overrides` defined. This cannot be used with `launcher.useTemplates=true`.\n\nPlease move `job-json-overrides` to the corresponding `launcher.templateValues`, or set `launcher.useTemplates=false`.\n\nNote: `launcher.useTemplates=true` was made the default in chart version 0.9.0" }}
       {{- end }}
     {{- end }}
   {{- end }}
 {{- end }}
+
+{{- /* order-sensitive files written as maps (table 2 in _helpers.tpl) */}}
+{{- $unordered := list }}
+{{- range $scope := list "server" "profiles" "session" }}
+  {{- range $file, $content := (get $.Values.config $scope | default dict) }}
+    {{- if and (kindIs "map" $content) $content (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
+      {{- $unordered = append $unordered (printf "`.Values.config.%s.%s`" $scope $file) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- if $unordered }}
+
+WARNING: the following configuration files are written as maps, which does not keep the order you wrote them in
+{{- range $path := $unordered }}
+  - {{ $path }}
+{{- end }}
+  Workbench reads these files in order, so sorting their sections by name can change how they behave. Write them as a list instead, putting `- ` in front of each section or entry:
+
+    config:
+      server:
+        profiles:
+          - "*":
+              max-memory-mb: 1024
+          - "@analysts":
+              max-memory-mb: 4096
+{{- end }}
+
+{{- $session := default (dict) .Values.config.session }}
+{{- $repos := get $session "repos.conf" }}
+{{- if and (hasKey $session "repos.conf") (kindIs "string" $repos) (not (regexMatch "(?m)^\\s*CRAN\\s*=" $repos)) }}
+
+WARNING: `.Values.config.session.repos.conf` is a string with no `CRAN=` line. Workbench ignores a repos.conf without a CRAN entry. Add one, or write repos.conf as a list or map so the chart adds its default CRAN entry.
+{{- end }}
+
+
 
 {{- if .Values.serviceAccountName }}
   {{- fail "\n\n`serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead"}}
