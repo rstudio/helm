@@ -727,30 +727,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 */ -}}
 
 {{- /*
-  Table 1: files that aren't .ini, so these sections can't render them from a map or a list.
-    is: what the file is, completing "<file> is ..."
-    fix: what to do instead
+  Table 1: files that aren't .ini. These sections render a map or a list as .ini, so these files
+  must be written as strings.
+    format: the file's format, for the error message
 */ -}}
 {{- define "rstudio-workbench.config.nonIniFiles" -}}
 - scopes: [server, session]
   pattern: '^r-versions$'
-  is: a DCF file that only the Workbench server reads
-  fix: |-
-    Write it in config.serverDcf, which renders DCF, as a list of records:
-
-      config:
-        serverDcf:
-          r-versions:
-            - Path: /opt/R/4.4.1
-              Label: Latest
-- scopes: [session]
+  format: DCF
+- scopes: [server, session]
   pattern: '^notifications\.conf$'
-  is: a DCF file
-  fix: Write the whole file as a string.
+  format: DCF
 - scopes: [server, session]
   pattern: '\.json$'
-  is: a JSON file
-  fix: Write the whole file as a string.
+  format: JSON
 {{- end }}
 
 {{- /*
@@ -802,9 +792,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
        chart adds job-json-overrides to the [*] section of every file there.
     2. A file name is in only one of config.server, config.serverDcf and config.profiles: all three
        are written to the same ConfigMap, where the last copy silently wins.
-    3. Only order-sensitive .ini files (table 2) are written as a list. A file that isn't .ini
-       (table 1) gets that row's fix. Every file with chart defaults is order-agnostic, apart from
-       the ones the chart merges into a list itself, so a list never drops chart defaults.
+    3. A file that isn't .ini (table 1) is written as a string.
+    4. Only order-sensitive .ini files (table 2) are written as a list. Every file with chart
+       defaults is order-agnostic, apart from the ones the chart merges into a list itself, so a
+       list never drops chart defaults.
 */ -}}
 {{- define "rstudio-workbench.config.validate" -}}
 {{- $config := .Values.config }}
@@ -832,11 +823,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- range $scope := list "server" "session" "profiles" }}
   {{- range $file, $content := (get $config $scope | default dict) }}
+    {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
+    {{- /* an empty map or list renders an empty file, which is fine (notifications.conf: {} is a default) */}}
+    {{- if and $nonIni.format $content (not (kindIs "string" $content)) }}
+      {{- fail (printf "\n\nconfig.%s.%s is a %s file, not an .ini file. Write the whole file as a string." $scope $file $nonIni.format) }}
+    {{- end }}
     {{- if kindIs "slice" $content }}
-      {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
-      {{- if $nonIni.fix }}
-        {{- fail (printf "\n\nconfig.%s.%s is %s, not an .ini file. %s" $scope $file $nonIni.is $nonIni.fix) }}
-      {{- else if not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
+      {{- if not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
         {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only order-sensitive files accept a list (%s). Write it as a map; to repeat a section, give that section a list of maps." $scope $file (join ", " $accepted)) }}
       {{- end }}
     {{- end }}

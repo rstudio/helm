@@ -53,18 +53,12 @@ Please consider removing this configuration value.
   {{- end }}
 {{- end }}
 
-{{- /* files written as maps that the config file tables in _helpers.tpl flag */}}
+{{- /* order-sensitive files written as maps (table 2 in _helpers.tpl) */}}
 {{- $unordered := list }}
-{{- $problems := list }}
 {{- range $scope := list "server" "profiles" "session" }}
   {{- range $file, $content := (get $.Values.config $scope | default dict) }}
-    {{- if and (kindIs "map" $content) $content }}
-      {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
-      {{- if $nonIni.fix }}
-        {{- $problems = append $problems (printf "WARNING: `.Values.config.%s.%s` is %s, not an .ini file, so it won't work as a map. %s" $scope $file $nonIni.is $nonIni.fix) }}
-      {{- else if include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file) }}
-        {{- $unordered = append $unordered (printf "`.Values.config.%s.%s`" $scope $file) }}
-      {{- end }}
+    {{- if and (kindIs "map" $content) $content (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
+      {{- $unordered = append $unordered (printf "`.Values.config.%s.%s`" $scope $file) }}
     {{- end }}
   {{- end }}
 {{- end }}
@@ -92,10 +86,7 @@ WARNING: the following configuration files are written as maps, which does not k
 WARNING: `.Values.config.session.repos.conf` is a string with no `CRAN=` line. Workbench ignores a repos.conf without a CRAN entry. Add one, or write repos.conf as a list or map so the chart adds its default CRAN entry.
 {{- end }}
 
-{{- range $warning := $problems }}
 
-{{ $warning }}
-{{- end }}
 
 {{- if .Values.serviceAccountName }}
   {{- fail "\n\n`serviceAccountName` is no longer used. Use `rbac.serviceAccount.name` instead"}}

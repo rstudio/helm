@@ -457,7 +457,7 @@ tests:
       - failedTemplate:
           errorPattern: "config.server.rserver.conf and config.serverDcf.rserver.conf are both written to .*\\(one of them may be a chart default\\)"
 
-  # -- check 3: lists
+  # -- check 3: files that aren't .ini must be strings; check 4: lists
 
   - it: should fail on a list for a file that doesn't depend on order, listing the files that accept one
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -471,7 +471,7 @@ tests:
       - failedTemplate:
           errorPattern: "config.server.launcher.conf is written as a list, but only order-sensitive files accept a list \\(config.server.profiles, config.server.launcher.\\*.profiles.conf, config.profiles.launcher.\\*.profiles.conf, config.server.launcher.\\*.resources.conf, config.session.repos.conf\\). Write it as a map; to repeat a section, give that section a list of maps."
 
-  - it: should point config.session.r-versions written as a list to config.serverDcf
+  - it: should fail on r-versions in config.session written as a list
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
     template: configmap-session.yaml
     set:
@@ -481,9 +481,9 @@ tests:
             - {Path: /opt/R/4.4.1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.r-versions is a DCF file that only the Workbench server reads, not an .ini file. Write it in config.serverDcf"
+          errorPattern: "config.session.r-versions is a DCF file, not an .ini file. Write the whole file as a string."
 
-  - it: should point config.server.r-versions written as a list to config.serverDcf
+  - it: should fail on r-versions in config.server written as a list
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
     template: configmap-session.yaml
     set:
@@ -493,7 +493,7 @@ tests:
             - {Path: /opt/R/4.4.1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.r-versions is a DCF file that only the Workbench server reads, not an .ini file. Write it in config.serverDcf"
+          errorPattern: "config.server.r-versions is a DCF file, not an .ini file. Write the whole file as a string."
 
   - it: should point notifications.conf written as a list to the string form
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -530,3 +530,56 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "config.server.vscode-user-settings.json is a JSON file, not an .ini file. Write the whole file as a string."
+
+  - it: should fail on r-versions written as a map, the user's example
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          r-versions:
+            cluster:
+              - {name: Kubernetes, type: Kubernetes}
+              - {name: Local, type: Local}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.r-versions is a DCF file, not an .ini file. Write the whole file as a string."
+
+  - it: should fail on notifications.conf written as a map
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          notifications.conf:
+            Message: hello
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.notifications.conf is a DCF file, not an .ini file. Write the whole file as a string."
+
+  - it: should fail on a json file written as a map
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          positron-user-settings.json:
+            a: 1
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.positron-user-settings.json is a JSON file, not an .ini file. Write the whole file as a string."
+
+  - it: should accept files that aren't .ini as strings, and the empty notifications.conf default
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          r-versions: |
+            Path: /opt/R/4.4.1
+          rstudio-prefs.json: |
+            {"save_workspace": "never"}
+    asserts:
+      - equal:
+          path: data["r-versions"]
+          value: |
+            Path: /opt/R/4.4.1
+      - exists:
+          path: data["notifications.conf"]
