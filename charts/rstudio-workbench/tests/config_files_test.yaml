@@ -90,81 +90,6 @@ tests:
           pattern: "(?m)^port=5559$"
 
   # -- lists are rejected for order-agnostic files
-  - it: should fail on a list for a file that doesn't depend on order
-    # the check runs in both ConfigMaps; failedTemplate only sees it in configmap-session.yaml
-    template: configmap-session.yaml
-    set:
-      config:
-        server:
-          launcher.conf:
-            - server: {port: 5559}
-    asserts:
-      - failedTemplate:
-          errorPattern: "config.server.launcher.conf is written as a list, but only files that depend on the order of their sections accept a list"
-
-  - it: should fail on a list for a config.profiles file that isn't a launcher profiles file
-    # the check runs in both ConfigMaps; failedTemplate only sees it in configmap-session.yaml
-    template: configmap-session.yaml
-    set:
-      config:
-        profiles:
-          other.conf:
-            - "*": {a: 1}
-    asserts:
-      - failedTemplate:
-          errorPattern: "config.profiles.other.conf won't work as written. config.profiles is only for launcher.\\*.profiles.conf files.*Write other.conf in config.server instead."
-
-  # -- table 1 (non-.ini files): a list fails with the row's fix
-  - it: should point config.session.r-versions written as a list to its fix
-    template: configmap-session.yaml
-    set:
-      config:
-        session:
-          r-versions: [{Path: /opt/R/4.4.1, Label: Latest}]
-    asserts:
-      - failedTemplate:
-          errorPattern: "config\\.session\\.r\\-versions won't work as written\\. config\\.session renders \\.ini files, and r\\-versions is a DCF file that only the Workbench server reads\\. Write it in config\\.serverDcf"
-
-  - it: should point config.server.r-versions written as a list to its fix
-    template: configmap-session.yaml
-    set:
-      config:
-        server:
-          r-versions: [{Path: /opt/R/4.4.1, Label: Latest}]
-    asserts:
-      - failedTemplate:
-          errorPattern: "config\\.server\\.r\\-versions won't work as written\\. config\\.server renders \\.ini files, and r\\-versions is a DCF file that only the Workbench server reads\\. Write it in config\\.serverDcf"
-
-  - it: should point config.session.notifications.conf written as a list to its fix
-    template: configmap-session.yaml
-    set:
-      config:
-        session:
-          notifications.conf: [{Message: hello}]
-    asserts:
-      - failedTemplate:
-          errorPattern: "config\\.session\\.notifications\\.conf won't work as written\\. config\\.session renders \\.ini files, and notifications\\.conf is a DCF file\\. Write the whole file as a string"
-
-  - it: should point config.session.rstudio-prefs.json written as a list to its fix
-    template: configmap-session.yaml
-    set:
-      config:
-        session:
-          rstudio-prefs.json: [{a: 1}]
-    asserts:
-      - failedTemplate:
-          errorPattern: "config\\.session\\.rstudio\\-prefs\\.json won't work as written\\. config\\.session renders \\.ini files, and rstudio\\-prefs\\.json is a JSON file\\. Write the whole file as a string"
-
-  - it: should point config.server.vscode-user-settings.json written as a list to its fix
-    template: configmap-session.yaml
-    set:
-      config:
-        server:
-          vscode-user-settings.json: [{a: 1}]
-    asserts:
-      - failedTemplate:
-          errorPattern: "config\\.server\\.vscode\\-user\\-settings\\.json won't work as written\\. config\\.server renders \\.ini files, and vscode\\-user\\-settings\\.json is a JSON file\\. Write the whole file as a string"
-
   # -- table 2 (order-sensitive .ini files): every row accepts a list
   - it: should accept a list for config.server.launcher.local.profiles.conf
     template: configmap-general.yaml
@@ -193,17 +118,6 @@ tests:
       - matchRegex:
           path: data["launcher.local.profiles.conf"]
           pattern: "^\\[@b\\]\\nmax-cpus=2\\n\\n\\[@a\\]\\nmax-cpus=1\\n"
-
-  - it: should list the files that accept a list in the error, from the table
-    template: configmap-session.yaml
-    set:
-      config:
-        session:
-          rsession.conf:
-            - a: 1
-    asserts:
-      - failedTemplate:
-          errorPattern: "The files that accept a list are:\\n  - config.server: profiles, launcher.\\*.profiles.conf, launcher.\\*.resources.conf\\n  - config.session: repos.conf\\n  - config.profiles: launcher.\\*.profiles.conf"
 
   - it: should accept r-versions in config.serverDcf
     template: configmap-general.yaml
@@ -378,59 +292,6 @@ tests:
           path: data["rsession.conf"]
 
   # -- a file name may be in only one of config.server, config.serverDcf and config.profiles
-  - it: should fail when a profiles file is in both config.server and config.profiles
-    template: configmap-session.yaml
-    set:
-      config:
-        server:
-          launcher.local.profiles.conf:
-            "*": {max-cpus: 1}
-        profiles:
-          launcher.local.profiles.conf:
-            "*": {max-cpus: 2}
-    asserts:
-      - failedTemplate:
-          errorPattern: "config.server.launcher.local.profiles.conf and config.profiles.launcher.local.profiles.conf would both be written to"
-
-  - it: should report r-versions in both config.server and config.serverDcf as misplaced in config.server
-    template: configmap-session.yaml
-    set:
-      config:
-        server:
-          r-versions: |
-            Path: /opt/R/4.4.1
-        serverDcf:
-          r-versions:
-            - {Path: /opt/R/4.0.2}
-    asserts:
-      - failedTemplate:
-          errorPattern: "config.server.r-versions won't work as written. config.server renders .ini files.*Write it in config.serverDcf"
-
-  - it: should fail when the deprecated kubernetes profiles location is used alongside config.profiles
-    template: configmap-session.yaml
-    set:
-      config:
-        server:
-          launcher.kubernetes.profiles.conf:
-            "*": {max-cpus: 1}
-        profiles:
-          launcher.kubernetes.profiles.conf:
-            "*": {max-cpus: 2}
-    asserts:
-      - failedTemplate:
-          errorPattern: "config.server.launcher.kubernetes.profiles.conf and config.profiles.launcher.kubernetes.profiles.conf would both be written to"
-
-  - it: should fail on a list for a resources file in config.profiles, pointing to config.server
-    template: configmap-session.yaml
-    set:
-      config:
-        profiles:
-          launcher.kubernetes.resources.conf:
-            - small: {cpus: 1}
-    asserts:
-      - failedTemplate:
-          errorPattern: "Write launcher.kubernetes.resources.conf in config.server instead."
-
   # -- default [cluster] in launcher.conf, provided by the template
   - it: should render the default [cluster] when launcher.conf doesn't set one
     template: configmap-general.yaml
@@ -484,7 +345,36 @@ tests:
           path: data["launcher.conf"]
           pattern: "\\[server\\]"
 
-  - it: should report launcher.conf in config.profiles as misplaced, not as colliding with the default
+  # -- check 1: config.profiles only takes launcher profiles files
+
+  - it: should fail on a non-profiles file in config.profiles, as a map
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        profiles:
+          other.conf:
+            section: {a: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.profiles.other.conf: config.profiles only takes launcher.\\*.profiles.conf files. Put other.conf in config.server instead."
+
+  - it: should fail on r-versions in config.profiles, pointing to config.server
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        profiles:
+          r-versions:
+            cluster:
+              - {name: Kubernetes, type: Kubernetes}
+              - {name: Local, type: Local}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.profiles.r-versions: config.profiles only takes launcher.\\*.profiles.conf files. Put r-versions in config.server instead."
+
+  - it: should report launcher.conf in config.profiles as misplaced, before it collides with the default
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
     template: configmap-session.yaml
     set:
       config:
@@ -492,12 +382,71 @@ tests:
           launcher.conf:
             cluster:
               - {name: Kubernetes, type: Kubernetes}
-              - {name: Local, type: Local}
     asserts:
       - failedTemplate:
-          errorPattern: "^\\s*config.profiles.launcher.conf won't work as written. config.profiles is only for launcher.\\*.profiles.conf files.*Write launcher.conf in config.server instead.\\s*$"
+          errorPattern: "^\\s*config.profiles.launcher.conf: config.profiles only takes launcher.\\*.profiles.conf files. Put launcher.conf in config.server instead.\\s*$"
 
-  - it: should say that a colliding copy may come from the chart's defaults
+  - it: should fail on a resources file in config.profiles, as a list
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.resources.conf:
+            - small: {cpus: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "Put launcher.kubernetes.resources.conf in config.server instead."
+
+  # -- check 2: a file name in only one of config.server, config.serverDcf, config.profiles
+
+  - it: should fail when a profiles file is in both config.server and config.profiles
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          launcher.local.profiles.conf:
+            "*": {max-cpus: 1}
+        profiles:
+          launcher.local.profiles.conf:
+            "*": {max-cpus: 2}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.local.profiles.conf and config.profiles.launcher.local.profiles.conf are both written to /mnt/configmap/rstudio/launcher.local.profiles.conf, so only one would be used"
+
+  - it: should fail when a file is in both config.server and config.serverDcf
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          r-versions: |
+            Path: /opt/R/4.4.1
+        serverDcf:
+          r-versions:
+            - {Path: /opt/R/4.0.2}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.r-versions and config.serverDcf.r-versions are both written to"
+
+  - it: should fail when the deprecated kubernetes profiles location is used alongside config.profiles
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          launcher.kubernetes.profiles.conf:
+            "*": {max-cpus: 1}
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            "*": {max-cpus: 2}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.kubernetes.profiles.conf and config.profiles.launcher.kubernetes.profiles.conf are both written to"
+
+  - it: should say that a colliding copy may be a chart default
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
     template: configmap-session.yaml
     set:
       config:
@@ -506,4 +455,78 @@ tests:
             - {a: 1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.rserver.conf and config.serverDcf.rserver.conf would both be written to /mnt/configmap/rstudio/rserver.conf.*One of them may come from the chart's defaults"
+          errorPattern: "config.server.rserver.conf and config.serverDcf.rserver.conf are both written to .*\\(one of them may be a chart default\\)"
+
+  # -- check 3: lists
+
+  - it: should fail on a list for a file that doesn't depend on order, listing the files that accept one
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          launcher.conf:
+            - server: {port: 5559}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.conf is written as a list, but only order-sensitive files accept a list \\(config.server.profiles, config.server.launcher.\\*.profiles.conf, config.profiles.launcher.\\*.profiles.conf, config.server.launcher.\\*.resources.conf, config.session.repos.conf\\). Write it as a map; to repeat a section, give that section a list of maps."
+
+  - it: should point config.session.r-versions written as a list to config.serverDcf
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          r-versions:
+            - {Path: /opt/R/4.4.1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.r-versions is a DCF file that only the Workbench server reads, not an .ini file. Write it in config.serverDcf"
+
+  - it: should point config.server.r-versions written as a list to config.serverDcf
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          r-versions:
+            - {Path: /opt/R/4.4.1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.r-versions is a DCF file that only the Workbench server reads, not an .ini file. Write it in config.serverDcf"
+
+  - it: should point notifications.conf written as a list to the string form
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          notifications.conf:
+            - {Message: hello}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.notifications.conf is a DCF file, not an .ini file. Write the whole file as a string."
+
+  - it: should point rstudio-prefs.json written as a list to the string form
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          rstudio-prefs.json:
+            - {a: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.rstudio-prefs.json is a JSON file, not an .ini file. Write the whole file as a string."
+
+  - it: should point a server json file written as a list to the string form
+    # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          vscode-user-settings.json:
+            - {a: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.vscode-user-settings.json is a JSON file, not an .ini file. Write the whole file as a string."
