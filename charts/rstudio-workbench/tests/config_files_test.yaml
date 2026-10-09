@@ -1,0 +1,320 @@
+suite: Workbench config files (list form, list values, defaults)
+templates:
+  - configmap-general.yaml
+  - configmap-session.yaml
+tests:
+  # -- order-sensitive files accept the list form and keep its order
+  - it: should render config.server.profiles written as a list in the order written
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          profiles:
+            - "*": {max-memory-mb: 1024}
+            - "@analysts": {max-memory-mb: 4096}
+            - "12345": {max-memory-mb: 512}
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-memory-mb=1024
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [12345]
+            max-memory-mb=512
+
+  - it: should render a launcher resources file written as a list in the order written
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.kubernetes.resources.conf:
+            - small: {name: Small, cpus: 1, mem-mb: 1024}
+            - large: {name: Large, cpus: 8, mem-mb: 16384}
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.resources.conf"]
+          pattern: "(?s)^\\[small\\].*\\[large\\]"
+
+  # -- list values
+  - it: should comma-join a list inside a section
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          logging.conf:
+            "*": {log-level: [info, debug]}
+    asserts:
+      - matchRegex:
+          path: data["logging.conf"]
+          pattern: "(?m)^log-level=info,debug$"
+
+  - it: should repeat a top-level key for a list of values
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          rserver.conf:
+            www-allow-origin: [one.example.com, two.example.com]
+    asserts:
+      - matchRegex:
+          path: data["rserver.conf"]
+          pattern: "(?m)^www-allow-origin=one.example.com\\nwww-allow-origin=two.example.com$"
+
+  - it: should repeat [cluster] for a list of clusters and keep the [server] defaults
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.conf:
+            cluster:
+              - {name: Kubernetes, type: Kubernetes}
+              - {name: Local, type: Local}
+    asserts:
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "\\[cluster\\]\\nname=Kubernetes\\ntype=Kubernetes\\n\\n\\[cluster\\]\\nname=Local\\ntype=Local\\n"
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "(?m)^\\[server\\]$"
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "(?m)^port=5559$"
+
+  # -- lists are rejected for order-agnostic files
+  - it: should fail on a list for a file that doesn't depend on order
+    # the check runs in both ConfigMaps; failedTemplate only sees it in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          launcher.conf:
+            - server: {port: 5559}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.launcher.conf is written as a list, but only files that depend on the order of their sections accept a list"
+
+  - it: should fail on a list for a config.profiles file that isn't a launcher profiles file
+    # the check runs in both ConfigMaps; failedTemplate only sees it in configmap-session.yaml
+    template: configmap-session.yaml
+    set:
+      config:
+        profiles:
+          other.conf:
+            - "*": {a: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.profiles.other.conf is written as a list"
+
+  - it: should point config.session.r-versions written as a list to config.serverDcf
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          r-versions:
+            - {Path: /opt/R/4.4.1, Label: Latest}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.r-versions is written as a list.*write it in config.serverDcf"
+
+  - it: should point notifications.conf written as a list to the string form
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          notifications.conf:
+            - {Message: hello}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.notifications.conf is written as a list.*Write the whole file as a string"
+
+  - it: should point a json file written as a list to the string form
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          rstudio-prefs.json:
+            - {a: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.session.rstudio-prefs.json is written as a list.*Write the whole file as a string"
+
+  - it: should accept r-versions in config.serverDcf
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        serverDcf:
+          r-versions:
+            - {Path: /opt/R/4.4.1, Label: Latest}
+            - {Path: /opt/R/4.0.2, Label: Old}
+    asserts:
+      - matchRegex:
+          path: data["r-versions"]
+          pattern: "Label: Latest\\nPath: /opt/R/4.4.1\\n\\nLabel: Old\\nPath: /opt/R/4.0.2"
+
+  # -- [*] session image defaults in config.profiles
+  - it: should add the default [*] at the top of a kubernetes profiles list without one
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - "@gpu": {container-images: [gpu-image:1]}
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "^\\[\\*\\]\\nallow-unknown-images=1\\ncontainer-images=posit/workbench-session:[^\\n]+\\ndefault-container-image=posit/workbench-session:[^\\n]+\\n\\n\\[@gpu\\]\\ncontainer-images=gpu-image:1\\n"
+
+  - it: should merge the default [*] into the [*] entry of a kubernetes profiles list, where it is
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - "@gpu": {max-cpus: 8}
+            - "*": {max-cpus: 2, allow-unknown-images: 0}
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "^\\[@gpu\\]\\nmax-cpus=8\\n\\n\\[\\*\\]\\nallow-unknown-images=0\\ncontainer-images=posit/workbench-session:[^\\n]+\\ndefault-container-image=posit/workbench-session:[^\\n]+\\nmax-cpus=2\\n"
+
+  - it: should keep merging the default [*] into a kubernetes profiles map
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            "@gpu": {max-cpus: 8}
+            "*": {max-cpus: 2}
+    asserts:
+      - matchRegex:
+          path: data["launcher.kubernetes.profiles.conf"]
+          pattern: "^\\[\\*\\]\\nallow-unknown-images=1\\ncontainer-images=posit/workbench-session:[^\\n]+\\ndefault-container-image=posit/workbench-session:[^\\n]+\\nmax-cpus=2\\n\\n\\[@gpu\\]\\nmax-cpus=8\\n"
+
+  - it: should fail when [*] appears twice in a config.profiles list
+    template: configmap-general.yaml
+    set:
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - "*": {max-cpus: 2}
+            - "*": {max-cpus: 4}
+    asserts:
+      - failedTemplate:
+          errorPattern: "the \\[\\*\\] section appears more than once"
+
+  - it: should add the default job-json-overrides to a non-kubernetes profiles list with useTemplates=false
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      launcher:
+        useTemplates: false
+      config:
+        profiles:
+          launcher.local.profiles.conf:
+            - "@gpu":
+                job-json-overrides:
+                  - name: gpu
+                    target: /spec/template/spec/tolerations
+                    json: []
+    asserts:
+      - matchRegex:
+          path: data["launcher.local.profiles.conf"]
+          pattern: "^\\[\\*\\]\\njob-json-overrides=\"/spec/template/spec/volumes/-\":\"/mnt/job-json-overrides-new/defaultSessionVolume.json\",\"/spec/template/spec/containers/0/volumeMounts/-\":\"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json\"\\n\\n\\[@gpu\\]\\njob-json-overrides=\"/spec/template/spec/volumes/-\":\"/mnt/job-json-overrides-new/defaultSessionVolume.json\",\"/spec/template/spec/containers/0/volumeMounts/-\":\"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json\",\"/spec/template/spec/tolerations\":\"/mnt/job-json-overrides-new/gpu.json\"\\n"
+
+  # -- CRAN default in repos.conf
+  - it: should render the default CRAN repos.conf when it isn't set
+    template: configmap-session.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest
+
+  - it: should add CRAN to a repos.conf map without one
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com/internal
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest
+            Internal=https://pkgs.example.com/internal
+
+  - it: should add CRAN at the top of a repos.conf list without one
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - Another: https://pkgs.example.com/another
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest
+            Internal=https://pkgs.example.com/internal
+            Another=https://pkgs.example.com/another
+
+  - it: should keep the user's CRAN in a repos.conf list where it is
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com/internal
+            - CRAN: https://cran.example.com
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+            CRAN=https://cran.example.com
+
+  - it: should use a repos.conf string as-is
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf: |
+            Internal=https://pkgs.example.com/internal
+    asserts:
+      - equal:
+          path: data["repos.conf"]
+          value: |
+            Internal=https://pkgs.example.com/internal
+
+  - it: should render no repos.conf when it is null
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          repos.conf: null
+    asserts:
+      - notExists:
+          path: data["repos.conf"]
+      - exists:
+          path: data["rsession.conf"]

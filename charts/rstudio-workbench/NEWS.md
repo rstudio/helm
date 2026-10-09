@@ -1,5 +1,50 @@
 # Changelog
 
+## 0.23.0
+
+- Order-sensitive config files can be written as a list to keep their order. A map is always
+  rendered sorted by name, which can change how Workbench reads these files: in `profiles`, for
+  example, the last matching section wins. The order-sensitive files are `config.server.profiles`,
+  `launcher.*.profiles.conf` (in `config.server` or `config.profiles`),
+  `config.server.launcher.*.resources.conf` and `config.session.repos.conf`. Write each section or
+  entry as a list item:
+
+  ```yaml
+  config:
+    server:
+      profiles:
+        - "*": {max-memory-mb: 1024}
+        - "@analysts": {max-memory-mb: 4096}
+  ```
+
+  These files still accept a map, but NOTES prints a warning.
+- Any other `.ini` file in `config.server`, `config.session` or `config.profiles` written as a list
+  now fails with an error that shows how to write it as a map. A list there used to render
+  unusable output and drop the chart's defaults for that file.
+- A list inside an `.ini` section is now written comma-separated (`container-images=a,b`) instead of
+  Go's `[a b]`. At the top level of a file, a list still repeats the key (`www-allow-origin`), and a
+  list of maps still repeats the section (several `[cluster]` sections in `launcher.conf`).
+- Values `.ini` can't represent now fail instead of rendering as Go syntax: a map as an option
+  inside a section, and a list holding maps or lists inside a section.
+- `config.session.repos.conf` is no longer set in `values.yaml`. The chart always renders a `CRAN`
+  entry with the same default URL, adding it to a map or list that has none (at the top of a
+  list). `repos.conf: null` still omits the file, and a string is used as-is (NOTES warns if it has
+  no `CRAN=` line).
+- In `config.profiles`, `[*]` may appear only once. When a list has no `[*]` entry, the chart's
+  `[*]` defaults (session image settings, and the default `job-json-overrides` with
+  `launcher.useTemplates=false`) are added at the top.
+- `r-versions` belongs in `config.serverDcf`: only the Workbench server reads it, and that section
+  renders DCF. `config.session.r-versions` written as a list now fails with that pointer, and as a
+  map gets a NOTES warning.
+- NOTES warns when `notifications.conf` or a `*.json` file is written as a map, since those render
+  as `.ini`. Write them as strings.
+- Fixed NOTES failing when `config.profiles` is `null`.
+- Fixed the README's `config.profiles` example, which claimed that `[*]` arrays are appended into
+  other sections. Only `job-json-overrides` are.
+- Rendered config files change only where a list sat inside a section, and in blank lines in
+  `config.profiles` files. The config checksums change, so pods restart once on upgrade.
+- Update the `rstudio-library` dependency to 0.1.38.
+
 ## 0.22.5
 
 - Update the default session `repos.conf` CRAN URL to use `noble` (Ubuntu 24.04) instead of `jammy` (Ubuntu 22.04). The domain already uses `packagemanager.posit.co`. This matches the Ubuntu 24.04 default used elsewhere in the charts and ensures CRAN binary packages resolve against a current distribution. The rendered default changes, but any user-supplied `config.session.repos.conf.CRAN` value is unaffected.

@@ -715,3 +715,90 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "rstudio-workbench.xdg-config-dirs" -}}
 {{  trimSuffix ":" ( join ":" (list .Values.xdgConfigDirs (join ":" .Values.xdgConfigDirsExtra) ) ) }}
 {{- end -}}
+
+{{- /*
+  Whether a config file depends on the order of its sections or entries. Only these files accept
+  a list (rstudio-library.config.ini's list form, which keeps the order written), and writing
+  one as a map gets a NOTES warning. Used for validation and warnings only: every file renders
+  the same way whatever its name.
+
+  Takes a dict:
+    scope: the key under .Values.config ("server", "session" or "profiles")
+    file: the file name
+  Returns "true" for an order-sensitive file, otherwise an empty string.
+*/ -}}
+{{- define "rstudio-workbench.config.ordered" -}}
+{{- $launcherProfiles := regexMatch "^launcher\\..+\\.profiles\\.conf$" .file }}
+{{- if eq .scope "server" }}
+  {{- if or (eq .file "profiles") $launcherProfiles (regexMatch "^launcher\\..+\\.resources\\.conf$" .file) -}}
+    true
+  {{- end }}
+{{- else if eq .scope "profiles" }}
+  {{- if $launcherProfiles -}}
+    true
+  {{- end }}
+{{- else if eq .scope "session" }}
+  {{- if eq .file "repos.conf" -}}
+    true
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- /*
+  Fails if an ini file in config.server, config.session or config.profiles is written as a list
+  but doesn't depend on order (see rstudio-workbench.config.ordered). Every file with chart
+  defaults is order-agnostic, apart from the two the chart merges into a list itself, so this
+  also guarantees a list never drops chart defaults.
+*/ -}}
+{{- define "rstudio-workbench.config.validate" -}}
+{{- $accepted := "The files that accept a list are:\n  - config.server: profiles, launcher.*.resources.conf, launcher.*.profiles.conf\n  - config.profiles: launcher.*.profiles.conf\n  - config.session: repos.conf" }}
+{{- range $scope := list "server" "session" "profiles" }}
+  {{- range $file, $content := (get $.Values.config $scope | default dict) }}
+    {{- if and (kindIs "slice" $content) (not (include "rstudio-workbench.config.ordered" (dict "scope" $scope "file" $file))) }}
+      {{- if and (eq $scope "session") (eq $file "r-versions") }}
+        {{- fail "\n\nconfig.session.r-versions is written as a list, but config.session only renders ini files. r-versions is a DCF file, and only the Workbench server reads it, so write it in config.serverDcf:\n\n  config:\n    serverDcf:\n      r-versions:\n        - Path: /opt/R/4.4.1\n          Label: Latest" }}
+      {{- else if or (eq $file "notifications.conf") (hasSuffix ".json" $file) }}
+        {{- fail (printf "\n\nconfig.%s.%s is written as a list, but config.%s only renders ini files, and %s isn't one. Write the whole file as a string:\n\n  config:\n    %s:\n      %s: |\n        ..." $scope $file $scope $file $scope $file) }}
+      {{- else }}
+        {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only files that depend on the order of their sections accept a list. Nothing in %s depends on order, so write it as a map:\n\n  config:\n    %s:\n      %s:\n        section-name:\n          option: value\n\nTo repeat a section, give it a list of maps:\n\n        section-name:\n          - option: value\n          - option: other-value\n\nA string is also accepted, and is used as the whole file.\n\n%s" $scope $file $file $scope $file $accepted) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- /*
+  Renders the config.session ini files. repos.conf always gets a CRAN entry, because Workbench
+  ignores a repos.conf without one:
+    - absent: the file is just the default CRAN entry
+    - a map or a list without CRAN: the default CRAN entry is added (at the top of a list)
+    - null: no file
+    - a string: used as the whole file
+*/ -}}
+{{- define "rstudio-workbench.config.session" -}}
+{{- $session := deepCopy (default dict .Values.config.session) }}
+{{- $cran := "https://packagemanager.posit.co/cran/__linux__/noble/latest" }}
+{{- if not (hasKey $session "repos.conf") }}
+  {{- $_ := set $session "repos.conf" (dict "CRAN" $cran) }}
+{{- else }}
+  {{- $repos := get $session "repos.conf" }}
+  {{- if kindIs "invalid" $repos }}
+    {{- $_ := unset $session "repos.conf" }}
+  {{- else if kindIs "map" $repos }}
+    {{- if not (hasKey $repos "CRAN") }}
+      {{- $_ := set $repos "CRAN" $cran }}
+    {{- end }}
+  {{- else if kindIs "slice" $repos }}
+    {{- $named := false }}
+    {{- range $entry := $repos }}
+      {{- if and (kindIs "map" $entry) (hasKey $entry "CRAN") }}
+        {{- $named = true }}
+      {{- end }}
+    {{- end }}
+    {{- if not $named }}
+      {{- $_ := set $session "repos.conf" (prepend $repos (dict "CRAN" $cran)) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- include "rstudio-library.config.ini" $session }}
+{{- end }}
