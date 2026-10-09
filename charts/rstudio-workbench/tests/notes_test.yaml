@@ -74,6 +74,8 @@ tests:
         session:
           repos.conf:
             Internal: https://pkgs.example.com
+          profiles:
+            "*": {max-memory-mb: 1024}
     asserts:
       - matchRegexRaw:
           pattern: "WARNING: the following configuration files are written as maps"
@@ -87,6 +89,8 @@ tests:
           pattern: "- `.Values.config.profiles.launcher.kubernetes.profiles.conf`"
       - matchRegexRaw:
           pattern: "- `.Values.config.session.repos.conf`"
+      - matchRegexRaw:
+          pattern: "- `.Values.config.session.profiles`"
 
   - it: should not warn about order-sensitive files written as lists
     set:

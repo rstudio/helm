@@ -772,7 +772,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     label: the file name as shown to users
 */ -}}
 {{- define "rstudio-workbench.config.orderedFiles" -}}
-- scopes: [server]
+- scopes: [server, session]  # the server also reads config.session, which is on its XDG_CONFIG_DIRS
   pattern: '^profiles$'
   label: profiles
 - scopes: [server, profiles]

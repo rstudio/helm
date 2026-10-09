@@ -329,7 +329,7 @@ map is always rendered sorted, write these files as a list:
 
 | Values | File | Why order matters |
 |---|---|---|
-| `config.server` | `profiles` | the last matching section wins |
+| `config.server`, `config.session` | `profiles` | the last matching section wins |
 | `config.server`, `config.profiles` | `launcher.*.profiles.conf` | the last matching section wins |
 | `config.server` | `launcher.*.resources.conf` | resource profiles are listed in order, and the first is pre-selected |
 | `config.session` | `repos.conf` | the order of the entries is the order of R's repositories |

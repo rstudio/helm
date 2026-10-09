@@ -469,7 +469,7 @@ tests:
             - server: {port: 5559}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.launcher.conf is written as a list, but only order-sensitive files accept a list \\(config.server.profiles, config.server.launcher.\\*.profiles.conf, config.profiles.launcher.\\*.profiles.conf, config.server.launcher.\\*.resources.conf, config.session.repos.conf\\). Write it as a map; to repeat a section, give that section a list of maps."
+          errorPattern: "config.server.launcher.conf is written as a list, but only order-sensitive files accept a list \\(config.server.profiles, config.session.profiles, config.server.launcher.\\*.profiles.conf, config.profiles.launcher.\\*.profiles.conf, config.server.launcher.\\*.resources.conf, config.session.repos.conf\\). Write it as a map; to repeat a section, give that section a list of maps."
 
   - it: should fail on r-versions in config.session written as a list
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -636,3 +636,26 @@ tests:
       - matchRegex:
           path: data["launcher.local.profiles.conf"]
           pattern: "max-cpus=2"
+
+  - it: should accept config.session.profiles written as a list, in the order written
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          profiles:
+            - "*": {max-memory-mb: 1024}
+            - "@analysts": {max-memory-mb: 4096}
+            - "12345": {max-memory-mb: 512}
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-memory-mb=1024
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [12345]
+            max-memory-mb=512
