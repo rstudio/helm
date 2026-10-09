@@ -55,13 +55,13 @@ Please consider removing this configuration value.
 
 {{- /* files written as maps that the config file tables in _helpers.tpl flag */}}
 {{- $unordered := list }}
-{{- $nonIniWarnings := list }}
+{{- $problems := list }}
 {{- range $scope := list "server" "profiles" "session" }}
   {{- range $file, $content := (get $.Values.config $scope | default dict) }}
     {{- if and (kindIs "map" $content) $content }}
-      {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
-      {{- if $nonIni.fix }}
-        {{- $nonIniWarnings = append $nonIniWarnings (printf "WARNING: `.Values.config.%s.%s` is written as a map, which renders as .ini, but %s is %s. %s" $scope $file $file $nonIni.is $nonIni.fix) }}
+      {{- $problem := include "rstudio-workbench.config.problem" (dict "scope" $scope "file" $file) | fromYaml }}
+      {{- if $problem.fix }}
+        {{- $problems = append $problems (printf "WARNING: `.Values.config.%s.%s` won't work as written. %s %s" $scope $file $problem.why $problem.fix) }}
       {{- else if include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file) }}
         {{- $unordered = append $unordered (printf "`.Values.config.%s.%s`" $scope $file) }}
       {{- end }}
@@ -92,7 +92,7 @@ WARNING: the following configuration files are written as maps, which does not k
 WARNING: `.Values.config.session.repos.conf` is a string with no `CRAN=` line. Workbench ignores a repos.conf without a CRAN entry. Add one, or write repos.conf as a list or map so the chart adds its default CRAN entry.
 {{- end }}
 
-{{- range $warning := $nonIniWarnings }}
+{{- range $warning := $problems }}
 
 {{ $warning }}
 {{- end }}

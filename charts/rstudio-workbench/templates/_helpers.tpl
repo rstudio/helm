@@ -796,10 +796,34 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- /*
+  Whether a config file can't work where it is, whatever its content: a file that isn't .ini
+  (table 1), or a file in config.profiles that isn't a launcher profiles file. config.profiles
+  treats every file as a launcher profiles file: with launcher.useTemplates=false, the chart adds
+  job-json-overrides to its [*] section.
+
+  Takes a dict:
+    scope: the key under .Values.config
+    file: the file name
+  Returns {why, fix} as YAML (use fromYaml), or an empty string.
+*/ -}}
+{{- define "rstudio-workbench.config.problem" -}}
+{{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" .scope "file" .file) | fromYaml }}
+{{- if $nonIni.fix }}
+  {{- toYaml (dict "why" (printf "config.%s renders .ini files, and %s is %s." .scope .file $nonIni.is) "fix" $nonIni.fix) }}
+{{- else if and (eq .scope "profiles") (not (regexMatch "^launcher\\..+\\.profiles\\.conf$" .file)) }}
+  {{- toYaml (dict "why" "config.profiles is only for launcher.*.profiles.conf files. The chart treats every file there as one, and with launcher.useTemplates=false adds job-json-overrides to its [*] section." "fix" (printf "Write %s in config.server instead." .file)) }}
+{{- end }}
+{{- end }}
+
+{{- /*
   Fails if a file in config.server, config.session or config.profiles is written as a list, unless
-  it is an order-sensitive .ini file (table 2). A file that isn't .ini (table 1) fails with that
-  row's fix. Every file with chart defaults is order-agnostic, apart from the two the chart merges
-  into a list itself, so this also guarantees a list never drops chart defaults.
+  it is an order-sensitive .ini file (table 2). A file that can't work where it is (see
+  rstudio-workbench.config.problem) fails with its fix. Every file with chart defaults is
+  order-agnostic, apart from the two the chart merges into a list itself, so this also guarantees
+  a list never drops chart defaults.
+
+  Also fails if a file name is in more than one of config.server, config.serverDcf and
+  config.profiles: all three are written to the same ConfigMap, where the last copy silently wins.
 */ -}}
 {{- define "rstudio-workbench.config.validate" -}}
 {{- $scopes := list "server" "session" "profiles" }}
@@ -815,12 +839,23 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- $accepted = append $accepted (printf "  - config.%s: %s" $scope (join ", " $labels)) }}
   {{- end }}
 {{- end }}
+{{- $seen := dict }}
+{{- range $scope := list "server" "serverDcf" "profiles" }}
+  {{- range $file, $content := (get $.Values.config $scope | default dict) }}
+    {{- if not (kindIs "invalid" $content) }}
+      {{- if hasKey $seen $file }}
+        {{- fail (printf "\n\nconfig.%s.%s and config.%s.%s are both set. Both are written to /mnt/configmap/rstudio/%s, so only one of them would be used. Keep one and remove the other." (get $seen $file) $file $scope $file $file) }}
+      {{- end }}
+      {{- $_ := set $seen $file $scope }}
+    {{- end }}
+  {{- end }}
+{{- end }}
 {{- range $scope := $scopes }}
   {{- range $file, $content := (get $.Values.config $scope | default dict) }}
     {{- if kindIs "slice" $content }}
-      {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
-      {{- if $nonIni.fix }}
-        {{- fail (printf "\n\nconfig.%s.%s is written as a list, but config.%s renders .ini files, and %s is %s. %s" $scope $file $scope $file $nonIni.is $nonIni.fix) }}
+      {{- $problem := include "rstudio-workbench.config.problem" (dict "scope" $scope "file" $file) | fromYaml }}
+      {{- if $problem.fix }}
+        {{- fail (printf "\n\nconfig.%s.%s won't work as written. %s %s" $scope $file $problem.why $problem.fix) }}
       {{- else if not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
         {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only files that depend on the order of their sections accept a list. Nothing in %s depends on order, so write it as a map:\n\n  config:\n    %s:\n      %s:\n        section-name:\n          option: value\n\nTo repeat a section, give it a list of maps:\n\n        section-name:\n          - option: value\n          - option: other-value\n\nA string is also accepted, and is used as the whole file.\n\nThe files that accept a list are:\n%s" $scope $file $file $scope $file (join "\n" $accepted)) }}
       {{- end }}
