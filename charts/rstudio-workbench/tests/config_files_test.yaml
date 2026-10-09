@@ -357,7 +357,7 @@ tests:
             section: {a: 1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.profiles.other.conf: config.profiles only takes launcher.\\*.profiles.conf files. Put other.conf in config.server instead."
+          errorPattern: "config.profiles.other.conf: config.profiles only takes launcher.\\*.profiles.conf files. Move it to config.server."
 
   - it: should fail on r-versions in config.profiles, pointing to config.server
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -371,7 +371,7 @@ tests:
               - {name: Local, type: Local}
     asserts:
       - failedTemplate:
-          errorPattern: "config.profiles.r-versions: config.profiles only takes launcher.\\*.profiles.conf files. Put r-versions in config.server instead."
+          errorPattern: "config.profiles.r-versions: config.profiles only takes launcher.\\*.profiles.conf files. Move it to config.server."
 
   - it: should report launcher.conf in config.profiles as misplaced, before it collides with the default
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -384,7 +384,7 @@ tests:
               - {name: Kubernetes, type: Kubernetes}
     asserts:
       - failedTemplate:
-          errorPattern: "^\\s*config.profiles.launcher.conf: config.profiles only takes launcher.\\*.profiles.conf files. Put launcher.conf in config.server instead.\\s*$"
+          errorPattern: "^\\s*config.profiles.launcher.conf: config.profiles only takes launcher.\\*.profiles.conf files. Move it to config.server.\\s*$"
 
   - it: should fail on a resources file in config.profiles, as a list
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -396,7 +396,7 @@ tests:
             - small: {cpus: 1}
     asserts:
       - failedTemplate:
-          errorPattern: "Put launcher.kubernetes.resources.conf in config.server instead."
+          errorPattern: "config.profiles.launcher.kubernetes.resources.conf: config.profiles only takes launcher.\\*.profiles.conf files. Move it to config.server."
 
   # -- check 2: a file name in only one of config.server, config.serverDcf, config.profiles
 
@@ -505,7 +505,7 @@ tests:
             - {Message: hello}
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.notifications.conf: notifications.conf is a DCF file, not an .ini file. Write the whole file as a string \\(notifications.conf: \\|\\). Sessions read it, so it stays in config.session."
+          errorPattern: "config.session.notifications.conf: notifications.conf is a DCF file, not an .ini file. Write the whole file as a string \\(notifications.conf: \\|\\)."
 
   - it: should point rstudio-prefs.json written as a list to the string form
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -553,7 +553,7 @@ tests:
             Message: hello
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.notifications.conf: notifications.conf is a DCF file, not an .ini file. Write the whole file as a string \\(notifications.conf: \\|\\). Sessions read it, so it stays in config.session."
+          errorPattern: "config.session.notifications.conf: notifications.conf is a DCF file, not an .ini file. Write the whole file as a string \\(notifications.conf: \\|\\)."
 
   - it: should fail on a json file written as a map
     template: configmap-session.yaml
@@ -583,3 +583,56 @@ tests:
             Path: /opt/R/4.4.1
       - exists:
           path: data["notifications.conf"]
+
+  # -- table 1 rows that the tests above don't cover
+  - it: should fail on notifications.conf in config.server, even as a string
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          notifications.conf: |
+            EndTime: 2026-06-05
+            Message: hello
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.notifications.conf: Sessions read notifications.conf, so move it to config.session, as a string \\(notifications.conf: \\|\\)."
+
+  - it: should accept notifications.conf in config.session as a string
+    template: configmap-session.yaml
+    documentIndex: 0
+    set:
+      config:
+        session:
+          notifications.conf: |
+            EndTime: 2026-06-05
+            Message: hello
+    asserts:
+      - equal:
+          path: data["notifications.conf"]
+          value: |
+            EndTime: 2026-06-05
+            Message: hello
+
+  - it: should fail on a non-profiles file in config.profiles even as a string
+    template: configmap-session.yaml
+    set:
+      config:
+        profiles:
+          other.conf: |
+            a=1
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.profiles.other.conf: config.profiles only takes launcher.\\*.profiles.conf files. Move it to config.server."
+
+  - it: should accept a launcher profiles file in config.profiles (the allow row comes before the catch-all)
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        profiles:
+          launcher.local.profiles.conf:
+            "*": {max-cpus: 2}
+    asserts:
+      - matchRegex:
+          path: data["launcher.local.profiles.conf"]
+          pattern: "max-cpus=2"
