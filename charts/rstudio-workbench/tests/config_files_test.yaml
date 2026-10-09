@@ -481,7 +481,7 @@ tests:
             - {Path: /opt/R/4.4.1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.r-versions is a DCF file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.session.r-versions: r-versions is a DCF file, not an .ini file. Write the whole file as a string \\(r-versions: \\|\\), or move it to config.serverDcf as a list of records."
 
   - it: should fail on r-versions in config.server written as a list
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -493,7 +493,7 @@ tests:
             - {Path: /opt/R/4.4.1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.r-versions is a DCF file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.server.r-versions: r-versions is a DCF file, not an .ini file. Write the whole file as a string \\(r-versions: \\|\\), or move it to config.serverDcf as a list of records."
 
   - it: should point notifications.conf written as a list to the string form
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -505,7 +505,7 @@ tests:
             - {Message: hello}
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.notifications.conf is a DCF file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.session.notifications.conf: notifications.conf is a DCF file, not an .ini file. Write the whole file as a string \\(notifications.conf: \\|\\). Sessions read it, so it stays in config.session."
 
   - it: should point rstudio-prefs.json written as a list to the string form
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -517,7 +517,7 @@ tests:
             - {a: 1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.rstudio-prefs.json is a JSON file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.session.rstudio-prefs.json: This is a JSON file, not an .ini file. Write the whole file as a string."
 
   - it: should point a server json file written as a list to the string form
     # the checks run in both ConfigMaps; failedTemplate only sees them in configmap-session.yaml
@@ -529,7 +529,7 @@ tests:
             - {a: 1}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.vscode-user-settings.json is a JSON file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.server.vscode-user-settings.json: This is a JSON file, not an .ini file. Write the whole file as a string."
 
   - it: should fail on r-versions written as a map, the user's example
     template: configmap-session.yaml
@@ -542,7 +542,7 @@ tests:
               - {name: Local, type: Local}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.r-versions is a DCF file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.server.r-versions: r-versions is a DCF file, not an .ini file. Write the whole file as a string \\(r-versions: \\|\\), or move it to config.serverDcf as a list of records."
 
   - it: should fail on notifications.conf written as a map
     template: configmap-session.yaml
@@ -553,7 +553,7 @@ tests:
             Message: hello
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.notifications.conf is a DCF file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.session.notifications.conf: notifications.conf is a DCF file, not an .ini file. Write the whole file as a string \\(notifications.conf: \\|\\). Sessions read it, so it stays in config.session."
 
   - it: should fail on a json file written as a map
     template: configmap-session.yaml
@@ -564,7 +564,7 @@ tests:
             a: 1
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.positron-user-settings.json is a JSON file, not an .ini file. Write the whole file as a string."
+          errorPattern: "config.server.positron-user-settings.json: This is a JSON file, not an .ini file. Write the whole file as a string."
 
   - it: should accept files that aren't .ini as strings, and the empty notifications.conf default
     template: configmap-session.yaml
