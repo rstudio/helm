@@ -719,7 +719,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- /*
   The config.server, config.session and config.profiles sections render every file as .ini, the
   same way whatever its name. Two tables describe the files that need more than that. They drive
-  only the list check (rstudio-workbench.config.validate) and the NOTES warnings, never rendering.
+  only the checks in rstudio-workbench.config.validate and the NOTES warnings, never rendering.
 
   Each row has:
     scopes: the keys under .Values.config the row applies to
@@ -727,23 +727,40 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 */ -}}
 
 {{- /*
-  Table 1: files that aren't .ini. These sections render a map or a list as .ini, so these files
-  must be written as strings (an empty value, such as the notifications.conf: {} default, is fine).
-    message: the error, after "config.<scope>.<file>: "
+  Table 1: rules for where a file can go and how it can be written. The first matching row wins.
+    allow: true, if the file is fine as written
+    message: otherwise, the error, after "config.<scope>.<file>: "
+    stringOk: true, if a string is fine (the file just isn't .ini, so a map or a list won't work)
+  An empty value, such as the notifications.conf: {} default, is always fine.
 */ -}}
-{{- define "rstudio-workbench.config.nonIniFiles" -}}
+{{- define "rstudio-workbench.config.fileRules" -}}
+- scopes: [profiles]
+  pattern: '^launcher\..+\.profiles\.conf$'
+  allow: true
+- scopes: [profiles]
+  pattern: '.*'  # any other file in config.profiles
+  message: >-
+    config.profiles only takes launcher.*.profiles.conf files. Move it to config.server.
+- scopes: [server]
+  pattern: '^notifications\.conf$'
+  message: >-
+    Sessions read notifications.conf, so move it to config.session, as a string
+    (notifications.conf: |).
+- scopes: [session]
+  pattern: '^notifications\.conf$'
+  stringOk: true
+  message: >-
+    notifications.conf is a DCF file, not an .ini file. Write the whole file as a string
+    (notifications.conf: |).
 - scopes: [server, session]
   pattern: '^r-versions$'
+  stringOk: true
   message: >-
     r-versions is a DCF file, not an .ini file. Write the whole file as a string
     (r-versions: |), or move it to config.serverDcf as a list of records.
 - scopes: [server, session]
-  pattern: '^notifications\.conf$'
-  message: >-
-    notifications.conf is a DCF file, not an .ini file. Write the whole file as a
-    string (notifications.conf: |). Sessions read it, so it stays in config.session.
-- scopes: [server, session]
   pattern: '\.json$'
+  stringOk: true
   message: >-
     This is a JSON file, not an .ini file. Write the whole file as a string.
 {{- end }}
@@ -793,20 +810,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- /*
   Checks the files in config.server, config.session, config.profiles and config.serverDcf, in
   order, failing on the first problem:
-    1. config.profiles only takes launcher profiles files: with launcher.useTemplates=false the
-       chart adds job-json-overrides to the [*] section of every file there.
+    1. Each file follows its rule in table 1.
     2. A file name is in only one of config.server, config.serverDcf and config.profiles: all three
        are written to the same ConfigMap, where the last copy silently wins.
-    3. A file that isn't .ini (table 1) is written as a string.
-    4. Only order-sensitive .ini files (table 2) are written as a list. Every file with chart
+    3. Only order-sensitive .ini files (table 2) are written as a list. Every file with chart
        defaults is order-agnostic, apart from the ones the chart merges into a list itself, so a
        list never drops chart defaults.
 */ -}}
 {{- define "rstudio-workbench.config.validate" -}}
 {{- $config := .Values.config }}
-{{- range $file, $_ := (get $config "profiles" | default dict) }}
-  {{- if not (regexMatch "^launcher\\..+\\.profiles\\.conf$" $file) }}
-    {{- fail (printf "\n\nconfig.profiles.%s: config.profiles only takes launcher.*.profiles.conf files. Put %s in config.server instead." $file $file) }}
+{{- range $scope := list "server" "session" "profiles" }}
+  {{- range $file, $content := (get $config $scope | default dict) }}
+    {{- $rule := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.fileRules" "scope" $scope "file" $file) | fromYaml }}
+    {{- if and $rule.message (not $rule.allow) $content (not (and $rule.stringOk (kindIs "string" $content))) }}
+      {{- fail (printf "\n\nconfig.%s.%s: %s" $scope $file $rule.message) }}
+    {{- end }}
   {{- end }}
 {{- end }}
 {{- $seen := dict }}
@@ -828,14 +846,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- range $scope := list "server" "session" "profiles" }}
   {{- range $file, $content := (get $config $scope | default dict) }}
-    {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
-    {{- if and $nonIni.message $content (not (kindIs "string" $content)) }}
-      {{- fail (printf "\n\nconfig.%s.%s: %s" $scope $file $nonIni.message) }}
-    {{- end }}
-    {{- if kindIs "slice" $content }}
-      {{- if not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
-        {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only order-sensitive files accept a list (%s). Write it as a map; to repeat a section, give that section a list of maps." $scope $file (join ", " $accepted)) }}
-      {{- end }}
+    {{- if and (kindIs "slice" $content) (not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file))) }}
+      {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only order-sensitive files accept a list (%s). Write it as a map; to repeat a section, give that section a list of maps." $scope $file (join ", " $accepted)) }}
     {{- end }}
   {{- end }}
 {{- end }}
