@@ -33,20 +33,10 @@
 - In `config.profiles`, `[*]` may appear only once. When a list has no `[*]` entry, the chart's
   `[*]` defaults (session image settings, and the default `job-json-overrides` with
   `launcher.useTemplates=false`) are added at the top.
-- `r-versions` belongs in `config.serverDcf`: only the Workbench server reads it, and that section
-  renders DCF. `config.session.r-versions` written as a list now fails with that pointer, and as a
-  map gets a NOTES warning.
-- NOTES warns when `notifications.conf` or a `*.json` file is written as a map, since those render
-  as `.ini`. Write them as strings.
-- A file name may now appear in only one of `config.server`, `config.serverDcf` and
-  `config.profiles`. All three are written to the same ConfigMap, where a second copy used to
-  silently replace the first, so one of them was never used.
-- The default `[cluster]` of `launcher.conf` is no longer set in `values.yaml`; the chart adds it,
-  rendering the same file. A `cluster` map is merged with it, a list of clusters is used as-is, and
-  `cluster: null` omits it. Writing several clusters as a list no longer makes Helm warn that it
-  can't overwrite a table with a non-table.
-- `config.profiles` now only accepts `launcher.*.profiles.conf` files. Any other file there fails,
-  pointing to `config.server`: the chart treats every `config.profiles` file as a profiles file.
+- Files in `config.server` and `config.session` that aren't `.ini` (`r-versions`, `notifications.conf`
+  and `*.json`) must now be written as strings. A map or a list rendered them as `.ini`, which
+  Workbench can't read, so it now fails. `r-versions` can also go in `config.serverDcf`, which
+  renders DCF records from a list.
 - Fixed NOTES failing when `config.profiles` is `null`.
 - Fixed the README's `config.profiles` example, which claimed that `[*]` arrays are appended into
   other sections. Only `job-json-overrides` are.
