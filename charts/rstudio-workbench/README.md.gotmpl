@@ -273,12 +273,12 @@ inside a section.
 Workbench reads some files top to bottom, so the order of their sections or entries changes how they behave. Because a
 map is always rendered sorted, write these files as a list:
 
-| Values | File | Why order matters |
-|---|---|---|
-| `config.server`, `config.session` | `profiles` | the last matching section wins |
-| `config.server`, `config.profiles` | `launcher.*.profiles.conf` | the last matching section wins |
-| `config.server` | `launcher.*.resources.conf` | resource profiles are listed in order, and the first is pre-selected |
-| `config.session` | `repos.conf` | the order of the entries is the order of R's repositories |
+| File | Why order matters |
+|---|---|
+| `profiles` | the last matching section wins |
+| `launcher.*.profiles.conf` | the last matching section wins |
+| `launcher.*.resources.conf` | resource profiles are listed in order, and the first is pre-selected |
+| `repos.conf` | the order of the entries is the order of R's repositories |
 
 ```yaml
 config:
