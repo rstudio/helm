@@ -56,7 +56,7 @@ tests:
   - it: should not warn about config files on a default install
     asserts:
       - notMatchRegexRaw:
-          pattern: "written as maps|repos\\\\.conf|r-versions|notifications\\\\.conf|written as a map|no `CRAN=` line"
+          pattern: "WARNING: `.Values.config"
 
   - it: should warn about each order-sensitive file written as a map
     set:
@@ -109,7 +109,7 @@ tests:
             Internal=https://pkgs.example.com
     asserts:
       - matchRegexRaw:
-          pattern: "repos\\\\.conf` is a string with no `CRAN=` line"
+          pattern: "repos.conf` is a string with no `CRAN=` line"
 
   - it: should not warn about a repos.conf string with a CRAN line
     set:
@@ -122,35 +122,50 @@ tests:
       - notMatchRegexRaw:
           pattern: "no `CRAN=` line"
 
-  - it: should point config.session.r-versions written as a map to config.serverDcf
+  # -- table 1 (non-.ini files): a non-empty map warns with the row's fix
+  - it: should warn about r-versions written as a map, in config.session or config.server
     set:
       config:
         session:
-          r-versions:
-            Path: /opt/R/4.4.1
+          r-versions: {Path: /opt/R/4.4.1}
+        server:
+          r-versions: {Path: /opt/R/4.4.1}
     asserts:
       - matchRegexRaw:
-          pattern: "config.session.r-versions` is rendered as an ini file.*config.serverDcf.r-versions"
+          pattern: "WARNING: `.Values.config.session.r-versions` is written as a map, which renders as .ini, but r-versions is a DCF file that only the Workbench server reads. Write it in config.serverDcf"
+      - matchRegexRaw:
+          pattern: "WARNING: `.Values.config.server.r-versions` is written as a map"
 
-  - it: should warn about notifications.conf written as a non-empty map
+  - it: should warn about notifications.conf written as a map
     set:
       config:
         session:
-          notifications.conf:
-            Message: hello
+          notifications.conf: {Message: hello}
     asserts:
       - matchRegexRaw:
-          pattern: "notifications\\\\.conf` is written as a map"
+          pattern: "WARNING: `.Values.config.session.notifications.conf` is written as a map, which renders as .ini, but notifications.conf is a DCF file. Write the whole file as a string."
 
-  - it: should warn about a json file written as a map
+  - it: should warn about json files written as maps, in config.session or config.server
     set:
       config:
         session:
-          rstudio-prefs.json:
-            a: 1
+          rstudio-prefs.json: {a: 1}
+        server:
+          positron-user-settings.json: {a: 1}
     asserts:
       - matchRegexRaw:
-          pattern: "config.session.rstudio-prefs.json` is written as a map, which renders as ini, not JSON"
+          pattern: "WARNING: `.Values.config.session.rstudio-prefs.json` is written as a map, which renders as .ini, but rstudio-prefs.json is a JSON file. Write the whole file as a string."
+      - matchRegexRaw:
+          pattern: "WARNING: `.Values.config.server.positron-user-settings.json` is written as a map"
+
+  - it: should not warn about an empty map for a non-.ini file
+    set:
+      config:
+        session:
+          notifications.conf: {}
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "notifications.conf` is written as a map"
 
   - it: should not fail when config.profiles is null
     set:

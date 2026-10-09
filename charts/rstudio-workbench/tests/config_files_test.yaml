@@ -114,38 +114,96 @@ tests:
       - failedTemplate:
           errorPattern: "config.profiles.other.conf is written as a list"
 
-  - it: should point config.session.r-versions written as a list to config.serverDcf
+  # -- table 1 (non-.ini files): a list fails with the row's fix
+  - it: should point config.session.r-versions written as a list to its fix
     template: configmap-session.yaml
     set:
       config:
         session:
-          r-versions:
-            - {Path: /opt/R/4.4.1, Label: Latest}
+          r-versions: [{Path: /opt/R/4.4.1, Label: Latest}]
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.r-versions is written as a list.*write it in config.serverDcf"
+          errorPattern: "config\\.session\\.r\\-versions is written as a list, but config\\.session renders \\.ini files, and r\\-versions is a DCF file that only the Workbench server reads\\. Write it in config\\.serverDcf"
 
-  - it: should point notifications.conf written as a list to the string form
+  - it: should point config.server.r-versions written as a list to its fix
     template: configmap-session.yaml
     set:
       config:
-        session:
-          notifications.conf:
-            - {Message: hello}
+        server:
+          r-versions: [{Path: /opt/R/4.4.1, Label: Latest}]
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.notifications.conf is written as a list.*Write the whole file as a string"
+          errorPattern: "config\\.server\\.r\\-versions is written as a list, but config\\.server renders \\.ini files, and r\\-versions is a DCF file that only the Workbench server reads\\. Write it in config\\.serverDcf"
 
-  - it: should point a json file written as a list to the string form
+  - it: should point config.session.notifications.conf written as a list to its fix
     template: configmap-session.yaml
     set:
       config:
         session:
-          rstudio-prefs.json:
-            - {a: 1}
+          notifications.conf: [{Message: hello}]
     asserts:
       - failedTemplate:
-          errorPattern: "config.session.rstudio-prefs.json is written as a list.*Write the whole file as a string"
+          errorPattern: "config\\.session\\.notifications\\.conf is written as a list, but config\\.session renders \\.ini files, and notifications\\.conf is a DCF file\\. Write the whole file as a string"
+
+  - it: should point config.session.rstudio-prefs.json written as a list to its fix
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          rstudio-prefs.json: [{a: 1}]
+    asserts:
+      - failedTemplate:
+          errorPattern: "config\\.session\\.rstudio\\-prefs\\.json is written as a list, but config\\.session renders \\.ini files, and rstudio\\-prefs\\.json is a JSON file\\. Write the whole file as a string"
+
+  - it: should point config.server.vscode-user-settings.json written as a list to its fix
+    template: configmap-session.yaml
+    set:
+      config:
+        server:
+          vscode-user-settings.json: [{a: 1}]
+    asserts:
+      - failedTemplate:
+          errorPattern: "config\\.server\\.vscode\\-user\\-settings\\.json is written as a list, but config\\.server renders \\.ini files, and vscode\\-user\\-settings\\.json is a JSON file\\. Write the whole file as a string"
+
+  # -- table 2 (order-sensitive .ini files): every row accepts a list
+  - it: should accept a list for config.server.launcher.local.profiles.conf
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.local.profiles.conf:
+            - "@b": {max-cpus: 2}
+            - "@a": {max-cpus: 1}
+    asserts:
+      - matchRegex:
+          path: data["launcher.local.profiles.conf"]
+          pattern: "^\\[@b\\]\\nmax-cpus=2\\n\\n\\[@a\\]\\nmax-cpus=1\\n"
+
+  - it: should accept a list for config.profiles.launcher.local.profiles.conf
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        profiles:
+          launcher.local.profiles.conf:
+            - "@b": {max-cpus: 2}
+            - "@a": {max-cpus: 1}
+    asserts:
+      - matchRegex:
+          path: data["launcher.local.profiles.conf"]
+          pattern: "^\\[@b\\]\\nmax-cpus=2\\n\\n\\[@a\\]\\nmax-cpus=1\\n"
+
+  - it: should list the files that accept a list in the error, from the table
+    template: configmap-session.yaml
+    set:
+      config:
+        session:
+          rsession.conf:
+            - a: 1
+    asserts:
+      - failedTemplate:
+          errorPattern: "The files that accept a list are:\\n  - config.server: profiles, launcher.\\*.profiles.conf, launcher.\\*.resources.conf\\n  - config.session: repos.conf\\n  - config.profiles: launcher.\\*.profiles.conf"
 
   - it: should accept r-versions in config.serverDcf
     template: configmap-general.yaml
