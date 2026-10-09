@@ -40,7 +40,12 @@
   as `.ini`. Write them as strings.
 - A file name may now appear in only one of `config.server`, `config.serverDcf` and
   `config.profiles`. All three are written to the same ConfigMap, where a second copy used to
-  silently replace the first, so one of them was never used.
+  silently replace the first, so one of them was never used. When one of the copies is in the wrong
+  place (for example `launcher.conf` in `config.profiles`), the error says so instead.
+- The default `[cluster]` of `launcher.conf` is no longer set in `values.yaml`; the chart adds it,
+  rendering the same file. A `cluster` map is merged with it, a list of clusters is used as-is, and
+  `cluster: null` omits it. Writing several clusters as a list no longer makes Helm warn that it
+  can't overwrite a table with a non-table.
 - `config.profiles` is only for `launcher.*.profiles.conf` files. Any other file there, such as a
   `launcher.*.resources.conf`, fails as a list and gets a NOTES warning as a map, pointing to
   `config.server`.

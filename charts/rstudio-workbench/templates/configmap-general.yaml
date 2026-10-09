@@ -87,6 +87,23 @@ metadata:
 data:
 {{/* generate the server configuration, setting remote licensing if applicable */}}
 {{- $overrideDict := .Values.config.server | deepCopy }}
+{{- /* the default [cluster] of launcher.conf. It isn't in values.yaml, so that a list of clusters
+       doesn't make Helm warn about replacing a map with a list:
+       - absent: the default cluster
+       - a map: the default merged in, with the user's values winning
+       - a list: used as-is, one [cluster] per map
+       - null: no [cluster] */}}
+{{- $launcherConf := get $overrideDict "launcher.conf" }}
+{{- if kindIs "map" $launcherConf }}
+  {{- $defaultCluster := dict "name" "Kubernetes" "type" "Kubernetes" }}
+  {{- if not (hasKey $launcherConf "cluster") }}
+    {{- $_ := set $launcherConf "cluster" $defaultCluster }}
+  {{- else if kindIs "map" (get $launcherConf "cluster") }}
+    {{- $_ := set $launcherConf "cluster" (mergeOverwrite $defaultCluster (get $launcherConf "cluster")) }}
+  {{- else if kindIs "invalid" (get $launcherConf "cluster") }}
+    {{- $_ := unset $launcherConf "cluster" }}
+  {{- end }}
+{{- end }}
 {{- if .Values.license.server }}
   {{- $licenseParam := dict "server-license-type" "remote" }}
   {{- $licenseServerConf := dict "rserver.conf" $licenseParam}}

@@ -844,7 +844,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- range $file, $content := (get $.Values.config $scope | default dict) }}
     {{- if not (kindIs "invalid" $content) }}
       {{- if hasKey $seen $file }}
-        {{- fail (printf "\n\nconfig.%s.%s and config.%s.%s are both set. Both are written to /mnt/configmap/rstudio/%s, so only one of them would be used. Keep one and remove the other." (get $seen $file) $file $scope $file $file) }}
+        {{- $first := get $seen $file }}
+        {{- /* a copy in the wrong place explains the collision better than the collision does */}}
+        {{- range $where := list (list $first $file) (list $scope $file) }}
+          {{- $problem := include "rstudio-workbench.config.problem" (dict "scope" (index $where 0) "file" (index $where 1)) | fromYaml }}
+          {{- if $problem.fix }}
+            {{- fail (printf "\n\nconfig.%s.%s won't work as written. %s %s" (index $where 0) (index $where 1) $problem.why $problem.fix) }}
+          {{- end }}
+        {{- end }}
+        {{- fail (printf "\n\nconfig.%s.%s and config.%s.%s would both be written to /mnt/configmap/rstudio/%s, so only one of them would be used. One of them may come from the chart's defaults. Set %s in one of them only." $first $file $scope $file $file $file) }}
       {{- end }}
       {{- $_ := set $seen $file $scope }}
     {{- end }}
