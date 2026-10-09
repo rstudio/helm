@@ -390,9 +390,9 @@ tests:
             "*": {max-cpus: 2}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.launcher.local.profiles.conf and config.profiles.launcher.local.profiles.conf are both set"
+          errorPattern: "config.server.launcher.local.profiles.conf and config.profiles.launcher.local.profiles.conf would both be written to"
 
-  - it: should fail when a file is in both config.server and config.serverDcf
+  - it: should report r-versions in both config.server and config.serverDcf as misplaced in config.server
     template: configmap-session.yaml
     set:
       config:
@@ -404,7 +404,7 @@ tests:
             - {Path: /opt/R/4.0.2}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.r-versions and config.serverDcf.r-versions are both set"
+          errorPattern: "config.server.r-versions won't work as written. config.server renders .ini files.*Write it in config.serverDcf"
 
   - it: should fail when the deprecated kubernetes profiles location is used alongside config.profiles
     template: configmap-session.yaml
@@ -418,7 +418,7 @@ tests:
             "*": {max-cpus: 2}
     asserts:
       - failedTemplate:
-          errorPattern: "config.server.launcher.kubernetes.profiles.conf and config.profiles.launcher.kubernetes.profiles.conf are both set"
+          errorPattern: "config.server.launcher.kubernetes.profiles.conf and config.profiles.launcher.kubernetes.profiles.conf would both be written to"
 
   - it: should fail on a list for a resources file in config.profiles, pointing to config.server
     template: configmap-session.yaml
@@ -430,3 +430,80 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "Write launcher.kubernetes.resources.conf in config.server instead."
+
+  # -- default [cluster] in launcher.conf, provided by the template
+  - it: should render the default [cluster] when launcher.conf doesn't set one
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "^\\[cluster\\]\\nname=Kubernetes\\ntype=Kubernetes\\n\\n\\[server\\]"
+
+  - it: should merge the default [cluster] into a cluster map
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.conf:
+            cluster:
+              name: Other
+    asserts:
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "^\\[cluster\\]\\nname=Other\\ntype=Kubernetes\\n"
+
+  - it: should use a list of clusters as-is
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.conf:
+            cluster:
+              - {name: Local, type: Local}
+    asserts:
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "^\\[cluster\\]\\nname=Local\\ntype=Local\\n\\n\\[server\\]"
+
+  - it: should omit [cluster] when it is null
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          launcher.conf:
+            cluster: null
+    asserts:
+      - notMatchRegex:
+          path: data["launcher.conf"]
+          pattern: "\\[cluster\\]"
+      - matchRegex:
+          path: data["launcher.conf"]
+          pattern: "\\[server\\]"
+
+  - it: should report launcher.conf in config.profiles as misplaced, not as colliding with the default
+    template: configmap-session.yaml
+    set:
+      config:
+        profiles:
+          launcher.conf:
+            cluster:
+              - {name: Kubernetes, type: Kubernetes}
+              - {name: Local, type: Local}
+    asserts:
+      - failedTemplate:
+          errorPattern: "^\\s*config.profiles.launcher.conf won't work as written. config.profiles is only for launcher.\\*.profiles.conf files.*Write launcher.conf in config.server instead.\\s*$"
+
+  - it: should say that a colliding copy may come from the chart's defaults
+    template: configmap-session.yaml
+    set:
+      config:
+        serverDcf:
+          rserver.conf:
+            - {a: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.server.rserver.conf and config.serverDcf.rserver.conf would both be written to /mnt/configmap/rstudio/rserver.conf.*One of them may come from the chart's defaults"

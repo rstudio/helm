@@ -636,9 +636,9 @@ config:
         authorization-enabled: 1
         thread-pool-size: 4
         enable-debug-logging: 0
-      cluster:
-        name: Kubernetes
-        type: Kubernetes
+      # cluster: the chart renders a `[cluster]` section with `name=Kubernetes` and
+      # `type=Kubernetes` by default. Set it to a map to change it, to a list of maps for several
+      # `[cluster]` sections, or to null to omit it.
     jupyter.conf:
       jupyter-exe: /usr/local/bin/jupyter
       labs-enabled: 1
