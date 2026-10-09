@@ -722,8 +722,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   only the checks in rstudio-workbench.config.validate and the NOTES warnings, never rendering.
 
   Each row has:
-    scopes: the keys under .Values.config the row applies to
     pattern: a regular expression matched against the file name
+    scopes: (table 1 only) the keys under .Values.config the row applies to
 */ -}}
 
 {{- /*
@@ -766,23 +766,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- /*
-  Table 2: .ini files that depend on the order of their sections or entries. Only these accept a
-  list (rstudio-library.config.ini's list form, which keeps the order written), and writing one as
-  a map gets a NOTES warning.
+  Table 2: .ini files that depend on the order of their sections or entries, wherever they are
+  placed (where a file may go is table 1's job). Only these accept a list
+  (rstudio-library.config.ini's list form, which keeps the order written), and writing one as a
+  map gets a NOTES warning.
     label: the file name as shown to users
 */ -}}
 {{- define "rstudio-workbench.config.orderedFiles" -}}
-- scopes: [server, session]  # the server also reads config.session, which is on its XDG_CONFIG_DIRS
-  pattern: '^profiles$'
+- pattern: '^profiles$'
   label: profiles
-- scopes: [server, profiles]
-  pattern: '^launcher\..+\.profiles\.conf$'
+- pattern: '^launcher\..+\.profiles\.conf$'
   label: launcher.*.profiles.conf
-- scopes: [server]
-  pattern: '^launcher\..+\.resources\.conf$'
+- pattern: '^launcher\..+\.resources\.conf$'
   label: launcher.*.resources.conf
-- scopes: [session]
-  pattern: '^repos\.conf$'
+- pattern: '^repos\.conf$'
   label: repos.conf
 {{- end }}
 
@@ -793,14 +790,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     table: the name of the table template
     scope: the key under .Values.config
     file: the file name
-  Returns the matching row as YAML (use fromYaml), or an empty string.
+  Returns the first matching row as YAML (use fromYaml), or an empty string. A row without scopes
+  matches in every section.
 */ -}}
 {{- define "rstudio-workbench.config.match" -}}
 {{- $scope := .scope }}
 {{- $file := .file }}
 {{- $match := "" }}
 {{- range $row := (include .table . | fromYamlArray) }}
-  {{- if and (not $match) (has $scope $row.scopes) (regexMatch $row.pattern $file) }}
+  {{- if and (not $match) (or (not $row.scopes) (has $scope $row.scopes)) (regexMatch $row.pattern $file) }}
     {{- $match = toYaml $row }}
   {{- end }}
 {{- end }}
@@ -840,9 +838,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- $accepted := list }}
 {{- range $row := (include "rstudio-workbench.config.orderedFiles" . | fromYamlArray) }}
-  {{- range $scope := $row.scopes }}
-    {{- $accepted = append $accepted (printf "config.%s.%s" $scope $row.label) }}
-  {{- end }}
+  {{- $accepted = append $accepted $row.label }}
 {{- end }}
 {{- range $scope := list "server" "session" "profiles" }}
   {{- range $file, $content := (get $config $scope | default dict) }}
