@@ -796,76 +796,48 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- /*
-  Whether a config file can't work where it is, whatever its content: a file that isn't .ini
-  (table 1), or a file in config.profiles that isn't a launcher profiles file. config.profiles
-  treats every file as a launcher profiles file: with launcher.useTemplates=false, the chart adds
-  job-json-overrides to its [*] section.
-
-  Takes a dict:
-    scope: the key under .Values.config
-    file: the file name
-  Returns {why, fix} as YAML (use fromYaml), or an empty string.
-*/ -}}
-{{- define "rstudio-workbench.config.problem" -}}
-{{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" .scope "file" .file) | fromYaml }}
-{{- if $nonIni.fix }}
-  {{- toYaml (dict "why" (printf "config.%s renders .ini files, and %s is %s." .scope .file $nonIni.is) "fix" $nonIni.fix) }}
-{{- else if and (eq .scope "profiles") (not (regexMatch "^launcher\\..+\\.profiles\\.conf$" .file)) }}
-  {{- toYaml (dict "why" "config.profiles is only for launcher.*.profiles.conf files. The chart treats every file there as one, and with launcher.useTemplates=false adds job-json-overrides to its [*] section." "fix" (printf "Write %s in config.server instead." .file)) }}
-{{- end }}
-{{- end }}
-
-{{- /*
-  Fails if a file in config.server, config.session or config.profiles is written as a list, unless
-  it is an order-sensitive .ini file (table 2). A file that can't work where it is (see
-  rstudio-workbench.config.problem) fails with its fix. Every file with chart defaults is
-  order-agnostic, apart from the two the chart merges into a list itself, so this also guarantees
-  a list never drops chart defaults.
-
-  Also fails if a file name is in more than one of config.server, config.serverDcf and
-  config.profiles: all three are written to the same ConfigMap, where the last copy silently wins.
+  Checks the files in config.server, config.session, config.profiles and config.serverDcf, in
+  order, failing on the first problem:
+    1. config.profiles only takes launcher profiles files: with launcher.useTemplates=false the
+       chart adds job-json-overrides to the [*] section of every file there.
+    2. A file name is in only one of config.server, config.serverDcf and config.profiles: all three
+       are written to the same ConfigMap, where the last copy silently wins.
+    3. Only order-sensitive .ini files (table 2) are written as a list. A file that isn't .ini
+       (table 1) gets that row's fix. Every file with chart defaults is order-agnostic, apart from
+       the ones the chart merges into a list itself, so a list never drops chart defaults.
 */ -}}
 {{- define "rstudio-workbench.config.validate" -}}
-{{- $scopes := list "server" "session" "profiles" }}
-{{- $accepted := list }}
-{{- range $scope := $scopes }}
-  {{- $labels := list }}
-  {{- range $row := (include "rstudio-workbench.config.orderedFiles" . | fromYamlArray) }}
-    {{- if has $scope $row.scopes }}
-      {{- $labels = append $labels $row.label }}
-    {{- end }}
-  {{- end }}
-  {{- if $labels }}
-    {{- $accepted = append $accepted (printf "  - config.%s: %s" $scope (join ", " $labels)) }}
+{{- $config := .Values.config }}
+{{- range $file, $_ := (get $config "profiles" | default dict) }}
+  {{- if not (regexMatch "^launcher\\..+\\.profiles\\.conf$" $file) }}
+    {{- fail (printf "\n\nconfig.profiles.%s: config.profiles only takes launcher.*.profiles.conf files. Put %s in config.server instead." $file $file) }}
   {{- end }}
 {{- end }}
 {{- $seen := dict }}
 {{- range $scope := list "server" "serverDcf" "profiles" }}
-  {{- range $file, $content := (get $.Values.config $scope | default dict) }}
+  {{- range $file, $content := (get $config $scope | default dict) }}
     {{- if not (kindIs "invalid" $content) }}
       {{- if hasKey $seen $file }}
-        {{- $first := get $seen $file }}
-        {{- /* a copy in the wrong place explains the collision better than the collision does */}}
-        {{- range $where := list (list $first $file) (list $scope $file) }}
-          {{- $problem := include "rstudio-workbench.config.problem" (dict "scope" (index $where 0) "file" (index $where 1)) | fromYaml }}
-          {{- if $problem.fix }}
-            {{- fail (printf "\n\nconfig.%s.%s won't work as written. %s %s" (index $where 0) (index $where 1) $problem.why $problem.fix) }}
-          {{- end }}
-        {{- end }}
-        {{- fail (printf "\n\nconfig.%s.%s and config.%s.%s would both be written to /mnt/configmap/rstudio/%s, so only one of them would be used. One of them may come from the chart's defaults. Set %s in one of them only." $first $file $scope $file $file $file) }}
+        {{- fail (printf "\n\nconfig.%s.%s and config.%s.%s are both written to /mnt/configmap/rstudio/%s, so only one would be used (one of them may be a chart default). Set it in one place only." (get $seen $file) $file $scope $file $file) }}
       {{- end }}
       {{- $_ := set $seen $file $scope }}
     {{- end }}
   {{- end }}
 {{- end }}
-{{- range $scope := $scopes }}
-  {{- range $file, $content := (get $.Values.config $scope | default dict) }}
+{{- $accepted := list }}
+{{- range $row := (include "rstudio-workbench.config.orderedFiles" . | fromYamlArray) }}
+  {{- range $scope := $row.scopes }}
+    {{- $accepted = append $accepted (printf "config.%s.%s" $scope $row.label) }}
+  {{- end }}
+{{- end }}
+{{- range $scope := list "server" "session" "profiles" }}
+  {{- range $file, $content := (get $config $scope | default dict) }}
     {{- if kindIs "slice" $content }}
-      {{- $problem := include "rstudio-workbench.config.problem" (dict "scope" $scope "file" $file) | fromYaml }}
-      {{- if $problem.fix }}
-        {{- fail (printf "\n\nconfig.%s.%s won't work as written. %s %s" $scope $file $problem.why $problem.fix) }}
+      {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
+      {{- if $nonIni.fix }}
+        {{- fail (printf "\n\nconfig.%s.%s is %s, not an .ini file. %s" $scope $file $nonIni.is $nonIni.fix) }}
       {{- else if not (include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file)) }}
-        {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only files that depend on the order of their sections accept a list. Nothing in %s depends on order, so write it as a map:\n\n  config:\n    %s:\n      %s:\n        section-name:\n          option: value\n\nTo repeat a section, give it a list of maps:\n\n        section-name:\n          - option: value\n          - option: other-value\n\nA string is also accepted, and is used as the whole file.\n\nThe files that accept a list are:\n%s" $scope $file $file $scope $file (join "\n" $accepted)) }}
+        {{- fail (printf "\n\nconfig.%s.%s is written as a list, but only order-sensitive files accept a list (%s). Write it as a map; to repeat a section, give that section a list of maps." $scope $file (join ", " $accepted)) }}
       {{- end }}
     {{- end }}
   {{- end }}

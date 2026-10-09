@@ -59,9 +59,9 @@ Please consider removing this configuration value.
 {{- range $scope := list "server" "profiles" "session" }}
   {{- range $file, $content := (get $.Values.config $scope | default dict) }}
     {{- if and (kindIs "map" $content) $content }}
-      {{- $problem := include "rstudio-workbench.config.problem" (dict "scope" $scope "file" $file) | fromYaml }}
-      {{- if $problem.fix }}
-        {{- $problems = append $problems (printf "WARNING: `.Values.config.%s.%s` won't work as written. %s %s" $scope $file $problem.why $problem.fix) }}
+      {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
+      {{- if $nonIni.fix }}
+        {{- $problems = append $problems (printf "WARNING: `.Values.config.%s.%s` is %s, not an .ini file, so it won't work as a map. %s" $scope $file $nonIni.is $nonIni.fix) }}
       {{- else if include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file) }}
         {{- $unordered = append $unordered (printf "`.Values.config.%s.%s`" $scope $file) }}
       {{- end }}
