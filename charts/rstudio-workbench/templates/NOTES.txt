@@ -53,12 +53,18 @@ Please consider removing this configuration value.
   {{- end }}
 {{- end }}
 
-{{- /* order-sensitive files written as maps (see rstudio-workbench.config.ordered) */}}
+{{- /* files written as maps that the config file tables in _helpers.tpl flag */}}
 {{- $unordered := list }}
+{{- $nonIniWarnings := list }}
 {{- range $scope := list "server" "profiles" "session" }}
   {{- range $file, $content := (get $.Values.config $scope | default dict) }}
-    {{- if and (kindIs "map" $content) $content (include "rstudio-workbench.config.ordered" (dict "scope" $scope "file" $file)) }}
-      {{- $unordered = append $unordered (printf "`.Values.config.%s.%s`" $scope $file) }}
+    {{- if and (kindIs "map" $content) $content }}
+      {{- $nonIni := include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.nonIniFiles" "scope" $scope "file" $file) | fromYaml }}
+      {{- if $nonIni.fix }}
+        {{- $nonIniWarnings = append $nonIniWarnings (printf "WARNING: `.Values.config.%s.%s` is written as a map, which renders as .ini, but %s is %s. %s" $scope $file $file $nonIni.is $nonIni.fix) }}
+      {{- else if include "rstudio-workbench.config.match" (dict "table" "rstudio-workbench.config.orderedFiles" "scope" $scope "file" $file) }}
+        {{- $unordered = append $unordered (printf "`.Values.config.%s.%s`" $scope $file) }}
+      {{- end }}
     {{- end }}
   {{- end }}
 {{- end }}
@@ -83,33 +89,12 @@ WARNING: the following configuration files are written as maps, which does not k
 {{- $repos := get $session "repos.conf" }}
 {{- if and (hasKey $session "repos.conf") (kindIs "string" $repos) (not (regexMatch "(?m)^\\s*CRAN\\s*=" $repos)) }}
 
-WARNING: `.Values.config.session.repos\.conf` is a string with no `CRAN=` line. Workbench ignores a repos.conf without a CRAN entry. Add one, or write repos.conf as a list or map so the chart adds its default CRAN entry.
+WARNING: `.Values.config.session.repos.conf` is a string with no `CRAN=` line. Workbench ignores a repos.conf without a CRAN entry. Add one, or write repos.conf as a list or map so the chart adds its default CRAN entry.
 {{- end }}
 
-{{- if kindIs "map" (get $session "r-versions") }}
+{{- range $warning := $nonIniWarnings }}
 
-WARNING: `.Values.config.session.r-versions` is rendered as an ini file, which Workbench ignores. r-versions is a DCF file read by the Workbench server, not by sessions. Move it to `.Values.config.serverDcf.r-versions`, as a list of records:
-
-    config:
-      serverDcf:
-        r-versions:
-          - Path: /opt/R/4.4.1
-            Label: Latest
-{{- end }}
-
-{{- $notifications := get $session "notifications.conf" }}
-{{- if and (kindIs "map" $notifications) $notifications }}
-
-WARNING: `.Values.config.session.notifications\.conf` is written as a map, which renders as ini. notifications.conf is a DCF file, so Workbench can't read it. Write the whole file as a string instead.
-{{- end }}
-
-{{- range $scope := list "server" "session" }}
-  {{- range $file, $content := (get $.Values.config $scope | default dict) }}
-    {{- if and (hasSuffix ".json" $file) (kindIs "map" $content) }}
-
-WARNING: `.Values.config.{{ $scope }}.{{ $file }}` is written as a map, which renders as ini, not JSON. Write the JSON as a string instead.
-    {{- end }}
-  {{- end }}
+{{ $warning }}
 {{- end }}
 
 {{- if .Values.serviceAccountName }}
