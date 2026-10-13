@@ -3,6 +3,9 @@
 ## 0.21.4
 
 - Bump Connect version to 2026.10.0
+- Update the default Python `Executable` path to `/opt/python/3.15.0/bin/python` to
+  match the interpreter shipped in the 2026.10.0 image. The image no longer includes
+  Python 3.14. See the upgrade guidance in the README if you need to keep Python 3.14.
 
 ## 0.21.3
 

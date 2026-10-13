@@ -10,6 +10,36 @@
 
 ## Upgrade guidance
 
+### 0.21.4
+
+- The Connect 2026.10.0 image ships Python 3.15.0 and no longer includes Python 3.14. The default `config.Python.Executable` is now `/opt/python/3.15.0/bin/python`.
+- With Off-Host Execution (the default), content runs in your execution environments, not the Connect server image, so this change does not affect which Python versions are available to content. To keep Python 3.14, keep or add an execution environment that provides it, such as `posit/connect-content:R4.6.1-python3.14.8-ubuntu-24.04`.
+- With Local Execution, content uses the interpreters listed in `config.Python.Executable`. If you override this value with a 3.14 path, Python content fails because that path no longer exists in the image. To keep Python 3.14, build an image that adds it alongside 3.15.0:
+
+  ```dockerfile
+  FROM ghcr.io/astral-sh/uv:debian-slim AS python-builder
+  ENV UV_PYTHON_INSTALL_DIR=/opt/python UV_PYTHON_PREFERENCE=only-managed
+  RUN uv python install 3.14.8 && mv /opt/python/cpython-3.14.8-linux-*/ /opt/python/3.14.8
+
+  FROM posit/connect:2026.10.0-ubuntu-24.04
+  COPY --from=python-builder /opt/python/3.14.8 /opt/python/3.14.8
+  RUN /opt/python/3.14.8/bin/pip install --no-cache-dir --upgrade --break-system-packages \
+        pip setuptools virtualenv
+  ```
+
+  Then point the chart at your image and list both interpreters:
+
+  ```yaml
+  image:
+    repository: my-registry/connect
+    tag: 2026.10.0-py3.14
+  config:
+    Python:
+      Executable:
+        - /opt/python/3.14.8/bin/python
+        - /opt/python/3.15.0/bin/python
+  ```
+
 ### 0.20.1
 
 - Chart version 0.10.0 changes the default execution backend to use a new Off-Host Execution implementation: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`.
