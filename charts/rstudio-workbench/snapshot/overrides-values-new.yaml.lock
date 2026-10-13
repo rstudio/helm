@@ -371,7 +371,7 @@ data:
   
   notifications.conf: |
   repos.conf: |
-    CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+    CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest
   rsession.conf: |
   rstudio-prefs.json: |
     {}
@@ -596,7 +596,7 @@ spec:
         checksum/config-general: 1c741163df4bd78cfd671899b1e1b8e19d3c447d4b820b1a2dea8b403c25b991
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
-        checksum/config-session: 9ef1204bdb98f009c987668c37a09197705ef115789725cd915ab808a67e2d6b
+        checksum/config-session: 096470466d459fe1294a2de277365e91426e2ab6d5aab0f134434f31928fe2ad
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8989"

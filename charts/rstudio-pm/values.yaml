@@ -181,11 +181,12 @@ startupProbe:
   timeoutSeconds: 1
   # -- failureThreshold * periodSeconds should be strictly > worst case startup time
   failureThreshold: 30
-# -- readinessProbe is used to configure the container's readinessProbe
+# -- readinessProbe is used to configure the container's readinessProbe.
+# `/__cluster-health__` needs Package Manager 2026.06.0 or later; on older images set `readinessProbe.httpGet.path` to `/__ping__`.
 readinessProbe:
   enabled: true
   httpGet:
-    path: /__ping__
+    path: /__cluster-health__
     port: 4242
   initialDelaySeconds: 3
   periodSeconds: 3

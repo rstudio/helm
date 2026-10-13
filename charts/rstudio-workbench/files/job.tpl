@@ -154,6 +154,11 @@ spec:
         {{- range . }}
         - name: {{ toYaml .name }}
           image: {{ toYaml .image }}
+          {{- if or (hasSuffix ":daily" .image) (hasSuffix ":latest" .image) }}
+          imagePullPolicy: Always
+          {{- else if $templateData.pod.initContainerImagePullPolicy }}
+          imagePullPolicy: {{- $templateData.pod.initContainerImagePullPolicy | nindent 12 }}
+          {{- end }}
           {{- $isShell := false }}
           {{- if .command }}
           command: ['/bin/sh']

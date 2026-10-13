@@ -222,7 +222,7 @@ metadata:
 data:
   rstudio-library-templates-data.tpl: |
     {{- define "rstudio-library.templates.data" -}}
-    {"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"}],"volumes":[{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"}]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}
+    {"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainerImagePullPolicy":"","initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"}],"volumes":[{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"}]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}
     {{- end }}
   job.tpl: |
     # Version: 2.5.0
@@ -381,6 +381,11 @@ data:
             {{- range . }}
             - name: {{ toYaml .name }}
               image: {{ toYaml .image }}
+              {{- if or (hasSuffix ":daily" .image) (hasSuffix ":latest" .image) }}
+              imagePullPolicy: Always
+              {{- else if $templateData.pod.initContainerImagePullPolicy }}
+              imagePullPolicy: {{- $templateData.pod.initContainerImagePullPolicy | nindent 12 }}
+              {{- end }}
               {{- $isShell := false }}
               {{- if .command }}
               command: ['/bin/sh']
@@ -1057,7 +1062,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: a9e43e919e93a329ac6e4496134248a1a116609fde60c7cc0c02cddcd5e2de34
+        checksum/config-general: 4271418405c1ff3cff80e7137048b5ae700f1c3decd79f6f30b2f0af1434b6ff
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
         checksum/config-session: 48310335f89476a8c073c0672cbb57125bf9b9ff53be27c6e3f336f8d3cee0ef

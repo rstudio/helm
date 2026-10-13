@@ -45,7 +45,7 @@ config:
       # installation time. If you have your own Posit Package Manager server
       # then replace with the URL. Note you can list multiple repos in 
       # `repos.conf` but you must include one repo named "CRAN".
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest # TODO: Change this URL to point to your own Package Manager CRAN URL if desired
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest # TODO: Change this URL to point to your own Package Manager CRAN URL if desired
     pip.conf:
       "global":
         index-url: https://packagemanager.posit.co/pypi/latest/simple # TODO: Change this URL to point to your own Package Manager PyPI URL if desired

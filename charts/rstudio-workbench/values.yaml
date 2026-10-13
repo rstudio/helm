@@ -195,6 +195,10 @@ launcher:
       volumeMounts: []
       env: []
       imagePullPolicy: ""
+      # -- imagePullPolicy for the init containers the launcher adds to session pods (e.g. session-init, positron-init).
+      # Images tagged `:daily` or `:latest` (such as the Positron preview init image) always use `Always`.
+      # Leave empty to use the Kubernetes default.
+      initContainerImagePullPolicy: ""
       imagePullSecrets: []
       initContainers: []
       extraContainers: []
@@ -581,7 +585,7 @@ config:
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
     rsession.conf: {}
     notifications.conf: {}
     rstudio-prefs.json: |

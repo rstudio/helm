@@ -226,7 +226,7 @@ metadata:
 data:
   rstudio-library-templates-data.tpl: |
     {{- define "rstudio-library.templates.data" -}}
-    {"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}
+    {"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainerImagePullPolicy":"","initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}
     {{- end }}
   job.tpl: |
     # Version: 2.5.0
@@ -385,6 +385,11 @@ data:
             {{- range . }}
             - name: {{ toYaml .name }}
               image: {{ toYaml .image }}
+              {{- if or (hasSuffix ":daily" .image) (hasSuffix ":latest" .image) }}
+              imagePullPolicy: Always
+              {{- else if $templateData.pod.initContainerImagePullPolicy }}
+              imagePullPolicy: {{- $templateData.pod.initContainerImagePullPolicy | nindent 12 }}
+              {{- end }}
               {{- $isShell := false }}
               {{- if .command }}
               command: ['/bin/sh']
@@ -1112,7 +1117,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 6e49b8f23c02305e955d66c117058e2c7aaf38e29e1761d10fe0d7f30db60b9b
+        checksum/config-general: eb08cce3a8eb8aaad5a1056b367035f5140f20a1c9179022639ce469f9ebd222
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: 22db9027c8eb716b48563ca4dc912b166c7f83524984762ce2406b7d92b429e1
         checksum/config-session: ff0ea5c20b4bb63129f40ce2b041b42898a5a008bd8f239e4af323661a597b7d

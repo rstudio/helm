@@ -1,0 +1,23 @@
+suite: Probe defaults
+templates:
+  - deployment.yaml
+  - configmap.yaml
+  - secret-aws-creds.yaml
+  - secret-rstudio-pm-key.yaml
+tests:
+  - it: uses /__cluster-health__ for readiness by default
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /__cluster-health__
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+  - it: allows readiness to be set back to /__ping__
+    template: deployment.yaml
+    set:
+      readinessProbe.httpGet.path: /__ping__
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /__ping__

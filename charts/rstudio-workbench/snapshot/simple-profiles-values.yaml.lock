@@ -178,7 +178,7 @@ metadata:
 data:
   rstudio-library-templates-data.tpl: |
     {{- define "rstudio-library.templates.data" -}}
-    {"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"}],"volumes":[{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"}]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}
+    {"job":{"annotations":{},"labels":{}},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainerImagePullPolicy":"","initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"}],"volumes":[{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"}]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}
     {{- end }}
   job.tpl: |
     # Version: 2.5.0
@@ -337,6 +337,11 @@ data:
             {{- range . }}
             - name: {{ toYaml .name }}
               image: {{ toYaml .image }}
+              {{- if or (hasSuffix ":daily" .image) (hasSuffix ":latest" .image) }}
+              imagePullPolicy: Always
+              {{- else if $templateData.pod.initContainerImagePullPolicy }}
+              imagePullPolicy: {{- $templateData.pod.initContainerImagePullPolicy | nindent 12 }}
+              {{- end }}
               {{- $isShell := false }}
               {{- if .command }}
               command: ['/bin/sh']
@@ -753,7 +758,7 @@ data:
   
   notifications.conf: |
   repos.conf: |
-    CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+    CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest
   rsession.conf: |
   rstudio-prefs.json: |
     {}
@@ -975,10 +980,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 223d8ce84c5bf64f856ad795a08494590d93c7ce4c0c3eac3cbcaf8bc860eacf
+        checksum/config-general: 25415a4e41be887e7db7511d9e82ec2f27d5a5b2cbcd8b07edeccfac44ba354d
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
-        checksum/config-session: 9ef1204bdb98f009c987668c37a09197705ef115789725cd915ab808a67e2d6b
+        checksum/config-session: 096470466d459fe1294a2de277365e91426e2ab6d5aab0f134434f31928fe2ad
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8989"

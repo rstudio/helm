@@ -172,7 +172,7 @@ metadata:
 data:
   rstudio-library-templates-data.tpl: |
     {{- define "rstudio-library.templates.data" -}}
-    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"},"ttlSecondsAfterFinished":99},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"command":[],"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"env":[{"name":"SOME_ENV_VAR","value":"the-env-var-value"}],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{"three":"four"},"nodeSelector":{},"securityContext":{"runAsUser":999},"serviceAccountName":"test","suppressStdinAnnotation":false,"tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
+    {"job":{"annotations":{"seven":"eight"},"labels":{"nine":"ten"},"ttlSecondsAfterFinished":99},"pod":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.azure.com/scalesetpriority","operator":"In","values":["spot"]}]}]}}},"annotations":{"one":"two"},"command":[],"containerSecurityContext":{"privileged":false},"defaultSecurityContext":{"fsGroupChangePolicy":"Always","runAsGroup":999},"env":[{"name":"SOME_ENV_VAR","value":"the-env-var-value"}],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainerImagePullPolicy":"","initContainers":[],"labels":{"three":"four"},"nodeSelector":{},"securityContext":{"runAsUser":999},"serviceAccountName":"test","suppressStdinAnnotation":false,"tolerations":[{"effect":"NoSchedule","key":"kubernetes.azure.com/scalesetpriority","operator":"Equal","value":"spot"}],"volumeMounts":[{"mountPath":"/tmp/mnt","name":"test"},{"mountPath":"/mnt/session-configmap/rstudio","name":"session-config"},{"mountPath":"/mnt/session-secret/","name":"session-secret"}],"volumes":[{"emptyDir":{},"name":"test"},{"configMap":{"defaultMode":420,"name":"release-name-rstudio-workbench-session"},"name":"session-config"},{"name":"session-secret","secret":{"defaultMode":272,"secretName":"release-name-rstudio-workbench-session-secret"}}]},"service":{"annotations":{"five":"six"},"labels":{},"type":"ClusterIP"}}
     {{- end }}
   job.tpl: |
     # Version: 2.5.0
@@ -331,6 +331,11 @@ data:
             {{- range . }}
             - name: {{ toYaml .name }}
               image: {{ toYaml .image }}
+              {{- if or (hasSuffix ":daily" .image) (hasSuffix ":latest" .image) }}
+              imagePullPolicy: Always
+              {{- else if $templateData.pod.initContainerImagePullPolicy }}
+              imagePullPolicy: {{- $templateData.pod.initContainerImagePullPolicy | nindent 12 }}
+              {{- end }}
               {{- $isShell := false }}
               {{- if .command }}
               command: ['/bin/sh']
@@ -747,7 +752,7 @@ data:
   
   notifications.conf: |
   repos.conf: |
-    CRAN=https://packagemanager.posit.co/cran/__linux__/jammy/latest
+    CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest
   rsession.conf: |
   rstudio-prefs.json: |
     {}
@@ -946,10 +951,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: ef0619fef593b65f845bcf93541123b963ca601319f254eeba2ada4b4498c110
+        checksum/config-general: f6c452d958f12d6a226b6bf227b2b0847496a3f1bf0f2629ca0c23ccaeeb9a9b
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
-        checksum/config-session: 79c2d5c9f687d6a5c958b9c06d9c064081e50769f47b6ff6dcef4c79691baac2
+        checksum/config-session: 3a9e721b94876968fc17174cda1166304ecf5e8e7b7de98bec69af8cad21da2b
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8989"
