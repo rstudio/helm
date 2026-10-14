@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.6
+
+- Mount `config.pam` files in sorted order. Previously the order of the `rstudio-pam` volume mounts could change from one render to the next when more than one PAM file was configured, which changed the pod spec and could restart Workbench pods on a `helm upgrade` with no configuration change.
+
 ## 0.22.5
 
 - Update the default session `repos.conf` CRAN URL to use `noble` (Ubuntu 24.04) instead of `jammy` (Ubuntu 22.04). The domain already uses `packagemanager.posit.co`. This matches the Ubuntu 24.04 default used elsewhere in the charts and ensures CRAN binary packages resolve against a current distribution. The rendered default changes, but any user-supplied `config.session.repos.conf.CRAN` value is unaffected.
