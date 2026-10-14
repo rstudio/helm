@@ -149,12 +149,10 @@ data:
   
   
   launcher.kubernetes.profiles.conf: |
-  
     [*]
     allow-unknown-images=1
     container-images=posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
     default-container-image=posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
-  
   
   
   
@@ -951,10 +949,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: f6c452d958f12d6a226b6bf227b2b0847496a3f1bf0f2629ca0c23ccaeeb9a9b
+        checksum/config-general: 37bfe6fd30bfe9b08ad8659f3e274056bfc595aa777b45fe3f28e7ab8cd6d678
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
-        checksum/config-session: 3a9e721b94876968fc17174cda1166304ecf5e8e7b7de98bec69af8cad21da2b
+        checksum/config-session: 12f25ba5cc5194042292d4df6212ba8969f04f03bc7a89e88c5f2f70ae22d94d
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8989"
