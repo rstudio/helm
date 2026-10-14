@@ -51,3 +51,102 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "session.image.tagPrefix.*has been removed.*session.image.os"
+
+  # -- config file warnings
+  - it: should not warn about config files on a default install
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING: `.Values.config"
+
+  - it: should warn about each order-sensitive file written as a map
+    set:
+      config:
+        server:
+          profiles:
+            "*": {max-memory-mb: 1024}
+          launcher.kubernetes.resources.conf:
+            small: {cpus: 1}
+          launcher.local.profiles.conf:
+            "*": {max-cpus: 1}
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            "*": {max-cpus: 1}
+        session:
+          repos.conf:
+            Internal: https://pkgs.example.com
+          profiles:
+            "*": {max-memory-mb: 1024}
+    asserts:
+      - matchRegexRaw:
+          pattern: "WARNING: the following configuration files are written as maps"
+      - matchRegexRaw:
+          pattern: "- `.Values.config.server.profiles`"
+      - matchRegexRaw:
+          pattern: "- `.Values.config.server.launcher.kubernetes.resources.conf`"
+      - matchRegexRaw:
+          pattern: "- `.Values.config.server.launcher.local.profiles.conf`"
+      - matchRegexRaw:
+          pattern: "- `.Values.config.profiles.launcher.kubernetes.profiles.conf`"
+      - matchRegexRaw:
+          pattern: "- `.Values.config.session.repos.conf`"
+      - matchRegexRaw:
+          pattern: "- `.Values.config.session.profiles`"
+
+  - it: should not warn about order-sensitive files written as lists
+    set:
+      config:
+        server:
+          profiles:
+            - "*": {max-memory-mb: 1024}
+        session:
+          repos.conf:
+            - Internal: https://pkgs.example.com
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "written as maps"
+
+  - it: should warn about a repos.conf string without a CRAN line
+    set:
+      config:
+        session:
+          repos.conf: |
+            Internal=https://pkgs.example.com
+    asserts:
+      - matchRegexRaw:
+          pattern: "repos.conf` is a string with no `CRAN=` line"
+
+  - it: should not warn about a repos.conf string with a CRAN line
+    set:
+      config:
+        session:
+          repos.conf: |
+            CRAN=https://cran.example.com
+            Internal=https://pkgs.example.com
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "no `CRAN=` line"
+
+  - it: should not fail when config.profiles is null
+    set:
+      config:
+        profiles: null
+    asserts:
+      - matchRegexRaw:
+          pattern: "successfully deployed"
+
+  - it: should fail on job-json-overrides with useTemplates in a kubernetes profiles list
+    set:
+      launcher:
+        useTemplates: true
+      config:
+        profiles:
+          launcher.kubernetes.profiles.conf:
+            - "@gpu":
+                job-json-overrides:
+                  - name: gpu
+                    target: /spec/a
+                    json: {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "`profiles` has `job-json-overrides` defined"
+

@@ -147,13 +147,11 @@ data:
   
   
   launcher.kubernetes.profiles.conf: |
-  
     [*]
     allow-unknown-images=1
     container-images=some-image:tag,another-image:tag
     default-container-image=posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
     job-json-overrides="/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/defaultSessionVolume.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/defaultSessionVolumeMount.json","/spec/template/spec/volumes/-":"/mnt/job-json-overrides-new/volumes.json","/spec/template/spec/containers/0/volumeMounts/-":"/mnt/job-json-overrides-new/volumeMounts.json","/spec/template/spec/containers/0/command/0":"/mnt/job-json-overrides-new/entrypoint.json"
-  
   
   
   
@@ -593,10 +591,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 1c741163df4bd78cfd671899b1e1b8e19d3c447d4b820b1a2dea8b403c25b991
+        checksum/config-general: 153f6e66cdaa14e0a25bc855f6d982df04824feabfcf4bf218dd6ef530a0893f
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: 430b73ff69335b3048f037da394321b8a5f15f7e6415d51cbaab07cf99039fed
-        checksum/config-session: 096470466d459fe1294a2de277365e91426e2ab6d5aab0f134434f31928fe2ad
+        checksum/config-session: b0a8c6d16badaae34ad46f1b213c8def08aedd7dd96554657d5a9fd573dd0dd9
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8989"

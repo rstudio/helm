@@ -150,12 +150,10 @@ data:
   
   
   launcher.kubernetes.profiles.conf: |
-  
     [*]
     allow-unknown-images=1
     container-images=posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
     default-container-image=posit/workbench-session:R4.5.2-python3.14.3-ubuntu-24.04
-  
   
   
   launcher-env: |
@@ -170,6 +168,13 @@ data:
       TESTA=A
       TESTB=B
     JobType: adhoc
+  
+  r-versions: |
+    Label: test
+    Path: /opt/R/3.6.3
+  
+    Label: other
+    Path: /opt/R/4.0.2
   
   
   
@@ -801,13 +806,6 @@ metadata:
 data:
   
   notifications.conf: |
-  r-versions: |
-    Label=test
-    Path=/opt/R/3.6.3
-  
-    Label=other
-    Path=/opt/R/4.0.2
-  
   repos.conf: |
     CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest
     RSPM=https://packagemanager.posit.co/cran/__linux__/noble/latest
@@ -1062,10 +1060,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-general: 4271418405c1ff3cff80e7137048b5ae700f1c3decd79f6f30b2f0af1434b6ff
+        checksum/config-general: 8c555a24263322066a05b0978af989caf01587a8d79dcd87f2534f6724422b8b
         checksum/config-prestart: a2f535e18c880759298215f28ad76bb94f5a146ba5d082ddd81c05ebb62c12bb
         checksum/config-secret: ad52e25359a651886a989483098b1d6a177e1a5871803e5992bdd591dd82ebc4
-        checksum/config-session: 48310335f89476a8c073c0672cbb57125bf9b9ff53be27c6e3f336f8d3cee0ef
+        checksum/config-session: b568ec829135e1ba84623a3c5a1b0c27096fc3a11be4ec0b0ef5326bd874cf29
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8989"
