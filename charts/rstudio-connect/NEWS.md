@@ -3,6 +3,7 @@
 ## 0.21.4
 
 - Bump Connect version to 2026.10.0
+- Bump the default Connect Python version from 3.14.7 to 3.14.8
 
 ## 0.21.3
 
