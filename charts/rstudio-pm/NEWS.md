@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.7
+
+- Bump Package Manager version to 2026.10.0
+
 ## 0.20.6
 
 - Change the default readiness probe path from `/__ping__` to `/__cluster-health__`, because `/__ping__` now
