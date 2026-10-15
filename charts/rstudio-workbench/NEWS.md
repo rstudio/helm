@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.7
+
+- Bump Workbench version to 2026.10.0
+
 ## 0.22.6
 
 - Mount `config.pam` files in sorted order. Previously the order of the `rstudio-pam` volume mounts could change from one render to the next when more than one PAM file was configured, which changed the pod spec and could restart Workbench pods on a `helm upgrade` with no configuration change.
