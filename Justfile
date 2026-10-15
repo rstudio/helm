@@ -1,5 +1,7 @@
 DIFF := "diff"
 HELM_DOCS_VERSION := env_var_or_default("HELM_DOCS_VERSION", "1.13.1")
+# The Helm version CI pins. The snapshot baselines are only reproducible with it.
+HELM_VERSION := `sed -n 's/^  HELM_VERSION: *//p' .github/workflows/chart-test.yaml`
 OS := if os() == "macos" {"Darwin"} else if os() == "linux" {"Linux"} else if os() == "windows" {"Windows"} else {""}
 ARCH := if arch() == "aarch64" {"arm64"} else if arch() == "x86_64" {"x86_64"} else {""}
 
@@ -47,6 +49,28 @@ lint:
   #!/bin/bash
   ct lint ./charts --target-branch main
 
+# `ct lint` only reads each chart's `ci/` directory, so the lint-only values
+# files in `lint/` are linted here, through each chart's `make lint`.
+lint-values:
+  #!/bin/bash
+  failed=0
+  for chart in charts/*/; do
+    [[ -d "${chart}lint" ]] || continue
+    # Without a Makefile, `make lint` sees the lint/ directory as an
+    # up-to-date target and silently does nothing.
+    if [[ ! -f "${chart}Makefile" ]]; then
+      echo "WARNING: ${chart}lint/ is not linted: ${chart} has no Makefile" >&2
+      continue
+    fi
+    echo "==> $chart"
+    helm dependency build "$chart" > /dev/null
+    if ! make -C "$chart" lint; then
+      echo "ERROR: make lint failed for $chart" >&2
+      failed=1
+    fi
+  done
+  exit $failed
+
 snapshot-rsw:
   #!/bin/bash
   set -e
@@ -62,6 +86,18 @@ snapshot-rsw:
   pin=(--set global.secureCookieKey.value=abc --set launcherPem.value=abc)
   outdir=charts/rstudio-workbench/snapshot
   failed=0
+
+  # Helm's exact output (blank lines, document separators, null handling)
+  # varies between versions, so baselines rendered with any other version
+  # will not match in CI.
+  have=$(helm version --short)
+  have=${have%%+*}
+  if [[ "$have" != "{{ HELM_VERSION }}" ]]; then
+    echo "WARNING: rendering with Helm $have, but CI uses {{ HELM_VERSION }}." >&2
+    echo "         Snapshots locked with this version may not match in CI." >&2
+  fi
+
+  helm dependency build ./charts/rstudio-workbench > /dev/null
 
   render() {
     local out="$1"; shift
