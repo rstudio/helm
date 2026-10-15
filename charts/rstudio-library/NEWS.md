@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.38
+
+- `rstudio-library.config.ini` accepts a file written as a list of single-key maps, and renders it
+  in the order written. Each entry renders as the same key would in a map: a map value is a
+  `[section]`, any other value is a `key=value` line. Names may repeat. Malformed entries (more
+  than one key, empty, no value, not a map) fail with a message that shows the fix.
+- `rstudio-library.config.ini` writes a list of plain values inside a section comma-separated
+  (`key=a,b`) instead of Go's `[a b]`. At the top level of a file, a list of plain values still
+  repeats the key, and a list of maps still repeats the section.
+- `rstudio-library.config.ini` fails on values ini can't represent instead of rendering them as
+  Go syntax: a map as an option inside a section, a list holding maps or lists inside a section,
+  and a top-level list that mixes maps, lists and plain values.
+- Add `rstudio-library.config.ini.file`, which renders a single ini file.
+- The profiles helpers (`profiles.ini`, `profiles.ini.singleFile`, `profiles.ini.advanced`,
+  `profiles.apply-everyone-and-default-to-others`, `profiles.json-from-overrides-config`) render
+  through `rstudio-library.config.ini.file`, so they accept the list form and follow the same
+  rules. Rendered content is unchanged apart from blank lines.
+- In the profiles helpers, `[*]` must be a single section: it fails if it appears more than once
+  in a list, or if it is a list. When the chart's default `job-json-overrides` need a `[*]` and a
+  list has none, it is added at the top.
+
 ## 0.1.37
 
 - **DEPRECATED**: Chronicle agent helpers are deprecated.
