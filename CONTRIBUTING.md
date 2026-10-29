@@ -40,11 +40,15 @@ We'll try to be as responsive as possible in reviewing and accepting pull reques
 
 ## Testing
 
+CI pins a single Helm version for every job (`HELM_VERSION` in
+`.github/workflows/chart-test.yaml`). Use that version locally where you can.
+The snapshot baselines only reproduce with it exactly.
+
 Running the [helm chart unit tests](https://github.com/helm-unittest/helm-unittest):
 
 ```
-# install the unittest plugin
-helm plugin install https://github.com/helm-unittest/helm-unittest.git
+# install the unittest plugin (Helm 4 requires --verify=false for git installs)
+helm plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false
 
 # unit tests are defined in `charts/$CHART_NAME/tests`
 
@@ -54,6 +58,23 @@ just test
 # run unit tests for a single chart
 just test rstudio-connect
 ```
+
+Linting the `lint/` values files and checking the Workbench snapshots:
+
+```
+# lint every chart's lint/ values files (the scenarios ct doesn't install)
+just lint-values
+
+# render the Workbench snapshots and compare them to the committed baselines
+just snapshot-rsw && just snapshot-rsw-diff
+
+# if the change is intended, accept the new output as the baselines
+just snapshot-rsw-lock
+```
+
+When `check-snapshots` fails in CI, it uploads its rendered snapshots as a
+`workbench-snapshots` artifact. If the change is intended, commit those as the
+new `.yaml.lock` files.
 
 ## Templates
 
