@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.9
+
+- Fix continuation indentation for `workingDir` in the launcher Job template so long working-directory paths containing spaces produce valid YAML without changing the path. ([#969](https://github.com/rstudio/helm/issues/969))
+
 ## 0.22.8
 
 - Bump Workbench version to 2026.10.1

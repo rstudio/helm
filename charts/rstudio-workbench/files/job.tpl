@@ -231,7 +231,7 @@ spec:
           {{- end }}
           stdinOnce: true
           {{- if .Job.workingDirectory }}
-          workingDir: {{ toYaml .Job.workingDirectory }}
+          workingDir: {{ toYaml .Job.workingDirectory | indent 12 | trimPrefix (repeat 12 " ") }}
           {{- end }}
           {{- if or (ne (len .Job.args) 0) $isShell }}
           args:
