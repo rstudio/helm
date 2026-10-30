@@ -1,0 +1,24 @@
+# An existing password Secret, and custom ports, storage, and resources.
+service:
+  port: 14317
+clickhouse:
+  auth:
+    existingSecret: telemetry-clickhouse
+    existingSecretKey: password
+  service:
+    port: 19000
+  persistence:
+    storageClass: gp3
+    size: 100Gi
+  resources:
+    requests:
+      cpu: "1"
+      memory: 4Gi
+    limits:
+      memory: 8Gi
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 1Gi

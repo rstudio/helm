@@ -1,0 +1,83 @@
+suite: Clickhouse tests
+templates:
+  - clickhouse-statefulset.yaml
+  - clickhouse-configmap.yaml
+  - clickhouse-service.yaml
+  - secret.yaml
+release:
+  name: test-release
+  namespace: test-namespace
+tests:
+  - it: should pin the Clickhouse image
+    template: clickhouse-statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: clickhouse/clickhouse-server:26.8.34.13
+  - it: should keep Clickhouse's data on a volume of the requested class and size
+    template: clickhouse-statefulset.yaml
+    set:
+      clickhouse.persistence.storageClass: gp3
+      clickhouse.persistence.size: 50Gi
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: gp3
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
+          value: 50Gi
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: data
+            mountPath: /var/lib/clickhouse
+  - it: should use the cluster's default storage class by default
+    template: clickhouse-statefulset.yaml
+    asserts:
+      - notExists:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+  - it: should give Clickhouse the server's password
+    template: clickhouse-statefulset.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: CLICKHOUSE_TELEMETRY_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: test-release-posit-telemetry-clickhouse
+                key: password
+  - it: should read the password from the environment, never the ConfigMap
+    template: clickhouse-configmap.yaml
+    asserts:
+      - matchRegex:
+          path: data["users.xml"]
+          pattern: <password from_env="CLICKHOUSE_TELEMETRY_PASSWORD"/>
+      - matchRegex:
+          path: data["users.xml"]
+          pattern: <default remove="remove"/>
+  - it: should expose Clickhouse's native port on the configured port
+    template: clickhouse-service.yaml
+    set:
+      clickhouse.service.port: 9440
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 9440
+      - equal:
+          path: spec.ports[0].targetPort
+          value: native
+  - it: should generate a password
+    template: secret.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: data.password
+  - it: should not generate a password when given an existing Secret
+    template: secret.yaml
+    set:
+      clickhouse.auth.existingSecret: my-secret
+    asserts:
+      - hasDocuments:
+          count: 0

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "posit-telemetry.fullname" . }}
+  labels:
+    {{- include "posit-telemetry.labels" . | nindent 4 }}
+    {{- include "posit-telemetry.selectorLabels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "posit-telemetry.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: otlp-grpc
+      port: {{ .Values.service.port }}
+      targetPort: otlp-grpc
+      protocol: TCP
+      appProtocol: grpc
