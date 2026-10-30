@@ -1,0 +1,54 @@
+{{ template "rstudio.header" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "rstudio.description" . }}
+
+{{ template "rstudio.disclaimer" . }}
+
+{{ template "rstudio.install" . }}
+
+## Usage
+
+This chart deploys the telemetry server, which receives Opentelemetry data from the agents that run in Posit product
+pods and stores it in Clickhouse. Clickhouse runs beside it as a StatefulSet, from Clickhouse's own image.
+
+Agents send OTLP gRPC to the server's Service, `<release>-posit-telemetry.<namespace>.svc:4317`.
+
+The server creates its Clickhouse database and runs the schema migrations each time it starts, before it accepts
+data, so the chart runs exactly one server and replaces it rather than rolling it on upgrade. The agents retry while
+it restarts.
+
+## Clickhouse
+
+The chart pins `clickhouse.image.tag` to the Clickhouse LTS release the server is tested with.
+
+Clickhouse keeps its data on a PersistentVolumeClaim, `data-<release>-posit-telemetry-clickhouse-0`, which Kubernetes
+keeps when the release is uninstalled. Delete it to remove the data. Use block storage (for example `gp3` on EKS) rather
+than a network filesystem such as NFS or EFS:
+
+```yaml
+clickhouse:
+  persistence:
+    storageClass: gp3
+    size: 100Gi
+```
+
+Clickhouse limits its own memory use to 90% of `clickhouse.resources.limits.memory`.
+
+### Password
+
+The chart generates a password for the server's Clickhouse user on install and reuses it on upgrade. Tools that render
+the chart without a cluster, such as `helm template` or Argo CD, generate a new one each time, so with them create a
+Secret yourself and set `clickhouse.auth.existingSecret`:
+
+```yaml
+clickhouse:
+  auth:
+    existingSecret: telemetry-clickhouse
+    existingSecretKey: password
+```
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

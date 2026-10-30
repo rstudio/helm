@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "posit-telemetry.fullname" . }}
+  labels:
+    {{- include "posit-telemetry.labels" . | nindent 4 }}
+    {{- include "posit-telemetry.selectorLabels" . | nindent 4 }}
+spec:
+  # the server runs the schema migrations when it starts, which assumes it's the only one, even during an upgrade
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "posit-telemetry.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "posit-telemetry.labels" . | nindent 8 }}
+        {{- include "posit-telemetry.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: telemetry-server
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: TELEMETRY_SERVER_CLICKHOUSE_ENDPOINT
+              value: "clickhouse://{{ include "posit-telemetry.clickhouse.fullname" . }}:{{ .Values.clickhouse.service.port }}"
+            - name: TELEMETRY_SERVER_CLICKHOUSE_USERNAME
+              value: telemetry
+            - name: TELEMETRY_SERVER_CLICKHOUSE_DATABASE
+              value: telemetry
+            - name: TELEMETRY_SERVER_CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "posit-telemetry.clickhouse.secretName" . }}
+                  key: {{ include "posit-telemetry.clickhouse.secretKey" . }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: otlp-grpc
+              containerPort: 4317
+              protocol: TCP
+          # the OTLP port opens once the server has reached Clickhouse and run the migrations
+          startupProbe:
+            tcpSocket:
+              port: otlp-grpc
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: otlp-grpc
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            # the server's RuntimeDir, for the collector config it generates
+            - name: runtime
+              mountPath: /run/telemetry-server
+      volumes:
+        - name: runtime
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

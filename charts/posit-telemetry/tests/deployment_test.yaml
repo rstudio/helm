@@ -1,0 +1,64 @@
+suite: Telemetry server tests
+templates:
+  - deployment.yaml
+chart:
+  version: 9.9.9+test
+  appVersion: 9.9.9
+release:
+  name: test-release
+  namespace: test-namespace
+tests:
+  - it: should run one server, replaced rather than rolled
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.strategy.type
+          value: Recreate
+  - it: should default the image tag to the appVersion
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/posit-dev/telemetry-server:9.9.9
+  - it: should connect to the release's Clickhouse with the generated password
+    set:
+      clickhouse.service.port: 9440
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TELEMETRY_SERVER_CLICKHOUSE_ENDPOINT
+            value: clickhouse://test-release-posit-telemetry-clickhouse:9440
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TELEMETRY_SERVER_CLICKHOUSE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: test-release-posit-telemetry-clickhouse
+                key: password
+  - it: should use an existing password Secret
+    set:
+      clickhouse.auth.existingSecret: my-secret
+      clickhouse.auth.existingSecretKey: my-key
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TELEMETRY_SERVER_CLICKHOUSE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+  - it: should append additional environment variables
+    set:
+      env:
+        - name: TELEMETRY_SERVER_LOGGING_LEVEL
+          value: DEBUG
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TELEMETRY_SERVER_LOGGING_LEVEL
+            value: DEBUG
