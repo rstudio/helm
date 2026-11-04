@@ -295,6 +295,12 @@ config:
 These files still accept a map, which renders sorted by name, but the chart prints a warning after install. Any other
 `.ini` file written as a list fails with an error that shows how to write it as a map.
 
+Helm merges maps from several values files (`-f base.yaml -f prod.yaml`) key by key, but a list
+replaces the earlier value as a whole. So once one of these files is a list, a later values file
+can't change just one section: it has to repeat the whole file. Keep each order-sensitive file in
+one values file, or write it as a map if you rely on overriding single sections, as long as the
+sorted order gives the result you want.
+
 - Session Configuration
   - These configuration files are mounted into the server and
     are mounted into the session pods.
