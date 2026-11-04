@@ -298,10 +298,10 @@ These files still accept a map, which renders sorted by name, but the chart prin
 - Session Configuration
   - These configuration files are mounted into the server and
     are mounted into the session pods.
-  - `repos.conf`, `rsession.conf`, `notifications.conf`, `rstudio-prefs.json`
+  - `repos.conf`, `rsession.conf`, `notifications.conf`, `r-versions`, `rstudio-prefs.json`
   - Located in: <br>`config.session.<< name of file >>` Helm values
-  - Rendered as `.ini` files. Write files in other formats, such as `notifications.conf` (DCF) and
-    `rstudio-prefs.json`, as strings.
+  - Rendered as `.ini` files. Write files in other formats, such as `notifications.conf` (DCF),
+    `r-versions` (DCF) and `rstudio-prefs.json`, as strings.
   - Mounted at:<br> `/mnt/session-configmap/rstudio/`
 - Session Secret Configuration:
   - These configuration files are mounted into the server and session pods.
@@ -320,7 +320,7 @@ These files still accept a map, which renders sorted by name, but the chart prin
   - Mounted at:<br> `/mnt/configmap/rstudio/`
 - Server DCF Configuration:
   - These configuration files are mounted into the server (.dcf file format).
-  - `launcher-mounts`, `launcher-env`, `r-versions`
+  - `launcher-mounts`, `launcher-env`
   - Located at:<br> `config.serverDcf.<< name of file >>` Helm values
   - Included at:<br> `/mnt/configmap/rstudio/`
 - Profiles Configuration:
@@ -393,18 +393,22 @@ For more information about configuring CRAN repositories in Workbench, see the [
 
 #### R versions
 
-Extra R installations can be listed in `r-versions`. Only the Workbench server reads this file, so it goes in
-`config.serverDcf`, as a list of records:
+Extra R installations can be listed in `r-versions`. Both the Workbench server and the sessions read this file: a
+Kubernetes session rescans its own container for R, and finds `r-versions` through `XDG_CONFIG_DIRS`, where only
+`/mnt/session-configmap` is mounted. So it goes in `config.session`. It isn't an `.ini` file, so write it as a string:
 
 ```yaml
 config:
-  serverDcf:
-    r-versions:
-      - Path: /opt/R/4.4.1
-        Label: Latest
-      - Path: /opt/R/4.0.2
-        Label: Old
+  session:
+    r-versions: |
+      Path: /opt/R/4.4.1
+      Label: Latest
+
+      Path: /opt/R/4.0.2
+      Label: Old
 ```
+
+Every R path listed must exist in both the Workbench image and the session images.
 
 #### Admin notifications
 

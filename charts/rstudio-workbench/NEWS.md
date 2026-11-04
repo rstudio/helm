@@ -34,8 +34,8 @@
   `launcher.useTemplates=false`) are added at the top.
 - Files in `config.server` and `config.session` that aren't `.ini` (`r-versions`, `notifications.conf`
   and `*.json`) must now be written as strings. A map or a list rendered them as `.ini`, which
-  Workbench can't read, so it now fails with what to do instead. `r-versions` can also go in
-  `config.serverDcf`, which renders DCF records from a list. `notifications.conf` belongs in
+  Workbench can't read, so it now fails with what to do instead. `r-versions` belongs in
+  `config.session`, because Kubernetes sessions read it too. `notifications.conf` belongs in
   `config.session`, because sessions read it; in `config.server` it now fails.
 - Fixed NOTES failing when `config.profiles` is `null`.
 - Fixed the README's `config.profiles` example, which claimed that `[*]` arrays are appended into

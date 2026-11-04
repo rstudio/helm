@@ -758,7 +758,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   stringOk: true
   message: >-
     r-versions is a DCF file, not an .ini file. Write the whole file as a string
-    (r-versions: |), or move it to config.serverDcf as a list of records.
+    (r-versions: |) in config.session, where both the server and sessions read it.
 - scopes: [server, session]
   pattern: '\.json$'
   stringOk: true
