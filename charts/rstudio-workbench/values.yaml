@@ -584,8 +584,10 @@ config:
 
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
-    repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
+    # repos.conf: the chart renders `CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest`
+    # by default. To add repositories, set it to a list of single-key maps, which keeps their order
+    # (e.g. `- Internal: https://...`); the default CRAN is added unless you set your own. Set it to
+    # null to omit the file.
     rsession.conf: {}
     notifications.conf: {}
     rstudio-prefs.json: |
@@ -636,9 +638,9 @@ config:
         authorization-enabled: 1
         thread-pool-size: 4
         enable-debug-logging: 0
-      cluster:
-        name: Kubernetes
-        type: Kubernetes
+      # cluster: the chart renders a `[cluster]` section with `name=Kubernetes` and
+      # `type=Kubernetes` by default. Set it to a map to change it, to a list of maps for several
+      # `[cluster]` sections, or to null to omit it.
     jupyter.conf:
       jupyter-exe: /usr/local/bin/jupyter
       labs-enabled: 1

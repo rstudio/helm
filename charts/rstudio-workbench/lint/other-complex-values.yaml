@@ -88,11 +88,6 @@ config:
       CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
     rsession.conf: {}
     notifications.conf: {}
-    r-versions:
-      - Label: test
-        Path: /opt/R/3.6.3
-      - Label: other
-        Path: /opt/R/4.0.2
   secret:
     "database.conf": {}
   server:
@@ -125,6 +120,11 @@ config:
       default-session-cluster: Kubernetes
     logging.conf: {}
   serverDcf:
+    r-versions:
+      - Label: test
+        Path: /opt/R/3.6.3
+      - Label: other
+        Path: /opt/R/4.0.2
     launcher-mounts:
       - MountType: KubernetesPersistentVolumeClaim
         MountPath: /home

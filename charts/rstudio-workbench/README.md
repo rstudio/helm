@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.22.6](https://img.shields.io/badge/Version-0.22.6-informational?style=flat-square) ![AppVersion: 2026.09.0](https://img.shields.io/badge/AppVersion-2026.09.0-informational?style=flat-square)
+![Version: 0.23.0](https://img.shields.io/badge/Version-0.23.0-informational?style=flat-square) ![AppVersion: 2026.09.0](https://img.shields.io/badge/AppVersion-2026.09.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -24,11 +24,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.22.6:
+To install the chart with the release name `my-release` at version 0.23.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.22.6
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.23.0
 ```
 
 To explore other chart versions, look at:
@@ -267,11 +267,118 @@ The names of files are dynamically used, so you can add new files as needed. Bew
 so moving them can have adverse effects. Also, if you use a different mounting paradigm, you need to change
 the `XDG_CONFIG_DIRS` environment variable.
 
+### How values become `.ini` files
+
+The recommended form depends on the file:
+
+| File | Write it as | Why |
+|---|---|---|
+| `profiles`, `launcher.*.profiles.conf` | a list | when several sections match a user, their order can decide which one applies |
+| `launcher.*.resources.conf` | a list | resource profiles are listed in order, and the first is pre-selected |
+| `repos.conf` | a list | the order of the entries is the order of R's repositories |
+| Any other `.ini` file (`rserver.conf`, `launcher.conf`, `rsession.conf`, …) | a map | order doesn't matter, so the chart sorts it |
+| Files that aren't `.ini` (`r-versions`, `notifications.conf`, `*.json`) | a string | the chart can only render `.ini` from a map or list |
+
+In `config.server`, `config.session` and `config.profiles`, only the order-sensitive files in the first three rows can
+be written as a list as a whole; any other file written as a list fails with an error. A string works for any file,
+and is used as-is.
+
+**A map** renders sections and options sorted by name:
+
+```yaml
+rsession.conf:
+  session-timeout-minutes: 60
+  session-save-action-default: "no"
+```
+
+**A list** of single-key maps renders its entries in the order written; each one renders exactly as it would in a map:
+
+```yaml
+profiles:
+  - "*":
+      session-limit: 2
+  - "@analysts":
+      session-limit: 5
+```
+
+**A string** is used as the whole file, as-is. It's useful for pasting an existing file:
+
+```yaml
+profiles: |
+  [*]
+  session-limit=2
+
+  [@analysts]
+  session-limit=5
+```
+
+In a map, an entry whose value is a map is a `[section]`; any other value is a `key=value` line. Options within a
+section are always sorted.
+
+A list as a value is written according to where it appears:
+
+| Where | List of plain values | List of maps |
+|---|---|---|
+| Top level of a file | the key is repeated, once per value | the section is repeated, once per map |
+| Inside a section | comma-separated: `key=a,b` | not allowed |
+
+For example, a top-level list repeats `www-allow-origin` in `rserver.conf`, which is how Workbench reads options that
+take several values, and a list of maps gives `launcher.conf` one `[cluster]` section per cluster:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      www-allow-origin:
+        - one.example.com
+        - two.example.com
+    launcher.conf:
+      cluster:
+        - name: Kubernetes
+          type: Kubernetes
+        - name: Local
+          type: Local
+```
+
+```ini
+# rserver.conf
+www-allow-origin=one.example.com
+www-allow-origin=two.example.com
+
+# launcher.conf
+[cluster]
+name=Kubernetes
+type=Kubernetes
+
+[cluster]
+name=Local
+type=Local
+
+[server]
+...
+```
+
+The `Local` cluster here only shows how sections repeat. On Kubernetes we discourage the Local launcher: it runs
+sessions inside the Workbench pod, where they compete with Workbench for CPU and memory.
+
+#### Order-sensitive files
+
+The order-sensitive files (`profiles`, `launcher.*.profiles.conf`, `launcher.*.resources.conf` and `repos.conf`) still
+accept a map, which renders sorted by name, but the chart prints a warning after install.
+
+Helm merges maps from several values files (`-f base.yaml -f prod.yaml`) key by key, but a list
+replaces the earlier value as a whole. So once one of these files is a list, a later values file
+can't change just one section: it has to repeat the whole file. Keep each order-sensitive file in
+one values file, or write it as a map if you rely on overriding single sections, as long as the
+sorted order gives the result you want.
+
 - Session Configuration
   - These configuration files are mounted into the server and
     are mounted into the session pods.
-  - `repos.conf`, `rsession.conf`, `notifications.conf`
+  - `repos.conf`, `rsession.conf`, `notifications.conf`, `r-versions`, `rstudio-prefs.json`
   - Located in: <br>`config.session.<< name of file >>` Helm values
+  - Rendered as `.ini` files. Write files in other formats, such as `notifications.conf` (DCF),
+    `r-versions` (DCF) and `rstudio-prefs.json`, as strings.
   - Mounted at:<br> `/mnt/session-configmap/rstudio/`
 - Session Secret Configuration:
   - These configuration files are mounted into the server and session pods.
@@ -340,16 +447,62 @@ pip can be configured with `config.session.pip.conf`:
 
 #### R repositories
 
-R package repositories can be configured with `config.session.repos.conf`:
+R package repositories can be configured with `config.session.repos.conf`. Write it as a list to control the order
+of the repositories:
 
 ```yaml
 config:
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
+      - CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
+      - Internal: https://packages.example.com/internal
 ```
 
+Workbench ignores a `repos.conf` without a `CRAN` entry, so the chart always provides one:
+
+- If `repos.conf` isn't set, the file contains just
+  `CRAN=https://packagemanager.posit.co/cran/__linux__/noble/latest`.
+- If `repos.conf` is a list or a map without a `CRAN` entry, that default is added (at the top of a list).
+- A string is used as the whole file, as-is.
+- Set `repos.conf: null` to omit the file.
+
 For more information about configuring CRAN repositories in Workbench, see the [Posit Workbench Administrator Guide's - Package Installation > CRAN repositories](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories) section.
+
+#### R versions
+
+Extra R installations can be listed in `r-versions`. Both the Workbench server and the sessions read this file: a
+Kubernetes session rescans its own container for R, and finds `r-versions` through `XDG_CONFIG_DIRS`, where only
+`/mnt/session-configmap` is mounted. So it goes in `config.session`. It isn't an `.ini` file, so write it as a string:
+
+```yaml
+config:
+  session:
+    r-versions: |
+      Path: /opt/R/4.4.1
+      Label: Latest
+
+      Path: /opt/R/4.0.2
+      Label: Old
+```
+
+Every R path listed must exist in both the Workbench image and the session images.
+
+#### Admin notifications
+
+`notifications.conf` is read by sessions, so it stays in `config.session`, but it isn't an `.ini` file. Write it as a
+string:
+
+```yaml
+config:
+  session:
+    notifications.conf: |
+      StartTime: 2026-06-01 10:30:00 -05:00
+      EndTime: 2026-06-05
+      Message: Workbench will be down for maintenance on June 5.
+
+      EndTime: 2026-07-05
+      Message: Each notification is separated by one blank line.
+```
 
 ## User provisioning
 
@@ -414,15 +567,26 @@ The product reads configuration from top to bottom and "last-in-wins" for a give
 
 The `/etc/rstudio/profiles` file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the [Posit Workbench Administrator Guide - User and Group Profiles](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html) page for more information.
 
-In the `values.yaml`, define the content of `/etc/rstudio/profiles` in `config.server.profiles`. For example:
+On Kubernetes, use this file for options such as `session-limit`, `session-timeout-minutes`, `r-version` and
+`session-env`. Set CPU and memory limits in
+[`launcher.kubernetes.profiles.conf`](#etcrstudiolauncherkubernetesprofilesconf) instead, so Kubernetes applies them
+to the session pod.
+
+In the `values.yaml`, define the content of `/etc/rstudio/profiles` in `config.server.profiles`. When several sections
+match a user, their order can decide which one applies, so write it as a list to keep the order you wrote. For
+example:
 
 ```yaml
 config:
   server:
     profiles:
-      "*":
-        session-limit: 5
-        session-timeout-minutes: 60
+      - "*":
+          session-limit: 2
+          session-timeout-minutes: 60
+      - "@analysts":
+          session-limit: 5
+      - "12345":
+          session-limit: 1
 ```
 
 Becomes:
@@ -431,23 +595,29 @@ _/etc/rstudio/profiles_
 
 ```ini
 [*]
-session-limit=5
+session-limit=2
 session-timeout-minutes=60
+
+[@analysts]
+session-limit=5
+
+[12345]
+session-limit=1
 ```
 
 ### `/etc/rstudio/launcher.kubernetes.profiles.conf`
 
-The `/etc/rstudio/launcher.kubernetes.profiles.conf` contains the configuration of resource limits by user and group when using the Kubernetes Launcher Plugin. In the `values.yaml`, define the content of `/etc/rstudio/launcher.kubernetes.profiles.conf	` in the `config.profiles.launcher.kubernetes.profiles.conf` file. The `config.profiles` section has a couple of niceties that are added in by default.
+The `/etc/rstudio/launcher.kubernetes.profiles.conf` contains the configuration of resource limits by user and group when using the Kubernetes Launcher Plugin. In the `values.yaml`, define the content of `/etc/rstudio/launcher.kubernetes.profiles.conf` in `config.profiles.launcher.kubernetes.profiles.conf`. Like `/etc/rstudio/profiles`, write it as a list so the sections keep their order.
 
-- YAML arrays like the following becomes "comma-joined." For instance, the following becomes: `some-key=value1,value2`
+The chart adds to the `[*]` section:
 
-  ```yaml
-  some-key:
-    - value1
-    - value2
-  ```
+- The session image settings (`default-container-image`, `container-images`, `allow-unknown-images`). Your own values
+  for these win.
+- When `launcher.useTemplates=false`, the chart's default `job-json-overrides`. The `job-json-overrides` of `[*]` are
+  also added in front of the `job-json-overrides` of every other section that has its own.
 
-- The `[*]` section has arrays "appended" to user and group sections, along with "defaults" defined by the chart.
+If your list has a `[*]` entry, these are merged into it; otherwise a `[*]` section is added at the top. Because the
+chart reads and changes `[*]`, it may appear only once in a `config.profiles` file.
 
 For example:
 
@@ -455,14 +625,13 @@ For example:
 config:
   profiles:
     launcher.kubernetes.profiles.conf:
-      "*":
-        some-key:
-          - value1
-          - value2
-      myuser:
-        some-key:
-          - value4
-          - value5
+      - "*":
+          max-cpus: 2
+      - "@gpu-users":
+          container-images:
+            - gpu-image:1
+            - gpu-image:2
+          max-cpus: 8
 ```
 
 Becomes:
@@ -471,14 +640,18 @@ _/etc/rstudio/launcher.kubernetes.profiles.conf_
 
 ```ini
 [*]
-some-key: value1,value2
-[myuser]
-some-key: value1,value2,value3,value4
+allow-unknown-images=1
+container-images=<session image>
+default-container-image=<session image>
+max-cpus=2
+
+[@gpu-users]
+container-images=gpu-image:1,gpu-image:2
+max-cpus=8
 ```
 
-:::{.callout-note}
-This appending/concatenation/array translation behavior only works with the helm chart.
-:::
+Only `job-json-overrides` are carried from `[*]` into other sections; other options are not. Workbench itself applies
+`[*]` to every user.
 
 ## Launcher Templates
 
@@ -768,7 +941,7 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | config.secret | string | `nil` | a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
 | config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
-| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/noble/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
+| config.session | object | `{"notifications.conf":{},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
 | config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
 | config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |
