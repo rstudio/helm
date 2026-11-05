@@ -1,0 +1,29 @@
+suite: Workbench Launcher RBAC
+templates:
+  - rbac.yaml
+tests:
+  - it: should let the Launcher manage ConfigMaps in its namespace
+    documentIndex: 1
+    asserts:
+      - isKind:
+          of: Role
+      - contains:
+          path: rules
+          content:
+            apiGroups:
+              - ""
+            resources:
+              - "configmaps"
+            verbs:
+              - "create"
+              - "get"
+              - "list"
+              - "patch"
+              - "delete"
+  - it: should not render a ConfigMaps rule when rbac is not created
+    set:
+      rbac:
+        create: false
+    asserts:
+      - hasDocuments:
+          count: 0

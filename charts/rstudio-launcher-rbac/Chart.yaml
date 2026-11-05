@@ -2,7 +2,7 @@ apiVersion: v2
 name: rstudio-launcher-rbac
 description: RBAC definition for the RStudio Job Launcher
 type: application
-version: 0.2.26
+version: 0.2.27
 appVersion: 0.2.21
 icon: https://raw.githubusercontent.com/rstudio/helm/main/images/posit-icon-fullcolor.svg
 sources:
@@ -13,7 +13,7 @@ maintainers:
     url: https://github.com/sol-eng
 dependencies:
   - name: rstudio-library
-    version: 0.1.31
+    version: 0.1.38
     repository: https://helm.rstudio.com
 keywords:
   - "data science"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.27
+
+- Add a namespaced `configmaps` rule (`create`, `get`, `list`, `patch`, `delete`) to the Role, from `rstudio-library` 0.1.38. The Job Launcher Kubernetes plugin uses it to mount inline files into session pods from a per-job ConfigMap.
+
 ## 0.2.26
 
 - Update Chart.lock
