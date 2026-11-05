@@ -269,12 +269,51 @@ the `XDG_CONFIG_DIRS` environment variable.
 
 ### How values become `.ini` files
 
-An `.ini` file can be written as a string (used as the whole file), as a map, or as a list:
+The recommended form depends on the file:
 
-- **A map** renders its entries sorted by name. An entry whose value is a map is a `[section]`; any other value is a
-  `key=value` line. Options within a section are always sorted.
-- **A list** of single-key maps renders its entries in the order written. Each entry renders exactly as it would in a
-  map. Only [order-sensitive files](#order-sensitive-files) accept a list.
+| File | Write it as | Why |
+|---|---|---|
+| `profiles`, `launcher.*.profiles.conf` | a list | when several sections match a user, their order can decide which one applies |
+| `launcher.*.resources.conf` | a list | resource profiles are listed in order, and the first is pre-selected |
+| `repos.conf` | a list | the order of the entries is the order of R's repositories |
+| Any other `.ini` file (`rserver.conf`, `launcher.conf`, `rsession.conf`, …) | a map | order doesn't matter, so the chart sorts it |
+| Files that aren't `.ini` (`r-versions`, `notifications.conf`, `*.json`) | a string | the chart can only render `.ini` from a map or list |
+
+In `config.server`, `config.session` and `config.profiles`, only the order-sensitive files in the first three rows can
+be written as a list as a whole; any other file written as a list fails with an error. A string works for any file,
+and is used as-is.
+
+**A map** renders sections and options sorted by name:
+
+```yaml
+rsession.conf:
+  session-timeout-minutes: 60
+  session-save-action-default: "no"
+```
+
+**A list** of single-key maps renders its entries in the order written; each one renders exactly as it would in a map:
+
+```yaml
+profiles:
+  - "*":
+      session-limit: 2
+  - "@analysts":
+      session-limit: 5
+```
+
+**A string** is used as the whole file, as-is. It's useful for pasting an existing file:
+
+```yaml
+profiles: |
+  [*]
+  session-limit=2
+
+  [@analysts]
+  session-limit=5
+```
+
+In a map, an entry whose value is a map is a `[section]`; any other value is a `key=value` line. Options within a
+section are always sorted.
 
 A list as a value is written according to where it appears:
 
@@ -327,30 +366,8 @@ inside a section.
 
 #### Order-sensitive files
 
-Workbench reads some files top to bottom, so the order of their sections or entries changes how they behave. Because a
-map is always rendered sorted, write these files as a list:
-
-| File | Why order matters |
-|---|---|
-| `profiles` | the last matching section wins |
-| `launcher.*.profiles.conf` | the last matching section wins |
-| `launcher.*.resources.conf` | resource profiles are listed in order, and the first is pre-selected |
-| `repos.conf` | the order of the entries is the order of R's repositories |
-
-```yaml
-config:
-  server:
-    profiles:
-      - "*":
-          session-limit: 2
-      - "@analysts":
-          session-limit: 5
-      - "12345":
-          session-limit: 1
-```
-
-These files still accept a map, which renders sorted by name, but the chart prints a warning after install. Any other
-`.ini` file written as a list fails with an error that shows how to write it as a map.
+The order-sensitive files (`profiles`, `launcher.*.profiles.conf`, `launcher.*.resources.conf` and `repos.conf`) still
+accept a map, which renders sorted by name, but the chart prints a warning after install.
 
 Helm merges maps from several values files (`-f base.yaml -f prod.yaml`) key by key, but a list
 replaces the earlier value as a whole. So once one of these files is a list, a later values file
@@ -558,8 +575,9 @@ On Kubernetes, use this file for options such as `session-limit`, `session-timeo
 [`launcher.kubernetes.profiles.conf`](#etcrstudiolauncherkubernetesprofilesconf) instead, so Kubernetes applies them
 to the session pod.
 
-In the `values.yaml`, define the content of `/etc/rstudio/profiles` in `config.server.profiles`. Because the last
-matching section wins, write it as a list so the sections keep the order you wrote them in. For example:
+In the `values.yaml`, define the content of `/etc/rstudio/profiles` in `config.server.profiles`. When several sections
+match a user, their order can decide which one applies, so write it as a list to keep the order you wrote. For
+example:
 
 ```yaml
 config:
@@ -589,9 +607,6 @@ session-limit=5
 [12345]
 session-limit=1
 ```
-
-User `12345` gets 1 session even if they belong to `@analysts`, because their section comes last. Written as a map,
-the sections would be sorted by name, `[12345]` would come before `[@analysts]`, and the user would get 5.
 
 ### `/etc/rstudio/launcher.kubernetes.profiles.conf`
 
