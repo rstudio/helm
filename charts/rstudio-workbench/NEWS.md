@@ -12,8 +12,8 @@
   config:
     server:
       profiles:
-        - "*": {max-memory-mb: 1024}
-        - "@analysts": {max-memory-mb: 4096}
+        - "*": {session-limit: 2}
+        - "@analysts": {session-limit: 5}
   ```
 
   These files still accept a map, but NOTES prints a warning.

@@ -74,9 +74,9 @@ WARNING: the following configuration files are written as maps, which does not k
       server:
         profiles:
           - "*":
-              max-memory-mb: 1024
+              session-limit: 2
           - "@analysts":
-              max-memory-mb: 4096
+              session-limit: 5
 {{- end }}
 
 {{- $session := default (dict) .Values.config.session }}

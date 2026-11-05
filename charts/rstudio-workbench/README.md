@@ -319,6 +319,9 @@ type=Local
 ...
 ```
 
+The `Local` cluster here only shows how sections repeat. On Kubernetes we discourage the Local launcher: it runs
+sessions inside the Workbench pod, where they compete with Workbench for CPU and memory.
+
 Values `.ini` can't represent fail with an error: a map as an option inside a section, and a list holding maps or lists
 inside a section.
 
@@ -339,11 +342,11 @@ config:
   server:
     profiles:
       - "*":
-          max-memory-mb: 1024
+          session-limit: 2
       - "@analysts":
-          max-memory-mb: 4096
+          session-limit: 5
       - "12345":
-          max-memory-mb: 512
+          session-limit: 1
 ```
 
 These files still accept a map, which renders sorted by name, but the chart prints a warning after install. Any other
@@ -550,6 +553,11 @@ The product reads configuration from top to bottom and "last-in-wins" for a give
 
 The `/etc/rstudio/profiles` file enables you to tailor the behavior of sessions on a per-user or per-group basis. See the [Posit Workbench Administrator Guide - User and Group Profiles](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/user_and_group_profiles.html) page for more information.
 
+On Kubernetes, use this file for options such as `session-limit`, `session-timeout-minutes`, `r-version` and
+`session-env`. Set CPU and memory limits in
+[`launcher.kubernetes.profiles.conf`](#etcrstudiolauncherkubernetesprofilesconf) instead, so Kubernetes applies them
+to the session pod.
+
 In the `values.yaml`, define the content of `/etc/rstudio/profiles` in `config.server.profiles`. Because the last
 matching section wins, write it as a list so the sections keep the order you wrote them in. For example:
 
@@ -558,12 +566,12 @@ config:
   server:
     profiles:
       - "*":
-          session-limit: 5
-          max-memory-mb: 1024
+          session-limit: 2
+          session-timeout-minutes: 60
       - "@analysts":
-          max-memory-mb: 4096
+          session-limit: 5
       - "12345":
-          max-memory-mb: 512
+          session-limit: 1
 ```
 
 Becomes:
@@ -572,18 +580,18 @@ _/etc/rstudio/profiles_
 
 ```ini
 [*]
-max-memory-mb=1024
-session-limit=5
+session-limit=2
+session-timeout-minutes=60
 
 [@analysts]
-max-memory-mb=4096
+session-limit=5
 
 [12345]
-max-memory-mb=512
+session-limit=1
 ```
 
-User `12345` gets 512 even if they belong to `@analysts`, because their section comes last. Written as a map, the
-sections would be sorted by name, `[12345]` would come before `[@analysts]`, and the user would get 4096.
+User `12345` gets 1 session even if they belong to `@analysts`, because their section comes last. Written as a map,
+the sections would be sorted by name, `[12345]` would come before `[@analysts]`, and the user would get 5.
 
 ### `/etc/rstudio/launcher.kubernetes.profiles.conf`
 
