@@ -16,7 +16,7 @@ The default OS changed from Ubuntu 22.04 to Ubuntu 24.04 across all products. Th
 
 If you never set `image.repository`, `image.tagPrefix`, or `image.tag`, you do not need to change anything.
 
-If you mirror images to a private registry, update the repository path. Make sure your mirror tags follow the new `{appVersion}-{os}` format, or pin `image.tag` to an exact value.
+If you mirror images to a private registry, update the repository path. Make sure your mirror tags follow the new `{appVersion}-{os}` format, or pin `image.tag` to an exact value. For the full list of images and the related Helm values, see [Private container registries](private-registries.qmd).
 
 ## Posit Connect
 
