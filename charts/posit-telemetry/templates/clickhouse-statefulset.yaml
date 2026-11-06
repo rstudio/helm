@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "posit-telemetry.clickhouse.fullname" . }}
+  labels:
+    {{- include "posit-telemetry.labels" . | nindent 4 }}
+    {{- include "posit-telemetry.clickhouse.selectorLabels" . | nindent 4 }}
+spec:
+  # a single Clickhouse server; the schema doesn't use replicated tables
+  replicas: 1
+  serviceName: {{ include "posit-telemetry.clickhouse.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "posit-telemetry.clickhouse.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "posit-telemetry.labels" . | nindent 8 }}
+        {{- include "posit-telemetry.clickhouse.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/clickhouse-configmap.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.clickhouse.podSecurityContext | nindent 8 }}
+      containers:
+        - name: clickhouse
+          image: "{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag }}"
+          imagePullPolicy: {{ .Values.clickhouse.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.clickhouse.securityContext | nindent 12 }}
+          env:
+            - name: CLICKHOUSE_TELEMETRY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "posit-telemetry.clickhouse.secretName" . }}
+                  key: {{ include "posit-telemetry.clickhouse.secretKey" . }}
+            # the image's entrypoint would otherwise write its own default user, which users.xml removes
+            - name: CLICKHOUSE_SKIP_USER_SETUP
+              value: "1"
+          ports:
+            - name: native
+              containerPort: 9000
+              protocol: TCP
+            - name: http
+              containerPort: 8123
+              protocol: TCP
+          # /ping needs no login
+          startupProbe:
+            httpGet:
+              path: /ping
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.clickhouse.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/clickhouse-server/users.d/telemetry-server.xml
+              subPath: users.xml
+              readOnly: true
+            - name: config
+              mountPath: /etc/clickhouse-server/config.d/telemetry-server.xml
+              subPath: config.xml
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/clickhouse
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "posit-telemetry.clickhouse.fullname" . }}
+      {{- with .Values.clickhouse.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.clickhouse.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.clickhouse.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  # Kubernetes keeps this volume when the release is uninstalled
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- with .Values.clickhouse.persistence.storageClass }}
+        storageClassName: {{ . }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.clickhouse.persistence.size }}

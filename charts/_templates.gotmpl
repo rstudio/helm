@@ -52,6 +52,8 @@ After `1.0.0`, standard SemVer applies.
 # Posit Workbench
   {{- else if eq .Name "posit-chronicle" -}}
 # Posit Chronicle
+  {{- else if eq .Name "posit-telemetry" -}}
+# Posit Telemetry
   {{- else -}}
 {{ template "chart.header" . }}
   {{- end }}
