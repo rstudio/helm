@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.8
+
+- Bump Package Manager version to 2026.11.0
+
 ## 0.20.7
 
 - Bump Package Manager version to 2026.10.0
