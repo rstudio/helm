@@ -15,8 +15,14 @@ just docs               # Generate README.md files from templates
 just test               # Run helm unittest on all charts
 just test <chart-name>  # Run tests for specific chart (e.g., just test rstudio-connect)
 just lint               # Run chart-testing lint (ct lint)
+just lint-values        # Run `make lint` in every chart with a lint/ directory (runs in CI)
 just update-lock        # Update Chart.lock files for all charts
+just snapshot-rsw       # Render Workbench snapshots, then:
+just snapshot-rsw-diff  #   compare them to the .lock baselines (runs in CI), or
+just snapshot-rsw-lock  #   accept them as the new baselines
 ```
+
+CI pins one Helm version for every job (`HELM_VERSION` in `.github/workflows/chart-test.yaml`). Snapshot baselines only reproduce with that exact version; `just snapshot-rsw` warns if your local Helm differs. When the snapshot job fails, it uploads its rendered snapshots as an artifact you can commit as the new locks.
 
 ### Per-Chart Makefile Commands
 ```bash
