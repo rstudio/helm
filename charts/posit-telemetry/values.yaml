@@ -1,0 +1,96 @@
+# -- Override for the name of the chart
+nameOverride: ""
+# -- Override for the full name of the release
+fullnameOverride: ""
+
+image:
+  # -- The telemetry server image repository
+  repository: ghcr.io/posit-dev/telemetry-server
+  # -- The telemetry server image tag, defaults to the chart's appVersion
+  tag: ""
+  # -- The image pull policy
+  pullPolicy: IfNotPresent
+
+# -- Secrets for pulling the telemetry server and Clickhouse images
+imagePullSecrets: []
+
+service:
+  # -- The Service type for the telemetry server
+  type: ClusterIP
+  # -- The port agents send Opentelemetry (OTLP gRPC) data to
+  port: 4317
+  # -- Annotations for the Service
+  annotations: {}
+
+# -- Additional environment variables for the telemetry server, such as `TELEMETRY_SERVER_LOGGING_LEVEL`
+env: []
+# -- Resources for the telemetry server container
+resources: {}
+# -- The telemetry server's pod-level security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+# -- The telemetry server's container-level security context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+# -- Node selector for the telemetry server pod
+nodeSelector: {}
+# -- Tolerations for the telemetry server pod
+tolerations: []
+# -- Affinity for the telemetry server pod
+affinity: {}
+
+clickhouse:
+  image:
+    # -- The Clickhouse image repository
+    repository: clickhouse/clickhouse-server
+    # -- The Clickhouse image tag, the LTS release the telemetry server is tested with
+    tag: "26.8.34.13"
+    # -- The image pull policy
+    pullPolicy: IfNotPresent
+  auth:
+    # -- An existing Secret with the telemetry server's Clickhouse password. The chart generates one if empty.
+    existingSecret: ""
+    # -- The key in `existingSecret` that holds the password
+    existingSecretKey: password
+  service:
+    # -- The port for Clickhouse's native protocol, which the telemetry server uses
+    port: 9000
+  persistence:
+    # -- The storage class for Clickhouse's data, defaults to the cluster's default. Use block storage, not a network
+    #    filesystem such as NFS or EFS.
+    storageClass: ""
+    # -- The size of Clickhouse's data volume
+    size: 20Gi
+  # -- Resources for the Clickhouse container. Clickhouse limits its own memory use to 90% of the memory limit.
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      memory: 4Gi
+  # -- Clickhouse's pod-level security context. The image runs Clickhouse as uid 101.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+    runAsGroup: 101
+    fsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+  # -- Clickhouse's container-level security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+  # -- Node selector for the Clickhouse pod
+  nodeSelector: {}
+  # -- Tolerations for the Clickhouse pod
+  tolerations: []
+  # -- Affinity for the Clickhouse pod
+  affinity: {}

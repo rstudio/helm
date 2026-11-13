@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "posit-telemetry.clickhouse.fullname" . }}
+  labels:
+    {{- include "posit-telemetry.labels" . | nindent 4 }}
+    {{- include "posit-telemetry.clickhouse.selectorLabels" . | nindent 4 }}
+data:
+  # the server's user, as `telemetry-server setup` writes it on a VM (internal/server/clickhouse/users.xml.gotmpl in
+  # posit-dev/telemetry), but reachable from other pods and with its password from the Secret; and without
+  # Clickhouse's default user, which has no password and can manage users
+  users.xml: |
+    <clickhouse>
+        <users>
+            <default remove="remove"/>
+            <telemetry>
+                <password from_env="CLICKHOUSE_TELEMETRY_PASSWORD"/>
+                <networks>
+                    <ip>::/0</ip>
+                </networks>
+                <profile>default</profile>
+                <quota>default</quota>
+                <grants>
+                    <query>GRANT SELECT, INSERT, CREATE DATABASE, CREATE TABLE, ALTER TABLE, DROP TABLE, SHOW TABLES, SHOW COLUMNS ON telemetry.*</query>
+                </grants>
+            </telemetry>
+        </users>
+    </clickhouse>
+  # logs to the container's output rather than files in it; and only the native port for the server, and HTTP for the
+  # probes
+  config.xml: |
+    <clickhouse>
+        <logger>
+            <level>information</level>
+            <console>1</console>
+            <log remove="remove"/>
+            <errorlog remove="remove"/>
+        </logger>
+        <mysql_port remove="remove"/>
+        <postgresql_port remove="remove"/>
+        <interserver_http_port remove="remove"/>
+    </clickhouse>
