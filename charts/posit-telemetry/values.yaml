@@ -3,64 +3,97 @@ nameOverride: ""
 # -- Override for the full name of the release
 fullnameOverride: ""
 
+# -- Which server type the chronicle image runs: `posit-telemetry` (stores data in Clickhouse, deployed alongside it
+#    by this chart) or `chronicle` (the classic server, storing data on a local volume and/or in S3). Both server
+#    types accept data from the same Chronicle agent, just pointed at a different address.
+serverType: posit-telemetry
+
 image:
-  # -- The telemetry server image repository
-  repository: ghcr.io/posit-dev/telemetry-server
-  # -- The telemetry server image tag, defaults to the chart's appVersion
+  # -- The chronicle image repository. Chronicle builds the posit-telemetry server, the classic chronicle server, and
+  #    the agent from one codebase; this placeholder should be replaced once that image is published.
+  repository: ghcr.io/posit-dev/chronicle
+  # -- The image tag, defaults to the chart's appVersion
   tag: ""
   # -- The image pull policy
   pullPolicy: IfNotPresent
 
-# -- Secrets for pulling the telemetry server and Clickhouse images
+# -- Secrets for pulling the chronicle and Clickhouse images
 imagePullSecrets: []
 
 service:
-  # -- The Service type for the telemetry server
+  # -- The Service type for the server
   type: ClusterIP
-  # -- The port agents send Opentelemetry (OTLP gRPC) data to
-  port: 4317
+  # -- The port agents send data to: OTLP HTTP for the posit-telemetry server type, or Chronicle's own protocol for
+  #    the chronicle server type
+  port: 4318
   # -- Annotations for the Service
   annotations: {}
 
-# -- Additional environment variables for the telemetry server, such as `TELEMETRY_SERVER_LOGGING_LEVEL`
+# -- Additional environment variables for the server, such as `POSIT_TELEMETRY_LOGGING_LEVEL` or `CHRONICLE_LOGGING_LEVEL`
 env: []
-# -- Resources for the telemetry server container
+# -- Resources for the server container
 resources: {}
-# -- The telemetry server's pod-level security context
+# -- The server's pod-level security context
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
   seccompProfile:
     type: RuntimeDefault
-# -- The telemetry server's container-level security context
+# -- The server's container-level security context
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   capabilities:
     drop: ["ALL"]
-# -- Node selector for the telemetry server pod
+# -- Node selector for the server pod
 nodeSelector: {}
-# -- Tolerations for the telemetry server pod
+# -- Tolerations for the server pod
 tolerations: []
-# -- Affinity for the telemetry server pod
+# -- Affinity for the server pod
 affinity: {}
+
+# -- Settings for the `chronicle` server type. Ignored when `serverType` is `posit-telemetry`.
+chronicle:
+  localStorage:
+    # -- Store data on a local volume. Can be used together with `s3Storage`.
+    enabled: true
+    persistence:
+      # -- The storage class for the local data volume, defaults to the cluster's default. Use block storage, not a
+      #    network filesystem such as NFS or EFS.
+      storageClass: ""
+      # -- The size of the local data volume
+      size: 20Gi
+  s3Storage:
+    # -- Store data in S3. Can be used together with `localStorage`. Credentials come from the pod's environment
+    #    (for example an IAM role), not from this chart.
+    enabled: false
+    # -- The S3 bucket
+    bucket: ""
+    # -- The prefix within the bucket
+    prefix: ""
+    # -- The AWS region, defaults to the `$AWS_REGION` environment variable
+    region: ""
+    # -- The AWS profile, defaults to the `$AWS_PROFILE` environment variable
+    profile: ""
+    # -- A custom S3-compatible endpoint (for example MinIO); enables path-style addressing
+    endpoint: ""
 
 clickhouse:
   image:
     # -- The Clickhouse image repository
     repository: clickhouse/clickhouse-server
-    # -- The Clickhouse image tag, the LTS release the telemetry server is tested with
+    # -- The Clickhouse image tag, the LTS release the posit-telemetry server is tested with
     tag: "26.8.34.13"
     # -- The image pull policy
     pullPolicy: IfNotPresent
   auth:
-    # -- An existing Secret with the telemetry server's Clickhouse password. The chart generates one if empty.
+    # -- An existing Secret with the posit-telemetry server's Clickhouse password. The chart generates one if empty.
     existingSecret: ""
     # -- The key in `existingSecret` that holds the password
     existingSecretKey: password
   service:
-    # -- The port for Clickhouse's native protocol, which the telemetry server uses
+    # -- The port for Clickhouse's native protocol, which the posit-telemetry server uses
     port: 9000
   persistence:
     # -- The storage class for Clickhouse's data, defaults to the cluster's default. Use block storage, not a network

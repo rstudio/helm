@@ -22,6 +22,19 @@ If the release name contains the chart name, it's used as the full name.
 {{- printf "%s-clickhouse" (include "posit-telemetry.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+{{- define "posit-telemetry.data.fullname" -}}
+{{- printf "%s-data" (include "posit-telemetry.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Validates .Values.serverType and fails with a clear message otherwise.
+*/}}
+{{- define "posit-telemetry.validateServerType" -}}
+{{- if not (has .Values.serverType (list "posit-telemetry" "chronicle")) }}
+{{- fail (printf "serverType must be \"posit-telemetry\" or \"chronicle\", got %q" .Values.serverType) }}
+{{- end }}
+{{- end }}
+
 {{- define "posit-telemetry.labels" -}}
 helm.sh/chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}

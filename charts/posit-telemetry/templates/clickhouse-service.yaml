@@ -1,3 +1,4 @@
+{{- if eq .Values.serverType "posit-telemetry" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,3 +15,4 @@ spec:
       port: {{ .Values.clickhouse.service.port }}
       targetPort: native
       protocol: TCP
+{{- end }}

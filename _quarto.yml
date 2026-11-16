@@ -10,6 +10,8 @@ project:
     - charts/rstudio-connect/NEWS.md
     - charts/rstudio-pm/README.md
     - charts/rstudio-pm/NEWS.md
+    - charts/posit-telemetry/README.md
+    - charts/posit-telemetry/NEWS.md
     - charts/posit-chronicle/README.md
     - charts/posit-chronicle/NEWS.md
     - examples/auto-scaling/README.md
@@ -81,6 +83,12 @@ website:
             file: charts/rstudio-pm/NEWS.md
           - text: Examples
             file: examples/package-manager/index.qmd
+      - section: "Posit Telemetry"
+        contents:
+          - text: Overview
+            file: charts/posit-telemetry/README.md
+          - text: Changelog
+            file: charts/posit-telemetry/NEWS.md
       - section: "Posit Chronicle"
         contents:
           - text: Overview

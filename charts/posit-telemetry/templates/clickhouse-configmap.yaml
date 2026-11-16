@@ -1,3 +1,4 @@
+{{- if eq .Values.serverType "posit-telemetry" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,8 +7,8 @@ metadata:
     {{- include "posit-telemetry.labels" . | nindent 4 }}
     {{- include "posit-telemetry.clickhouse.selectorLabels" . | nindent 4 }}
 data:
-  # the server's user, as `telemetry-server setup` writes it on a VM (internal/server/clickhouse/users.xml.gotmpl in
-  # posit-dev/telemetry), but reachable from other pods and with its password from the Secret; and without
+  # the server's user, as `posit-telemetry setup` writes it on a VM (internal/posittelemetry/clickhouse/users.xml.gotmpl
+  # in posit-dev/chronicle), but reachable from other pods and with its password from the Secret; and without
   # Clickhouse's default user, which has no password and can manage users
   users.xml: |
     <clickhouse>
@@ -40,3 +41,4 @@ data:
         <postgresql_port remove="remove"/>
         <interserver_http_port remove="remove"/>
     </clickhouse>
+{{- end }}

@@ -1,6 +1,7 @@
-suite: Telemetry server tests
+suite: Posit-telemetry server type tests
 templates:
   - deployment.yaml
+  - pvc.yaml
 chart:
   version: 9.9.9+test
   appVersion: 9.9.9
@@ -9,6 +10,7 @@ release:
   namespace: test-namespace
 tests:
   - it: should run one server, replaced rather than rolled
+    template: deployment.yaml
     asserts:
       - equal:
           path: spec.replicas
@@ -17,28 +19,40 @@ tests:
           path: spec.strategy.type
           value: Recreate
   - it: should default the image tag to the appVersion
+    template: deployment.yaml
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: ghcr.io/posit-dev/telemetry-server:9.9.9
+          value: ghcr.io/posit-dev/chronicle:9.9.9
+  - it: should run the posit-telemetry binary
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["posit-telemetry"]
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value: ["start"]
   - it: should connect to the release's Clickhouse with the generated password
+    template: deployment.yaml
     set:
       clickhouse.service.port: 9440
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: TELEMETRY_SERVER_CLICKHOUSE_ENDPOINT
+            name: POSIT_TELEMETRY_CLICKHOUSE_ENDPOINT
             value: clickhouse://test-release-posit-telemetry-clickhouse:9440
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: TELEMETRY_SERVER_CLICKHOUSE_PASSWORD
+            name: POSIT_TELEMETRY_CLICKHOUSE_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: test-release-posit-telemetry-clickhouse
                 key: password
   - it: should use an existing password Secret
+    template: deployment.yaml
     set:
       clickhouse.auth.existingSecret: my-secret
       clickhouse.auth.existingSecretKey: my-key
@@ -46,19 +60,32 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: TELEMETRY_SERVER_CLICKHOUSE_PASSWORD
+            name: POSIT_TELEMETRY_CLICKHOUSE_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: my-secret
                 key: my-key
   - it: should append additional environment variables
+    template: deployment.yaml
     set:
       env:
-        - name: TELEMETRY_SERVER_LOGGING_LEVEL
+        - name: POSIT_TELEMETRY_LOGGING_LEVEL
           value: DEBUG
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: TELEMETRY_SERVER_LOGGING_LEVEL
+            name: POSIT_TELEMETRY_LOGGING_LEVEL
             value: DEBUG
+  - it: should not deploy a local-storage PVC for the posit-telemetry server type
+    template: pvc.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should reject an unknown serverType
+    template: deployment.yaml
+    set:
+      serverType: bogus
+    asserts:
+      - failedTemplate:
+          errorMessage: 'serverType must be "posit-telemetry" or "chronicle", got "bogus"'

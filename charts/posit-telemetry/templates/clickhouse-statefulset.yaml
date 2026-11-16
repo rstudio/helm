@@ -1,3 +1,4 @@
+{{- if eq .Values.serverType "posit-telemetry" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -107,3 +108,4 @@ spec:
         resources:
           requests:
             storage: {{ .Values.clickhouse.persistence.size }}
+{{- end }}

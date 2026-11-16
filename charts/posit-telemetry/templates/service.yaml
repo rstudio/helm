@@ -14,8 +14,8 @@ spec:
   selector:
     {{- include "posit-telemetry.selectorLabels" . | nindent 4 }}
   ports:
-    - name: otlp-grpc
+    - name: server
       port: {{ .Values.service.port }}
-      targetPort: otlp-grpc
+      targetPort: server
       protocol: TCP
-      appProtocol: grpc
+      appProtocol: http

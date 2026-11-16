@@ -1,18 +1,19 @@
 apiVersion: v2
 name: posit-telemetry
-description: Official Helm chart for the Posit telemetry server and the Clickhouse database it writes to
+description: Official Helm chart for the Posit telemetry server, which can run as either the Clickhouse-backed posit-telemetry server or the classic Chronicle server
 version: 0.1.0
 appVersion: 0.1.0
 icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png
 home: https://www.posit.co
 sources:
   - https://github.com/rstudio/helm
-  - https://github.com/posit-dev/telemetry
+  - https://github.com/posit-dev/chronicle
 annotations:
   artifacthub.io/license: MIT
 keywords:
   - "rstudio"
   - "posit"
   - "telemetry"
+  - "chronicle"
   - "clickhouse"
   - "opentelemetry"
