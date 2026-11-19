@@ -1,8 +1,126 @@
 # Changelog
+
+## 0.21.7
+
+- Add optional Gateway API support: the chart creates `HTTPRoute` resources from the `gatewayApi` values. It is off by default and independent of `ingress`.
+- Fail the render if `gatewayApi.enabled` is true, `gatewayApi.hosts` is set, and `gatewayApi.parentRefs` is empty.
+- Document shared Gateway API examples (`examples/gateway-api/aws`, `examples/gateway-api/kgateway`) in the README.
+- Update `rstudio-library` dependency to 0.1.38.
+
+## 0.21.6
+
+- Bump Connect version to 2026.11.1
+
+## 0.21.5
+
+- Bump Connect version to 2026.11.0
+
+## 0.21.4
+
+- Bump Connect version to 2026.10.0
+- Bump the default Connect Python version from 3.14.7 to 3.14.8
+
+## 0.21.3
+
+- The default `config` uses `packagemanager.posit.co` and Ubuntu 24.04 (`noble`) binaries for R packages.
+- The default `config` sets `PythonPackageRepository "PyPI"` to the public Posit Package Manager PyPI mirror. This setting requires Connect 2026.05.0 or later.
+
+## 0.21.2
+
+- Bump Connect version to 2026.09.0
+
+## 0.21.1
+
+- Bump Connect version to 2026.08.1
+
+## 0.21.0
+
+- New `chronicle.localConfig` value for overriding the configuration of the Chronicle bundled with Connect, covering settings `config.Chronicle` does not expose.
+
+## 0.20.13
+
+- Bump Connect version to 2026.08.0
+
+## 0.20.12
+
+- `sharedStorage.subPath` now applies to content pods run by the direct
+  Kubernetes runner (`backends.kubernetes.enabled`), so content stored under a
+  subdirectory of a shared PersistentVolumeClaim is found correctly. The chart
+  maps it to `Kubernetes.DataDirPVCSubPath`. Requires Connect 2026.08.0 or later.
+
+## 0.20.11
+
+- Bump Connect version to 2026.07.0
+
+## 0.20.10
+
+- **DEPRECATED**: The `chronicleAgent` configuration is deprecated and will be removed in a future release.
+
+## 0.20.9
+
+- Bump Connect version to 2026.06.1
+
+## 0.20.8
+
+- Bump Connect version to 2026.06.0
+- Update the default Python `Executable` path to `/opt/python/3.14.6/bin/python` to
+  match the interpreter shipped in the 2026.06.0 image
+
+## 0.20.7
+
+- The init container's `rsc-volume` now mounts at `/opt/rstudio-connect-runtime`
+  (previously `/opt/rstudio-connect`), and the chart sets
+  `Kubernetes.ConnectRuntimeDir` to match so Connect finds the runtime there.
+
+## 0.20.6
+
+- Clarify `nameservice.apiKey` documentation to use a Connect service token with the
+  `nameservice:read` scope.
+
+## 0.20.5
+
+- Remove the `os` field from `backends.kubernetes.defaultInitContainer` and
+  `launcher.defaultInitContainer`. The `connect-content-init` image copies an
+  architecture-specific binary and is not OS-specific; the tag is now the chart
+  `appVersion` (e.g. `2026.05.1`) rather than `2026.05.1-ubuntu-24.04`. Any
+  `os:` values in your `values.yaml` can be removed.
+
+## 0.20.4
+
+- Bump Connect version to 2026.05.1
+
+## 0.20.3
+
+- Add `get` on `pods/attach` and `pods/exec` to the direct Kubernetes runner Role in `templates/rbac.yaml` to support attach/exec authorization checks used by Kubernetes clients to support websocket connection upgrades.
+
+## 0.20.2
+
+- Bump Connect version to 2026.05.0
+
+## 0.20.1
+
+- BREAKING: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`.
+    - New installations use the new implementation for Off-Host Execution by default.
+    - For existing installations, see the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning to the new implementation.
+    - To continue using the Launcher implementation, set `launcher.enabled: true` and `backends.kubernetes.enabled: false` in your values.yaml.
+    - **IMPORTANT** When `backends.kubernetes.enabled=true`, service accounts used for content execution require the `connect.posit.co/service-account` label.
+
+## 0.20.0
+
+- **BREAKING**: Default images now pull from the `posit/` namespace on Docker Hub
+  - `image.repository` changed from `ghcr.io/rstudio/rstudio-connect` to `posit/connect`
+  - `launcher.defaultInitContainer.repository` changed to `posit/connect-content-init`
+  - `backends.kubernetes.defaultInitContainer.repository` changed to `posit/connect-content-init`
+  - Default content images updated to `posit/connect-content`
+  - Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`
+  - `image.tagPrefix` replaced by `image.os`; same for `launcher.defaultInitContainer` and `backends.kubernetes.defaultInitContainer`
+  - Update chart metadata links and branding.
+- **BREAKING**: Remove `launcher.customRuntimeYaml`, `launcher.additionalRuntimeImages`, and bundled `default-runtime.yaml` / `default-runtime-pro.yaml`. Use `executionEnvironments` instead.
+- Default Python executable updated to 3.14.4
+
 ## 0.9.5
 
-- Document shared Gateway API examples (`examples/gateway-api/aws`, `examples/gateway-api/kgateway`) in the README.
-- Add optional Gateway API support (`HTTPRoute` via `gatewayApi` values), independent of `ingress`.
+- Bump Connect version to 2026.04.1
 
 ## 0.9.4
 
@@ -39,7 +157,6 @@
 
 - Remove deprecated default value `Metrics.Enabled = true`
 - Remove legacy Graphite exporter sidecar (`prometheus.legacy`, `prometheusExporter.*`, and `configmap-graphite-exporter.yaml`). The built-in Prometheus `/metrics` endpoint is now the only supported metrics path. Use OpenTelemetry for richer instrumentation.
-
 
 ## 0.8.35
 

@@ -1,10 +1,114 @@
 # Changelog
 
+## 0.22.10
 
-## 0.11.3
-
+- Add optional Gateway API support: the chart creates `HTTPRoute` resources from the `gatewayApi` values. It is off by default and independent of `ingress`.
+- Fail the render if `gatewayApi.enabled` is true, `gatewayApi.hosts` is set, and `gatewayApi.parentRefs` is empty.
 - Document shared Gateway API examples (`examples/gateway-api/aws`, `examples/gateway-api/kgateway`) in the README.
-- Add optional Gateway API support (`HTTPRoute` via `gatewayApi` values), independent of `ingress`.
+- Update `rstudio-library` dependency to 0.1.38.
+
+## 0.22.9
+
+- Bump Workbench version to 2026.11.0
+
+## 0.22.8
+
+- Bump Workbench version to 2026.10.1
+
+## 0.22.7
+
+- Bump Workbench version to 2026.10.0
+
+## 0.22.6
+
+- Mount `config.pam` files in sorted order. Previously the order of the `rstudio-pam` volume mounts could change from one render to the next when more than one PAM file was configured, which changed the pod spec and could restart Workbench pods on a `helm upgrade` with no configuration change.
+
+## 0.22.5
+
+- Update the default session `repos.conf` CRAN URL to use `noble` (Ubuntu 24.04) instead of `jammy` (Ubuntu 22.04). The domain already uses `packagemanager.posit.co`. This matches the Ubuntu 24.04 default used elsewhere in the charts and ensures CRAN binary packages resolve against a current distribution. The rendered default changes, but any user-supplied `config.session.repos.conf.CRAN` value is unaffected.
+
+## 0.22.4
+
+- The session job template (`files/job.tpl`) now sets `imagePullPolicy` on the init containers the launcher adds to session pods. Images tagged `:daily` or `:latest` always get `Always`, so the Positron preview init image (`ghcr.io/posit-dev/workbench-positron-init-preview:daily`) no longer goes stale on each node. For other init containers, the new `launcher.templateValues.pod.initContainerImagePullPolicy` value sets the policy; leaving it empty keeps the Kubernetes default ([#949](https://github.com/rstudio/helm/issues/949)).
+
+## 0.22.3
+
+- Fixed the document separator emitted by `templates/configmap-secret.yaml` when `sealedSecret.enabled=true`. The template produced `---apiVersion: bitnami.com/v1alpha1` on a single line, which is not a valid YAML document separator; `helm lint --strict` under Helm 4 rejected it. The rendered manifests are unchanged (only the `checksum/config-secret` pod annotation differs, since it hashes the rendered file).
+
+## 0.22.2
+
+- Bump Workbench version to 2026.09.0
+
+## 0.22.1
+
+- Bump Workbench version to 2026.08.2
+
+## 0.22.0
+
+- New `chronicle.localConfig` value for overriding the configuration of Chronicle bundled with Workbench, covering settings not exposed as `rserver.conf` keys.
+
+## 0.21.7
+
+- Bump Workbench version to 2026.08.1
+
+## 0.21.6
+
+- Bump Workbench version to 2026.08.0
+
+## 0.21.5
+
+- The session job template (`files/job.tpl`) now passes through the Linux capabilities the launcher requests for the session container (`.Job.container.capabilitiesAdd` / `.Job.container.capabilitiesDrop`), merging them into `launcher.templateValues.pod.containerSecurityContext`. Previously these were silently dropped.
+
+## 0.21.4
+
+- Bump Workbench version to 2026.07.1
+
+## 0.21.3
+
+- Fix SSSD/LDAP (and Active Directory) sign-in that broke under the rootless changes. The rootless setup made Kubernetes re-own the pod's mounted files to a non-root group, which included the SSSD config. SSSD ignores its config unless it is owned by `root:root` with `0600` permissions, so logins failed. The config is now given the correct owner and permissions before SSSD starts.
+
+## 0.21.2
+
+- Bump Workbench version to 2026.07.0
+
+## 0.21.1
+
+- **DEPRECATED**: The `chronicleAgent` configuration is deprecated.
+
+## 0.21.0
+
+- New `pod.runAsRoot` value (default `true`); set it to `false` to run the Workbench pod as a non-root user. Rootless mode requires Workbench's native user provisioning (SCIM or just-in-time) with an external auth provider (e.g. OpenID/SAML) — local/PAM authentication is not supported — and adds init containers.
+- The bundled SSSD daemon is now controlled by the new `config.sssd` block; `config.userProvisioning` is deprecated.
+- Supporting changes for unprivileged pods and the non-root launcher: prestart scripts no longer perform root-only operations, the launcher's ServiceAccount token is made group-readable via `fsGroup`, the `secure-cookie-key` is shared with the launcher, the Kubernetes launcher scratch dir (`/var/lib/rstudio-launcher/Kubernetes`) is backed by an `fsGroup`-owned `emptyDir` so it is group-writable for the non-root launcher, and writable scratch and `/mnt/load-balancer` volumes are mounted as needed.
+
+## 0.20.4
+
+- finally fix the last bit for suppressStdinAnnotation (cf. PR #842)
+
+## 0.20.3
+
+- Bump Workbench version to 2026.06.0
+
+## 0.20.2
+
+- Bump Workbench version to 2026.05.1
+
+## 0.20.1
+
+- Bump Workbench version to 2026.05.0
+
+## 0.20.0
+
+- **BREAKING**: Default images now pull from the `posit/` namespace on Docker Hub
+  - `image.repository` changed from `rstudio/rstudio-workbench` to `posit/workbench`
+  - `session.image.repository` changed from `rstudio/workbench-session` to `posit/workbench-session`
+  - `components.sessionInit.image.repository` changed to `posit/workbench-session-init`
+  - `components.positron.image.repository` changed to `posit/workbench-positron-init`
+  - Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`
+  - `image.tagPrefix` replaced by `image.os`
+  - `session.image.tagPrefix` replaced by `session.image.os`, `session.image.rVersion`, `session.image.pythonVersion`
+  - `versionOverride` no longer affects the session image tag (use `session.image.rVersion`, `session.image.pythonVersion`, `session.image.os` instead)
+  - Update chart metadata links and branding.
 
 ## 0.11.2
 

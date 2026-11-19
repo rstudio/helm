@@ -7,6 +7,11 @@ metadata:
 data:
   rstudio-connect.gcfg: |
     {{- include "rstudio-connect.config" . | nindent 4 }}
+{{- /* Staged into Chronicle's config dir by the chronicle-config init container; see
+       deployment.yaml for why it is not mounted there directly. */}}
+{{- with .Values.chronicle.localConfig }}
+{{ include "rstudio-library.config.ini" (dict "chronicle-local.gcfg" .) | indent 2 }}
+{{- end }}
 {{- if .Values.backends.kubernetes.enabled }}
   job.yaml: |
 {{- include "rstudio-connect.jobBase" . | nindent 4 }}
@@ -26,11 +31,6 @@ data:
 {{- end }}
 {{- $sessionTemplate := deepCopy .Values.launcher.templateValues }}
 {{- if .Values.launcher.enabled }}
-  {{- $runtimeYamlContent := include "rstudio-connect.runtimeYaml" . }}
-  {{- if $runtimeYamlContent }}
-  runtime.yaml: |
-    {{- $runtimeYamlContent | nindent 4 }}
-  {{- end }}
   {{- /* configuration for job customization (also used below) */ -}}
     {{- /* 1 - volume */ -}}
       {{- $emptyRscVolume := dict "name" ("rsc-volume") "emptydir" (dict) }}
@@ -46,7 +46,7 @@ data:
       {{- $jobJsonRuntimeMountExt := dict "target" ("/spec/template/spec/containers/0/volumeMounts/-") "name" ("defaultRuntimeContainerVolumeMountExt") "json" ( $rscVolumeMountExt ) }}
     {{- /* 3 - init container */ -}}
       {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-      {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default (printf "%s%s" .Values.launcher.defaultInitContainer.tagPrefix $defaultVersion )}}
+      {{- $initContainerImageTag := .Values.launcher.defaultInitContainer.tag | default $defaultVersion }}
       {{- $initContainerImage := print .Values.launcher.defaultInitContainer.repository ":" ( $initContainerImageTag ) }}
       {{- $initContainerPullPolicy := default "IfNotPresent" .Values.launcher.defaultInitContainer.imagePullPolicy }}
       {{- $initContainerResources := .Values.launcher.defaultInitContainer.resources }}

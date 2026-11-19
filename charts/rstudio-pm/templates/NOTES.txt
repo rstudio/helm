@@ -36,3 +36,7 @@ WARNING: `image.pullPolicy` value has been removed in chart version 0.2.7. Pleas
 NOTE: `pod.serviceAccountName` is deprecated and will be removed in the future.
 Please use `serviceAccount.name` instead.
 {{- end }}
+
+{{- if .Values.image.tagPrefix }}
+  {{- fail "\n\n`image.tagPrefix` has been removed. Use `image.os` instead (e.g. `ubuntu-24.04`). The image tag format is now `{version}-{os}`." }}
+{{- end }}

@@ -3,11 +3,38 @@
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/rstudio)](https://artifacthub.io/packages/search?repo=rstudio)
 [![GitHub license](https://img.shields.io/github/license/rstudio/helm.svg)](https://github.com/rstudio/helm/blob/main/LICENSE)
 
+> [!IMPORTANT]
+> **Chart version 0.20.0 contains breaking changes:**
+>
+> - Default images moved from `rstudio/` and `ghcr.io/rstudio/` to
+>   `posit/` on [Docker Hub](https://hub.docker.com/u/posit) and
+>   `ghcr.io/posit-dev/` on [GitHub Container Registry (GHCR)](https://github.com/orgs/posit-dev/packages).
+> - The default tag format changed from `{tagPrefix}{appVersion}` to
+>   `{appVersion}-{os}`.
+>
+> If you are upgrading from an earlier version, read the
+> [image migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) first.
+
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
+
 ## Usage
 
 1. Install [Helm](https://helm.sh). Please refer to Helm's [documentation](https://helm.sh/docs/) for more information on getting started.
 
-2. Add the RStudio Helm repo:
+2. Add the Helm repo:
 
    ```console
    helm repo add rstudio https://helm.rstudio.com
@@ -26,7 +53,7 @@ Individual helm charts have their own documentation
 - [Posit Connect](./charts/rstudio-connect) ([documentation](https://docs.posit.co/helm/charts/rstudio-connect/README.html))
 - [Posit Workbench](./charts/rstudio-workbench) ([documentation](https://docs.posit.co/helm/charts/rstudio-workbench/README.html))
 - [Posit Package Manager](./charts/rstudio-pm) ([documentation](https://docs.posit.co/helm/charts/rstudio-pm/README.html))
-- [Posit Chronicle](./charts/posit-chronicle) ([documentation](https://docs.posit.co/helm/charts/posit-chronicle/README.html))
+- [Posit Chronicle](./charts/posit-chronicle) ([documentation](https://docs.posit.co/helm/charts/posit-chronicle/README.html)) **(Deprecated)**
 
 Examples:
 
@@ -57,6 +84,10 @@ Bugs or feature requests should be opened in an [issue](https://github.com/rstud
 ## Contributing
 
 Posit values your contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+
+## Code of Conduct
+
+We expect all contributors to adhere to the project's [Code of Conduct](CODE_OF_CONDUCT.md) and create a positive and inclusive community.
 
 ## License
 

@@ -11,8 +11,8 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 image:
-  repository: rstudio/rstudio-connect
-  tag: 1.8.4-11
+  repository: ghcr.io/posit-dev/connect
+  tag: 2026.04.0-ubuntu-24.04
   imagePullPolicy: "IfNotPresent"
   imagePullSecrets:
     - name: "some-secret"
@@ -48,7 +48,7 @@ pod:
       command: ["sleep"]
       args: ["infinity"]
       imagePullPolicy: "IfNotPresent"
-    # This will spin up the chronicle-agent sidecar container
+    # DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release
     - name: chronicle-agent
       image: ghcr.io/rstudio/chronicle-agent:2025.03.0
       env:
@@ -148,9 +148,9 @@ config:
     Enabled: true
     Executable: /opt/python/3.6.5/bin/python
   'RPackageRepository "CRAN"':
-    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
   'RPackageRepository "RSPM"':
-    URL: https://packagemanager.rstudio.com/cran/__linux__/bionic/latest
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
   Server:
     Address: http://localhost:3939
     DataDir: /var/lib/rstudio-connect

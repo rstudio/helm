@@ -1,9 +1,53 @@
 # Changelog
 
-## 0.5.58
+## 0.20.9
 
+- Add optional Gateway API support: the chart creates `HTTPRoute` resources from the `gatewayApi` values. It is off by default and independent of `ingress`.
+- Fail the render if `gatewayApi.enabled` is true, `gatewayApi.hosts` is set, and `gatewayApi.parentRefs` is empty.
 - Document shared Gateway API examples (`examples/gateway-api/aws`, `examples/gateway-api/kgateway`) in the README.
-- Add optional Gateway API support (`HTTPRoute` via `gatewayApi` values), independent of `ingress`.
+- Update `rstudio-library` dependency to 0.1.38.
+
+## 0.20.8
+
+- Bump Package Manager version to 2026.11.0
+
+## 0.20.7
+
+- Bump Package Manager version to 2026.10.0
+
+## 0.20.6
+
+- Change the default readiness probe path from `/__ping__` to `/__cluster-health__`, because `/__ping__` now
+  returns 200 during startup and in offline mode. `/__cluster-health__` needs Package Manager 2026.06.0 or later;
+  on older images, set `readinessProbe.httpGet.path` back to `/__ping__`.
+
+## 0.20.5
+
+- Bump Package Manager version to 2026.09.0
+
+## 0.20.4
+
+- Bump Package Manager version to 2026.08.0
+
+## 0.20.3
+
+- Remove deprecated posit-chronicle from chart recommendations
+
+## 0.20.2
+
+- Update default Posit Package Manager version to 2026.06.0
+
+## 0.20.1
+
+- Update default Posit Package Manager version to 2026.05.0
+
+## 0.20.0
+
+- **BREAKING**: Default images now pull from the `posit/` namespace on Docker Hub
+  - `image.repository` changed from `rstudio/rstudio-package-manager` to `posit/package-manager`
+  - Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`
+  - `image.tagPrefix` replaced by `image.os`
+  - Update chart metadata links and branding.
 
 ## 0.5.57
 
@@ -44,7 +88,7 @@
 ## 0.5.48
 
 - Add recommended labels to all PVCs created by the chart.
- 
+
 ## 0.5.47
 
 - Update default Posit Package Manager version to 2025.04.2-8

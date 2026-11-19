@@ -72,9 +72,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- if .Values.launcher.enabled }}
     {{- $namespace := default $.Release.Namespace .Values.launcher.namespace }}
     {{- $launcherSettingsDict := dict "Enabled" ("true") "Kubernetes" ("true") "KubernetesNamespace" ($namespace) "KubernetesProfilesConfig" ("/etc/rstudio-connect/launcher/launcher.kubernetes.profiles.conf") }}
-    {{- if include "rstudio-connect.runtimeYaml" . }}
-      {{- $_ := set $launcherSettingsDict "ClusterDefinition" (list "/etc/rstudio-connect/runtime.yaml") }}
-    {{- end }}
     {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $launcherSettingsDict "DataDirPVCName" $dataDirPVCName }}
@@ -99,10 +96,22 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- if and (or .Values.sharedStorage.create .Values.sharedStorage.mount) .Values.sharedStorage.mountContent }}
       {{- $dataDirPVCName := default (print (include "rstudio-connect.fullname" .) "-shared-storage" ) .Values.sharedStorage.name }}
       {{- $_ := set $kubernetesSettingsDict "DataDirPVCName" $dataDirPVCName }}
+      {{- /* pass the shared storage subPath so content pods reference the same
+             location the Connect server mounts (rstudio/helm#916) */}}
+      {{- if .Values.sharedStorage.subPath }}
+        {{- $_ := set $kubernetesSettingsDict "DataDirPVCSubPath" .Values.sharedStorage.subPath }}
+      {{- end }}
     {{- end }}
     {{- $_ := set $kubernetesSettingsDict "DefaultResourceJobBase" (default "/etc/rstudio-connect/job.yaml" (dig "Kubernetes" "DefaultResourceJobBase" "" .Values.config)) }}
     {{- if .Values.backends.kubernetes.defaultResourceServiceBase }}
       {{- $_ := set $kubernetesSettingsDict "DefaultResourceServiceBase" (default "/etc/rstudio-connect/service.yaml" (dig "Kubernetes" "DefaultResourceServiceBase" "" .Values.config)) }}
+    {{- end }}
+    {{- /* When the default init container is enabled, default ConnectRuntimeDir to
+           the runtime mount path. This default MUST match the $runtimeDir default
+           in rstudio-connect.jobBase, which derives the content container's
+           mountPath from this same value so the config and mount cannot diverge. */}}
+    {{- if and .Values.backends.kubernetes.defaultInitContainer.enabled (not (dig "Kubernetes" "ConnectRuntimeDir" "" .Values.config)) }}
+      {{- $_ := set $kubernetesSettingsDict "ConnectRuntimeDir" "/opt/rstudio-connect-runtime" }}
     {{- end }}
     {{- $kubernetesDict := dict "Kubernetes" ( $kubernetesSettingsDict ) }}
     {{- $defaultConfig = merge $defaultConfig $kubernetesDict }}
@@ -124,62 +133,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     {{- if not (dig "Kubernetes" "DefaultResourceServiceBase" "" $configCopy) }}
       {{- $_ := unset (index $configCopy "Kubernetes") "DefaultResourceServiceBase" }}
     {{- end }}
+    {{- /* drop an empty/null ConnectRuntimeDir so the injected default applies and
+           the rendered gcfg value stays aligned with the content container mount */}}
+    {{- if not (dig "Kubernetes" "ConnectRuntimeDir" "" $configCopy) }}
+      {{- $_ := unset (index $configCopy "Kubernetes") "ConnectRuntimeDir" }}
+    {{- end }}
   {{- end }}
   {{- include "rstudio-library.config.gcfg" ( mergeOverwrite $defaultConfig $configCopy ) }}
 {{- end -}}
-
-{{/*
-  - Define the runtime.yaml file
-    - If a string:
-      - if "pro" - use pro runtime.yaml
-        - If additionalRuntimeImages is a string, append
-      - if "base" - use base runtime.yaml
-        - If additionalRuntimeImages is a string, append
-      - otherwise use the string verbatim
-        - If additionalRuntimeImages is a string, append
-    - If a map, pass it to "toYaml"
-      - If additionalRuntimeImages is a list, append
-    - Otherwise use the base runtime.yaml
-
-    When we append additionalRuntimeImages as a string, we presume that
-    the end of the runtimeImages file is still in the context of the "images" key
-*/}}
-{{- define "rstudio-connect.runtimeYaml" -}}
-  {{- $runtimeYaml := deepCopy (.Values.launcher.customRuntimeYaml | default "") }}
-  {{- $additionalImages := deepCopy .Values.launcher.additionalRuntimeImages }}
-  {{- if kindIs "string" $runtimeYaml }}
-    {{- if eq $runtimeYaml "pro" }}
-      {{- .Files.Get "default-runtime-pro.yaml" }}
-      {{- include "rstudio-connect.additionalImagesString" $additionalImages }}
-    {{- else if eq $runtimeYaml "base" }}
-      {{- .Files.Get "default-runtime.yaml" }}
-      {{- include "rstudio-connect.additionalImagesString" $additionalImages }}
-    {{- else }}
-      {{- /* Allow verbatim output */ -}}
-      {{- $runtimeYaml }}
-      {{- include "rstudio-connect.additionalImagesString" $additionalImages }}
-    {{- end }}
-  {{- else if kindIs "map" $runtimeYaml }}
-    {{- /*
-      only include additionalImages if it is a list.
-      otherwise it is possible the keys could be mismatched
-     */ -}}
-    {{- if kindIs "list" $additionalImages }}
-      {{- $_ := set $runtimeYaml "images" (append $runtimeYaml.images $additionalImages) }}
-    {{- end }}
-    {{- toYaml $runtimeYaml }}
-  {{- end }}
-{{- end -}}
-
-{{- define "rstudio-connect.additionalImagesString" }}
-  {{- if . }}
-    {{- if kindIs "string" . }}
-      {{- . | nindent 2 }}
-    {{- else }}
-      {{- toYaml . | nindent 2 }}
-    {{- end }}
-  {{- end }}
-{{- end }}
 
 {{- define "rstudio-connect.pod.annotations" -}}
 {{- range $key,$value := $.Values.pod.annotations -}}
@@ -207,7 +168,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- if .Values.backends.kubernetes.defaultInitContainer.enabled }}
     {{- /* build init container image tag */}}
     {{- $defaultVersion := .Values.versionOverride | default $.Chart.AppVersion }}
-    {{- $tag := .Values.backends.kubernetes.defaultInitContainer.tag | default (printf "%s%s" .Values.backends.kubernetes.defaultInitContainer.tagPrefix $defaultVersion) }}
+    {{- $tag := .Values.backends.kubernetes.defaultInitContainer.tag | default $defaultVersion }}
     {{- $image := printf "%s:%s" .Values.backends.kubernetes.defaultInitContainer.repository $tag }}
     {{- /* build the init container */}}
     {{- $initVolumeMount := dict "name" "rsc-volume" "mountPath" "/mnt/rstudio-connect-runtime/" }}
@@ -222,7 +183,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       {{- $_ := set $initContainer "securityContext" .Values.backends.kubernetes.defaultInitContainer.securityContext }}
     {{- end }}
     {{- /* build the content container */}}
-    {{- $contentVolumeMount := dict "name" "rsc-volume" "mountPath" "/opt/rstudio-connect" }}
+    {{- /* The content container mounts the runtime volume at ConnectRuntimeDir,
+           where Connect expects to find the runtime components. Derive the
+           mountPath from the resolved config value so the two can never diverge.
+           The default here MUST match the ConnectRuntimeDir default injected in
+           rstudio-connect.config. */}}
+    {{- /* default handles empty/null overrides (dig only fills in a missing key),
+           so config.Kubernetes.ConnectRuntimeDir: "" still falls back here. */}}
+    {{- $runtimeDir := default "/opt/rstudio-connect-runtime" (dig "Kubernetes" "ConnectRuntimeDir" "" .Values.config) }}
+    {{- $contentVolumeMount := dict "name" "rsc-volume" "mountPath" $runtimeDir }}
     {{- $contentContainer := dict "name" "connect-content" "volumeMounts" (list $contentVolumeMount) }}
     {{- /* build the shared volume */}}
     {{- $rscVolume := dict "name" "rsc-volume" "emptyDir" (dict) }}
@@ -283,10 +252,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
         {{- $mounts := default list .volumeMounts }}
         {{- $hasMount := false }}
         {{- range $mounts }}
-          {{- if and (eq .name "rsc-volume") (eq .mountPath "/opt/rstudio-connect") }}
+          {{- if and (eq .name "rsc-volume") (eq .mountPath $runtimeDir) }}
             {{- $hasMount = true }}
+          {{- else if eq .mountPath $runtimeDir }}
+            {{- fail (printf "backends.kubernetes.defaultResourceJobBase: connect-content container has a volumeMount at %s using a volume other than rsc-volume. This mountPath is reserved for the runtime volume (ConnectRuntimeDir) shared with the init container." $runtimeDir) }}
           {{- else if eq .mountPath "/opt/rstudio-connect" }}
-            {{- fail "backends.kubernetes.defaultResourceJobBase: connect-content container has a volumeMount at /opt/rstudio-connect using a volume other than rsc-volume. This mountPath is reserved for the runtime volume shared with the init container." }}
+            {{- fail "backends.kubernetes.defaultResourceJobBase: connect-content container has a volumeMount at /opt/rstudio-connect. This is the Connect installation and content bind-mount root (/opt/rstudio-connect/mnt/app) and must not be mounted over." }}
           {{- end }}
         {{- end }}
         {{- if not $hasMount }}

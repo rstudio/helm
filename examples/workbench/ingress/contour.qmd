@@ -1,0 +1,17 @@
+---
+category: "Ingress"
+---
+
+# Configuring Posit Workbench with a Contour HTTPProxy
+
+This example deploys Posit Workbench behind [Contour](https://projectcontour.io) using an `HTTPProxy` instead of a standard Kubernetes `Ingress`.
+Contour's `Ingress` annotations don't expose cookie-based session affinity, which Workbench requires when running more than one replica, so the chart's templated `Ingress` is disabled and an `HTTPProxy` is supplied via `extraObjects`.
+
+The `HTTPProxy` configures TLS, websockets (required for the RStudio IDE, VS Code, Positron, and Jupyter), long timeouts so idle sessions are not torn down by Envoy, and the `X-Forwarded-Proto` / `X-RStudio-Request` headers Workbench needs to generate correct redirect URLs.
+
+Please visit the [Contour HTTPProxy documentation](https://projectcontour.io/docs/main/config/fundamentals/) for more details specific to your use case.
+
+{{< include ../_prereqs.qmd >}}
+
+```{.yaml include="rstudio-workbench-contour-ingress.yaml" filename="values.yaml"}
+```

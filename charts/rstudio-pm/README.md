@@ -1,11 +1,26 @@
 # Posit Package Manager
 
-![Version: 0.5.58](https://img.shields.io/badge/Version-0.5.58-informational?style=flat-square) ![AppVersion: 2026.04.2](https://img.shields.io/badge/AppVersion-2026.04.2-informational?style=flat-square)
+![Version: 0.20.9](https://img.shields.io/badge/Version-0.20.9-informational?style=flat-square) ![AppVersion: 2026.11.0](https://img.shields.io/badge/AppVersion-2026.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
 IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
+
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
 
 ## For production
 
@@ -14,7 +29,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
@@ -24,11 +39,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.5.58:
+To install the chart with the release name `my-release` at version 0.20.9:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.5.58
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.20.9
 ```
 
 To explore other chart versions, look at:
@@ -38,6 +53,11 @@ helm search repo rstudio/rstudio-pm -l
 ```
 
 ## Upgrade guidance
+
+### 0.20.0
+
+- Chart version 0.20.0 switches default images from `rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
+- Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`. The chart will fail with a clear error if you have `image.tagPrefix` set — replace it with `image.os`.
 
 ### 0.4.0
 
@@ -245,9 +265,9 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | gatewayApi.parentRefs | list | `[]` | parentRefs attach HTTPRoutes to an existing Gateway (or other supported parent). Required when `gatewayApi.enabled` is true. [Gateway API parent reference](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference) |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-package-manager"` | the repository to use for the main pod image |
-| image.tag | string | `""` | the tag to use for the main pod image |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"posit/package-manager"` | the repository to use for the main pod image |
+| image.tag | string | `""` | the tag to use for the main pod image. Overrides os and appVersion |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -279,7 +299,7 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | pod.volumes | list | `[]` | volumes is an array of maps that is injected as-is into the "volumes:" component of the pod spec |
 | podDisruptionBudget | object | `{}` | Pod disruption budget |
 | priorityClassName | string | `""` | The pod's priorityClassName |
-| readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__ping__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe |
+| readinessProbe | object | `{"enabled":true,"failureThreshold":3,"httpGet":{"path":"/__cluster-health__","port":4242},"initialDelaySeconds":3,"periodSeconds":3,"successThreshold":1,"timeoutSeconds":1}` | readinessProbe is used to configure the container's readinessProbe. `/__cluster-health__` needs Package Manager 2026.06.0 or later; on older images set `readinessProbe.httpGet.path` to `/__ping__`. |
 | replicas | int | `1` | replicas is the number of replica pods to maintain for this service |
 | resources | object | `{"limits":{"cpu":"2000m","enabled":false,"ephemeralStorage":"200Mi","memory":"4Gi"},"requests":{"cpu":"100m","enabled":false,"ephemeralStorage":"100Mi","memory":"2Gi"}}` | resources define requests and limits for the rstudio-pm pod |
 | revisionHistoryLimit | int | `3` | The revisionHistoryLimit to use for the pod deployment. Do not set to 0 |
@@ -317,5 +337,5 @@ The Helm `config` values are converted into the `rstudio-pm.gcfg` service config
 | versionOverride | string | `""` | A Package Manager version to override the "tag" for the RStudio Package Manager image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
 

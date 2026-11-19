@@ -12,6 +12,14 @@ main() {
   _logf 'Ensuring %s exists' "${dyn_dir}"
   mkdir -p "${dyn_dir}"
 
+  if [[ -f "${launcher_pem}" ]]; then
+    # fsGroup adds group-read (0640) to the secret mount, which rserver rejects for
+    # launcher.pem. Read the key from a private 0600 copy instead; dyn_dir precedes
+    # the secret mount in XDG_CONFIG_DIRS.
+    _logf 'Copying %s to %s with mode 0600' "${launcher_pem}" "${dyn_dir}/launcher.pem"
+    install -m 0600 "${launcher_pem}" "${dyn_dir}/launcher.pem"
+  fi
+
   if [[ ! -s "${launcher_pub}" ]] && [[ -f "${launcher_pem}" ]]; then
     _logf 'Generating %s from %s' "${launcher_pub}" "${launcher_pem}"
     openssl rsa -in "${launcher_pem}" -outform PEM -pubout -out "${launcher_pub}" 2>&1 | _indent
@@ -25,16 +33,6 @@ main() {
     _logf "Enabling load-balancing by making sure that the /mnt/load-balancer/rstudio/load-balancer file exists"
     mkdir -p /mnt/load-balancer/rstudio/
     echo -e "delete-node-on-exit=1\nwww-host-name=$(hostname -i)" > /mnt/load-balancer/rstudio/load-balancer
-  fi
-
-  _logf 'Preparing dirs'
-  mkdir -p \
-    /var/lib/rstudio-server/monitor/log
-  
-  if [ -d "/var/lib/rstudio-server/Local" ]; then
-    chown -v -R \
-    rstudio-server:rstudio-server \
-    /var/lib/rstudio-server/Local 2>&1 | _indent
   fi
 
   _writeEtcRstudioReadme
@@ -69,7 +67,7 @@ in order to facilitate running in Kubernetes. The directories are specified via
 the XDG_CONFIG_DIRS environment variable defined in the Helm chart. The currently
 defined directories are:
 
-$(echo "$XDG_CONFIG_DIRS" | sed 's/:/\n/g')
+$(echo "$XDG_CONFIG_DIRS" | tr ':' '\n')
 $HERE$
   ) > /etc/rstudio/README
 }

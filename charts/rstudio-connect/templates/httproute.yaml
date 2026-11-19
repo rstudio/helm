@@ -1,4 +1,7 @@
 {{- if and .Values.gatewayApi.enabled .Values.gatewayApi.hosts -}}
+{{- if not .Values.gatewayApi.parentRefs -}}
+{{- fail "gatewayApi.parentRefs is required when gatewayApi.enabled is true and gatewayApi.hosts is set" -}}
+{{- end -}}
 {{- $apiVersion := include "rstudio-library.gateway.apiVersion" . -}}
 {{- $fullName := include "rstudio-connect.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}

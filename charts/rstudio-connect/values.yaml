@@ -2,10 +2,8 @@
 nameOverride: ""
 # -- The full name of the release (can be overridden)
 fullnameOverride: ""
-
 # -- A Connect version to override the "tag" for the Posit Connect image and the Content Init image. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
-
 sharedStorage:
   # -- Whether to create the persistentVolumeClaim for shared storage
   create: false
@@ -32,9 +30,11 @@ sharedStorage:
   selector: {}
   # -- the volumeName passed along to the persistentVolumeClaim. Optional
   volumeName: ""
-  # -- an optional subPath for the volume mount
+  # -- an optional subPath for the volume mount. Also applied to content pod
+  # mounts for the launcher and the direct Kubernetes runner
+  # (backends.kubernetes.enabled). The direct runner requires Connect 2026.08.0
+  # or later. Must be a relative path.
   subPath: ""
-
 rbac:
   # -- Whether to create rbac. (also depends on launcher.enabled = true or backends.kubernetes.enabled = true)
   create: true
@@ -49,10 +49,8 @@ rbac:
     name: ""
     annotations: {}
     labels: {}
-
 # -- Extra objects to deploy (value evaluated as a template)
 extraObjects: []
-
 # -- A map used verbatim as the pod's "affinity" definition
 affinity: {}
 # -- A map used verbatim as the pod's "nodeSelector" definition
@@ -65,34 +63,29 @@ tolerations: []
 priorityClassName: ""
 # -- Pod disruption budget
 podDisruptionBudget: {}
-
 # -- The revisionHistoryLimit to use for the pod deployment. Do not set to 0
 revisionHistoryLimit: 3
-
 # -- Defines the Posit Connect image to deploy
 image:
   # -- The repository to use for the main pod image
-  repository: ghcr.io/rstudio/rstudio-connect
-  # -- A tag prefix for the server image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-  tagPrefix: ubuntu2204-
+  repository: posit/connect
+  # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+  os: "ubuntu-24.04"
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- The imagePullPolicy for the main pod image
   imagePullPolicy: "IfNotPresent"
   # -- an array of kubernetes secrets for pulling the main pod image from private registries
   imagePullSecrets: []
-
 # -- Defines the update strategy for a deployment
 strategy:
   type: "RollingUpdate"
   rollingUpdate:
     maxSurge: "100%"
     maxUnavailable: 0
-
 deployment:
   # -- Additional annotations to add to the rstudio-connect deployment
   annotations: {}
-
 service:
   # -- Annotations for the service, for example to specify [an internal load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer)
   annotations: {}
@@ -111,7 +104,6 @@ service:
   port: 80
   # -- The port to forward to on the Connect pod. Also see pod.port
   targetPort: 3939
-
 pod:
   # -- A helper that defines the RSTUDIO_CONNECT_HASTE environment variable
   haste: true
@@ -137,14 +129,12 @@ pod:
   terminationGracePeriodSeconds: 120
   # -- Array of hostnames to supply to the main pod
   hostAliases: []
-
 # -- The pod's run command. By default, it uses the container's default
 command: []
 # -- The pod's run arguments. By default, it uses the container's default
 args: []
 # -- The number of replica pods to maintain for this service
 replicas: 1
-
 license:
   # -- key is the license to use
   key: null
@@ -163,17 +153,14 @@ license:
     secretKey: "license.lic"
     # -- secret is an existing secret with a license file in it
     secret: false
-
 # -- Values to set the `securityContext` for the Connect container. It must include "privileged: true" or "CAP_SYS_ADMIN" when
 # running in local execution mode. If launcher or backends.kubernetes is enabled, this can be removed with `securityContext: {}`
 securityContext: {}
-
 prometheus:
   # -- The parent setting for whether to enable prometheus metrics. Default is to use the built-in product exporter
   enabled: true
   # -- The port that prometheus will listen on
   port: 3232
-
 serviceMonitor:
   # -- Whether to create a ServiceMonitor CRD for use with a Prometheus Operator
   enabled: false
@@ -184,18 +171,17 @@ serviceMonitor:
   # Operator
   additionalLabels: {}
   #   release: kube-prometheus-stack
-
 # -- Defines resources for the rstudio-connect container
 resources: {}
-  # requests:
-  #   memory: "1Gi"
-  #   cpu: "100m"
-  #   ephemeral-storage: "100Mi"
-  # limits:
-  #   enabled: false
-  #   memory: "2Gi"
-  #   cpu: "2000m"
-  #   ephemeral-storage: "200Mi"
+# requests:
+#   memory: "1Gi"
+#   cpu: "100m"
+#   ephemeral-storage: "100Mi"
+# limits:
+#   enabled: false
+#   memory: "2Gi"
+#   cpu: "2000m"
+#   ephemeral-storage: "200Mi"
 
 # -- Used to configure the container's livenessProbe. Only included if enabled = true
 livenessProbe:
@@ -207,7 +193,6 @@ livenessProbe:
   periodSeconds: 5
   timeoutSeconds: 2
   failureThreshold: 10
-
 # -- Used to configure the container's startupProbe. Only included if enabled = true
 startupProbe:
   enabled: false
@@ -219,7 +204,6 @@ startupProbe:
   timeoutSeconds: 1
   # -- failureThreshold * periodSeconds should be strictly > worst case startup time
   failureThreshold: 30
-
 # -- Used to configure the container's readinessProbe. Only included if enabled = true
 readinessProbe:
   enabled: true
@@ -231,10 +215,8 @@ readinessProbe:
   timeoutSeconds: 1
   successThreshold: 1
   failureThreshold: 3
-
 # -- The initContainer spec that will be used verbatim
 initContainers: false
-
 ingress:
   enabled: false
   # -- The ingressClassName for the ingress resource. Only used for clusters that support
@@ -250,6 +232,17 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+# Settings for the Chronicle bundled with Connect. Unrelated to the deprecated `chronicleAgent`
+# sidecar below.
+chronicle:
+  # -- Overrides for Chronicle, rendered as a `chronicle-local.gcfg` and applied after
+  #    the configuration Connect generates. Keys are Chronicle's own `.gcfg` sections and
+  #    properties
+  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).
+  #    Use it for anything `config.Chronicle` does not expose.
+  localConfig: {}
+  # Logging:
+  #   Level: DEBUG
 
 # -- Gateway API (HTTPRoute) resources. Independent of `ingress`; both may be enabled if desired.
 gatewayApi:
@@ -274,9 +267,10 @@ gatewayApi:
   #     # or path: /api
   #     #    pathType: Prefix
 
+# DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:
-  # -- Creates a Chronicle agent sidecar container in the pod if true
+  # -- (DEPRECATED) Creates a Chronicle agent sidecar container in the pod if true
   enabled: false
   # -- Additional environment variables to set on the Chronicle agent container `env`
   env: []
@@ -301,12 +295,12 @@ chronicleAgent:
   autoDiscovery: true
   # -- Defines resources for the posit-chronicle-agent container
   resources: {}
-    # requests:
-    #   memory: "256Mi"
-    #   cpu: "100m"
-    # limits:
-    #   memory: "512Mi"
-    #   cpu: "200m"
+  # requests:
+  #   memory: "256Mi"
+  #   cpu: "100m"
+  # limits:
+  #   memory: "512Mi"
+  #   cpu: "200m"
   # -- Address for the Chronicle server including the protocol (ex. "http://address"), defaults to auto-discovered
   #    Chronicle server in the given namespace or is required if `chronicleAgent.autoDiscovery=false`
   serverAddress: ""
@@ -325,11 +319,10 @@ chronicleAgent:
   # -- An environment tag to apply to all metrics reported by this agent
   #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment))
   agentEnvironment: ""
-
 backends:
   kubernetes:
     # -- Whether to enable off-host execution for running content-jobs in remote Kubernetes pods.
-    enabled: false
+    enabled: true
     # -- The namespace to launch connect-content jobs into. Uses the Release namespace by default
     namespace: ""
     defaultInitContainer:
@@ -340,9 +333,7 @@ backends:
       # https://docs.posit.co/connect/admin/appendix/off-host/arch-overview/#runtime-init-container
       enabled: true
       # -- The repository to use for the Content InitContainer image
-      repository: ghcr.io/rstudio/rstudio-connect-content-init
-      # -- A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-      tagPrefix: ubuntu2204-
+      repository: posit/connect-content-init
       # -- Overrides the image tag whose default is the chart appVersion.
       tag: ""
       # -- The imagePullPolicy for the default initContainer
@@ -363,28 +354,15 @@ backends:
     # https://kubernetes.io/docs/concepts/services-networking/service/
     # https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays
     defaultResourceServiceBase: {}
-      # apiVersion: v1
-      # kind: Service
-      # spec:
-      #   type: NodePort
-
+    # apiVersion: v1
+    # kind: Service
+    # spec:
+    #   type: NodePort
 launcher:
   # -- Whether to enable the launcher
-  enabled: true
+  enabled: false
   # -- The namespace to launch sessions into. Uses the Release namespace by default
   namespace: ""
-  # -- Deprecated, use `executionEnvironments` instead. Optional. The runtime.yaml definition of Kubernetes runtime containers.
-  # If set to "base", will pull in the default runtime.yaml file.
-  # If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the
-  # cost of a larger image).
-  # Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments
-  # the first time the server starts. If any execution environments already exist in the database, these values are ignored;
-  # execution environments are not created or modified during subsequent restarts.
-  customRuntimeYaml: ""
-  # -- Deprecated, use `executionEnvironments` instead. Optional. Additional images to append to the end of
-  # the "launcher.customRuntimeYaml" (in the "images" key).
-  # If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list".
-  additionalRuntimeImages: []
   # -- User definition of launcher.kubernetes.profiles.conf for job customization
   launcherKubernetesProfilesConf: {}
   # -- Whether to use launcher templates when launching sessions. Defaults to true
@@ -444,67 +422,62 @@ launcher:
     # -- Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way.
     enabled: true
     # -- The repository to use for the Content InitContainer image
-    repository: ghcr.io/rstudio/rstudio-connect-content-init
-    # -- A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined
-    tagPrefix: ubuntu2204-
+    repository: posit/connect-content-init
     # -- Overrides the image tag whose default is the chart appVersion.
     tag: ""
     # -- The imagePullPolicy for the default initContainer
     imagePullPolicy: ""
     # -- Optional resources for the default initContainer
     resources: {}
-      # requests:
-      #   cpu: "128m"
-      #   memory: "128Mi"
-      # limits:
-      #   cpu: "512m"
-      #   memory: "512Mi"
+    # requests:
+    #   cpu: "128m"
+    #   memory: "128Mi"
+    # limits:
+    #   cpu: "512m"
+    #   memory: "512Mi"
     # -- The securityContext for the default initContainer
     securityContext: {}
-
 # -- Optional list of execution environments to manage declaratively.
 # Requires Connect version 2026.03.0 or later.
 # When set, the chart renders these into a ConfigMap, mounts it into the Connect pod,
 # and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration.
-# Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade
-# without requiring a pod restart or database reset.
+# Changes take effect on every helm upgrade without requiring a pod restart or database reset.
 # @default -- `[]` (disabled)
 executionEnvironments: []
-  # - name: ghcr.io/my-org/connect-runtime:ubuntu22
-  #   title: "Default Runtime"
-  #   description: "Runtime with R and Python"
-  #   matching: any
-  #   supervisor: ""
-  #   python:
-  #     installations:
-  #       - version: "3.11.3"
-  #         path: /opt/python/3.11.3/bin/python3
-  #   r:
-  #     installations:
-  #       - version: "4.4.0"
-  #         path: /opt/R/4.4.0/bin/R
-  #   quarto:
-  #     installations:
-  #       - version: "1.4.557"
-  #         path: /opt/quarto/1.4.557/bin/quarto
-  #   tensorflow:
-  #     installations:
-  #       - version: "2.17.1"
-  #         path: /usr/bin/tensorflow_model_server
+# - name: ghcr.io/my-org/connect-runtime:ubuntu22
+#   title: "Default Runtime"
+#   description: "Runtime with R and Python"
+#   matching: any
+#   supervisor: ""
+#   python:
+#     installations:
+#       - version: "3.11.3"
+#         path: /opt/python/3.11.3/bin/python3
+#   r:
+#     installations:
+#       - version: "4.4.0"
+#         path: /opt/R/4.4.0/bin/R
+#   quarto:
+#     installations:
+#       - version: "1.4.557"
+#         path: /opt/quarto/1.4.557/bin/quarto
+#   tensorflow:
+#     installations:
+#       - version: "2.17.1"
+#         path: /usr/bin/tensorflow_model_server
 
 # -- Nameservice configuration for current user execution (RunAsCurrentUser).
 # This can only be enabled if using an SSO authentication provider (OAuth2, SAML, or LDAP).
 nameservice:
   # -- Whether to enable nameservice integration.
   enabled: false
-  # -- Connect API key for nameservice module. Must be a Viewer API key.
+  # -- The Connect service token used by the nameservice module. Create a service token with the `nameservice:read` scope. See https://docs.posit.co/connect/api/#post-/v1/system/service-tokens.
   apiKey: ""
   # -- Connect server URL for nameservice module.
   server: "http://127.0.0.1:3939"
   # -- Optional: name of existing secret containing libnss_connect.conf (overrides apiKey and server).
   # The secret must be in the same namespace as the Connect deployment.
   secretName: ""
-
 # -- A nested map of maps that generates the rstudio-connect.gcfg file
 # @default -- [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/)
 config:
@@ -513,9 +486,11 @@ config:
   Authentication:
     Provider: password
   'RPackageRepository "CRAN"':
-    URL: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
   'RPackageRepository "RSPM"':
-    URL: https://packagemanager.rstudio.com/cran/__linux__/jammy/latest
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
+  'PythonPackageRepository "PyPI"':
+    URL: https://packagemanager.posit.co/pypi/latest/simple
   Server:
     Address: http://localhost:3939
     DataDir: /var/lib/rstudio-connect
@@ -525,14 +500,13 @@ config:
     # For Off-Host Execution, Python versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/python/
     Executable:
-      - /opt/python/3.12.11/bin/python
-      - /opt/python/3.13.9/bin/python
+      - /opt/python/3.14.10/bin/python
   Quarto:
     Enabled: true
     # Note: The `Executable` listed below is only used for Local Execution.
     # For Off-Host Execution, Quarto versions are defined by the set of Execution Environments
     # https://docs.posit.co/connect/admin/quarto/
-    Executable: "/opt/quarto/1.8.25/bin/quarto"
+    Executable: "/usr/local/bin/quarto"
   TensorFlow:
     Enabled: true
     # For off-host Execution, TensorFlow versions are defined by the set of Execution Environments https://docs.posit.co/connect/admin/tensorflow/
@@ -548,3 +522,6 @@ config:
     AccessLogFormat: COMMON  # COMMON, COMBINED, or JSON
   Launcher: {}
   Kubernetes: {}
+  Chronicle:
+    # Chronicle configuration -- see [Posit Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html)
+    Enabled: false

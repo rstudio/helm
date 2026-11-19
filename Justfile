@@ -49,14 +49,40 @@ lint:
 
 snapshot-rsw:
   #!/bin/bash
-  set -xe
+  set -e
 
-  helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" | sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' > charts/rstudio-workbench/snapshot/default.yaml
+  # The snapshots are named after the values files in `lint/`, which is where
+  # the lint-only scenarios live. `ci/` belongs to chart-testing (`ct lint` /
+  # `ct install`) and is deliberately not snapshotted.
+  #
+  # `global.secureCookieKey` and `launcherPem` are tables (`.value` /
+  # `.existingSecret`), so they have to be set through their `.value` key.
+  # Pinning them keeps the render deterministic: without them the chart
+  # generates a fresh cookie key and RSA launcher key on every run.
+  pin=(--set global.secureCookieKey.value=abc --set launcherPem.value=abc)
+  outdir=charts/rstudio-workbench/snapshot
+  failed=0
 
-  for file in `ls ./charts/rstudio-workbench/ci/*.yaml`; do
-    filename=$(basename $file)
-    helm template -n rstudio ./charts/rstudio-workbench --set global.secureCookieKey="abc" --set launcherPem="abc" -f $file | sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' > charts/rstudio-workbench/snapshot/$filename
+  render() {
+    local out="$1"; shift
+    echo "==> $out"
+    if ! helm template -n rstudio ./charts/rstudio-workbench "${pin[@]}" "$@" > "$out.tmp"; then
+      echo "ERROR: helm template failed for $out (snapshot not updated)" >&2
+      rm -f "$out.tmp"
+      failed=1
+      return
+    fi
+    sed -e 's|\(helm\.sh/chart\:\ [a-zA-Z\-]*\).*|\1VERSION|g' "$out.tmp" > "$out"
+    rm -f "$out.tmp"
+  }
+
+  render "$outdir/default.yaml"
+
+  for file in ./charts/rstudio-workbench/lint/*.yaml; do
+    render "$outdir/$(basename "$file")" -f "$file"
   done
+
+  exit $failed
 
 snapshot-rsw-lock:
   #!/bin/bash
@@ -67,13 +93,31 @@ snapshot-rsw-lock:
 
 snapshot-rsw-diff:
   #!/bin/bash
-  set -x
-  for file in `ls ./charts/rstudio-workbench/snapshot/*.yaml`; do
-    echo Diffing $file
-    if [[ `diff -q $file $file.lock` ]]; then
-        {{ DIFF }} $file $file.lock
+  outdir=charts/rstudio-workbench/snapshot
+  differed=0
+
+  for lock in "$outdir"/*.yaml.lock; do
+    file="${lock%.lock}"
+    if [[ ! -f "$file" ]]; then
+      echo "MISSING: $file was not generated (run \`just snapshot-rsw\` first)"
+      differed=1
+      continue
+    fi
+    if ! diff -q "$file" "$lock" > /dev/null; then
+      echo "DIFF: $file"
+      {{ DIFF }} "$lock" "$file"
+      differed=1
     fi
   done
+
+  for file in "$outdir"/*.yaml; do
+    [[ -f "$file.lock" ]] || { echo "UNTRACKED: $file has no .lock baseline"; differed=1; }
+  done
+
+  if [[ $differed -eq 0 ]]; then
+    echo "All snapshots match their .lock baselines"
+  fi
+  exit $differed
 
 test chart='all':
   #!/usr/bin/env bash
@@ -94,21 +138,21 @@ test-connect-interpreter-versions:
   # find the default image
   image=$(
     helm template ./charts/rstudio-connect \
-    --set launcher.enabled=false \
+    --set backends.kubernetes.enabled=false \
     --show-only templates/deployment.yaml | \
-    grep "image\:.*rstudio-connect.*" | \
+    grep "image\:.*posit/connect\:.*" | \
     awk -F": " '{print $2}' | \
     xargs)
 
   for lang in "Python" "Quarto" "R"
   do
     echo "Testing $lang"
-    
+
     # print the default connect config file for local execution in ini format
     # print the section and grep for the Executables to find each interpreter
     executables=$(
       helm template ./charts/rstudio-connect \
-      --set launcher.enabled=false \
+      --set backends.kubernetes.enabled=false \
       --show-only templates/configmap.yaml | \
       sed -n -e "/\[$lang\]/,/\[*\]/ p" | \
       grep Executable | awk -F= '{print $2}' | \
@@ -117,7 +161,20 @@ test-connect-interpreter-versions:
     for ex in $executables
     do
       echo "Checking $ex"
-      docker run --rm $image /bin/bash -c "command -v $ex"
+      if ! docker run --rm $image /bin/bash -c "command -v $ex"; then
+        echo "ERROR: $lang executable '$ex' configured in charts/rstudio-connect/values.yaml" >&2
+        echo "       was not found in image '$image'." >&2
+        echo "       Update the $lang Executable path in values.yaml to match the version shipped in the image:" >&2
+        # derive the install root from the configured path, e.g.
+        #   /opt/python/3.14.6/bin/python -> /opt/python (strip the version dir)
+        #   /usr/local/bin/quarto         -> /usr/local (no version dir)
+        install_root=$(dirname "$(dirname "$ex")")
+        if [[ "$(basename "$install_root")" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+          install_root=$(dirname "$install_root")
+        fi
+        docker run --rm $image /bin/bash -c "ls -d $install_root/*/ 2>/dev/null" >&2 || true
+        exit 1
+      fi
     done
   done
 

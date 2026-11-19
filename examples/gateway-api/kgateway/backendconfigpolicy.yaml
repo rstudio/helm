@@ -1,0 +1,37 @@
+# Session affinity (sticky sessions) for multi-replica Workbench and Connect.
+# Only needed when replicas > 1. Both products keep per-user state on the serving pod.
+# The policy targets the Service and sets consistent-hash load balancing on a cookie
+# that kgateway sets. Apply it in the release namespace.
+# Edit the names and namespaces below to match your releases.
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: posit-workbench-affinity
+  namespace: rstudio-workbench
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: posit-workbench-rstudio-workbench
+  loadBalancer:
+    ringHash:
+      hashPolicies:
+        - cookie: { name: posit-workbench-affinity, path: /, ttl: 86400s }
+          terminal: true
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: posit-connect-affinity
+  namespace: rstudio-connect
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: posit-connect-rstudio-connect
+  loadBalancer:
+    ringHash:
+      hashPolicies:
+        - cookie: { name: posit-connect-affinity, path: /, ttl: 86400s }
+          terminal: true

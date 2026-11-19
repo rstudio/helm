@@ -1,11 +1,26 @@
 # Posit Connect
 
-![Version: 0.9.5](https://img.shields.io/badge/Version-0.9.5-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.21.7](https://img.shields.io/badge/Version-0.21.7-informational?style=flat-square) ![AppVersion: 2026.11.1](https://img.shields.io/badge/AppVersion-2026.11.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
 Business Users and Collaborators use R and Python data products on [Posit Connect](https://posit.co/products/enterprise/connect/)
 that are published by Data Scientists.
+
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
 
 ## Best practices
 
@@ -30,11 +45,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.9.5:
+To install the chart with the release name `my-release` at version 0.21.7:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.9.5
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.21.7
 ```
 
 To explore other chart versions, look at:
@@ -44,6 +59,19 @@ helm search repo rstudio/rstudio-connect -l
 ```
 
 ## Upgrade guidance
+
+### 0.20.1
+
+- Chart version 0.10.0 changes the default execution backend to use a new Off-Host Execution implementation: `backends.kubernetes.enabled` now defaults to `true` and `launcher.enabled` now defaults to `false`.
+New installations use the new implementation by default. To continue using the Launcher, set `launcher.enabled: true` and `backends.kubernetes.enabled: false` in your values.yaml.
+See the [upgrade guide](https://docs.posit.co/helm/examples/connect/upgrade-launcher-to-kubernetes/launcher-to-kubernetes.html) for details on transitioning to the new implementation.
+  - **IMPORTANT** When `backends.kubernetes.enabled=true`, service accounts used for content execution require the `connect.posit.co/service-account` label.
+
+### 0.20.0
+
+- Chart version 0.20.0 switches default images from `ghcr.io/rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
+- Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`. The chart will fail with a clear error if you have `image.tagPrefix` set — replace it with `image.os`.
+- `launcher.customRuntimeYaml` and `launcher.additionalRuntimeImages` have been removed. Use `executionEnvironments` instead.
 
 ### 0.9.0
 
@@ -135,7 +163,124 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.Postgres.Password="<YOUR_PASSWORD_HERE>"`
 
-## Chronicle Agent
+## Chronicle
+
+Starting with Connect 2026.06, Chronicle is built into Connect and can be enabled by setting `config.Chronicle.Enabled: true`.
+Chronicle also requires Connect's Prometheus metrics endpoint, which this chart enables by default (`prometheus.enabled: true`).
+At least one storage backend -- local or S3 -- must also be configured, or Chronicle will fail to start.
+
+### Chronicle local storage
+
+Chronicle's data directory must be separate from Connect's own data directory (`sharedStorage`), so a dedicated
+volume should be mounted for it. The following example creates a PersistentVolumeClaim via `extraObjects` and
+mounts it into the Connect pod with `pod.volumes` / `pod.volumeMounts`:
+
+```yaml
+extraObjects:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: my-release-chronicle-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+
+pod:
+  volumes:
+    - name: chronicle-data
+      persistentVolumeClaim:
+        claimName: my-release-chronicle-data
+  volumeMounts:
+    - name: chronicle-data
+      mountPath: /var/lib/posit-chronicle/data
+
+config:
+  Chronicle:
+    Enabled: true
+    LocalStorageEnabled: true
+    LocalStorageLocation: /var/lib/posit-chronicle/data
+```
+
+If persistence isn't needed (for example, local testing), `LocalStorageEnabled: true` alone is enough --
+Chronicle will write to its default path (`/var/lib/posit-chronicle/data`) on the pod's ephemeral filesystem, and
+that data is lost on restart.
+
+If you run with `replicas > 1`, or use off-host execution (`backends.kubernetes.enabled` or `launcher.enabled`) on
+a platform other than AWS, the volume must support `ReadWriteMany` so every pod can share the same data. On AWS,
+prefer S3 storage instead so no shared volume is needed.
+
+### Chronicle S3 storage
+
+Alternatively, Chronicle can write directly to an S3 bucket, which avoids the need for shared storage entirely:
+
+```yaml
+config:
+  Chronicle:
+    Enabled: true
+    S3StorageEnabled: true
+    S3Bucket: my-chronicle-bucket
+    S3Region: us-east-1
+```
+
+`S3Bucket` and `S3Region` are both required when `S3StorageEnabled` is set. Chronicle uses the standard AWS
+credential chain to access the bucket; on EKS, [IAM Roles for Service
+Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) can be attached to
+the chart's service account:
+
+```yaml
+rbac:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
+```
+
+Whichever credentials Chronicle uses need `s3:GetObject`, `s3:ListBucket`, `s3:PutObject`, and `s3:DeleteObject`
+permissions on the bucket (and prefix, if `S3Prefix` is set).
+
+For more information on running Chronicle within Connect, see the [Connect Chronicle documentation](https://docs.posit.co/connect/admin/chronicle/index.html).
+
+### Chronicle settings not exposed by Connect
+
+Connect rewrites Chronicle's configuration file on every start, so it cannot be edited directly.
+Use `chronicle.localConfig` for anything `config.Chronicle` does not expose. Chronicle applies it
+after the configuration Connect generates, so any key set here takes precedence.
+
+Keys are Chronicle's own sections and properties, not `config.Chronicle` keys — see the
+[Chronicle configuration
+reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html). Check
+the [Connect configuration
+reference](https://docs.posit.co/connect/admin/appendix/configuration/) for the Chronicle
+settings your Connect version exposes.
+
+```yaml
+chronicle:
+  localConfig:
+    Logging:
+      Level: DEBUG
+```
+
+Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
+however the cluster normally does it
+
+Setting this adds an init container that prepares Chronicle's configuration directory: Chronicle
+creates its socket there as the `posit-chronicle` user, so the directory has to be a writable
+volume rather than a read-only mount. It requires a pod running as root, which is Connect's
+default.
+
+::: {.callout-warning}
+Chronicle refuses to start on a property it does not recognize. Check every property exists in
+the Chronicle version bundled with the Connect you are deploying.
+:::
+
+### Deprecated Chronicle Agent
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+Use the `config` options described above to enable Chronicle.
+:::
 
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
@@ -174,7 +319,11 @@ initContainers:
 
 For more information on Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
-### Chronicle Connect API Key
+#### Chronicle Connect API Key
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+:::
 
 In order to communicate with Connect, the Chronicle agent must be passed an API key. This can either be done by passing
 a Kubernetes secret (recommended) or by setting the key directly as an environment variable. Below is an example
@@ -199,8 +348,8 @@ can be set and the release can be upgraded to include the new value.
 
 This chart supports [declarative management of execution environments](https://docs.posit.co/connect/admin/appendix/off-host/execution-environments/#declarative-management)
 via `ExecutionEnvironments.ConfigFilePath`. Requires Connect version 2026.03.0 or later.
-Unlike the legacy `launcher.customRuntimeYaml`, changes to `executionEnvironments`
-take effect on every `helm upgrade` without requiring a pod restart or database reset.
+Changes to `executionEnvironments` take effect on every `helm upgrade` without
+requiring a pod restart or database reset.
 
 When `executionEnvironments` is set, the chart renders the list into a dedicated
 ConfigMap and mounts it into the Connect pod. Connect only manages the execution
@@ -299,21 +448,21 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | args | list | `[]` | The pod's run arguments. By default, it uses the container's default |
 | backends.kubernetes.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. Changing the default setting is an advanced option and not recommended. For more information on how Connect uses the session init container refer to https://docs.posit.co/connect/admin/appendix/off-host/arch-overview/#runtime-init-container |
 | backends.kubernetes.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
-| backends.kubernetes.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
+| backends.kubernetes.defaultInitContainer.repository | string | `"posit/connect-content-init"` | The repository to use for the Content InitContainer image |
 | backends.kubernetes.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
 | backends.kubernetes.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | backends.kubernetes.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| backends.kubernetes.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
 | backends.kubernetes.defaultResourceJobBase | object | `{}` | defaultResourceJobBase is an optional Kubernetes Job definition used as the base when launching content jobs. The chart automatically adds the init container and runtime volume when backends.kubernetes.defaultInitContainer.enabled is true. Only set this if you need to customize the job (e.g., add sidecars, node selectors, tolerations). https://kubernetes.io/docs/concepts/workloads/controllers/job/ |
 | backends.kubernetes.defaultResourceServiceBase | object | `{}` | defaultResourceServiceBase contains the Kubernetes Service definition which is used as an overlay "base" when creating a content job's Service in Kubernetes. Conceptually this is similar to a Kustomize base. Connect then applies any required Service configuration on-top of the overlay base to produce a final Service definition. https://kubernetes.io/docs/concepts/services-networking/service/ https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays |
-| backends.kubernetes.enabled | bool | `false` | Whether to enable off-host execution for running content-jobs in remote Kubernetes pods. |
+| backends.kubernetes.enabled | bool | `true` | Whether to enable off-host execution for running content-jobs in remote Kubernetes pods. |
 | backends.kubernetes.namespace | string | `""` | The namespace to launch connect-content jobs into. Uses the Release namespace by default |
+| chronicle.localConfig | object | `{}` | Overrides for Chronicle, rendered as a `chronicle-local.gcfg` and applied after    the configuration Connect generates. Keys are Chronicle's own `.gcfg` sections and    properties    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).    Use it for anything `config.Chronicle` does not expose. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
 | chronicleAgent.connectApiKey | object | `{"value":"","valueFrom":{}}` | An Administrator permissions API key generated in Connect for the Chronicle agent to use, API keys can only be    created after Connect has been deployed so this value may need to be filled in later if performing an initial    deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
 | chronicleAgent.connectApiKey.value | string | `""` | Connect API key as a raw string to set as the `CHRONICLE_CONNECT_APIKEY` environment variable (not recommended) |
 | chronicleAgent.connectApiKey.valueFrom | object | `{}` | Connect API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_CONNECT_APIKEY` environment variable (recommended) |
-| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.enabled | DEPRECATED | `false` | Creates a Chronicle agent sidecar container in the pod if true |
 | chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
 | chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
@@ -328,7 +477,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | command | list | `[]` | The pod's run command. By default, it uses the container's default |
 | config | object | [Posit Connect Configuration Reference](https://docs.posit.co/connect/admin/appendix/off-host/helm-reference/) | A nested map of maps that generates the rstudio-connect.gcfg file |
 | deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-connect deployment |
-| executionEnvironments | list | `[]` (disabled) | Optional list of execution environments to manage declaratively. Requires Connect version 2026.03.0 or later. When set, the chart renders these into a ConfigMap, mounts it into the Connect pod, and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration. Unlike launcher.customRuntimeYaml, changes take effect on every helm upgrade without requiring a pod restart or database reset. |
+| executionEnvironments | list | `[]` (disabled) | Optional list of execution environments to manage declaratively. Requires Connect version 2026.03.0 or later. When set, the chart renders these into a ConfigMap, mounts it into the Connect pod, and sets ExecutionEnvironments.ConfigFilePath in the Connect configuration. Changes take effect on every helm upgrade without requiring a pod restart or database reset. |
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template) |
 | fullnameOverride | string | `""` | The full name of the release (can be overridden) |
 | gatewayApi | object | `{"annotations":{},"enabled":false,"hosts":[],"labels":{},"parentRefs":[]}` | Gateway API (HTTPRoute) resources. Independent of `ingress`; both may be enabled if desired. |
@@ -336,29 +485,26 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | gatewayApi.hosts | list | `[]` | Same shape as `ingress.hosts`. Each entry becomes one HTTPRoute; omit or use empty `paths` to skip an entry. |
 | gatewayApi.labels | object | `{}` | Extra labels for all HTTPRoute resources created by this chart |
 | gatewayApi.parentRefs | list | `[]` | parentRefs attach HTTPRoutes to an existing Gateway (or other supported parent). Required when `gatewayApi.enabled` is true. [Gateway API parent reference](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference) |
-| image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"repository":"ghcr.io/rstudio/rstudio-connect","tag":"","tagPrefix":"ubuntu2204-"}` | Defines the Posit Connect image to deploy |
+| image | object | `{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"os":"ubuntu-24.04","repository":"posit/connect","tag":""}` | Defines the Posit Connect image to deploy |
 | image.imagePullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"ghcr.io/rstudio/rstudio-connect"` | The repository to use for the main pod image |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"posit/connect"` | The repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
 | ingress.ingressClassName | string | `""` | The ingressClassName for the ingress resource. Only used for clusters that support networking.k8s.io/v1 Ingress resources |
 | ingress.tls | list | `[]` |  |
 | initContainers | bool | `false` | The initContainer spec that will be used verbatim |
-| launcher.additionalRuntimeImages | list | `[]` | Deprecated, use `executionEnvironments` instead. Optional. Additional images to append to the end of the "launcher.customRuntimeYaml" (in the "images" key). If `customRuntimeYaml` is a "map", then "additionalRuntimeImages" will only be used if it is a "list". |
-| launcher.customRuntimeYaml | string | `""` | Deprecated, use `executionEnvironments` instead. Optional. The runtime.yaml definition of Kubernetes runtime containers. If set to "base", will pull in the default runtime.yaml file. If set to "pro", will pull in the "pro" versions of the default runtime images (i.e. including the pro drivers at the cost of a larger image). Starting with Connect v2023.05.0, this configuration is used to bootstrap the initial set of execution environments the first time the server starts. If any execution environments already exist in the database, these values are ignored; execution environments are not created or modified during subsequent restarts. |
-| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"ghcr.io/rstudio/rstudio-connect-content-init","resources":{},"securityContext":{},"tag":"","tagPrefix":"ubuntu2204-"}` | Image definition for the default Posit Connect Content InitContainer |
+| launcher.defaultInitContainer | object | `{"enabled":true,"imagePullPolicy":"","repository":"posit/connect-content-init","resources":{},"securityContext":{},"tag":""}` | Image definition for the default Posit Connect Content InitContainer |
 | launcher.defaultInitContainer.enabled | bool | `true` | Whether to enable the defaultInitContainer. If disabled, you must ensure that the session components are available another way. |
 | launcher.defaultInitContainer.imagePullPolicy | string | `""` | The imagePullPolicy for the default initContainer |
-| launcher.defaultInitContainer.repository | string | `"ghcr.io/rstudio/rstudio-connect-content-init"` | The repository to use for the Content InitContainer image |
+| launcher.defaultInitContainer.repository | string | `"posit/connect-content-init"` | The repository to use for the Content InitContainer image |
 | launcher.defaultInitContainer.resources | object | `{}` | Optional resources for the default initContainer |
 | launcher.defaultInitContainer.securityContext | object | `{}` | The securityContext for the default initContainer |
 | launcher.defaultInitContainer.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| launcher.defaultInitContainer.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the Content InitContainer image (common selections: jammy-, ubuntu2204-). Only used if tag is not defined |
-| launcher.enabled | bool | `true` | Whether to enable the launcher |
+| launcher.enabled | bool | `false` | Whether to enable the launcher |
 | launcher.extraTemplates | object | `{}` | extra templates to render in the template directory. |
 | launcher.includeDefaultTemplates | bool | `true` | whether to include the default `job.tpl` and `service.tpl` files included with the chart |
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
@@ -379,7 +525,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | livenessProbe | object | `{"enabled":false,"failureThreshold":10,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":5,"timeoutSeconds":2}` | Used to configure the container's livenessProbe. Only included if enabled = true |
 | nameOverride | string | `""` | The name of the chart deployment (can be overridden) |
 | nameservice | object | `{"apiKey":"","enabled":false,"secretName":"","server":"http://127.0.0.1:3939"}` | Nameservice configuration for current user execution (RunAsCurrentUser). This can only be enabled if using an SSO authentication provider (OAuth2, SAML, or LDAP). |
-| nameservice.apiKey | string | `""` | Connect API key for nameservice module. Must be a Viewer API key. |
+| nameservice.apiKey | string | `""` | The Connect service token used by the nameservice module. Create a service token with the `nameservice:read` scope. See https://docs.posit.co/connect/api/#post-/v1/system/service-tokens. |
 | nameservice.enabled | bool | `false` | Whether to enable nameservice integration. |
 | nameservice.secretName | string | `""` | Optional: name of existing secret containing libnss_connect.conf (overrides apiKey and server). The secret must be in the same namespace as the Connect deployment. |
 | nameservice.server | string | `"http://127.0.0.1:3939"` | Connect server URL for nameservice module. |
@@ -428,7 +574,7 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | sharedStorage.requests.storage | string | `"10Gi"` | The volume of storage to request for this persistent volume claim |
 | sharedStorage.selector | object | `{}` | selector for PVC definition |
 | sharedStorage.storageClassName | bool | `false` | The type of storage to use. Must allow ReadWriteMany |
-| sharedStorage.subPath | string | `""` | an optional subPath for the volume mount |
+| sharedStorage.subPath | string | `""` | an optional subPath for the volume mount. Also applied to content pod mounts for the launcher and the direct Kubernetes runner (backends.kubernetes.enabled). The direct runner requires Connect 2026.08.0 or later. Must be a relative path. |
 | sharedStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | startupProbe | object | `{"enabled":false,"failureThreshold":30,"httpGet":{"path":"/__ping__","port":3939},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":1}` | Used to configure the container's startupProbe. Only included if enabled = true |
 | startupProbe.failureThreshold | int | `30` | failureThreshold * periodSeconds should be strictly > worst case startup time |
@@ -438,5 +584,5 @@ The Helm `config` values are converted into the `rstudio-connect.gcfg` service c
 | versionOverride | string | `""` | A Connect version to override the "tag" for the Posit Connect image and the Content Init image. Necessary until https://github.com/helm/helm/issues/8194 |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
 

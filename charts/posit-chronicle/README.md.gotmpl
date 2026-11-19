@@ -2,6 +2,15 @@
 
 {{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
 
+::: {.callout-warning}
+## Deprecated
+
+The posit-chronicle Helm chart is deprecated and will be removed in a future release.
+
+You can now run Chronicle as part of the [Workbench](https://github.com/rstudio/helm/tree/main/charts/rstudio-workbench#chronicle)
+and [Connect](https://github.com/rstudio/helm/tree/main/charts/rstudio-connect#chronicle) charts.
+:::
+
 {{ template "rstudio.description" . }}
 
 {{ template "rstudio.disclaimer" . }}

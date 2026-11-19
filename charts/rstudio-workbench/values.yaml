@@ -3,7 +3,7 @@ nameOverride: ""
 # -- the full name of the release (can be overridden)
 fullnameOverride: ""
 
-# -- A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194
+# -- A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194
 versionOverride: ""
 
 # -- Settings for enabling server diagnostics
@@ -21,17 +21,16 @@ session:
   # -- The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods
   defaultSecretMountPath: /mnt/session-secret/
   image:
-    # -- A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined.
-    # The `rstudio/workbench-session` default repository does not publish tags in `{{ tagPrefix }}{{ appVersion }}`
-    # form — see the pinned tag below — so `tagPrefix` is effectively unused for the default session image.
-    tagPrefix: ubuntu2204-
+    # -- The OS version for the session image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+    os: "ubuntu-24.04"
+    # -- The R version for the session image tag. Only used if tag is not defined
+    rVersion: "4.5.2"
+    # -- The Python version for the session image tag. Only used if tag is not defined
+    pythonVersion: "3.14.3"
     # -- The repository to use for the session image
-    repository: "rstudio/workbench-session"
-    # -- A tag override for the session image. Pinned to an explicit R/Python matrix because
-    # `rstudio/workbench-session` publishes tags by language runtime version, not by Workbench release
-    # (unlike `rstudio/r-session-complete`). Pick a published tag from
-    # https://hub.docker.com/r/rstudio/workbench-session/tags.
-    tag: "ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11"
+    repository: "posit/workbench-session"
+    # -- A tag override for the session image. When empty, the chart computes the tag as `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}`
+    tag: ""
 
 # -- Session component delivery via init containers. When enabled (default), the chart
 # configures rserver.conf so the launcher injects init containers into session pods at startup.
@@ -44,7 +43,7 @@ components:
   sessionInit:
     image:
       # -- The repository for the session init container image
-      repository: "rstudio/workbench-session-init"
+      repository: "posit/workbench-session-init"
       # -- A tag override for the session init container. Default tag is the chart appVersion (or versionOverride)
       tag: ""
   positron:
@@ -54,7 +53,7 @@ components:
     version: ""
     image:
       # -- The image repository for the Positron init container
-      repository: "rstudio/workbench-positron-init"
+      repository: "posit/workbench-positron-init"
       # -- A tag override for the Positron init container image. Defaults to the positron version
       tag: ""
 
@@ -93,9 +92,28 @@ strategy:
     maxSurge: "100%"
     maxUnavailable: 0
 
+# Settings for the Chronicle bundled with Workbench. Unrelated to the deprecated
+# `chronicleAgent` sidecar below.
+chronicle:
+  # -- Overrides for the bundled Chronicle, rendered as a `chronicle-local.gcfg` and applied
+  #    after the configuration Workbench generates. Keys are Chronicle's own `.gcfg` sections and
+  #    properties
+  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).
+  #    Use it for anything Workbench does not expose as an `rserver.conf` key, such as S3 storage.
+  localConfig: {}
+  # LocalStorage:
+  #   Enabled: false
+  # S3Storage:
+  #   Enabled: true
+  #   Bucket: my-chronicle-bucket
+  #   Region: us-east-2
+  # Logging:
+  #   Level: DEBUG
+
+# DEPRECATED: The posit-chronicle helm chart is deprecated and will be removed in a future release.
 # Settings for the Chronicle Agent sidecar container
 chronicleAgent:
-  # -- Creates a Chronicle agent sidecar container in the pod if true
+  # -- (DEPRECATED) Creates a Chronicle agent sidecar container in the pod if true
   enabled: false
   # -- Additional environment variables to set on the Chronicle agent container `env`
   env: []
@@ -177,6 +195,10 @@ launcher:
       volumeMounts: []
       env: []
       imagePullPolicy: ""
+      # -- imagePullPolicy for the init containers the launcher adds to session pods (e.g. session-init, positron-init).
+      # Images tagged `:daily` or `:latest` (such as the Positron preview init image) always use `Always`.
+      # Leave empty to use the Kubernetes default.
+      initContainerImagePullPolicy: ""
       imagePullSecrets: []
       initContainers: []
       extraContainers: []
@@ -229,9 +251,9 @@ homeStorage:
 
 image:
   # -- the repository to use for the main pod image
-  repository: rstudio/rstudio-workbench
-  # -- A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined
-  tagPrefix: ubuntu2204-
+  repository: posit/workbench
+  # -- The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined
+  os: "ubuntu-24.04"
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # -- the imagePullPolicy for the main pod image
@@ -363,9 +385,10 @@ loadBalancer:
   # -- whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node
   forceEnabled: false
 
-# -- command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup
+# -- command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation.
 command: []
-# -- args is the pod container's run arguments.
+# -- args is the pod container's run arguments. When unset, the container's default arguments are used.
+# @default -- the image's built-in arguments
 args: []
 
 license:
@@ -428,6 +451,18 @@ podDisruptionBudget: {}
 revisionHistoryLimit: 3
 
 pod:
+  # -- Whether the pod's containers run as the root OS user. `true` (default) preserves historical
+  # behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on.
+  # `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to
+  # `pod.serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root
+  # `rserver.conf`/`launcher.conf` defaults are applied.
+  runAsRoot: true
+  # -- The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user`
+  # from `rserver.conf` entirely.
+  serviceAccountUser: "rstudio-server"
+  # -- The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `pod.runAsRoot` is
+  # false. Must match the UID of `pod.serviceAccountUser` baked into the Workbench image.
+  serviceAccountUserId: 999
   # -- env is an array of maps that is injected as-is into the "env:" component of the pod.container spec
   env: []
   # -- volumes is injected as-is into the "volumes:" component of the pod.container spec
@@ -573,7 +608,7 @@ config:
   # -- a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default.
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
     rsession.conf: {}
     notifications.conf: {}
     rstudio-prefs.json: |
@@ -592,14 +627,19 @@ config:
   #   items:
   #   - key: custom-file.conf
   #     path: custom-file.conf
-  # -- a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions
+  # -- DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`.
   userProvisioning: {}
+  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD.
+  sssd:
+    # -- whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `pod.runAsRoot` is false. Set to `false` to disable entirely.
+    enabled: true
+    # -- a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`.
+    conf: {}
   # -- a map of server config files. Mounted to `/mnt/configmap/rstudio/`
   # @default -- [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values`
   server:
     rserver.conf:
       server-health-check-enabled: 1
-      auth-pam-sessions-enabled: 1
       admin-enabled: 1
       www-port: 8787
       server-project-sharing: 1
@@ -608,6 +648,8 @@ config:
       launcher-sessions-enabled: 1
       launcher-default-cluster: Kubernetes
       audited-jobs: 1
+      chronicle-enabled: 0
+      metrics-enabled: 0
     launcher.conf:
       server:
         address: 127.0.0.1
@@ -687,19 +729,8 @@ config:
     launcher-mounts: []
   # -- a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/
   startupCustom: {}
-  # -- a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/
-  startupUserProvisioning:
-    sssd.conf: |
-      [program:sssd]
-      command=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr
-      autorestart=false
-      numprocs=1
-      stdout_logfile=/dev/stdout
-      stdout_logfile_maxbytes=0
-      stdout_logfile_backups=0
-      stderr_logfile=/dev/stderr
-      stderr_logfile_maxbytes=0
-      stderr_logfile_backups=0
+  # -- a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons.
+  startupUserProvisioning: {}
 
   # -- a map of pam config files. Will be mounted into the container directly / per file, in order to avoid overwriting system pam files
   pam: {}

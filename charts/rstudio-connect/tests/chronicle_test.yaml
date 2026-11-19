@@ -1,0 +1,133 @@
+suite: Bundled Chronicle configuration
+templates:
+  - configmap.yaml
+  - configmap-prestart.yaml
+  - deployment.yaml
+tests:
+  - it: should not emit a chronicle-local.gcfg by default
+    template: configmap.yaml
+    documentIndex: 0
+    asserts:
+      - notExists:
+          path: 'data["chronicle-local.gcfg"]'
+
+  - it: should not add the chronicle-config init container or volume by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")]'
+      - notExists:
+          path: 'spec.template.spec.volumes[?(@.name=="chronicle-config")]'
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.name=="chronicle-config")]'
+
+  - it: should render chronicle.localConfig as a gcfg file with section headers
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+          S3Storage:
+            Enabled: true
+            Bucket: my-chronicle-bucket
+            Region: us-east-2
+    asserts:
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: '\[Logging\]\nLevel=DEBUG'
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: 'Bucket=my-chronicle-bucket'
+
+  # Chronicle's config dir must be writable by posit-chronicle for its socket. A plain subPath
+  # mount leaves it root-owned and Chronicle fails to start, hence the emptyDir + init container.
+  - it: should stage the override into an emptyDir owned by posit-chronicle
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+    asserts:
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: chronicle-config
+            emptyDir: {}
+          any: true
+      - contains:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")].volumeMounts'
+          content:
+            name: chronicle-config
+            mountPath: /mnt/chronicle-config
+          any: true
+      - matchRegex:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")].command[2]'
+          pattern: 'install -d -o posit-chronicle -g posit-chronicle'
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: chronicle-config
+            mountPath: "/etc/rstudio-connect/chronicle"
+          any: true
+
+  - it: should fail when chronicle.localConfig is set and the pod runs as non-root
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+      pod:
+        securityContext:
+          runAsNonRoot: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "chronicle.localConfig requires the Connect pod to run as root: the chronicle-config init container chowns /etc/rstudio-connect/chronicle for posit-chronicle. Remove pod.securityContext.runAsNonRoot / a non-zero pod.securityContext.runAsUser, or unset chronicle.localConfig."
+
+  - it: should fail when chronicle.localConfig is set and the pod runs as a non-zero uid
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+      pod:
+        securityContext:
+          runAsUser: 1000
+    asserts:
+      - failedTemplate:
+          errorMessage: "chronicle.localConfig requires the Connect pod to run as root: the chronicle-config init container chowns /etc/rstudio-connect/chronicle for posit-chronicle. Remove pod.securityContext.runAsNonRoot / a non-zero pod.securityContext.runAsUser, or unset chronicle.localConfig."
+
+  # The connect container's own securityContext has no bearing on what UID the
+  # chronicle-config init container runs as (it inherits pod.securityContext, not this), so it
+  # must not trip the guard above.
+  - it: should not fail when only the connect container's securityContext restricts to non-root
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+    asserts:
+      - exists:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")]'
+
+  - it: should not fail when pod.securityContext explicitly sets runAsUser to 0
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+      pod:
+        securityContext:
+          runAsUser: 0
+    asserts:
+      - exists:
+          path: 'spec.template.spec.initContainers[?(@.name=="chronicle-config")]'

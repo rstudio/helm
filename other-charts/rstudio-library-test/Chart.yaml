@@ -2,7 +2,7 @@ apiVersion: v2
 name: rstudio-library-test
 description: Test harness for rstudio-library templates
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "0.1.0"
 
 maintainers:

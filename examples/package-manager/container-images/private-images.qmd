@@ -14,6 +14,8 @@ The default public images are on Docker Hub:
 
 Package Manager: [rstudio/rstudio-package-manager](https://hub.docker.com/r/rstudio/rstudio-package-manager)
 
+For a list of all images that each chart uses, and for other ways to authenticate to your registry, see [Private container registries](../../../docs/private-registries.qmd).
+
 {{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-pm-custom-image-private.yaml" filename="values.yaml"}

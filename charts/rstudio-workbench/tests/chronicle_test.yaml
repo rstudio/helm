@@ -1,0 +1,74 @@
+suite: Bundled Chronicle configuration
+templates:
+  - configmap-general.yaml
+  - configmap-prestart.yaml
+  - configmap-secret.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+tests:
+  - it: should not emit a chronicle-local.gcfg by default
+    template: configmap-general.yaml
+    documentIndex: 0
+    asserts:
+      - notExists:
+          path: 'data["chronicle-local.gcfg"]'
+
+  - it: should render chronicle.localConfig as a gcfg file with section headers
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      chronicle:
+        localConfig:
+          LocalStorage:
+            Enabled: false
+          S3Storage:
+            Enabled: true
+            Bucket: my-chronicle-bucket
+            Region: us-east-2
+    asserts:
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: '\[LocalStorage\]\nEnabled=false'
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: '\[S3Storage\]'
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: 'Bucket=my-chronicle-bucket'
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: 'Region=us-east-2'
+
+  # chronicle.localConfig needs no volume of its own only because Workbench finds the file via
+  # XDG_CONFIG_DIRS in the general config mount. Changing either breaks it silently.
+  - it: should keep the config mount on XDG_CONFIG_DIRS so Workbench finds the override
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+    asserts:
+      - matchRegex:
+          path: 'spec.template.spec.containers[0].env[?(@.name=="XDG_CONFIG_DIRS")].value'
+          pattern: '/mnt/configmap'
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: rstudio-config
+            mountPath: "/mnt/configmap/rstudio/"
+          any: true
+
+  - it: should still render a config.server chronicle-local.gcfg entry
+    template: configmap-general.yaml
+    documentIndex: 0
+    set:
+      config:
+        server:
+          chronicle-local.gcfg:
+            Logging:
+              Level: DEBUG
+    asserts:
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: '\[Logging\]\nLevel=DEBUG'

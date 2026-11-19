@@ -11,23 +11,26 @@ on:
 jobs:
   issues:
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Map label to project URL
         id: project-url
+        env:
+          LABEL_NAME: ${{ github.event.label.name }}
         run: |
-          if [ "${{ github.event.label.name }}" = "team: connect" ]; then
+          if [ "$LABEL_NAME" = "team: connect" ]; then
             echo "PROJECT=https://github.com/orgs/posit-dev/projects/23" >> "$GITHUB_OUTPUT"
             echo "ORG=posit-dev" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: workbench" ]; then
+          elif [ "$LABEL_NAME" = "team: workbench" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/92" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: package manager" ]; then
+          elif [ "$LABEL_NAME" = "team: package manager" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/48" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: chronicle" ]; then
+          elif [ "$LABEL_NAME" = "team: chronicle" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/134" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.label.name }}" = "team: launcher" ]; then
+          elif [ "$LABEL_NAME" = "team: launcher" ]; then
             echo "PROJECT=https://github.com/orgs/rstudio/projects/222" >> "$GITHUB_OUTPUT"
             echo "ORG=rstudio" >> "$GITHUB_OUTPUT"
           else
@@ -36,15 +39,16 @@ jobs:
       - name: Generate token for GitHub App
         id: generate-token
         if: steps.project-url.outputs.project != 'none'
-        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3  # v3.1.1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
         with:
-          app-id: ${{ secrets.POSIT_PLATFORM_APP_ID }}
+          client-id: ${{ secrets.POSIT_PLATFORM_CLIENT_ID }}
           private-key: ${{ secrets.POSIT_PLATFORM_PEM }}
           owner: ${{ steps.project-url.outputs.ORG }}
+          permission-organization-projects: write
       - name: Add issue to project
         id: add-to-project
         if: steps.project-url.outputs.project != 'none'
-        uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e  # v1.0.2
+        uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd  # v2.0.0
         with:
           project-url: ${{ steps.project-url.outputs.PROJECT }}
           github-token: ${{ steps.generate-token.outputs.token }}

@@ -1,11 +1,26 @@
 # Posit Workbench
 
-![Version: 0.11.3](https://img.shields.io/badge/Version-0.11.3-informational?style=flat-square) ![AppVersion: 2026.04.0](https://img.shields.io/badge/AppVersion-2026.04.0-informational?style=flat-square)
+![Version: 0.22.10](https://img.shields.io/badge/Version-0.22.10-informational?style=flat-square) ![AppVersion: 2026.11.0](https://img.shields.io/badge/AppVersion-2026.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
 Data Scientists use [Posit Workbench](https://posit.co/products/enterprise/workbench/) to analyze data and create data
 products using R and Python.
+
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
 
 ## For production
 
@@ -14,7 +29,7 @@ To ensure a stable production deployment:
 * "Pin" the version of the Helm chart that you are using. You can do this using the:
   * `helm dependency` command *and* the associated "Chart.lock" files *or*
   * the `--version` flag.
- 
+
     ::: {.callout-important}
     This protects you from breaking changes.
     :::
@@ -24,11 +39,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.11.3:
+To install the chart with the release name `my-release` at version 0.22.10:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.11.3
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.22.10
 ```
 
 To explore other chart versions, look at:
@@ -62,20 +77,22 @@ To function, this chart requires the following:
 * If using load balancing (by setting `replicas > 1`), you need similar storage defined for `sharedStorage` to
   store shared project configuration. However, you can also configure the product to store its shared data underneath `/home` by
   setting `config.server.rserver\.conf.server-shared-storage-path=/home/some-shared-dir`.
-* A method to join the deployed `rstudio-workbench` container to your auth domain. The default `rstudio/rstudio-workbench` image has `sssd` installed and started by default.
-  You can include `sssd` configuration in `config.userProvisioning` like so:
+* A method to join the deployed `rstudio-workbench` container to your auth domain. The `posit/workbench` image ships `sssd` for legacy LDAP/Active Directory provisioning; because it must run as root, the bundled daemon starts only when `config.sssd.enabled: true` and `pod.runAsRoot: true`. Modern provisioning (SCIM / native) does not require `sssd`. See [User provisioning](#user-provisioning) for details.
+  Provide `sssd` configuration in `config.sssd.conf` like so:
 
     ```yaml
     config:
-      userProvisioning:
-        mysssd.conf:
-          sssd:
-            config_file_version: 2
-            services: nss, pam
-            domains: rstudio.com
-          domain/rstudio.com:
-            id_provider: ldap
-            auth_provider: ldap
+      sssd:
+        enabled: true
+        conf:
+          mysssd.conf:
+            sssd:
+              config_file_version: 2
+              services: nss, pam
+              domains: rstudio.com
+            domain/rstudio.com:
+              id_provider: ldap
+              auth_provider: ldap
     ```
 
 ## Licensing
@@ -172,29 +189,32 @@ Alternatively, database passwords may be set during `helm install` with the foll
 
 `--set config.secret.'database\.conf'.password="<YOUR_PASSWORD_HERE>"`
 
+## Upgrade guidance
+
+### 0.20.0
+
+- Chart version 0.20.0 switches default images from `rstudio/` to the `posit/` namespace on Docker Hub (also available at `ghcr.io/posit-dev/`). See the [migration guide](https://docs.posit.co/helm/docs/migrating-to-posit-images.html) for details.
+- Image tag format changed from `{tagPrefix}{appVersion}` to `{appVersion}-{os}`. The chart will fail with a clear error if you have `image.tagPrefix` or `session.image.tagPrefix` set.
+- Session image tag is now constructed from `session.image.rVersion`, `session.image.pythonVersion`, and `session.image.os` (format: `R{rVersion}-python{pythonVersion}-{os}`).
+
 ## Session images
 
-By default, session pods use the `rstudio/workbench-session` image with an init
-container (`rstudio/workbench-session-init`) that delivers Workbench session
-components at pod startup.
+By default, session pods use the `posit/workbench-session` image (also available
+at `ghcr.io/posit-dev/workbench-session`) with an init container
+(`posit/workbench-session-init`) that delivers Workbench session components at
+pod startup.
 
-### Upgrading from 0.10.x
+The session image tag is constructed from three values: `session.image.rVersion`,
+`session.image.pythonVersion`, and `session.image.os`. Override
+`session.image.tag` to bypass this construction entirely.
 
-Chart defaults require no additional configuration, but the default
-`session.image.tag` now pins an explicit R/Python matrix (see `values.yaml`)
-because `rstudio/workbench-session` does not publish Workbench-version-shaped
-tags. Review the pinned tag against
-[hub.docker.com/r/rstudio/workbench-session/tags](https://hub.docker.com/r/rstudio/workbench-session/tags)
-during each Workbench upgrade.
+### Upgrading from 0.11.x
 
-If you pin `session.image.repository: rstudio/r-session-complete`, also set
-`components.enabled: false` to preserve the previous behavior. The
-`r-session-complete` tag format (`<tagPrefix><appVersion>`) still works there.
+If you use default values, no action is needed. If you customized session images:
 
-If you adopt the init-container pattern with a custom session image, confirm
-that the image does not already include Workbench session components (only
-language runtimes, system tools, and similar dependencies). Otherwise, the init
-container repeats work that the image already performs.
+- Replace `session.image.tagPrefix` with `session.image.os`, `session.image.rVersion`, and `session.image.pythonVersion`
+- Replace `session.image.repository: rstudio/workbench-session` with `posit/workbench-session`
+- If you pinned `session.image.tag` to an old-format string (e.g., `ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11`), verify that tag exists in the `posit/workbench-session` repository or update to the new format
 
 For platform-level upgrade steps, see the [Posit Workbench administrator guide](https://docs.posit.co/ide/server-pro/).
 
@@ -299,9 +319,9 @@ the `XDG_CONFIG_DIRS` environment variable.
   - It is mounted into the pod at `/scripts/`.
   - `prestart-workbench.bash` is used to start workbench.
   - `prestart-launcher.bash` is used to start launcher.
-- User Provisioning Configuration:
-  - These configuration files are used for configuring user provisioning (i.e., `sssd`).
-  - Located at:<br> `config.userProvisioning.<< name of file >>` Helm values
+- SSSD Configuration:
+  - These configuration files configure the bundled `sssd` daemon (legacy LDAP/AD provisioning), which is started only when `config.sssd.enabled=true`.
+  - Located at:<br> `config.sssd.conf.<< name of file >>` Helm values. The deprecated `config.userProvisioning` is still read when `config.sssd.conf` is unset.
   - Mounted onto:<br> `/etc/sssd/conf.d/` with `0600` permissions by default.
 - Custom Startup Configuration:
   - `supervisord` service / unit definition `.conf` files.
@@ -341,7 +361,7 @@ R package repositories can be configured with `config.session.repos.conf`:
 config:
   session:
     repos.conf:
-      CRAN: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      CRAN: https://packagemanager.posit.co/cran/__linux__/noble/latest
 ```
 
 For more information about configuring CRAN repositories in Workbench, see the [Posit Workbench Administrator Guide's - Package Installation > CRAN repositories](https://docs.posit.co/ide/server-pro/rstudio_pro_sessions/package_installation.html#cran-repositories) section.
@@ -352,9 +372,9 @@ Provisioning users in Workbench containers is challenging. Session images create
 consistent UIDs / GIDs). However, creating users in the Workbench containers is a responsibility that falls to the
 administrator.
 
-The most common way to provision users is via `sssd`.
-The [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
-has `sssd` included and running by default (see `userProvisioning` configuration files above).
+Posit Workbench's native user provisioning (SCIM / just-in-time) is the recommended approach and does not require SSSD.
+`sssd` is the legacy approach: the [latest Workbench container](https://github.com/rstudio/rstudio-docker-products/tree/main/workbench#user-provisioning)
+includes `sssd`, but it is started only when `config.sssd.enabled=true` (which requires `pod.runAsRoot: true`; see `config.sssd` above).
 
 The other way that this can be managed is via a lightweight startup service (runs once at startup and then sleeps forever)
 or a polling service (checks at regular intervals). Either can be written easily in `bash` or another programming language.
@@ -501,7 +521,106 @@ launcher:
           effect: "NoSchedule"
 ```
 
-## Chronicle Agent
+## Chronicle
+
+Starting with Workbench 2026.06, Chronicle is built into Workbench and can be enabled by setting the following values.
+Note that Workbench will not start if `chronicle-enabled` is set without `metrics-enabled`.
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+```
+
+### Chronicle storage
+
+By default, Chronicle writes its data under Workbench's shared-storage path
+(`<server-shared-storage-path>/chronicle`, which defaults to `/var/lib/rstudio-server/shared-storage/chronicle`).
+To persist that data across pod restarts, back it with a PersistentVolumeClaim using `sharedStorage`, which this
+chart mounts at `/var/lib/rstudio-server` by default:
+
+```yaml
+sharedStorage:
+  create: true
+
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+```
+
+Without persistent `sharedStorage`, Chronicle's data lives on the pod's ephemeral filesystem and is lost on
+restart. To store Chronicle's data at a different location instead, set `chronicle-storage-location`:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-storage-location: /path/to/chronicle/data
+```
+
+Workbench does not expose an S3 storage option as an `rserver.conf` key; use `chronicle.localConfig` for S3
+storage instead, as described in [Chronicle settings not exposed by Workbench](#chronicle-settings-not-exposed-by-workbench).
+
+To also have Chronicle collect user information, the admin-level Workbench API must be enabled by additionally
+setting `workbench-api-admin-enabled`:
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+      workbench-api-admin-enabled: 1
+```
+
+For more information on running Chronicle within Workbench, see the [Workbench Chronicle documentation](https://docs.posit.co/ide/server-pro/admin/auditing_and_monitoring/chronicle.html).
+
+### Chronicle settings not exposed by Workbench
+
+Workbench rewrites Chronicle's configuration file on every start, so it cannot be edited
+directly. Use `chronicle.localConfig` for anything Workbench does not expose as an
+`rserver.conf` key. Chronicle applies it after the configuration Workbench generated, so any key
+set here takes precedence.
+
+Keys are Chronicle's own sections and properties, not `rserver.conf` keys — see the [Chronicle
+configuration
+reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html).
+
+```yaml
+config:
+  server:
+    rserver.conf:
+      chronicle-enabled: 1
+      metrics-enabled: 1
+
+chronicle:
+  localConfig:
+    LocalStorage:
+      Enabled: false
+    S3Storage:
+      Enabled: true
+      Bucket: my-chronicle-bucket
+      Region: us-east-2
+```
+
+Chronicle reads AWS credentials from the environment first, so grant the pod bucket access
+however the cluster normally does it.
+
+::: {.callout-warning}
+Chronicle refuses to start on a property it does not recognize. Check every property exists in
+the Chronicle version bundled with the Workbench you are deploying.
+:::
+
+### Deprecated Chronicle Agent
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+Use the `config` options described above to enable Chronicle.
+:::
 
 This chart supports use of a sidecar [Chronicle agent](https://docs.posit.co/chronicle/) to report data to a Chronicle server. The agent can be enabled
 by setting `chronicleAgent.enabled=true`.
@@ -535,7 +654,11 @@ initContainers:
 
 For more information on Posit Chronicle, see the [Chronicle documentation](https://docs.posit.co/chronicle/).
 
-### Chronicle Workbench API Key
+#### Chronicle Workbench API Key
+
+::: {.callout-warning}
+**Deprecated**: The sidecar support for Chronicle in this helm chart is deprecated and will be removed in a future release.
+:::
 
 > [!WARNING]
 > The Workbench API is currently in preview. See
@@ -602,11 +725,13 @@ To activate the use of `SealedSecret` templates instead of `Secret` templates in
 
 - `config.secret`
 - `config.sessionSecret`
-- `config.userProvisioning`
+- `config.sssd.conf` (or the deprecated `config.userProvisioning`)
 - `launcherPem`
 - `secureCookieKey` (or `global.secureCookieKey`)
 
 Use of [Sealed secrets](https://github.com/bitnami-labs/sealed-secrets) disables the chart's auto-generation and reuse capabilities for `launcherPem` and `secureCookieKey`. `launcherPem` is an RSA private key, which can be generated via an RSA tool such as Helm's [`genPrivateKey`](https://helm.sh/docs/chart_template_guide/function_list/#genprivatekey) function. `secureCookieKey` is typically a UUID, which can be generated via a UUID generator such as Helm's [`uuidv4`](https://helm.sh/docs/chart_template_guide/function_list/#uuid-functions) function.
+
+When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=false`), you **must** explicitly provide `secureCookieKey` (value or existingSecret, local or global). In rootless mode the launcher reads `/mnt/secret-configmap/rstudio/secure-cookie-key`, so the key cannot be omitted.
 
 ## Gateway API
 
@@ -644,10 +769,11 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
-| args | list | `[]` | args is the pod container's run arguments. |
+| args | list | the image's built-in arguments | args is the pod container's run arguments. When unset, the container's default arguments are used. |
+| chronicle.localConfig | object | `{}` | Overrides for the bundled Chronicle, rendered as a `chronicle-local.gcfg` and applied    after the configuration Workbench generates. Keys are Chronicle's own `.gcfg` sections and    properties    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).    Use it for anything Workbench does not expose as an `rserver.conf` key, such as S3 storage. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
-| chronicleAgent.enabled | bool | `false` | Creates a Chronicle agent sidecar container in the pod if true |
+| chronicleAgent.enabled | DEPRECATED | `false` | Creates a Chronicle agent sidecar container in the pod if true |
 | chronicleAgent.env | list | `[]` | Additional environment variables to set on the Chronicle agent container `env` |
 | chronicleAgent.image.imagePullPolicy | string | `"IfNotPresent"` | The pull policy for the Chronicle agent image |
 | chronicleAgent.image.registry | string | `"ghcr.io"` | The Chronicle agent image registry |
@@ -662,13 +788,13 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | chronicleAgent.workbenchApiKey | object | `{"value":"","valueFrom":{}}` | A read-only administrator permissions API key generated for Workbench for the Chronicle agent to use, API keys    can only be created after Workbench has been deployed so this value may need to be filled in later if performing    an initial deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
-| command | list | `[]` | command is the pod container's run command. By default, it uses the container's default. However, the chart expects a container using `supervisord` for startup |
-| components | object | `{"enabled":true,"positron":{"image":{"repository":"rstudio/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"rstudio/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
+| command | list | `[]` | command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation. |
+| components | object | `{"enabled":true,"positron":{"image":{"repository":"posit/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"posit/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
 | components.enabled | bool | `true` | Enable session component delivery via init containers. When false, no init containers are configured and session.image must be a self-contained image like r-session-complete. |
-| components.positron.image.repository | string | `"rstudio/workbench-positron-init"` | The image repository for the Positron init container |
+| components.positron.image.repository | string | `"posit/workbench-positron-init"` | The image repository for the Positron init container |
 | components.positron.image.tag | string | `""` | A tag override for the Positron init container image. Defaults to the positron version |
 | components.positron.version | string | `""` | A Positron version to enable the Positron init container for session pods. When set, configures rserver.conf with the Positron init container settings and attaches a Positron init container to the Workbench server pod. |
-| components.sessionInit.image.repository | string | `"rstudio/workbench-session-init"` | The repository for the session init container image |
+| components.sessionInit.image.repository | string | `"posit/workbench-session-init"` | The repository for the session init container image |
 | components.sessionInit.image.tag | string | `""` | A tag override for the session init container. Default tag is the chart appVersion (or versionOverride) |
 | config.database | object | `{"conf":{"existingSecret":"","value":""}}` | a map of database connection config files. Mounted to `/mnt/secret-configmap/rstudio/database.conf` with 0600 permissions |
 | config.database.conf.existingSecret | string | `""` | Secret for database connection config. Will take precedence over `config.database.conf.value`.  Key: 'database.conf' |
@@ -688,11 +814,14 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | config.secret | string | `nil` | a map of secret, server-scoped config files (database.conf, databricks.conf, openid-client-secret). Mounted to `/mnt/secret-configmap/rstudio/` with 0600 permissions |
 | config.server | object | [RStudio Workbench Configuration Reference](https://docs.rstudio.com/ide/server-pro/rstudio_server_configuration/rstudio_server_configuration.html). See defaults with `helm show values` | a map of server config files. Mounted to `/mnt/configmap/rstudio/` |
 | config.serverDcf | object | `{"launcher-mounts":[]}` | a map of server-scoped config files (akin to `config.server`), but with .dcf file formatting (i.e. `launcher-mounts`, `launcher-env`, etc.) |
-| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/jammy/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
+| config.session | object | `{"notifications.conf":{},"repos.conf":{"CRAN":"https://packagemanager.posit.co/cran/__linux__/noble/latest"},"rsession.conf":{},"rstudio-prefs.json":"{}\n"}` | a map of session-scoped config files. Mounted to `/mnt/session-configmap/rstudio/` on both server and session, by default. |
 | config.sessionSecret | object | `{}` | a map of secret, session-scoped config files (odbc.ini, etc.). Mounted to `/mnt/session-secret/` on both server and session, by default |
+| config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
+| config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |
+| config.sssd.enabled | bool | `true` | whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `pod.runAsRoot` is false. Set to `false` to disable entirely. |
 | config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
-| config.startupUserProvisioning | object | `{"sssd.conf":"[program:sssd]\ncommand=/usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr\nautorestart=false\nnumprocs=1\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstdout_logfile_backups=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\nstderr_logfile_backups=0\n"}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/ |
-| config.userProvisioning | object | `{}` | a map of sssd config files, used for user provisioning. Mounted to `/etc/sssd/conf.d/` with 0600 permissions |
+| config.startupUserProvisioning | object | `{}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons. |
+| config.userProvisioning | object | `{}` | DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`. |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
 | deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench deployment |
 | diagnostics | object | `{"directory":"/var/log/rstudio","enabled":false}` | Settings for enabling server diagnostics |
@@ -718,9 +847,9 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | homeStorage.volumeName | string | `""` | the volumeName passed along to the persistentVolumeClaim. Optional |
 | image.imagePullPolicy | string | `"IfNotPresent"` | the imagePullPolicy for the main pod image |
 | image.imagePullSecrets | list | `[]` | an array of kubernetes secrets for pulling the main pod image from private registries |
-| image.repository | string | `"rstudio/rstudio-workbench"` | the repository to use for the main pod image |
+| image.os | string | `"ubuntu-24.04"` | The OS version for the image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| image.repository | string | `"posit/workbench"` | the repository to use for the main pod image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for the server image (common selection: ubuntu2204-). Only used if tag is not defined |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | string | `nil` |  |
@@ -734,8 +863,9 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | launcher.includeTemplateValues | bool | `true` | whether to include the templateValues rendering process |
 | launcher.kubernetesHealthCheck | object | `{"enabled":true,"extraCurlArgs":["-fsSL"]}` | configuration for the "Kubernetes Health Check" that the launcher entrypoint runs at startup |
 | launcher.namespace | string | `""` | allow customizing the namespace that sessions are launched into. Note RBAC and some config issues today |
-| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
+| launcher.templateValues | object | `{"job":{"annotations":{},"labels":{},"ttlSecondsAfterFinished":null},"pod":{"affinity":{},"annotations":{},"command":[],"containerSecurityContext":{},"defaultSecurityContext":{},"env":[],"ephemeralStorage":{"limit":"","request":""},"extraContainers":[],"hostAliases":[],"imagePullPolicy":"","imagePullSecrets":[],"initContainerImagePullPolicy":"","initContainers":[],"labels":{},"nodeSelector":{},"securityContext":{},"serviceAccountName":"","suppressStdinAnnotation":false,"tolerations":[],"volumeMounts":[],"volumes":[]},"service":{"annotations":{},"labels":{},"type":"ClusterIP"}}` | values that are passed along to the launcher job rendering process as a data object (in JSON). These values are then used within session templates. |
 | launcher.templateValues.pod.command | list | `[]` | command for all pods. This is really not something we should expose and will be removed once we have a better option |
+| launcher.templateValues.pod.initContainerImagePullPolicy | string | `""` | imagePullPolicy for the init containers the launcher adds to session pods (e.g. session-init, positron-init). Images tagged `:daily` or `:latest` (such as the Positron preview init image) always use `Always`. Leave empty to use the Kubernetes default. |
 | launcher.templateValues.pod.suppressStdinAnnotation | bool | `false` | Set to true to suppress the `stdin` pod annotation on session pods. The annotation mirrors the full stdin payload (session environment variables) into Kubernetes pod metadata, making it visible in kubectl describe, audit logs, and monitoring tools. This can expose sensitive values such as TLS certificates. The annotation is purely informational and safe to disable. |
 | launcher.useTemplates | bool | `true` | whether to render and use templates in the job launching process |
 | launcherPem | object | `{"existingSecret":"","value":""}` | An inline launcher.pem key. If not provided, one will be auto-generated. See README for more details. |
@@ -760,7 +890,10 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | pod.labels | object | `{}` | Additional labels to add to the rstudio-workbench pods |
 | pod.lifecycle | object | `{}` | container lifecycle hooks |
 | pod.port | int | `8787` | The containerPort used by the main pod container |
+| pod.runAsRoot | bool | `true` | Whether the pod's containers run as the root OS user. `true` (default) preserves historical behavior: pod runs as root (`runAsUser: 0`), SSSD starts, secrets mount 0600, PAM sessions on. `false` runs unprivileged: pod sets `runAsNonRoot: true` and `runAsUser`/`fsGroup` to `pod.serviceAccountUserId`, SSSD is skipped, secrets mount 0640, and non-root `rserver.conf`/`launcher.conf` defaults are applied. |
 | pod.securityContext | object | `{}` | Values to set the `securityContext` for the service pod |
+| pod.serviceAccountUser | string | `"rstudio-server"` | The OS user written to `rserver.conf` as `server-user`. Set to `""` to omit `server-user` from `rserver.conf` entirely. |
+| pod.serviceAccountUserId | int | `999` | The UID used as `runAsUser`/`fsGroup` in the pod's securityContext when `pod.runAsRoot` is false. Must match the UID of `pod.serviceAccountUser` baked into the Workbench image. |
 | pod.sidecar | list | `[]` | sidecar is an array of containers that will be run alongside the main container |
 | pod.terminationGracePeriodSeconds | int | `120` | The termination grace period seconds allowed for the pod before shutdown |
 | pod.volumeMounts | list | `[]` | volumeMounts is injected as-is into the "volumeMounts:" component of the pod.container spec |
@@ -803,9 +936,11 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | session.defaultConfigMount | bool | `true` | Whether to automatically mount the config.session configuration into session pods. If launcher.namespace is different from Release Namespace, then the chart will duplicate the session configmap in both namespaces to facilitate this |
 | session.defaultHomeMount | bool | `true` | Whether to automatically add the homeStorage PVC to the session (i.e. via the `launcher-mounts` file) |
 | session.defaultSecretMountPath | string | `"/mnt/session-secret/"` | The path to mount the sessionSecret (from `config.sessionSecret`) onto the server and session pods |
-| session.image.repository | string | `"rstudio/workbench-session"` | The repository to use for the session image |
-| session.image.tag | string | `"ubuntu2204-r4.5.2_4.4.3-py3.13.9_3.12.11"` | A tag override for the session image. Pinned to an explicit R/Python matrix because `rstudio/workbench-session` publishes tags by language runtime version, not by Workbench release (unlike `rstudio/r-session-complete`). Pick a published tag from https://hub.docker.com/r/rstudio/workbench-session/tags. |
-| session.image.tagPrefix | string | `"ubuntu2204-"` | A tag prefix for session images (common selections: ubuntu2204-). Only used if tag is not defined. The `rstudio/workbench-session` default repository does not publish tags in `{{ tagPrefix }}{{ appVersion }}` form — see the pinned tag below — so `tagPrefix` is effectively unused for the default session image. |
+| session.image.os | string | `"ubuntu-24.04"` | The OS version for the session image tag (e.g. ubuntu-24.04, ubuntu-22.04). Only used if tag is not defined |
+| session.image.pythonVersion | string | `"3.14.3"` | The Python version for the session image tag. Only used if tag is not defined |
+| session.image.rVersion | string | `"4.5.2"` | The R version for the session image tag. Only used if tag is not defined |
+| session.image.repository | string | `"posit/workbench-session"` | The repository to use for the session image |
+| session.image.tag | string | `""` | A tag override for the session image. When empty, the chart computes the tag as `R{{ rVersion }}-python{{ pythonVersion }}-{{ os }}` |
 | shareProcessNamespace | bool | `false` | whether to provide `shareProcessNamespace` to the pod. |
 | sharedStorage.accessModes | list | `["ReadWriteMany"]` | accessModes defined for the storage PVC (represented as YAML) |
 | sharedStorage.annotations | object | `{"helm.sh/resource-policy":"keep"}` | Define the annotations for the Persistent Volume Claim resource |
@@ -829,10 +964,10 @@ Path entries use the same shape as `ingress.hosts` paths: a string or an object 
 | userPassword.existingSecret | string | `""` | Existing Secret for userPassword. Will take precedence over `userPassword.value`. Key: 'password' |
 | userPassword.value | string | `"rstudio"` | userPassword determines the password of the created user. Will only be used if `userPassword.existingSecret` is not set. |
 | userUid | string | `"10000"` | userUid determines the UID of the created user |
-| versionOverride | string | `""` | A Workbench version to override the "tag" for the RStudio Workbench image and the session images. Necessary until https://github.com/helm/helm/issues/8194 |
+| versionOverride | string | `""` | A Workbench version to override the "tag" for the server image and session-init container. Does not affect the session image tag, which is controlled by session.image.rVersion, session.image.pythonVersion, and session.image.os. Necessary until https://github.com/helm/helm/issues/8194 |
 | xdgConfigDirs | string | `"/mnt/dynamic:/mnt/session-configmap:/mnt/secret-configmap:/mnt/configmap:/mnt/load-balancer/"` | The XDG config dirs (directories where configuration will be read from). Do not change without good reason. |
 | xdgConfigDirsExtra | list | `[]` | A list of additional XDG config dir paths |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
 

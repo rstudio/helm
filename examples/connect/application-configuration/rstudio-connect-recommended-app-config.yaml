@@ -20,19 +20,6 @@ sharedStorage:
     storage: 100G
 
 extraObjects:
-  # Required to set a custom PyPI repo
-  - apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: pip-config-connect
-    data:
-      # TODO: if using Posit Package Manager, edit the below to match your package manager python repo URL
-      pip.conf: |
-        [global]
-        timeout = 60
-        index-url = https://packagemanager.posit.co/pypi/latest/simple
-        trusted-host = packagemanager.posit.co
-
   # Required for authenticated R (not Python) repositories
   - apiVersion: v1
     kind: ConfigMap
@@ -48,11 +35,6 @@ launcher:
   templateValues:
     pod:
       volumes:
-        # Required to set a custom Python repo
-        - name: pip-config-volume
-          configMap:
-            name: pip-config-connect
-
         # Required for authenticated R and Python repositories
         # See the following documentation for more details:
         # https://packagemanager.posit.co/__docs__/admin/connect.html#authenticated-repositories
@@ -69,11 +51,6 @@ launcher:
             name: curlrc-config-connect
 
       volumeMounts:
-        # Required to set a custom Python repo
-        - mountPath: /etc/pip.conf
-          name: pip-config-volume
-          subPath: pip.conf
-
         # Required for authenticated R and Python repositories
         - mountPath: /etc/netrc
           name: netrc-config-volume
@@ -96,6 +73,31 @@ launcher:
 securityContext:
   privileged: false
 
+# Define the image used to execute content.
+# Each entry describes the runtime versions available in a content image.
+# Match these to the runtime versions in your content image.
+# You can also manage execution environments through the Connect UI or API.
+# launcher.customRuntimeYaml was removed in
+# chart 0.20.0, so use the top-level executionEnvironments key for both
+# backends. This key requires Connect 2026.03.0 or later. 
+# https://docs.posit.co/connect/admin/appendix/off-host/execution-environments
+executionEnvironments:
+  - name: posit/connect-content:R4.6-python3.14-ubuntu-24.04-pro # TODO: Change to match your content image
+    title: "Default Runtime"
+    description: "Runtime with R, Python, and Quarto"
+    python:
+      installations:
+        - path: /opt/python/3.14.6/bin/python3 # TODO: Match the Python path in your content image
+          version: 3.14.6 # TODO: Match the Python version in your content image
+    r:
+      installations:
+        - path: /opt/R/4.6.1/bin/R # TODO: Match the R path in your content image
+          version: 4.6.1 # TODO: Match the R version in your content image
+    quarto:
+      installations:
+        - path: /opt/quarto/1.9.38/bin/quarto # TODO: Match the Quarto path in your content image
+          version: 1.9.38 # TODO: Match the Quarto version in your content image
+
 # The config section overwrites values in Posit Connect's main
 # .gcfg configuration file.
 config:
@@ -111,9 +113,18 @@ config:
     Password: "<PASSWORD>" # TODO: Remove this line and instead set the password during helm install with --set config.Postgres.Password=<your-postgres-password>.
 
   "RPackageRepository \"CRAN\"":
-    URL: https://packagemanager.posit.co/cran/__linux__/jammy/latest # TODO: If using Package Manager change to match your package manager R repo url
-  # If using other R repos, add them here using the below format  
+    URL: https://packagemanager.posit.co/cran/__linux__/noble/latest # TODO: If using Package Manager change to match your package manager R repo url
+  # If using other R repos, add them here using the below format
   # "RPackageRepository \"INTERNAL\"":
-  #   URL: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+  #   URL: https://packagemanager.posit.co/cran/__linux__/noble/latest
+  # PythonPackageRepository sets the Python package index directly in Connect's
+  # configuration (Connect 2026.05.0 and later). This is the recommended way to
+  # point Connect at a Package Manager PyPI mirror and replaces mounting a pip.conf.
+  # https://docs.posit.co/connect/admin/integrations/package-manager/#configuring-connect-to-use-package-manager-for-python
+  "PythonPackageRepository \"PyPI\"":
+    URL: https://packagemanager.posit.co/pypi/latest/simple # TODO: If using Package Manager change to match your package manager Python repo url
+  # If using other Python repos, add them here using the below format
+  # "PythonPackageRepository \"INTERNAL\"":
+  #   URL: https://packagemanager.example.com/pypi/internal/simple
   Quarto:
     Enabled: true

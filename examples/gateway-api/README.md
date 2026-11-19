@@ -7,7 +7,7 @@ Pick the track that matches your ingress implementation:
 | Directory | Controller / dataplane | Notes |
 |-----------|------------------------|--------|
 | [aws](./aws/) | [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/) (ALB) | AWS-specific `LoadBalancerConfiguration`, ACM certificate ARNs, subnet tagging |
-| [kgateway](./kgateway/) | [KGateway](https://kgateway.dev/) (Envoy) | Cloud-agnostic Gateway API; install KGateway first, then apply the example `Gateway` |
+| [kgateway](./kgateway/) | [KGateway](https://kgateway.dev/) (Envoy) | Cloud-agnostic Gateway API; install KGateway first, then apply the example `Gateway`. Also apply the WebSocket policy: see [Tuning for Posit products](./kgateway/README.md#tuning-for-posit-products) |
 
 For classic **Ingress** on AWS (multiple `Ingress` objects, one ALB), see the [IngressGroup / `group.name`](../connect/ingress/aws-alb.qmd) notes in the per-product ALB examples.
 

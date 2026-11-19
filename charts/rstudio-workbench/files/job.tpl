@@ -47,7 +47,7 @@ spec:
         {{- $i = add $i 1 }}
         {{- end }}
         {{- end }}
-        {{- if not $templateData.pod.limitStdinAnnotation }}
+        {{- if not $templateData.pod.suppressStdinAnnotation }}
         stdin: {{ toYaml .Job.stdin | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- end }}
         user: {{ toYaml .Job.user }}
@@ -154,6 +154,11 @@ spec:
         {{- range . }}
         - name: {{ toYaml .name }}
           image: {{ toYaml .image }}
+          {{- if or (hasSuffix ":daily" .image) (hasSuffix ":latest" .image) }}
+          imagePullPolicy: Always
+          {{- else if $templateData.pod.initContainerImagePullPolicy }}
+          imagePullPolicy: {{- $templateData.pod.initContainerImagePullPolicy | nindent 12 }}
+          {{- end }}
           {{- $isShell := false }}
           {{- if .command }}
           command: ['/bin/sh']
@@ -271,9 +276,20 @@ spec:
               {{- toYaml $templateData.pod.env | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- with $templateData.pod.containerSecurityContext }}
+          {{- $containerSecurityContext := $templateData.pod.containerSecurityContext | default dict }}
+          {{- if or .Job.container.capabilitiesAdd .Job.container.capabilitiesDrop }}
+            {{- $capabilities := $containerSecurityContext.capabilities | default dict }}
+            {{- with .Job.container.capabilitiesAdd }}
+              {{- $_ := set $capabilities "add" (concat ($capabilities.add | default list) .) }}
+            {{- end }}
+            {{- with .Job.container.capabilitiesDrop }}
+              {{- $_ := set $capabilities "drop" (concat ($capabilities.drop | default list) .) }}
+            {{- end }}
+            {{- $_ := set $containerSecurityContext "capabilities" $capabilities }}
+          {{- end }}
+          {{- if $containerSecurityContext }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml $containerSecurityContext | nindent 12 }}
           {{- end }}
           {{- $exposedPorts := list }}
           {{- range .Job.exposedPorts }}

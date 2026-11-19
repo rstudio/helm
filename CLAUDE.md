@@ -40,8 +40,10 @@ charts/<chart-name>/
 ├── values.yaml         # Default configuration
 ├── README.md.gotmpl    # Documentation template (edit this, not README.md)
 ├── templates/          # Kubernetes resource templates
-├── ci/                 # Test value files (excluded from package)
+├── ci/                 # Test values run by `ct lint` AND `ct install` in CI
+├── lint/               # Test values that are only linted, never installed (`make lint`)
 ├── tests/              # helm-unittest test files
+├── snapshot/           # Committed rendered manifests (`just snapshot-rsw-diff`)
 └── files/              # Static files (launcher templates)
 ```
 
