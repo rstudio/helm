@@ -22,6 +22,9 @@ ingress:
   enabled: true
   ingressClassName: "alb"  # TODO: Fill in your desired ingressClassName for the ingress resource. If blank it will use the cluster default.
   annotations:
+    # Optional: same group name on each Posit Ingress merges rules onto one ALB (IngressGroup).
+    # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/guide/ingress/annotations/#group.name
+    # alb.ingress.kubernetes.io/group.name: posit-shared
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'

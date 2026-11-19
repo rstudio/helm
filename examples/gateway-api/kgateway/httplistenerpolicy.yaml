@@ -1,0 +1,20 @@
+# Enable WebSocket upgrades on the shared Gateway.
+# kgateway (Envoy) rejects WebSocket upgrades by default with 403. Workbench and Connect
+# sessions (RStudio, Jupyter, VS Code, Shiny, Dash, Streamlit) need them.
+# One policy on the Gateway covers every product attached to it.
+# Install in the Gateway namespace (here: kgateway-system).
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: HTTPListenerPolicy
+metadata:
+  name: posit-shared-ws
+  namespace: kgateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: posit-shared
+  upgradeConfig:
+    enabledUpgrades:
+      - websocket
+  # Optional: do not drop idle interactive sessions.
+  streamIdleTimeout: "0s"

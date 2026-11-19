@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.21.7
+
+- Add optional Gateway API support: the chart creates `HTTPRoute` resources from the `gatewayApi` values. It is off by default and independent of `ingress`.
+- Fail the render if `gatewayApi.enabled` is true, `gatewayApi.hosts` is set, and `gatewayApi.parentRefs` is empty.
+- Document shared Gateway API examples (`examples/gateway-api/aws`, `examples/gateway-api/kgateway`) in the README.
+- Update `rstudio-library` dependency to 0.1.38.
+
 ## 0.21.6
 
 - Bump Connect version to 2026.11.1

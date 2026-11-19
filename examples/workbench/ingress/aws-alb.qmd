@@ -9,6 +9,12 @@ This example is provided to show how to set annotations to enable session affini
 
 The AWS Load Balancer Controller has a variety of settings and modes of operation. Please visit the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/) for more details specific to your use case.
 
+## Sharing one ALB across multiple Ingresses
+
+Separate Ingress objects can each provision a separate ALB. To merge **multiple** Ingresses onto **one** ALB, set the same [`alb.ingress.kubernetes.io/group.name`](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/guide/ingress/annotations/#group.name) annotation on every Ingress (IngressGroup). The example `values.yaml` below includes a commented `group.name` line you can enable consistently across Connect, Package Manager, and Workbench releases.
+
+For a **single load balancer** using **Gateway API** instead of Ingress, see the repository [gateway-api/aws example](../../gateway-api/aws/README.md).
+
 {{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-workbench-alb-ingress.yaml" filename="values.yaml"}

@@ -1,0 +1,28 @@
+# Shared Envoy gateway (one proxy / LB path) for multiple HTTPRoutes.
+# Requires KGateway installed and GatewayClass "kgateway" (controllerName: kgateway.dev/kgateway).
+# https://kgateway.dev/docs/envoy/latest/setup/default/
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: posit-shared
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: posit-gateway-tls
+      allowedRoutes:
+        namespaces:
+          from: All

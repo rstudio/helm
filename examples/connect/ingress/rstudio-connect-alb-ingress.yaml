@@ -21,6 +21,9 @@ ingress:
   enabled: true
   ingressClassName: "alb"  # TODO: Fill in your desired ingressClassName for the ingress resource. If blank it will use the cluster default.
   annotations:
+    # Optional: set the same group name on every Posit Ingress to merge them onto one ALB (IngressGroup).
+    # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/guide/ingress/annotations/#group.name
+    # alb.ingress.kubernetes.io/group.name: posit-shared
     alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=86400 # required for session affinity
     alb.ingress.kubernetes.io/target-type: ip # target-type: ip is required to work with sticky sessions
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'

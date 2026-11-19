@@ -1,0 +1,62 @@
+# -----------------------------------------------------------------------------
+# Posit Connect — add under your values (or merge). HTTPRoute attaches to shared ALB Gateway.
+# -----------------------------------------------------------------------------
+# gatewayApi:
+#   enabled: true
+#   parentRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared-alb
+#       namespace: posit-gateway
+#       sectionName: http
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared-alb
+#       namespace: posit-gateway
+#       sectionName: https
+#   hosts:
+#     - host: connect.example.com
+#       paths:
+#         - /
+
+# -----------------------------------------------------------------------------
+# Posit Package Manager
+# -----------------------------------------------------------------------------
+# gatewayApi:
+#   enabled: true
+#   parentRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared-alb
+#       namespace: posit-gateway
+#       sectionName: http
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared-alb
+#       namespace: posit-gateway
+#       sectionName: https
+#   hosts:
+#     - host: packagemanager.example.com
+#       paths:
+#         - /
+
+# -----------------------------------------------------------------------------
+# Posit Workbench
+# -----------------------------------------------------------------------------
+# gatewayApi:
+#   enabled: true
+#   parentRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared-alb
+#       namespace: posit-gateway
+#       sectionName: http
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: posit-shared-alb
+#       namespace: posit-gateway
+#       sectionName: https
+#   hosts:
+#     - host: workbench.example.com
+#       paths:
+#         - /

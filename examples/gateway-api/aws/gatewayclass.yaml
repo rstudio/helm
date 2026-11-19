@@ -1,0 +1,9 @@
+# GatewayClass for AWS Load Balancer Controller (Layer 7 / ALB).
+# https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/gateway/l7gateway/
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: aws-alb
+spec:
+  controllerName: gateway.k8s.aws/alb
+  description: ALB-backed Gateway API (HTTPRoute) for shared Posit ingress.

@@ -1,0 +1,53 @@
+# Per-route timeouts and request buffering for each product.
+# Envoy defaults (15s request timeout, 5m stream idle timeout, request body buffer cap)
+# cut off long sessions and return 413 on large Connect bundles or Package Manager packages.
+# Each policy targets the HTTPRoute that the chart creates. Apply it in the release namespace.
+# Route name: <release fullname>-gw-<host index>. Find it with: kubectl get httproute -n <namespace>
+# Edit the names and namespaces below to match your releases.
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: posit-connect-traffic
+  namespace: rstudio-connect
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: posit-connect-rstudio-connect-gw-0
+  timeouts:
+    request: "0s"      # disable the per-request timeout, or set a finite bound such as "3600s"
+    streamIdle: "0s"
+  buffer:
+    disable: {}        # stream large bodies instead of buffering (or set buffer.maxRequestSize)
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: posit-workbench-traffic
+  namespace: rstudio-workbench
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: posit-workbench-rstudio-workbench-gw-0
+  timeouts:
+    request: "0s"
+    streamIdle: "0s"
+  buffer:
+    disable: {}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: posit-pm-traffic
+  namespace: rstudio-pm
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: posit-pm-rstudio-pm-gw-0
+  timeouts:
+    request: "3600s"   # finite bound for large package downloads and uploads
+  buffer:
+    disable: {}
