@@ -116,19 +116,19 @@ tests:
       - equal:
           path: metadata.name
           value: RELEASE-NAME-rstudio-pm-gw-0
-          documentIndex: 0
+        documentIndex: 0
       - equal:
           path: spec.hostnames[0]
           value: a.example.com
-          documentIndex: 0
+        documentIndex: 0
       - equal:
           path: metadata.name
           value: RELEASE-NAME-rstudio-pm-gw-2
-          documentIndex: 1
+        documentIndex: 1
       - equal:
           path: spec.hostnames[0]
           value: c.example.com
-          documentIndex: 1
+        documentIndex: 1
   - it: should map pathType values and use the configured service port
     template: httproute.yaml
     set:
