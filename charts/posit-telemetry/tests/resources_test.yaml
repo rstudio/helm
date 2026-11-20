@@ -1,0 +1,80 @@
+suite: Service, Secret, and Ingress tests
+templates:
+  - service.yaml
+  - secret.yaml
+  - ingress.yaml
+release:
+  name: test-release
+  namespace: test-namespace
+tests:
+  - it: should send the Service's traffic to the server's port in the pod
+    template: service.yaml
+    set:
+      service.port: 14318
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 14318
+      - equal:
+          path: spec.ports[0].targetPort
+          value: server
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: posit-telemetry
+            app.kubernetes.io/instance: test-release
+  - it: should generate a password
+    template: secret.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: data.password
+  - it: should not generate a password when given an existing Secret
+    template: secret.yaml
+    set:
+      clickhouse.auth.existingSecret: my-secret
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not deploy an Ingress by default
+    template: ingress.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should route each Ingress host to the server and terminate TLS
+    template: ingress.yaml
+    set:
+      service.port: 14318
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - telemetry.example.com
+        tls:
+          - secretName: telemetry-example-tls
+            hosts:
+              - telemetry.example.com
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+      - equal:
+          path: spec.rules[0].host
+          value: telemetry.example.com
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service
+          value:
+            name: test-release-posit-telemetry
+            port:
+              number: 14318
+      - equal:
+          path: spec.tls[0].secretName
+          value: telemetry-example-tls
+  - it: should require a host for the Ingress
+    template: ingress.yaml
+    set:
+      ingress.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: ingress.hosts must list at least one hostname when ingress.enabled is true

@@ -13,6 +13,9 @@
 /charts/posit-chronicle/** @matt-urbina @markrtucker @t-margheim
 /ci/posit-chronicle/** @matt-urbina @markrtucker @t-margheim
 
+# posit-telemetry resources
+/charts/posit-telemetry/** @matt-urbina @markrtucker @t-margheim
+
 # rstudio-workbench resources
 /charts/rstudio-workbench/** @GCrev @zachhannum
 /ci/rstudio-workbench/** @GCrev @zachhannum

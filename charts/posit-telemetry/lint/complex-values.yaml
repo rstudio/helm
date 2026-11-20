@@ -1,0 +1,31 @@
+# An existing password Secret, an Ingress with TLS, and custom ports, storage, and resources.
+service:
+  port: 14318
+clickhouse:
+  auth:
+    existingSecret: telemetry-clickhouse
+    existingSecretKey: password
+  persistence:
+    storageClass: gp3
+    size: 100Gi
+  resources:
+    requests:
+      cpu: "1"
+      memory: 4Gi
+    limits:
+      memory: 8Gi
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 1Gi
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - telemetry.example.com
+  tls:
+    - secretName: telemetry-example-tls
+      hosts:
+        - telemetry.example.com

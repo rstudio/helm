@@ -1,0 +1,200 @@
+suite: Pod tests
+templates:
+  - statefulset.yaml
+  - clickhouse-configmap.yaml
+chart:
+  version: 9.9.9+test
+  appVersion: 9.9.9
+release:
+  name: test-release
+  namespace: test-namespace
+tests:
+  - it: should run the server and Clickhouse in one pod, and only one of it
+    template: statefulset.yaml
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: server
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 1
+  - it: should run Clickhouse as a sidecar, started before the server and stopped after it
+    template: statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: clickhouse
+      - equal:
+          path: spec.template.spec.initContainers[0].restartPolicy
+          value: Always
+      - exists:
+          path: spec.template.spec.initContainers[0].startupProbe
+  - it: should default the server's image tag to the appVersion
+    template: statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/posit-dev/posit-telemetry:9.9.9
+  - it: should run the server image's own entrypoint
+    template: statefulset.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value: ["start"]
+  - it: should connect the server to Clickhouse over the pod's loopback with the generated password
+    template: statefulset.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: POSIT_TELEMETRY_CLICKHOUSE_ENDPOINT
+            value: clickhouse://127.0.0.1:9000
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: POSIT_TELEMETRY_CLICKHOUSE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: test-release-posit-telemetry-clickhouse
+                key: password
+  - it: should use an existing password Secret in both containers
+    template: statefulset.yaml
+    set:
+      clickhouse.auth.existingSecret: my-secret
+      clickhouse.auth.existingSecretKey: my-key
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: POSIT_TELEMETRY_CLICKHOUSE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+      - contains:
+          path: spec.template.spec.initContainers[0].env
+          content:
+            name: CLICKHOUSE_TELEMETRY_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+  - it: should append additional environment variables to the server
+    template: statefulset.yaml
+    set:
+      env:
+        - name: POSIT_TELEMETRY_LOGGING_LEVEL
+          value: DEBUG
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: POSIT_TELEMETRY_LOGGING_LEVEL
+            value: DEBUG
+  - it: should give the server a writable runtime directory
+    template: statefulset.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: runtime
+            mountPath: /run/posit-telemetry
+  - it: should restart a server that stops listening
+    template: statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.tcpSocket.port
+          value: server
+  - it: should run each container as its image's user
+    template: statefulset.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.securityContext.runAsUser
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 101
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1000
+      - equal:
+          path: spec.template.spec.initContainers[0].securityContext.runAsUser
+          value: 101
+  - it: should refuse a server port that Clickhouse uses in the pod
+    template: statefulset.yaml
+    set:
+      service.port: 9000
+    asserts:
+      - failedTemplate:
+          errorMessage: service.port must not be 9000 or 8123, which Clickhouse uses in the same pod
+  - it: should pin the Clickhouse image
+    template: statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: clickhouse/clickhouse-server:26.8.39.19
+  - it: should keep Clickhouse's data on a volume of the requested class and size
+    template: statefulset.yaml
+    set:
+      clickhouse.persistence.storageClass: gp3
+      clickhouse.persistence.size: 50Gi
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: gp3
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
+          value: 50Gi
+      - contains:
+          path: spec.template.spec.initContainers[0].volumeMounts
+          content:
+            name: data
+            mountPath: /var/lib/clickhouse
+  - it: should use the cluster's default storage class by default
+    template: statefulset.yaml
+    asserts:
+      - notExists:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+  - it: should not expose Clickhouse outside the pod
+    template: statefulset.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.initContainers[0].ports
+  - it: should probe Clickhouse from inside its container
+    template: statefulset.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.initContainers[0].livenessProbe.exec.command
+          content: http://127.0.0.1:8123/ping
+      - notExists:
+          path: spec.template.spec.initContainers[0].livenessProbe.httpGet
+  - it: should read the password from the environment, never the ConfigMap
+    template: clickhouse-configmap.yaml
+    asserts:
+      - matchRegex:
+          path: data["users.xml"]
+          pattern: <password from_env="CLICKHOUSE_TELEMETRY_PASSWORD"/>
+      - matchRegex:
+          path: data["users.xml"]
+          pattern: <default remove="remove"/>
+  - it: should only accept the server's user from inside the pod
+    template: clickhouse-configmap.yaml
+    asserts:
+      - matchRegex:
+          path: data["users.xml"]
+          pattern: <ip>127\.0\.0\.1</ip>
+      - notMatchRegex:
+          path: data["users.xml"]
+          pattern: ::/0
+  - it: should have Clickhouse listen on loopback only
+    template: clickhouse-configmap.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.xml"]
+          pattern: <listen_host remove="remove"/>\s+<listen_host>127\.0\.0\.1</listen_host>

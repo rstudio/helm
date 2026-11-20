@@ -1,0 +1,100 @@
+# -- Override for the name of the chart
+nameOverride: ""
+# -- Override for the full name of the release
+fullnameOverride: ""
+
+image:
+  # -- The Posit Telemetry server's image repository
+  repository: ghcr.io/posit-dev/posit-telemetry
+  # -- The image tag, defaults to the chart's appVersion
+  tag: ""
+  # -- The image pull policy
+  pullPolicy: IfNotPresent
+
+# -- Secrets for pulling the server and Clickhouse images
+imagePullSecrets: []
+
+service:
+  # -- The Service type for the server
+  type: ClusterIP
+  # -- The port agents send Opentelemetry data to, over HTTP (OTLP HTTP)
+  port: 4318
+  # -- Annotations for the Service
+  annotations: {}
+
+ingress:
+  # -- Expose the server outside the cluster with an Ingress, for agents that run elsewhere. The server itself speaks
+  #    plain HTTP, so this is where TLS is terminated.
+  enabled: false
+  # -- The Ingress class
+  ingressClassName: ""
+  # -- Annotations for the Ingress
+  annotations: {}
+  # -- The hostnames to route to the server. Agents post to paths under `/v1/`.
+  hosts: []
+  # - telemetry.example.com
+  # -- TLS certificates for the hostnames, as Secrets
+  tls: []
+  # - secretName: telemetry-example-tls
+  #   hosts:
+  #     - telemetry.example.com
+
+# -- Additional environment variables for the server, such as `POSIT_TELEMETRY_LOGGING_LEVEL`
+env: []
+# -- Resources for the server container
+resources: {}
+# -- The pod's security context, shared by the server and Clickhouse. `fsGroup` is the group of the Clickhouse image's
+#    user, so that Clickhouse can write to its data volume.
+podSecurityContext:
+  runAsNonRoot: true
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+# -- The server container's security context. The image runs the server as uid 1000.
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+# -- Node selector for the pod
+nodeSelector: {}
+# -- Tolerations for the pod
+tolerations: []
+# -- Affinity for the pod
+affinity: {}
+
+clickhouse:
+  image:
+    # -- The Clickhouse image repository
+    repository: clickhouse/clickhouse-server
+    # -- The Clickhouse image tag, the LTS release the server is tested with
+    tag: "26.8.39.19"
+    # -- The image pull policy
+    pullPolicy: IfNotPresent
+  auth:
+    # -- An existing Secret with the server's Clickhouse password. The chart generates one if empty.
+    existingSecret: ""
+    # -- The key in `existingSecret` that holds the password
+    existingSecretKey: password
+  persistence:
+    # -- The storage class for Clickhouse's data, defaults to the cluster's default. Use block storage, not a network
+    #    filesystem such as NFS or EFS.
+    storageClass: ""
+    # -- The size of Clickhouse's data volume
+    size: 20Gi
+  # -- Resources for the Clickhouse container. Clickhouse limits its own memory use to 90% of the memory limit.
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      memory: 4Gi
+  # -- The Clickhouse container's security context. The image runs Clickhouse as uid 101.
+  securityContext:
+    runAsUser: 101
+    runAsGroup: 101
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
