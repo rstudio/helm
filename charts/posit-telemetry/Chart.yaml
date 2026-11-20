@@ -3,6 +3,8 @@ name: posit-telemetry
 description: Official Helm chart for Posit Telemetry, which receives Opentelemetry data from the Chronicle agents in Posit products and stores it in Clickhouse
 version: 0.1.0
 appVersion: 0.1.0
+# sidecar containers, which Clickhouse runs as
+kubeVersion: ">=1.29.0-0"
 icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png
 home: https://www.posit.co
 sources:

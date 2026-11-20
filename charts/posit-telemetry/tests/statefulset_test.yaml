@@ -20,12 +20,20 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].name
           value: server
-      - equal:
-          path: spec.template.spec.containers[1].name
-          value: clickhouse
       - lengthEqual:
           path: spec.template.spec.containers
-          count: 2
+          count: 1
+  - it: should run Clickhouse as a sidecar, started before the server and stopped after it
+    template: statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: clickhouse
+      - equal:
+          path: spec.template.spec.initContainers[0].restartPolicy
+          value: Always
+      - exists:
+          path: spec.template.spec.initContainers[0].startupProbe
   - it: should default the server's image tag to the appVersion
     template: statefulset.yaml
     asserts:
@@ -71,7 +79,7 @@ tests:
                 name: my-secret
                 key: my-key
       - contains:
-          path: spec.template.spec.containers[1].env
+          path: spec.template.spec.initContainers[0].env
           content:
             name: CLICKHOUSE_TELEMETRY_PASSWORD
             valueFrom:
@@ -116,7 +124,7 @@ tests:
           path: spec.template.spec.containers[0].securityContext.runAsUser
           value: 1000
       - equal:
-          path: spec.template.spec.containers[1].securityContext.runAsUser
+          path: spec.template.spec.initContainers[0].securityContext.runAsUser
           value: 101
   - it: should refuse a server port that Clickhouse uses in the pod
     template: statefulset.yaml
@@ -129,7 +137,7 @@ tests:
     template: statefulset.yaml
     asserts:
       - equal:
-          path: spec.template.spec.containers[1].image
+          path: spec.template.spec.initContainers[0].image
           value: clickhouse/clickhouse-server:26.8.39.19
   - it: should keep Clickhouse's data on a volume of the requested class and size
     template: statefulset.yaml
@@ -144,7 +152,7 @@ tests:
           path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
           value: 50Gi
       - contains:
-          path: spec.template.spec.containers[1].volumeMounts
+          path: spec.template.spec.initContainers[0].volumeMounts
           content:
             name: data
             mountPath: /var/lib/clickhouse
@@ -157,15 +165,15 @@ tests:
     template: statefulset.yaml
     asserts:
       - notExists:
-          path: spec.template.spec.containers[1].ports
+          path: spec.template.spec.initContainers[0].ports
   - it: should probe Clickhouse from inside its container
     template: statefulset.yaml
     asserts:
       - contains:
-          path: spec.template.spec.containers[1].livenessProbe.exec.command
+          path: spec.template.spec.initContainers[0].livenessProbe.exec.command
           content: http://127.0.0.1:8123/ping
       - notExists:
-          path: spec.template.spec.containers[1].livenessProbe.httpGet
+          path: spec.template.spec.initContainers[0].livenessProbe.httpGet
   - it: should read the password from the environment, never the ConfigMap
     template: clickhouse-configmap.yaml
     asserts:

@@ -30,6 +30,56 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      # Clickhouse is a sidecar of the server: an init container that keeps running. Kubernetes starts it, and waits for
+      # its startup probe, before it starts the server, and stops it only once the server has exited, so the server
+      # can write what it still holds to Clickhouse while it shuts down.
+      initContainers:
+        - name: clickhouse
+          restartPolicy: Always
+          image: "{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag }}"
+          imagePullPolicy: {{ .Values.clickhouse.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.clickhouse.securityContext | nindent 12 }}
+          env:
+            - name: CLICKHOUSE_TELEMETRY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "posit-telemetry.clickhouse.secretName" . }}
+                  key: {{ include "posit-telemetry.clickhouse.secretKey" . }}
+            # the image's entrypoint would otherwise write its own default user, which users.xml removes
+            - name: CLICKHOUSE_SKIP_USER_SETUP
+              value: "1"
+          # Clickhouse listens on loopback only, which the kubelet's own HTTP probes can't reach, so these run inside
+          # the container. /ping needs no login.
+          startupProbe:
+            exec:
+              command: &clickhousePing ["wget", "--quiet", "--spider", "--tries=1", "--timeout=2", "http://127.0.0.1:8123/ping"]
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: *clickhousePing
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            exec:
+              command: *clickhousePing
+            periodSeconds: 20
+            timeoutSeconds: 3
+          resources:
+            {{- toYaml .Values.clickhouse.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/clickhouse-server/users.d/posit-telemetry.xml
+              subPath: users.xml
+              readOnly: true
+            - name: config
+              mountPath: /etc/clickhouse-server/config.d/posit-telemetry.xml
+              subPath: config.xml
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/clickhouse
       containers:
         - name: server
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -79,51 +129,6 @@ spec:
             # the server's RuntimeDir, for the collector config it generates
             - name: runtime
               mountPath: /run/posit-telemetry
-        - name: clickhouse
-          image: "{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag }}"
-          imagePullPolicy: {{ .Values.clickhouse.image.pullPolicy }}
-          securityContext:
-            {{- toYaml .Values.clickhouse.securityContext | nindent 12 }}
-          env:
-            - name: CLICKHOUSE_TELEMETRY_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "posit-telemetry.clickhouse.secretName" . }}
-                  key: {{ include "posit-telemetry.clickhouse.secretKey" . }}
-            # the image's entrypoint would otherwise write its own default user, which users.xml removes
-            - name: CLICKHOUSE_SKIP_USER_SETUP
-              value: "1"
-          # Clickhouse listens on loopback only, which the kubelet's own HTTP probes can't reach, so these run inside
-          # the container. /ping needs no login.
-          startupProbe:
-            exec:
-              command: &clickhousePing ["wget", "--quiet", "--spider", "--tries=1", "--timeout=2", "http://127.0.0.1:8123/ping"]
-            periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 60
-          readinessProbe:
-            exec:
-              command: *clickhousePing
-            periodSeconds: 10
-            timeoutSeconds: 3
-          livenessProbe:
-            exec:
-              command: *clickhousePing
-            periodSeconds: 20
-            timeoutSeconds: 3
-          resources:
-            {{- toYaml .Values.clickhouse.resources | nindent 12 }}
-          volumeMounts:
-            - name: config
-              mountPath: /etc/clickhouse-server/users.d/posit-telemetry.xml
-              subPath: users.xml
-              readOnly: true
-            - name: config
-              mountPath: /etc/clickhouse-server/config.d/posit-telemetry.xml
-              subPath: config.xml
-              readOnly: true
-            - name: data
-              mountPath: /var/lib/clickhouse
       volumes:
         - name: runtime
           emptyDir: {}

@@ -52,9 +52,10 @@ helm search repo rstudio/posit-telemetry -l
 ## Usage
 
 This chart deploys the Posit Telemetry server, which receives Opentelemetry data from the Chronicle agents in Posit
-products and stores it in Clickhouse. Clickhouse runs from its own image as a second container in the server's pod, so
-the two talk over the pod's loopback and nothing they exchange crosses the cluster network. Clickhouse listens only
-there: nothing outside the pod can reach it.
+products and stores it in Clickhouse. Clickhouse runs from its own image as a sidecar container in the server's pod,
+so the two talk over the pod's loopback and nothing they exchange crosses the cluster network. Clickhouse listens only
+there: nothing outside the pod can reach it. Kubernetes starts Clickhouse before the server and stops it after, so the
+server can write what it still holds as it shuts down. Sidecar containers need Kubernetes 1.29 or later.
 
 The server creates its Clickhouse database and runs the schema migrations each time it starts, before it accepts
 data, so the chart runs exactly one pod, as a StatefulSet, which stops it before starting its replacement. An upgrade
