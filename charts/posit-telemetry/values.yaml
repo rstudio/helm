@@ -3,98 +3,81 @@ nameOverride: ""
 # -- Override for the full name of the release
 fullnameOverride: ""
 
-# -- Which server type the chronicle image runs: `posit-telemetry` (stores data in Clickhouse, deployed alongside it
-#    by this chart) or `chronicle` (the classic server, storing data on a local volume and/or in S3). Both server
-#    types accept data from the same Chronicle agent, just pointed at a different address.
-serverType: posit-telemetry
-
 image:
-  # -- The chronicle image repository. Chronicle builds the posit-telemetry server, the classic chronicle server, and
-  #    the agent from one codebase; this placeholder should be replaced once that image is published.
-  repository: ghcr.io/posit-dev/chronicle
+  # -- The Posit Telemetry server's image repository
+  repository: ghcr.io/posit-dev/posit-telemetry
   # -- The image tag, defaults to the chart's appVersion
   tag: ""
   # -- The image pull policy
   pullPolicy: IfNotPresent
 
-# -- Secrets for pulling the chronicle and Clickhouse images
+# -- Secrets for pulling the server and Clickhouse images
 imagePullSecrets: []
 
 service:
   # -- The Service type for the server
   type: ClusterIP
-  # -- The port agents send data to: OTLP HTTP for the posit-telemetry server type, or Chronicle's own protocol for
-  #    the chronicle server type
+  # -- The port agents send Opentelemetry data to, over HTTP (OTLP HTTP)
   port: 4318
   # -- Annotations for the Service
   annotations: {}
 
-# -- Additional environment variables for the server, such as `POSIT_TELEMETRY_LOGGING_LEVEL` or `CHRONICLE_LOGGING_LEVEL`
+ingress:
+  # -- Expose the server outside the cluster with an Ingress, for agents that run elsewhere. The server itself speaks
+  #    plain HTTP, so this is where TLS is terminated.
+  enabled: false
+  # -- The Ingress class
+  ingressClassName: ""
+  # -- Annotations for the Ingress
+  annotations: {}
+  # -- The hostnames to route to the server. Agents post to paths under `/v1/`.
+  hosts: []
+  # - telemetry.example.com
+  # -- TLS certificates for the hostnames, as Secrets
+  tls: []
+  # - secretName: telemetry-example-tls
+  #   hosts:
+  #     - telemetry.example.com
+
+# -- Additional environment variables for the server, such as `POSIT_TELEMETRY_LOGGING_LEVEL`
 env: []
 # -- Resources for the server container
 resources: {}
-# -- The server's pod-level security context
+# -- The pod's security context, shared by the server and Clickhouse. `fsGroup` is the group of the Clickhouse image's
+#    user, so that Clickhouse can write to its data volume.
 podSecurityContext:
   runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
+  fsGroup: 101
   seccompProfile:
     type: RuntimeDefault
-# -- The server's container-level security context
+# -- The server container's security context. The image runs the server as uid 1000.
 securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   capabilities:
     drop: ["ALL"]
-# -- Node selector for the server pod
+# -- Node selector for the pod
 nodeSelector: {}
-# -- Tolerations for the server pod
+# -- Tolerations for the pod
 tolerations: []
-# -- Affinity for the server pod
+# -- Affinity for the pod
 affinity: {}
-
-# -- Settings for the `chronicle` server type. Ignored when `serverType` is `posit-telemetry`.
-chronicle:
-  localStorage:
-    # -- Store data on a local volume. Can be used together with `s3Storage`.
-    enabled: true
-    persistence:
-      # -- The storage class for the local data volume, defaults to the cluster's default. Use block storage, not a
-      #    network filesystem such as NFS or EFS.
-      storageClass: ""
-      # -- The size of the local data volume
-      size: 20Gi
-  s3Storage:
-    # -- Store data in S3. Can be used together with `localStorage`. Credentials come from the pod's environment
-    #    (for example an IAM role), not from this chart.
-    enabled: false
-    # -- The S3 bucket
-    bucket: ""
-    # -- The prefix within the bucket
-    prefix: ""
-    # -- The AWS region, defaults to the `$AWS_REGION` environment variable
-    region: ""
-    # -- The AWS profile, defaults to the `$AWS_PROFILE` environment variable
-    profile: ""
-    # -- A custom S3-compatible endpoint (for example MinIO); enables path-style addressing
-    endpoint: ""
 
 clickhouse:
   image:
     # -- The Clickhouse image repository
     repository: clickhouse/clickhouse-server
-    # -- The Clickhouse image tag, the LTS release the posit-telemetry server is tested with
-    tag: "26.8.34.13"
+    # -- The Clickhouse image tag, the LTS release the server is tested with
+    tag: "26.8.39.19"
     # -- The image pull policy
     pullPolicy: IfNotPresent
   auth:
-    # -- An existing Secret with the posit-telemetry server's Clickhouse password. The chart generates one if empty.
+    # -- An existing Secret with the server's Clickhouse password. The chart generates one if empty.
     existingSecret: ""
     # -- The key in `existingSecret` that holds the password
     existingSecretKey: password
-  service:
-    # -- The port for Clickhouse's native protocol, which the posit-telemetry server uses
-    port: 9000
   persistence:
     # -- The storage class for Clickhouse's data, defaults to the cluster's default. Use block storage, not a network
     #    filesystem such as NFS or EFS.
@@ -108,22 +91,10 @@ clickhouse:
       memory: 1Gi
     limits:
       memory: 4Gi
-  # -- Clickhouse's pod-level security context. The image runs Clickhouse as uid 101.
-  podSecurityContext:
-    runAsNonRoot: true
+  # -- The Clickhouse container's security context. The image runs Clickhouse as uid 101.
+  securityContext:
     runAsUser: 101
     runAsGroup: 101
-    fsGroup: 101
-    seccompProfile:
-      type: RuntimeDefault
-  # -- Clickhouse's container-level security context
-  securityContext:
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
-  # -- Node selector for the Clickhouse pod
-  nodeSelector: {}
-  # -- Tolerations for the Clickhouse pod
-  tolerations: []
-  # -- Affinity for the Clickhouse pod
-  affinity: {}

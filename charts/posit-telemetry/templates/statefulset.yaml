@@ -1,0 +1,157 @@
+{{- if has (int .Values.service.port) (list 9000 8123) }}
+{{- fail "service.port must not be 9000 or 8123, which Clickhouse uses in the same pod" }}
+{{- end }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "posit-telemetry.fullname" . }}
+  labels:
+    {{- include "posit-telemetry.labels" . | nindent 4 }}
+    {{- include "posit-telemetry.selectorLabels" . | nindent 4 }}
+spec:
+  # One pod holds the server and Clickhouse. The server runs schema migrations on start, which assumes it's the only
+  # one, and the schema doesn't use replicated tables. A StatefulSet stops this pod before starting its replacement.
+  replicas: 1
+  serviceName: {{ include "posit-telemetry.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "posit-telemetry.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "posit-telemetry.labels" . | nindent 8 }}
+        {{- include "posit-telemetry.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/clickhouse-configmap.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: server
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          args: ["start"]
+          env:
+            # Clickhouse is in this pod, so the connection never leaves it
+            - name: POSIT_TELEMETRY_CLICKHOUSE_ENDPOINT
+              value: "clickhouse://127.0.0.1:9000"
+            - name: POSIT_TELEMETRY_CLICKHOUSE_USERNAME
+              value: telemetry
+            - name: POSIT_TELEMETRY_CLICKHOUSE_DATABASE
+              value: telemetry
+            - name: POSIT_TELEMETRY_CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "posit-telemetry.clickhouse.secretName" . }}
+                  key: {{ include "posit-telemetry.clickhouse.secretKey" . }}
+            - name: POSIT_TELEMETRY_COLLECTOR_OTLPHTTPENDPOINT
+              value: "0.0.0.0:{{ .Values.service.port }}"
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: server
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          # the server only opens this port once it has reached Clickhouse and run the migrations
+          startupProbe:
+            tcpSocket:
+              port: server
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: server
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: server
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            # the server's RuntimeDir, for the collector config it generates
+            - name: runtime
+              mountPath: /run/posit-telemetry
+        - name: clickhouse
+          image: "{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag }}"
+          imagePullPolicy: {{ .Values.clickhouse.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.clickhouse.securityContext | nindent 12 }}
+          env:
+            - name: CLICKHOUSE_TELEMETRY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "posit-telemetry.clickhouse.secretName" . }}
+                  key: {{ include "posit-telemetry.clickhouse.secretKey" . }}
+            # the image's entrypoint would otherwise write its own default user, which users.xml removes
+            - name: CLICKHOUSE_SKIP_USER_SETUP
+              value: "1"
+          # Clickhouse listens on loopback only, which the kubelet's own HTTP probes can't reach, so these run inside
+          # the container. /ping needs no login.
+          startupProbe:
+            exec:
+              command: &clickhousePing ["wget", "--quiet", "--spider", "--tries=1", "--timeout=2", "http://127.0.0.1:8123/ping"]
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: *clickhousePing
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            exec:
+              command: *clickhousePing
+            periodSeconds: 20
+            timeoutSeconds: 3
+          resources:
+            {{- toYaml .Values.clickhouse.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/clickhouse-server/users.d/posit-telemetry.xml
+              subPath: users.xml
+              readOnly: true
+            - name: config
+              mountPath: /etc/clickhouse-server/config.d/posit-telemetry.xml
+              subPath: config.xml
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/clickhouse
+      volumes:
+        - name: runtime
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ include "posit-telemetry.clickhouse.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  # Kubernetes keeps this volume when the release is uninstalled
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- with .Values.clickhouse.persistence.storageClass }}
+        storageClassName: {{ . }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.clickhouse.persistence.size }}

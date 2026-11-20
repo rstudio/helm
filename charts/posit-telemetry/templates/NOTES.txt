@@ -1,16 +1,10 @@
-{{- if eq .Values.serverType "posit-telemetry" }}
 Agents send Opentelemetry data (OTLP HTTP) to:
 
-    {{ include "posit-telemetry.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
+    http://{{ include "posit-telemetry.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
+
+Set that address as each agent's `[Server] Address`, with `[Server] Enabled = false`.
 
 Query Clickhouse with:
 
-    kubectl exec -it -n {{ .Release.Namespace }} statefulset/{{ include "posit-telemetry.clickhouse.fullname" . }} -- \
+    kubectl exec -it -n {{ .Release.Namespace }} -c clickhouse statefulset/{{ include "posit-telemetry.fullname" . }} -- \
       sh -c 'clickhouse-client --user telemetry --password "$CLICKHOUSE_TELEMETRY_PASSWORD" --database telemetry'
-{{- else }}
-Chronicle agents send data to:
-
-    {{ include "posit-telemetry.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
-
-Set that address as each agent's `[Server] Address`, or `CHRONICLE_SERVER_ADDRESS`.
-{{- end }}

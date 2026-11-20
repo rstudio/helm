@@ -1,6 +1,6 @@
 apiVersion: v2
 name: posit-telemetry
-description: Official Helm chart for the Posit telemetry server, which can run as either the Clickhouse-backed posit-telemetry server or the classic Chronicle server
+description: Official Helm chart for Posit Telemetry, which receives Opentelemetry data from the Chronicle agents in Posit products and stores it in Clickhouse
 version: 0.1.0
 appVersion: 0.1.0
 icon: https://posit.co/wp-content/themes/Posit/dist/images/favicon/apple-touch-icon-180x180.png

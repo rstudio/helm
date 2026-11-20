@@ -10,34 +10,58 @@
 
 ## Usage
 
-This chart deploys one of two server types from the [posit-dev/chronicle](https://github.com/posit-dev/chronicle)
-image, set with `serverType`:
+This chart deploys the Posit Telemetry server, which receives Opentelemetry data from the Chronicle agents in Posit
+products and stores it in Clickhouse. Clickhouse runs from its own image as a second container in the server's pod, so
+the two talk over the pod's loopback and nothing they exchange crosses the cluster network. Clickhouse listens only
+there: nothing outside the pod can reach it.
 
-- `posit-telemetry` (the default): receives Opentelemetry data from Chronicle agents and stores it in Clickhouse.
-  This chart also deploys Clickhouse beside it as a StatefulSet, from Clickhouse's own image.
-- `chronicle`: the classic Chronicle server, storing data on a local volume (`chronicle.localStorage`) and/or in S3
-  (`chronicle.s3Storage`), with its own in-process agent disabled since no product runs on this pod.
+The server creates its Clickhouse database and runs the schema migrations each time it starts, before it accepts
+data, so the chart runs exactly one pod, as a StatefulSet, which stops it before starting its replacement. An upgrade
+of either image restarts both. Agents don't queue or retry, so they drop what they send while the pod restarts.
 
-Both server types accept connections from the same Chronicle agent. Agents send their data to the server's Service,
-`<release>-posit-telemetry.<namespace>.svc:4318`, or `<release>.<namespace>.svc:4318` if the release name already
-contains `posit-telemetry`; `helm install` prints it. Set it as each agent's `[Server] Address`, in a
-`*-local.gcfg` beside the agent's config file, or with `CHRONICLE_SERVER_ADDRESS`. The Connect, Workbench, and
-Package Manager charts don't configure an agent yet.
+## Sending data from Posit products
 
-With `serverType: posit-telemetry`, the server creates its Clickhouse database and runs the schema migrations each
-time it starts, before it accepts data, so the chart runs exactly one server and replaces it rather than rolling it
-on upgrade. Agents don't queue or retry, so they drop what they send while it restarts.
+Agents send their data to the server's Service, `http://<release>-posit-telemetry.<namespace>.svc:4318`, or
+`http://<release>.<namespace>.svc:4318` if the release name already contains `posit-telemetry`; `helm install` prints
+it. Connect and Workbench each run a Chronicle agent. Point it at the server, and turn off the Chronicle server that
+otherwise runs beside it, with `chronicle.localConfig` in the product's chart:
+
+```yaml
+# values for the rstudio-connect or rstudio-workbench chart
+chronicle:
+  localConfig:
+    Server:
+      Enabled: false
+      Address: http://my-release-posit-telemetry.my-namespace.svc:4318
+```
+
+## TLS
+
+The server speaks plain HTTP. Inside one cluster, agents reach it through its `ClusterIP` Service. For agents outside
+the cluster, enable the Ingress, which is where TLS is terminated, and use its `https://` address as the agents'
+`[Server] Address`:
+
+```yaml
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - telemetry.example.com
+  tls:
+    - secretName: telemetry-example-tls
+      hosts:
+        - telemetry.example.com
+```
+
+The server doesn't authenticate agents, so restrict who can reach the Ingress.
 
 ## Clickhouse
 
-Only deployed when `serverType` is `posit-telemetry`.
-
 The chart pins `clickhouse.image.tag` to the Clickhouse LTS release the server is tested with.
 
-Clickhouse keeps its data on a PersistentVolumeClaim, `data-<release>-posit-telemetry-clickhouse-0` (or
-`data-<release>-clickhouse-0` if the release name contains `posit-telemetry`), which Kubernetes keeps when the release
-is uninstalled. Delete it to remove the data. Use block storage (for example `gp3` on EKS) rather than a network
-filesystem such as NFS or EFS:
+Clickhouse keeps its data on a PersistentVolumeClaim, `data-<release>-posit-telemetry-0` (or `data-<release>-0` if the
+release name contains `posit-telemetry`), which Kubernetes keeps when the release is uninstalled. Delete it to remove
+the data. Use block storage (for example `gp3` on EKS) rather than a network filesystem such as NFS or EFS:
 
 ```yaml
 clickhouse:
@@ -47,6 +71,8 @@ clickhouse:
 ```
 
 Clickhouse limits its own memory use to 90% of `clickhouse.resources.limits.memory`.
+
+To query it, run `clickhouse-client` in its container; `helm install` prints the command.
 
 ### Password
 
@@ -60,26 +86,6 @@ clickhouse:
     existingSecret: telemetry-clickhouse
     existingSecretKey: password
 ```
-
-## Chronicle server storage
-
-Only used when `serverType` is `chronicle`. Enable `chronicle.localStorage`, `chronicle.s3Storage`, or both:
-
-```yaml
-serverType: chronicle
-chronicle:
-  localStorage:
-    enabled: false
-  s3Storage:
-    enabled: true
-    bucket: my-chronicle-bucket
-    region: us-east-1
-```
-
-`chronicle.localStorage` keeps data on a PersistentVolumeClaim, `<release>-posit-telemetry-data` (or `<release>-data`
-if the release name already contains `posit-telemetry`), which Kubernetes keeps when the release is uninstalled.
-`chronicle.s3Storage` relies on AWS credentials already present in the pod's environment, such as from an IAM role;
-this chart doesn't manage them.
 
 {{ template "chart.valuesSection" . }}
 
