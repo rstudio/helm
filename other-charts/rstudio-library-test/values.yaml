@@ -54,6 +54,20 @@ testIngress:
   path: /test
   pathType: Prefix
 
+# Gateway API helper test values
+# Exercises: gateway.apiVersion, gateway.ingressPathTypeToGateway, gateway.httpPathMatchBody,
+#            gateway.httpRouteName, gateway.serviceBackendRef
+testGateway:
+  pathTypes:
+    - Prefix
+    - Exact
+  path: /test
+  pathType: Prefix
+  fullName: my-release-rstudio-connect
+  index: 0
+  serviceName: test-service
+  servicePort: 8080
+
 # License helper test values
 # Exercises: license-env, license-mount, license-volume, license-secret
 testLicense:

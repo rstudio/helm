@@ -1,0 +1,76 @@
+{{/*
+Test templates for rstudio-library Gateway API helpers.
+Outputs computed Gateway API values to ConfigMaps for testing.
+*/}}
+
+{{- if .Values.testGateway }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-gateway-values
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  apiVersion: {{ include "rstudio-library.gateway.apiVersion" . }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-gateway-path-types
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  {{- range $i, $t := .Values.testGateway.pathTypes }}
+  type-{{ $i }}: {{ include "rstudio-library.gateway.ingressPathTypeToGateway" $t | quote }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-gateway-path-string
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  path.yaml: |
+    {{- include "rstudio-library.gateway.httpPathMatchBody" (dict "pathData" .Values.testGateway.path) | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-gateway-path-object
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  path.yaml: |
+    {{- include "rstudio-library.gateway.httpPathMatchBody" (dict "pathData" (dict "path" .Values.testGateway.path "pathType" .Values.testGateway.pathType)) | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-gateway-path-object-no-type
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  path.yaml: |
+    {{- include "rstudio-library.gateway.httpPathMatchBody" (dict "pathData" (dict "path" .Values.testGateway.path)) | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-gateway-route-name
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  name: {{ include "rstudio-library.gateway.httpRouteName" (dict "fullName" .Values.testGateway.fullName "index" .Values.testGateway.index) | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-gateway-backend
+  labels:
+    {{- include "rstudio-library-test.labels" . | nindent 4 }}
+data:
+  backend.yaml: |
+    {{- include "rstudio-library.gateway.serviceBackendRef" (dict "svcName" .Values.testGateway.serviceName "svcPort" .Values.testGateway.servicePort) | nindent 4 }}
+{{- end }}

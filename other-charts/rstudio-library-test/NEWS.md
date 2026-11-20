@@ -3,6 +3,7 @@
 ## 0.1.2
 
 - Update rstudio-library dependency to 0.1.38
+- Add unit tests for the Gateway API helpers (`testGateway`)
 
 ## 0.1.1
 

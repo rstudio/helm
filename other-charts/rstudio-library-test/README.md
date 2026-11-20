@@ -53,6 +53,14 @@ Test harness for rstudio-library templates
 | testDebug.sliceValue[0] | string | `"item1"` |  |
 | testDebug.sliceValue[1] | string | `"item2"` |  |
 | testDebug.stringValue | string | `"test string"` |  |
+| testGateway.fullName | string | `"my-release-rstudio-connect"` |  |
+| testGateway.index | int | `0` |  |
+| testGateway.path | string | `"/test"` |  |
+| testGateway.pathType | string | `"Prefix"` |  |
+| testGateway.pathTypes[0] | string | `"Prefix"` |  |
+| testGateway.pathTypes[1] | string | `"Exact"` |  |
+| testGateway.serviceName | string | `"test-service"` |  |
+| testGateway.servicePort | int | `8080` |  |
 | testIngress.path | string | `"/test"` |  |
 | testIngress.pathType | string | `"Prefix"` |  |
 | testIngress.serviceName | string | `"test-service"` |  |
