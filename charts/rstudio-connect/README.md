@@ -1,11 +1,26 @@
 # Posit Connect
 
-![Version: 0.21.4](https://img.shields.io/badge/Version-0.21.4-informational?style=flat-square) ![AppVersion: 2026.10.0](https://img.shields.io/badge/AppVersion-2026.10.0-informational?style=flat-square)
+![Version: 0.21.6](https://img.shields.io/badge/Version-0.21.6-informational?style=flat-square) ![AppVersion: 2026.11.1](https://img.shields.io/badge/AppVersion-2026.11.1-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Connect_
 
 Business Users and Collaborators use R and Python data products on [Posit Connect](https://posit.co/products/enterprise/connect/)
 that are published by Data Scientists.
+
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
 
 ## Best practices
 
@@ -30,11 +45,11 @@ To ensure reproducibility in your environment and insulate yourself from future 
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.21.4:
+To install the chart with the release name `my-release` at version 0.21.6:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-connect --version=0.21.4
+helm upgrade --install my-release rstudio/rstudio-connect --version=0.21.6
 ```
 
 To explore other chart versions, look at:

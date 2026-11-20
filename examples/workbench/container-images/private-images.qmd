@@ -17,6 +17,8 @@ Workbench service: [rstudio/rstudio-workbench](https://hub.docker.com/r/rstudio/
 Workbench sessions: [rstudio/r-session-complete](https://hub.docker.com/r/rstudio/r-session-complete)
 
 
+For a list of all images that each chart uses, and for other ways to authenticate to your registry, see [Private container registries](../../../docs/private-registries.qmd).
+
 {{< include ../_prereqs.qmd >}}
 
 ```{.yaml include="rstudio-workbench-custom-image-private.yaml" filename="values.yaml"}

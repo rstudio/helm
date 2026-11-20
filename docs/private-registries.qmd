@@ -1,0 +1,243 @@
+---
+title: Private container registries
+---
+
+Many organizations require Kubernetes to pull every image from a private container registry.
+This page lists the images that each Posit Helm chart uses.
+It also shows the Helm values that point each image at your registry and supply registry credentials.
+
+For a full `values.yaml` file for each product, see the private image examples:
+
+- [Posit Connect](../examples/connect/container-images/private-images.qmd)
+- [Posit Workbench](../examples/workbench/container-images/private-images.qmd)
+- [Posit Package Manager](../examples/package-manager/container-images/private-images.qmd)
+
+## Images used by the charts
+
+Copy each image that you use into your private registry, and keep the same tags.
+The tables show the default image for chart version 0.20.0 and later.
+The `posit/` images are on [Docker Hub](https://hub.docker.com/u/posit).
+The same images are also on [GitHub Container Registry](https://github.com/orgs/posit-dev/packages) under `ghcr.io/posit-dev/`.
+The Chronicle images are on GitHub Container Registry under `ghcr.io/rstudio/`, which the chart sets with the `registry` value.
+
+By default, the charts tag product images as `<appVersion>-<os>`, for example `2026.10.0-ubuntu-24.04`.
+Init container images use the tag `<appVersion>`, which corresponds to the Posit product version.
+An init container is a container that runs before the main container in a pod.
+To pin an exact tag, set the `tag` value next to the `repository` value.
+
+### Posit Connect
+
+| Image | Purpose | Helm value |
+|---|---|---|
+| `posit/connect` | Connect server | `image.repository` |
+| `posit/connect-content-init` | Copies Connect runtime components into content pods | `backends.kubernetes.defaultInitContainer.repository` |
+| `posit/connect-content` or your own image | Runs content | `executionEnvironments[].name` |
+| `rstudio/chronicle-agent` | Chronicle agent, if `chronicleAgent.enabled` is `true` | `chronicleAgent.image.registry` and `chronicleAgent.image.repository` |
+
+### Posit Workbench
+
+| Image | Purpose | Helm value |
+|---|---|---|
+| `posit/workbench` | Workbench server | `image.repository` |
+| `posit/workbench-session` | Runs sessions | `session.image.repository` |
+| `posit/workbench-session-init` | Copies Workbench session components into session pods | `components.sessionInit.image.repository` |
+| `posit/workbench-positron-init` | Copies Positron into session pods, if `components.positron.version` is set | `components.positron.image.repository` |
+| `rstudio/chronicle-agent` | Chronicle agent, if `chronicleAgent.enabled` is `true` | `chronicleAgent.image.registry` and `chronicleAgent.image.repository` |
+| `prom/graphite-exporter` | Metrics exporter, if `prometheus.legacy` is `true` | `prometheusExporter.image.repository` |
+
+### Posit Package Manager
+
+| Image | Purpose | Helm value |
+|---|---|---|
+| `posit/package-manager` | Package Manager server | `image.repository` |
+
+### Posit Chronicle
+
+| Image | Purpose | Helm value |
+|---|---|---|
+| `rstudio/chronicle` | Chronicle server | `image.registry` and `image.repository` |
+
+### List the images for your release
+
+The image list depends on your chart version and your values.
+To print the exact image references, render the chart with your values file:
+
+```{.bash filename="Terminal"}
+helm template rstudio/rstudio-connect --values values.yaml | grep -E 'image(-name|-tag)?[:=]'
+```
+
+Replace `rstudio/rstudio-connect` with the chart that you install.
+Workbench sets the session images in the `rserver.conf` file, so the pattern also finds the `image=`, `image-name=`, and `image-tag=` lines in that file.
+
+## Authenticate to the registry
+
+Kubernetes needs credentials to pull from a private registry.
+You can give Kubernetes these credentials in two ways.
+
+Node-level credentials
+: Some managed Kubernetes services let nodes pull from the provider registry.
+  Examples are Amazon EKS with Amazon ECR, and Azure Kubernetes Service with Azure Container Registry.
+  If your nodes can already pull from your registry, you do not need image pull secrets.
+  Go to [Point the charts at your registry](#point-the-charts-at-your-registry).
+
+Image pull secrets
+: An image pull secret is a Kubernetes Secret that holds registry credentials.
+  You reference it from each pod that pulls an image.
+  This approach works on all clusters and does not need permission to change the node configuration.
+
+### Create an image pull secret
+
+Create the Secret in the namespace where you install the chart.
+The command creates a Secret of type `kubernetes.io/dockerconfigjson`.
+
+```{.bash filename="Terminal"}
+kubectl create secret docker-registry private-registry-creds \
+  --namespace posit \
+  --docker-server=registry.example.com \
+  --docker-username=<username> \
+  --docker-password=<password-or-token>
+```
+
+Content pods and session pods can run in a different namespace than the server.
+Connect uses `backends.kubernetes.namespace` and Workbench uses `launcher.namespace`.
+If you set one of these values, create the Secret in that namespace too.
+
+For other ways to create the Secret, see [Pull an image from a private registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) in the Kubernetes documentation.
+
+## Point the charts at your registry
+
+In the examples below, replace `registry.example.com` with your registry host.
+Replace `private-registry-creds` with the name of your Secret.
+If you use node-level credentials, remove the `imagePullSecrets` entries.
+
+In each chart, `image.imagePullSecrets` applies only to the server pod.
+Connect content pods and Workbench session pods need the Secret in a second place.
+That Secret covers the main image and the init container images in the pod.
+
+### Posit Connect {#configure-connect}
+
+```{.yaml filename="values.yaml"}
+image:
+  repository: registry.example.com/posit/connect
+  imagePullSecrets:
+    - name: private-registry-creds
+
+backends:
+  kubernetes:
+    enabled: true
+    defaultInitContainer:
+      repository: registry.example.com/posit/connect-content-init
+    # The Secret that content pods use to pull images
+    defaultResourceJobBase:
+      spec:
+        template:
+          spec:
+            imagePullSecrets:
+              - name: private-registry-creds
+
+executionEnvironments:
+  - name: registry.example.com/posit/connect-content:R4.5.2-python3.14.3-ubuntu-24.04
+    # ...
+```
+
+### Posit Workbench {#configure-workbench}
+
+```{.yaml filename="values.yaml"}
+image:
+  repository: registry.example.com/posit/workbench
+  imagePullSecrets:
+    - name: private-registry-creds
+
+session:
+  image:
+    repository: registry.example.com/posit/workbench-session
+
+components:
+  sessionInit:
+    image:
+      repository: registry.example.com/posit/workbench-session-init
+  positron:
+    image:
+      repository: registry.example.com/posit/workbench-positron-init
+
+launcher:
+  templateValues:
+    pod:
+      # The Secret that session pods use to pull images
+      imagePullSecrets:
+        - name: private-registry-creds
+```
+
+The `launcher.templateValues` values apply only when `launcher.useTemplates` is `true`.
+This is the default.
+
+### Posit Package Manager {#configure-package-manager}
+
+```{.yaml filename="values.yaml"}
+image:
+  repository: registry.example.com/posit/package-manager
+  imagePullSecrets:
+    - name: private-registry-creds
+```
+
+### Posit Chronicle {#configure-chronicle}
+
+The Chronicle chart has no `imagePullSecrets` value.
+Instead, attach the Secret to a service account and tell the chart to use that service account.
+Kubernetes adds the image pull secrets of a service account to each pod that uses it.
+
+1. Create a service account that references the Secret:
+
+   ```{.bash filename="Terminal"}
+   kubectl create serviceaccount chronicle --namespace posit
+   kubectl patch serviceaccount chronicle --namespace posit \
+     --patch '{"imagePullSecrets": [{"name": "private-registry-creds"}]}'
+   ```
+
+2. Set the registry and the service account in your values:
+
+   ```{.yaml filename="values.yaml"}
+   image:
+     registry: registry.example.com
+     repository: rstudio/chronicle
+
+   serviceAccount:
+     create: false
+     name: chronicle
+   ```
+
+### Chronicle agent {#configure-chronicle-agent}
+
+The Connect and Workbench charts can run a Chronicle agent in the server pod.
+If you enable the agent, set its registry in the Connect or Workbench values:
+
+```{.yaml filename="values.yaml"}
+chronicleAgent:
+  image:
+    registry: registry.example.com
+    repository: rstudio/chronicle-agent
+```
+
+The agent runs in the server pod, so `image.imagePullSecrets` covers it.
+
+### Use a service account for content and session pods
+
+You can attach the Secret to a service account instead of the pod values above.
+For example, you can patch the service account that Connect content pods or Workbench session pods use.
+Use the `kubectl patch serviceaccount` command from the [Chronicle section](#configure-chronicle).
+
+## Troubleshooting
+
+If a pod cannot pull an image, Kubernetes reports an `ErrImagePull` or `ImagePullBackOff` status.
+To see the image reference and the error from the registry, describe the pod:
+
+```{.bash filename="Terminal"}
+kubectl describe pod <pod-name> --namespace posit
+```
+
+Then make sure that:
+
+- The image and the tag exist in your registry.
+- The Secret exists in the same namespace as the pod.
+- The server in the Secret matches the registry host in the image reference.
+- The pod references the Secret. Content pods and session pods need the Secret in their own values, as shown above.
