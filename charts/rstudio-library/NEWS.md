@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.38
+
+- Add Gateway API helpers in `_gateway.tpl` (`apiVersion`, path match mapping, HTTPRoute naming, service `backendRef`).
+
 ## 0.1.37
 
 - **DEPRECATED**: Chronicle agent helpers are deprecated.
