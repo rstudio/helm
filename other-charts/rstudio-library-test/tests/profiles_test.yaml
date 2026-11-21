@@ -119,6 +119,209 @@ tests:
           path: data["launcher.kubernetes.profiles.conf"]
           pattern: "default-cpus=2"
 
+  - it: should render advanced profiles written as a list in the order written
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "*": {max-cpus: 1}
+              - "@analysts": {max-cpus: 4, container-images: [one, two]}
+              - "12345": {max-cpus: 2}
+          jobJsonDefaults: []
+          filePath: /etc/rstudio/
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [*]
+            max-cpus=1
+
+            [@analysts]
+            container-images=one,two
+            max-cpus=4
+
+            [12345]
+            max-cpus=2
+
+  - it: should add [*] at the top of a list with the job-json-overrides defaults and prepend them to other sections
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "@gpu":
+                  job-json-overrides:
+                    - name: gpu
+                      target: /spec/template/spec/tolerations
+                      json: []
+              - "@cpu": {max-cpus: 2}
+          jobJsonDefaults:
+            - name: defaultVolume
+              target: /spec/template/spec/volumes/-
+              json: {}
+          filePath: /mnt/overrides/
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [*]
+            job-json-overrides="/spec/template/spec/volumes/-":"/mnt/overrides/defaultVolume.json"
+
+            [@gpu]
+            job-json-overrides="/spec/template/spec/volumes/-":"/mnt/overrides/defaultVolume.json","/spec/template/spec/tolerations":"/mnt/overrides/gpu.json"
+
+            [@cpu]
+            max-cpus=2
+
+  - it: should merge the job-json-overrides defaults into [*] where it is in a list
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "@first": {max-cpus: 2}
+              - "*":
+                  max-cpus: 1
+                  job-json-overrides:
+                    - name: everyone
+                      target: /spec/a
+                      json: {}
+              - "@last":
+                  job-json-overrides:
+                    - name: last
+                      target: /spec/b
+                      json: {}
+          jobJsonDefaults:
+            - name: default
+              target: /spec/c
+              json: {}
+          filePath: /m/
+    asserts:
+      - equal:
+          path: data["launcher.kubernetes.profiles.conf"]
+          value: |
+            [@first]
+            max-cpus=2
+
+            [*]
+            job-json-overrides="/spec/c":"/m/default.json","/spec/a":"/m/everyone.json"
+            max-cpus=1
+
+            [@last]
+            job-json-overrides="/spec/c":"/m/default.json","/spec/a":"/m/everyone.json","/spec/b":"/m/last.json"
+
+  - it: should render advanced profiles written as a map in sorted order, with [*] added
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.local.profiles.conf:
+              "@b": {max-cpus: 2}
+              "@a": {max-cpus: 1}
+          jobJsonDefaults:
+            - name: default
+              target: /spec/c
+              json: {}
+          filePath: /m/
+    asserts:
+      - equal:
+          path: data["launcher.local.profiles.conf"]
+          value: |
+            [*]
+            job-json-overrides="/spec/c":"/m/default.json"
+
+            [@a]
+            max-cpus=1
+
+            [@b]
+            max-cpus=2
+
+  - it: should allow repeated section names other than [*] in a profiles list
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.local.profiles.conf:
+              - "@a": {max-cpus: 1}
+              - "@a": {max-cpus: 2}
+          jobJsonDefaults: []
+    asserts:
+      - equal:
+          path: data["launcher.local.profiles.conf"]
+          value: |
+            [@a]
+            max-cpus=1
+
+            [@a]
+            max-cpus=2
+
+  - it: should fail when [*] appears twice in a profiles list
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "*": {max-cpus: 1}
+              - "@a": {max-cpus: 2}
+              - "*": {max-cpus: 3}
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "profiles file 'launcher.kubernetes.profiles.conf': the \\[\\*\\] section appears more than once"
+
+  - it: should fail when [*] is a list in a profiles map
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              "*":
+                - {max-cpus: 1}
+                - {max-cpus: 2}
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "profiles file 'launcher.kubernetes.profiles.conf': \\[\\*\\] is a list"
+
+  - it: should fail on a map as an option value in a profiles section
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              "@a":
+                limits: {cpu: 1}
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'launcher.kubernetes.profiles.conf': option 'limits' in section \\[@a\\] is a map"
+
+  - it: should fail on a malformed profiles list entry
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              - "@a":
+                max-cpus: 1
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'launcher.kubernetes.profiles.conf': list entry 1 has more than one key"
+
+  - it: should fail on a profiles section that is not a map
+    set:
+      testProfiles:
+        advanced:
+          data:
+            launcher.kubernetes.profiles.conf:
+              "@a": 5
+          jobJsonDefaults: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "\\[@a\\] section must be a 'map'"
+
   # ========================================
   # profiles.json-from-overrides-config Tests
   # ========================================
@@ -160,6 +363,36 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "must have keys 'name', 'json', and 'target'"
+
+  - it: should generate JSON files from overrides in a profiles list
+    set:
+      testProfiles:
+        jsonOverrides:
+          data:
+            - "@b":
+                job-json-overrides:
+                  - name: second
+                    target: /spec/b
+                    json: {b: 1}
+            - "*":
+                job-json-overrides:
+                  - name: first
+                    target: /spec/a
+                    json: {a: 1}
+          default: []
+    asserts:
+      - equal:
+          path: data["first.json"]
+          value: |
+            {
+              "a": 1
+            }
+      - equal:
+          path: data["second.json"]
+          value: |
+            {
+              "b": 1
+            }
 
   # ========================================
   # profiles.apply-everyone-and-default-to-others Tests

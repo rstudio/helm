@@ -143,6 +143,260 @@ tests:
           path: data["settings.ini"]
           pattern: "count=42"
 
+  - it: should render ini list form in the order written
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "*": {max-memory-mb: 1024}
+            - "@analysts": {max-memory-mb: 4096}
+            - "12345": {max-memory-mb: 512}
+    asserts:
+      - equal:
+          path: data["profiles"]
+          value: |
+            [*]
+            max-memory-mb=1024
+
+            [@analysts]
+            max-memory-mb=4096
+
+            [12345]
+            max-memory-mb=512
+
+  - it: should render ini list form entries exactly as top-level map entries
+    set:
+      testConfig:
+        ini:
+          filename: mixed.conf
+          config:
+            - Internal: https://example.com/internal
+            - CRAN: https://example.com/cran
+            - origin: [a, b]
+            - cluster:
+                - {name: one}
+                - {name: two}
+    asserts:
+      - equal:
+          path: data["mixed.conf"]
+          value: |
+            Internal=https://example.com/internal
+            CRAN=https://example.com/cran
+            origin=a
+            origin=b
+            [cluster]
+            name=one
+
+            [cluster]
+            name=two
+
+  - it: should allow a repeated name in ini list form
+    set:
+      testConfig:
+        ini:
+          filename: repeated.conf
+          config:
+            - cluster: {name: one}
+            - server: {port: 1}
+            - cluster: {name: two}
+    asserts:
+      - equal:
+          path: data["repeated.conf"]
+          value: |
+            [cluster]
+            name=one
+
+            [server]
+            port=1
+
+            [cluster]
+            name=two
+
+  - it: should repeat a top-level key for a list of plain values and a section for a list of maps
+    set:
+      testConfig:
+        ini:
+          filename: top.conf
+          config:
+            section1: null  # drop the default from values.yaml
+            www-allow-origin: [one, two]
+            cluster:
+              - {name: one, type: Kubernetes}
+              - {name: two, type: Local}
+    asserts:
+      - equal:
+          path: data["top.conf"]
+          value: |
+            [cluster]
+            name=one
+            type=Kubernetes
+
+            [cluster]
+            name=two
+            type=Local
+
+            www-allow-origin=one
+            www-allow-origin=two
+
+  - it: should comma-join a list of plain values inside a section
+    set:
+      testConfig:
+        ini:
+          filename: section-list.conf
+          config:
+            section1: null  # drop the default from values.yaml
+            "*":
+              container-images: [image-one, image-two]
+              empty: []
+    asserts:
+      - equal:
+          path: data["section-list.conf"]
+          value: |
+            [*]
+            container-images=image-one,image-two
+            empty=
+
+  - it: should use an ini string as the whole file
+    set:
+      testConfig:
+        ini:
+          filename: raw.conf
+          config: |
+            [b]
+            x=1
+            [a]
+            y=2
+    asserts:
+      - equal:
+          path: data["raw.conf"]
+          value: |
+            [b]
+            x=1
+            [a]
+            y=2
+
+  - it: should fail on an ini list entry with more than one key
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "*":
+              max-memory-mb: 1024
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'profiles': list entry 1 has more than one key \\(\\*, max-memory-mb\\)"
+
+  - it: should fail on an empty ini list entry
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'profiles': list entry 1 is empty"
+
+  - it: should fail on an ini list entry with no value
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - "@group": {a: 1}
+            - "*": null
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'profiles': list entry 2 \\('\\*'\\) has no value"
+
+  - it: should fail on an ini list entry that is not a map
+    set:
+      testConfig:
+        ini:
+          filename: profiles
+          config:
+            - just-a-string
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'profiles': list entry 1 is 'just-a-string', not a map"
+
+  - it: should fail on an ini file that is neither a map, a list nor a string
+    set:
+      testConfig:
+        ini:
+          filename: number.conf
+          config: 5
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'number.conf' is a float64"
+
+  - it: should fail on a map as an option value inside an ini section
+    set:
+      testConfig:
+        ini:
+          filename: nested.conf
+          config:
+            section1: null  # drop the default from values.yaml
+            "*":
+              limits: {cpu: 1}
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'nested.conf': option 'limits' in section \\[\\*\\] is a map"
+
+  - it: should fail on a list holding a map inside an ini section
+    set:
+      testConfig:
+        ini:
+          filename: nested.conf
+          config:
+            section1: null  # drop the default from values.yaml
+            "*":
+              images: [{name: one}]
+    asserts:
+      - failedTemplate:
+          errorPattern: "option 'images' in section \\[\\*\\] is a list that contains a map"
+
+  - it: should fail on a list holding a list inside an ini section
+    set:
+      testConfig:
+        ini:
+          filename: nested.conf
+          config:
+            section1: null  # drop the default from values.yaml
+            "*":
+              images: [[one]]
+    asserts:
+      - failedTemplate:
+          errorPattern: "option 'images' in section \\[\\*\\] is a list that contains a slice"
+
+  - it: should fail on a top-level ini list that mixes maps and plain values
+    set:
+      testConfig:
+        ini:
+          filename: mixed.conf
+          config:
+            section1: null  # drop the default from values.yaml
+            cluster:
+              - {name: one}
+              - two
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'mixed.conf': 'cluster' is a list that mixes maps, lists and plain values"
+
+  - it: should fail on a top-level ini list holding lists
+    set:
+      testConfig:
+        ini:
+          filename: mixed.conf
+          config:
+            section1: null  # drop the default from values.yaml
+            origin: [[one]]
+    asserts:
+      - failedTemplate:
+          errorPattern: "ini file 'mixed.conf': 'origin' is a list that mixes"
+
   # ========================================
   # DCF Format Tests
   # ========================================
