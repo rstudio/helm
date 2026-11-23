@@ -1,0 +1,16 @@
+{{- if .Values.pebble.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rstudio-workbench.fullname" . }}-pebble
+  namespace: {{ $.Release.Namespace }}
+data:
+  {{- range $name, $layer := include "rstudio-workbench.pebble.layers" . | fromYaml }}
+  {{ $name }}: |
+    {{- if kindIs "string" $layer }}
+    {{- $layer | nindent 4 }}
+    {{- else }}
+    {{- toYaml $layer | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

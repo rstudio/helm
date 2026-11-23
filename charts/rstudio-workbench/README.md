@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.22.9](https://img.shields.io/badge/Version-0.22.9-informational?style=flat-square) ![AppVersion: 2026.11.0](https://img.shields.io/badge/AppVersion-2026.11.0-informational?style=flat-square)
+![Version: 0.23.0](https://img.shields.io/badge/Version-0.23.0-informational?style=flat-square) ![AppVersion: 2026.11.0](https://img.shields.io/badge/AppVersion-2026.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -39,11 +39,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.22.9:
+To install the chart with the release name `my-release` at version 0.23.0:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.22.9
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.23.0
 ```
 
 To explore other chart versions, look at:
@@ -788,8 +788,8 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | config.sssd | object | `{"conf":{},"enabled":true}` | Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD. |
 | config.sssd.conf | object | `{}` | a map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Replaces the deprecated `config.userProvisioning`. |
 | config.sssd.enabled | bool | `true` | whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `pod.runAsRoot` is false. Set to `false` to disable entirely. |
-| config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/ |
-| config.startupUserProvisioning | object | `{}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons. |
+| config.startupCustom | object | `{}` | a map of supervisord .conf files to define custom services. Mounted into the container at /startup/custom/. Not supported when `pebble.enabled` is true (use `pebble.layers`). |
+| config.startupUserProvisioning | object | `{}` | a map of supervisord .conf files to define user provisioning services. Mounted into the container at /startup/user-provisioning/. Not supported when `pebble.enabled` is true (use `pebble.layers`). The bundled SSSD service is now controlled by `config.sssd.enabled`; use this only for custom provisioning daemons. |
 | config.userProvisioning | object | `{}` | DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`. |
 | dangerRegenerateAutomatedValues | bool | `false` |  |
 | deployment.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench deployment |
@@ -848,6 +848,8 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | loadBalancer.forceEnabled | bool | `false` | whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
+| pebble.enabled | bool | `false` | Render for a Pebble-based image. Leave `false` for supervisord-based images. When `true`, nothing is mounted at `/startup/*`; a Pebble layer ConfigMap is mounted into `/var/lib/posit-pebble/layers/` instead. `config.startupCustom` and `config.startupUserProvisioning` are not supported (the chart fails if they are set); use `pebble.layers`. |
+| pebble.layers | object | `{}` | a map of file name to Pebble layer YAML (a string) for custom services, mounted as individual files in `/var/lib/posit-pebble/layers/`. File names must match `NNN-label.yaml` with NNN between 110 and 999 (the chart itself uses 100-102). |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.hostAliases | list | `[]` | Array of hostnames to supply to the main pod |

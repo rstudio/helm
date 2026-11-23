@@ -36,15 +36,22 @@ true
 {{- end -}}
 
 {{/*
+Command that starts the bundled SSSD daemon.
+*/}}
+{{- define "rstudio-workbench.sssd.command" -}}
+{{- /* SSSD ignores its config unless it is root:root mode 0600, but the mounted secret arrives
+       owned by a non-root group. Copy it into place with the right owner and permissions right
+       before starting the daemon (this runs as root, since sssd only runs in a root pod). */ -}}
+/bin/bash -c 'mkdir -p /etc/sssd/conf.d && for f in /mnt/user-provisioning/*; do [ -e "$f" ] && install -m 0600 "$f" /etc/sssd/conf.d/; done; exec /usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr'
+{{- end -}}
+
+{{/*
 supervisord program definition that starts the bundled SSSD daemon.
 Rendered into the user-provisioning startup ConfigMap when sssd is active.
 */}}
 {{- define "rstudio-workbench.sssd.program" -}}
 [program:sssd]
-{{- /* SSSD ignores its config unless it is root:root mode 0600, but the mounted secret arrives
-       owned by a non-root group. Copy it into place with the right owner and permissions right
-       before starting the daemon (this runs as root, since sssd only runs in a root pod). */}}
-command=/bin/bash -c 'mkdir -p /etc/sssd/conf.d && for f in /mnt/user-provisioning/*; do [ -e "$f" ] && install -m 0600 "$f" /etc/sssd/conf.d/; done; exec /usr/sbin/sssd -i -c /etc/sssd/sssd.conf --logger=stderr'
+command={{ include "rstudio-workbench.sssd.command" . }}
 autorestart=false
 numprocs=1
 stdout_logfile=/dev/stdout
@@ -53,6 +60,34 @@ stdout_logfile_backups=0
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 stderr_logfile_backups=0
+{{- end -}}
+
+{{/*
+Pebble layers (file name -> YAML) mounted into /var/lib/posit-pebble/layers/ when pebble.enabled.
+Layers 100-102 sit after the image's 001-product and 002-sssd layers and merge into their services.
+*/}}
+{{- define "rstudio-workbench.pebble.layers" -}}
+{{- if or .Values.config.startupCustom .Values.config.startupUserProvisioning }}
+{{- fail "config.startupCustom and config.startupUserProvisioning are supervisord-only and not supported when pebble.enabled is true; use pebble.layers" }}
+{{- end }}
+{{- $layers := dict }}
+{{- /* Pod grace must outlast kill-delay so Pebble can finish the license deactivation trap. */}}
+{{- $_ := set $layers "100-chart-workbench.yaml" (dict "services" (dict "rstudio-workbench" (dict "override" "merge" "command" "/scripts/prestart-workbench.bash /usr/local/bin/startup.sh" "kill-delay" (printf "%ds" (max 1 (sub (int .Values.pod.terminationGracePeriodSeconds) 10)))))) }}
+{{- if .Values.launcher.enabled }}
+{{- $_ := set $layers "101-chart-launcher.yaml" (dict "services" (dict "rstudio-launcher" (dict "override" "merge" "command" "/scripts/prestart-launcher.bash /usr/lib/rstudio-server/bin/rstudio-launcher"))) }}
+{{- else }}
+{{- $_ := set $layers "101-chart-launcher.yaml" (dict "services" (dict "rstudio-launcher" (dict "override" "merge" "startup" "disabled"))) }}
+{{- end }}
+{{- if include "rstudio-workbench.sssd.active" . }}
+{{- $_ := set $layers "102-chart-sssd.yaml" (dict "services" (dict "sssd" (dict "override" "merge" "command" (include "rstudio-workbench.sssd.command" .)))) }}
+{{- end }}
+{{- range $name, $layer := .Values.pebble.layers }}
+{{- if not (regexMatch "^(1[1-9]|[2-9][0-9])[0-9]-.+\\.yaml$" $name) }}
+{{- fail (printf "pebble.layers key %q must match NNN-label.yaml with NNN between 110 and 999" $name) }}
+{{- end }}
+{{- $_ := set $layers $name $layer }}
+{{- end }}
+{{- toYaml $layers }}
 {{- end -}}
 
 {{- define "rstudio-workbench.containers" -}}
@@ -94,6 +129,10 @@ containers:
   - name: RSTUDIO_LAUNCHER_NAMESPACE
     value: "{{ default $.Release.Namespace .Values.launcher.namespace }}"
   {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-workbench") "envVarPrefix" ("RSW") "fullName" (include "rstudio-workbench.fullname" .)) | nindent 2 }}
+  {{- if .Values.pebble.enabled }}
+  - name: PWB_SSSD
+    value: "{{ ternary "true" "false" (not (not (include "rstudio-workbench.sssd.active" .))) }}"
+  {{- end }}
   - name: RSW_LAUNCHER
     value: "{{ .Values.launcher.enabled }}"
   {{- if .Values.userCreate }}
@@ -195,6 +234,13 @@ containers:
     - name: mnt-load-balancer
       mountPath: "/mnt/load-balancer"
     {{- end }}
+    {{- if .Values.pebble.enabled }}
+    {{- range $layerName := keys (include "rstudio-workbench.pebble.layers" . | fromYaml) | sortAlpha }}
+    - name: rstudio-pebble-layers
+      mountPath: "/var/lib/posit-pebble/layers/{{ $layerName }}"
+      subPath: "{{ $layerName }}"
+    {{- end }}
+    {{- else }}
     - name: rstudio-rsw-startup
       mountPath: "/startup/base"
     {{- if .Values.launcher.enabled }}
@@ -208,6 +254,7 @@ containers:
     {{- if .Values.config.startupCustom }}
     - name: rstudio-custom-startup
       mountPath: "/startup/custom"
+    {{- end }}
     {{- end }}
     {{- if .Values.config.pam }}
       {{- /* sortAlpha: sprig keys returns Go map order, which varies between renders */}}
@@ -363,6 +410,16 @@ volumes:
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-prestart
     defaultMode: {{ .Values.config.defaultMode.prestart }}
+{{- if .Values.pebble.enabled }}
+- name: rstudio-pebble-layers
+  configMap:
+    name: {{ include "rstudio-workbench.fullname" . }}-pebble
+    defaultMode: {{ .Values.config.defaultMode.startup }}
+{{- if .Values.launcher.enabled }}
+- name: launcher-kubernetes-scratch
+  emptyDir: {}
+{{- end }}
+{{- else }}
 - name: rstudio-rsw-startup
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-rsw
@@ -386,6 +443,7 @@ volumes:
   configMap:
     name: {{ include "rstudio-workbench.fullname" . }}-start-custom
     defaultMode: {{ .Values.config.defaultMode.startup }}
+{{- end }}
 {{- end }}
 {{- if .Values.config.pam }}
 - name: rstudio-pam

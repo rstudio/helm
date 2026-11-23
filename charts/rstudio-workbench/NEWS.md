@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.23.0
+
+- Add opt-in `pebble.enabled` for images that use Pebble instead of supervisord as PID 1 (posit-dev/images-workbench `workbench` image). In this mode the chart no longer mounts `/startup/*`; it mounts a Pebble layer ConfigMap into `/var/lib/posit-pebble/layers/` that runs the chart's prestart scripts before `rstudio-workbench` / `rstudio-launcher`, disables the launcher when `launcher.enabled: false`, starts SSSD via `PWB_SSSD`, and sets `kill-delay` to `pod.terminationGracePeriodSeconds` minus 10s.
+- Add `pebble.layers` for custom Pebble services (mounted as `NNN-label.yaml`, NNN 110-999).
+- `config.startupCustom` and `config.startupUserProvisioning` are supervisord-only; the chart fails if they are set with `pebble.enabled: true`.
+- Default rendering is unchanged.
+
 ## 0.22.9
 
 - Bump Workbench version to 2026.11.0
