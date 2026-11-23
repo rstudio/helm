@@ -364,14 +364,14 @@ loadBalancer:
 
 # Pebble mode, for images that use Pebble (not supervisord) as PID 1 (the posit-dev/images-workbench `workbench` image after supervisord removal).
 pebble:
-  # -- Render for a Pebble-based image. Leave `false` for supervisord-based images. When `true`, nothing is mounted at `/startup/*`; a Pebble layer ConfigMap is mounted into `/var/lib/posit-pebble/layers/` instead. `config.startupCustom` and `config.startupUserProvisioning` are not supported (the chart fails if they are set); use `pebble.layers`.
+  # -- Render for a Pebble-based image. Leave `false` for supervisord-based images. When `true`, nothing is mounted at `/startup/*`; a Pebble layer ConfigMap is mounted into `/var/lib/posit-pebble/layers/` instead. `config.startupCustom` and `config.startupUserProvisioning` are not supported (the chart fails if they are set); use `pebble.layers`. SSSD is controlled by `config.sssd.enabled` (the chart sets `PWB_SSSD`, and fails if `pod.env` sets it). The `rstudio-workbench` service `kill-delay` is `pod.terminationGracePeriodSeconds` minus 10s (minimum 1s), so set the grace period to at least 11s to keep the 10s margin.
   enabled: false
-  # -- a map of file name to Pebble layer YAML (a string) for custom services, mounted as individual files in `/var/lib/posit-pebble/layers/`. File names must match `NNN-label.yaml` with NNN between 110 and 999 (the chart itself uses 100-102).
+  # -- a map of file name to Pebble layer YAML (a string) for custom services, mounted as individual files in `/var/lib/posit-pebble/layers/`. File names must match `NNN-label.yaml` with NNN between 110 and 999 (the chart itself uses 100-102). Labels must be lowercase letters, digits and single hyphens, start with a letter and be at least 3 characters; order numbers and labels must be unique; `product`, `chart-workbench`, `chart-launcher`, `chart-sssd` and `sssd` are reserved.
   layers: {}
 
-# -- command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation.
+# -- command is the pod container's run command. When unset, the container's default command is used (`supervisord`, or `pebble` with `pebble.enabled`). In Pebble mode, setting `command` replaces the image ENTRYPOINT, so the image's entrypoint script (for example the Standard image's SSSD staging) is bypassed.
 command: []
-# -- args is the pod container's run arguments. When unset, the container's default arguments are used.
+# -- args is the pod container's run arguments. When unset, the container's default arguments are used. In Pebble mode, `args` set without `command` are passed to the image's `pebble run`.
 # @default -- the image's built-in arguments
 args: []
 

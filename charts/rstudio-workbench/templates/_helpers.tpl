@@ -81,10 +81,26 @@ Layers 100-102 sit after the image's 001-product and 002-sssd layers and merge i
 {{- if include "rstudio-workbench.sssd.active" . }}
 {{- $_ := set $layers "102-chart-sssd.yaml" (dict "services" (dict "sssd" (dict "override" "merge" "command" (include "rstudio-workbench.sssd.command" .)))) }}
 {{- end }}
+{{- /* Names follow Pebble's layer filename syntax; orders and labels must be unique, and the labels used by the image and chart are reserved. */}}
+{{- $seenOrders := dict }}
+{{- $seenLabels := dict }}
 {{- range $name, $layer := .Values.pebble.layers }}
-{{- if not (regexMatch "^(1[1-9]|[2-9][0-9])[0-9]-.+\\.yaml$" $name) }}
-{{- fail (printf "pebble.layers key %q must match NNN-label.yaml with NNN between 110 and 999" $name) }}
+{{- if not (regexMatch "^(1[1-9]|[2-9][0-9])[0-9]-[a-z](-?[a-z0-9]){2,}\\.yaml$" $name) }}
+{{- fail (printf "pebble.layers key %q must match NNN-label.yaml with NNN between 110 and 999 and a label of lowercase letters, digits and single hyphens that starts with a letter and has at least 3 characters" $name) }}
 {{- end }}
+{{- $order := substr 0 3 $name }}
+{{- $label := regexReplaceAll "^[0-9]{3}-(.*)\\.yaml$" $name "${1}" }}
+{{- if has $label (list "product" "chart-workbench" "chart-launcher" "chart-sssd" "sssd") }}
+{{- fail (printf "pebble.layers key %q uses label %q, which is reserved by the image or chart" $name $label) }}
+{{- end }}
+{{- if hasKey $seenOrders $order }}
+{{- fail (printf "pebble.layers keys %q and %q use the same order number %s" (get $seenOrders $order) $name $order) }}
+{{- end }}
+{{- if hasKey $seenLabels $label }}
+{{- fail (printf "pebble.layers keys %q and %q use the same label %q" (get $seenLabels $label) $name $label) }}
+{{- end }}
+{{- $_ := set $seenOrders $order $name }}
+{{- $_ := set $seenLabels $label $name }}
 {{- $_ := set $layers $name $layer }}
 {{- end }}
 {{- toYaml $layers }}
@@ -130,6 +146,11 @@ containers:
     value: "{{ default $.Release.Namespace .Values.launcher.namespace }}"
   {{- include "rstudio-library.license-env" (dict "license" ( .Values.license ) "product" ("rstudio-workbench") "envVarPrefix" ("RSW") "fullName" (include "rstudio-workbench.fullname" .)) | nindent 2 }}
   {{- if .Values.pebble.enabled }}
+  {{- range .Values.pod.env }}
+  {{- if eq .name "PWB_SSSD" }}
+  {{- fail "pod.env must not set PWB_SSSD when pebble.enabled is true; use config.sssd.enabled" }}
+  {{- end }}
+  {{- end }}
   - name: PWB_SSSD
     value: "{{ ternary "true" "false" (not (not (include "rstudio-workbench.sssd.active" .))) }}"
   {{- end }}

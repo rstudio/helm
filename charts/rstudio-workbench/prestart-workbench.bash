@@ -4,6 +4,7 @@ set -o pipefail
 
 main() {
   local startup_script="${1:-/usr/local/bin/startup.sh}"
+  shift $(( $# > 0 ? 1 : 0 ))  # remaining args are passed to the target
   local dyn_dir='/mnt/dynamic/rstudio'
 
   local launcher_pem='/mnt/secret-configmap/rstudio/launcher.pem'
@@ -41,7 +42,7 @@ main() {
   cp /mnt/configmap/rstudio/health-check /mnt/dynamic/rstudio/
 
   _logf 'Replacing process with %s' "${startup_script}"
-  exec "${startup_script}"
+  exec "${startup_script}" "${@}"
 }
 
 _logf() {

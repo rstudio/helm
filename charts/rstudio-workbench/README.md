@@ -1,6 +1,6 @@
 # Posit Workbench
 
-![Version: 0.23.0](https://img.shields.io/badge/Version-0.23.0-informational?style=flat-square) ![AppVersion: 2026.11.0](https://img.shields.io/badge/AppVersion-2026.11.0-informational?style=flat-square)
+![Version: 0.22.10](https://img.shields.io/badge/Version-0.22.10-informational?style=flat-square) ![AppVersion: 2026.11.0](https://img.shields.io/badge/AppVersion-2026.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Workbench_
 
@@ -39,11 +39,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.23.0:
+To install the chart with the release name `my-release` at version 0.22.10:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-workbench --version=0.23.0
+helm upgrade --install my-release rstudio/rstudio-workbench --version=0.22.10
 ```
 
 To explore other chart versions, look at:
@@ -738,7 +738,7 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | A map used verbatim as the pod's "affinity" definition |
-| args | list | the image's built-in arguments | args is the pod container's run arguments. When unset, the container's default arguments are used. |
+| args | list | the image's built-in arguments | args is the pod container's run arguments. When unset, the container's default arguments are used. In Pebble mode, `args` set without `command` are passed to the image's `pebble run`. |
 | chronicle.localConfig | object | `{}` | Overrides for the bundled Chronicle, rendered as a `chronicle-local.gcfg` and applied    after the configuration Workbench generates. Keys are Chronicle's own `.gcfg` sections and    properties    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).    Use it for anything Workbench does not expose as an `rserver.conf` key, such as S3 storage. |
 | chronicleAgent.agentEnvironment | string | `""` | An environment tag to apply to all metrics reported by this agent    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-agent.html#environment)) |
 | chronicleAgent.autoDiscovery | bool | `true` | If true, the chart will attempt to lookup the Chronicle Server address and version in the cluster |
@@ -757,7 +757,7 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | chronicleAgent.workbenchApiKey | object | `{"value":"","valueFrom":{}}` | A read-only administrator permissions API key generated for Workbench for the Chronicle agent to use, API keys    can only be created after Workbench has been deployed so this value may need to be filled in later if performing    an initial deployment ([reference](https://docs.posit.co/connect/user/api-keys/#api-keys-creating)) |
 | chronicleAgent.workbenchApiKey.value | string | `""` | Workbench API key as a raw string to set as the `CHRONICLE_WORKBENCH_APIKEY` environment variable    (not recommended) |
 | chronicleAgent.workbenchApiKey.valueFrom | object | `{}` | Workbench API key as a `valueFrom` reference (ex. a Kubernetes Secret reference) to set as the    `CHRONICLE_WORKBENCH_APIKEY` environment variable (recommended) |
-| command | list | `[]` | command is the pod container's run command. When unset, the container's default command (`supervisord`) is used, which supports both root and non-root (`serviceAccountUser`) operation. |
+| command | list | `[]` | command is the pod container's run command. When unset, the container's default command is used (`supervisord`, or `pebble` with `pebble.enabled`). In Pebble mode, setting `command` replaces the image ENTRYPOINT, so the image's entrypoint script (for example the Standard image's SSSD staging) is bypassed. |
 | components | object | `{"enabled":true,"positron":{"image":{"repository":"posit/workbench-positron-init","tag":""},"version":""},"sessionInit":{"image":{"repository":"posit/workbench-session-init","tag":""}}}` | Session component delivery via init containers. When enabled (default), the chart configures rserver.conf so the launcher injects init containers into session pods at startup. Set `enabled: false` and change `session.image.repository` to `rstudio/r-session-complete` to use the classic all-in-one session image instead. |
 | components.enabled | bool | `true` | Enable session component delivery via init containers. When false, no init containers are configured and session.image must be a self-contained image like r-session-complete. |
 | components.positron.image.repository | string | `"posit/workbench-positron-init"` | The image repository for the Positron init container |
@@ -848,8 +848,8 @@ When combining `sealedSecret.enabled=true` with rootless mode (`pod.runAsRoot=fa
 | loadBalancer.forceEnabled | bool | `false` | whether to force the loadBalancer to be enabled. Otherwise requires replicas > 1. Worth setting if you are HA but may only have one node |
 | nameOverride | string | `""` | the name of the chart deployment (can be overridden) |
 | nodeSelector | object | `{}` | A map used verbatim as the pod's "nodeSelector" definition |
-| pebble.enabled | bool | `false` | Render for a Pebble-based image. Leave `false` for supervisord-based images. When `true`, nothing is mounted at `/startup/*`; a Pebble layer ConfigMap is mounted into `/var/lib/posit-pebble/layers/` instead. `config.startupCustom` and `config.startupUserProvisioning` are not supported (the chart fails if they are set); use `pebble.layers`. |
-| pebble.layers | object | `{}` | a map of file name to Pebble layer YAML (a string) for custom services, mounted as individual files in `/var/lib/posit-pebble/layers/`. File names must match `NNN-label.yaml` with NNN between 110 and 999 (the chart itself uses 100-102). |
+| pebble.enabled | bool | `false` | Render for a Pebble-based image. Leave `false` for supervisord-based images. When `true`, nothing is mounted at `/startup/*`; a Pebble layer ConfigMap is mounted into `/var/lib/posit-pebble/layers/` instead. `config.startupCustom` and `config.startupUserProvisioning` are not supported (the chart fails if they are set); use `pebble.layers`. SSSD is controlled by `config.sssd.enabled` (the chart sets `PWB_SSSD`, and fails if `pod.env` sets it). The `rstudio-workbench` service `kill-delay` is `pod.terminationGracePeriodSeconds` minus 10s (minimum 1s), so set the grace period to at least 11s to keep the 10s margin. |
+| pebble.layers | object | `{}` | a map of file name to Pebble layer YAML (a string) for custom services, mounted as individual files in `/var/lib/posit-pebble/layers/`. File names must match `NNN-label.yaml` with NNN between 110 and 999 (the chart itself uses 100-102). Labels must be lowercase letters, digits and single hyphens, start with a letter and be at least 3 characters; order numbers and labels must be unique; `product`, `chart-workbench`, `chart-launcher`, `chart-sssd` and `sssd` are reserved. |
 | pod.annotations | object | `{}` | Additional annotations to add to the rstudio-workbench pods |
 | pod.env | list | `[]` | env is an array of maps that is injected as-is into the "env:" component of the pod.container spec |
 | pod.hostAliases | list | `[]` | Array of hostnames to supply to the main pod |

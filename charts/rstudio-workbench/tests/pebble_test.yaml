@@ -139,3 +139,78 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels with uppercase or underscores
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-Bad_label.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels shorter than 3 characters
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-ab.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels with consecutive hyphens
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-a--bc.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels reserved by the chart
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-sssd.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "reserved"
+  - it: fails on layer labels reserved by the image
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-product.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "reserved"
+  - it: fails on duplicate layer order numbers
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-one.yaml: "services: {}"
+        110-two.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "same order number"
+  - it: fails on duplicate layer labels
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-same.yaml: "services: {}"
+        111-same.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "same label"
+  - it: fails when pod.env sets PWB_SSSD in pebble mode
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pod.env:
+        - name: PWB_SSSD
+          value: "true"
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.sssd.enabled"

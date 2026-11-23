@@ -1,10 +1,14 @@
 # Changelog
 
-## 0.23.0
+## 0.22.10
 
-- Add opt-in `pebble.enabled` for images that use Pebble instead of supervisord as PID 1 (posit-dev/images-workbench `workbench` image). In this mode the chart no longer mounts `/startup/*`; it mounts a Pebble layer ConfigMap into `/var/lib/posit-pebble/layers/` that runs the chart's prestart scripts before `rstudio-workbench` / `rstudio-launcher`, disables the launcher when `launcher.enabled: false`, starts SSSD via `PWB_SSSD`, and sets `kill-delay` to `pod.terminationGracePeriodSeconds` minus 10s.
+- Add opt-in `pebble.enabled` for images that use Pebble instead of supervisord as PID 1 (posit-dev/images-workbench `workbench` image). In this mode the chart no longer mounts `/startup/*`; it mounts a Pebble layer ConfigMap into `/var/lib/posit-pebble/layers/` that runs the chart's prestart scripts before `rstudio-workbench` / `rstudio-launcher`, disables the launcher when `launcher.enabled: false`, starts SSSD via `PWB_SSSD`, and sets `kill-delay` to `pod.terminationGracePeriodSeconds` minus 10s (minimum 1s, so use a grace period of at least 11s to keep the margin).
 - Add `pebble.layers` for custom Pebble services (mounted as `NNN-label.yaml`, NNN 110-999).
 - `config.startupCustom` and `config.startupUserProvisioning` are supervisord-only; the chart fails if they are set with `pebble.enabled: true`.
+- `pebble.layers` names are validated against Pebble's filename syntax, order numbers and labels must be unique, and the labels `product`, `chart-workbench`, `chart-launcher`, `chart-sssd` and `sssd` are reserved.
+- The chart fails if `pod.env` sets `PWB_SSSD` in Pebble mode; use `config.sssd.enabled`.
+- In Pebble mode, `command` replaces the image ENTRYPOINT and `args` alone are passed to `pebble run`.
+- The prestart scripts pass extra arguments through to the service they exec.
 - Default rendering is unchanged.
 
 ## 0.22.9
