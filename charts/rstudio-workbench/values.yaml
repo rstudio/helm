@@ -613,7 +613,7 @@ config:
   #     path: custom-file.conf
   # -- DEPRECATED: use `config.sssd.conf` instead. A map of sssd config files, mounted to `/etc/sssd/conf.d/` with 0600 permissions. Only applied when `config.sssd.enabled=true`.
   userProvisioning: {}
-  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. Modern provisioning (SCIM / native) does not require SSSD.
+  # -- Bundled SSSD daemon for legacy LDAP/Active Directory user provisioning. On by default; automatically skipped when the pod runs unprivileged (`pod.runAsRoot: false`), since SSSD requires root. In Pebble mode SSSD requires the Standard image (the Minimal image has no base sssd service for the chart's `102` layer to merge onto). Modern provisioning (SCIM / native) does not require SSSD.
   sssd:
     # -- whether to start the bundled SSSD daemon. Automatically skipped (not an error) when `pod.runAsRoot` is false. Set to `false` to disable entirely.
     enabled: true

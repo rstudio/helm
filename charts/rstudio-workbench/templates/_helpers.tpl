@@ -154,6 +154,10 @@ containers:
   - name: PWB_SSSD
     value: "{{ ternary "true" "false" (not (not (include "rstudio-workbench.sssd.active" .))) }}"
   {{- end }}
+  {{- if .Values.pebble.enabled }}
+  - name: PWB_LAUNCHER
+    value: "{{ .Values.launcher.enabled }}"
+  {{- end }}
   - name: RSW_LAUNCHER
     value: "{{ .Values.launcher.enabled }}"
   {{- if .Values.userCreate }}

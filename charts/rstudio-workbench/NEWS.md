@@ -6,6 +6,8 @@
 - Add `pebble.layers` for custom Pebble services (mounted as `NNN-label.yaml`, NNN 110-999).
 - `config.startupCustom` and `config.startupUserProvisioning` are supervisord-only; the chart fails if they are set with `pebble.enabled: true`.
 - `pebble.layers` names are validated against Pebble's filename syntax, order numbers and labels must be unique, and the labels `product`, `chart-workbench`, `chart-launcher`, `chart-sssd` and `sssd` are reserved.
+- Pebble mode targets Workbench images released after 2026.11 (template-only rollout; existing tags remain supervisord), so `pebble.enabled` defaults to `false` until `appVersion` moves to a Pebble-based release.
+- In Pebble mode, `launcher.enabled=false` also sets `PWB_LAUNCHER=false`.
 - The chart fails if `pod.env` sets `PWB_SSSD` in Pebble mode; use `config.sssd.enabled`.
 - In Pebble mode, `command` replaces the image ENTRYPOINT and `args` alone are passed to `pebble run`.
 - The prestart scripts pass extra arguments through to the service they exec.

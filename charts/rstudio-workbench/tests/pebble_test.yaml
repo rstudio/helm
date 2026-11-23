@@ -69,6 +69,17 @@ tests:
       - matchRegex:
           path: data['101-chart-launcher.yaml']
           pattern: "startup: disabled"
+  - it: sets PWB_LAUNCHER=false when the launcher is disabled
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      launcher.enabled: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PWB_LAUNCHER
+            value: "false"
   - it: omits the sssd layer when sssd is disabled
     template: configmap-pebble.yaml
     set:
