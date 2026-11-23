@@ -1,11 +1,26 @@
 # Posit Package Manager
 
-![Version: 0.20.7](https://img.shields.io/badge/Version-0.20.7-informational?style=flat-square) ![AppVersion: 2026.10.0](https://img.shields.io/badge/AppVersion-2026.10.0-informational?style=flat-square)
+![Version: 0.20.8](https://img.shields.io/badge/Version-0.20.8-informational?style=flat-square) ![AppVersion: 2026.11.0](https://img.shields.io/badge/AppVersion-2026.11.0-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
 IT Administrators use [Posit Package Manager](https://posit.co/products/enterprise/package-manager/) to control and manage
 R and Python packages that Data Scientists need to create and share data products.
+
+## Chart versioning
+
+Chart versions use [SemVer](https://semver.org/) and follow [Helm's chart
+versioning guidance](https://helm.sh/docs/topics/charts/#charts-and-versioning). They describe the chart.
+
+Product versions belong in `appVersion`.
+
+While a chart is below `1.0.0`:
+
+- Minor: breaking changes or changes that require user action
+- Patch: product releases, enhancements, bug fixes, and other compatible changes
+- Major: not used
+
+After `1.0.0`, standard SemVer applies.
 
 ## For production
 
@@ -24,11 +39,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.7:
+To install the chart with the release name `my-release` at version 0.20.8:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.20.7
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.20.8
 ```
 
 To explore other chart versions, look at:

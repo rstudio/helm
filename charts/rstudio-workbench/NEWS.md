@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.22.9
+## 0.22.10
 
 - Add a namespaced `configmaps` rule (`create`, `get`, `list`, `patch`, `delete`) to the Launcher's Role, from `rstudio-library` 0.1.38. The Job Launcher Kubernetes plugin uses it for the `kubernetesConfigMapFiles` mount type, which mounts inline files into session pods from a per-job ConfigMap that is deleted with the Job. The plugin reports the `supportsConfigMapFiles` capability only when it is granted these permissions. Without the rule the plugin works as before.
+
+## 0.22.9
+
+- Bump Workbench version to 2026.11.0
 
 ## 0.22.8
 

@@ -19,6 +19,8 @@ This example also shows where to provide private registry credentials in the for
 
 The registry credentials secret must be specified in two places in the values to apply to Connect, content and init containers (shown in the example below).
 
+For a list of all images that each chart uses, and for other ways to authenticate to your registry, see [Private container registries](../../../docs/private-registries.qmd).
+
 {{< include ../_prereqs.qmd >}}
 
 ## Kubernetes

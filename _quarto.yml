@@ -17,6 +17,7 @@ project:
     - examples/connect/README.md
     - docs/customize.md
     - docs/migrating-to-posit-images.qmd
+    - docs/private-registries.qmd
     - "*.qmd"
 
 filters:
@@ -54,6 +55,8 @@ website:
         file: index.qmd
       - text: Image migration guide
         file: docs/migrating-to-posit-images.qmd
+      - text: Private container registries
+        file: docs/private-registries.qmd
       - section: "Posit Workbench"
         contents:
           - text: Overview
