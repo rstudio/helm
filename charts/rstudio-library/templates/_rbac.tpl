@@ -125,6 +125,16 @@ rules:
       - "list"
       - "delete"
   - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "create"
+      - "get"
+      - "list"
+      - "patch"
+      - "delete"
+  - apiGroups:
       - "batch"
     resources:
       - "jobs"

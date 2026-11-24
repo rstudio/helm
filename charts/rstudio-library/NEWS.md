@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.38
+
+- Add a namespaced `configmaps` rule (`create`, `get`, `list`, `patch`, `delete`) to the `rstudio-library.rbac` Role, so the Job Launcher Kubernetes plugin can mount inline files into session pods from a per-job ConfigMap.
+
 ## 0.1.37
 
 - **DEPRECATED**: Chronicle agent helpers are deprecated.
