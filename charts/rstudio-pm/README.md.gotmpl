@@ -143,6 +143,36 @@ so you can set the database password with something like:
 
 The Helm `config` values are converted into the `rstudio-pm.gcfg` service configuration file via go-templating.
 
+## Chronicle
+
+Package Manager bundles Chronicle and runs it when it is enabled in Package Manager's configuration. Chronicle also
+needs Package Manager's metrics, which this chart enables by default:
+
+```yaml
+config:
+  Chronicle:
+    Enabled: true
+```
+
+### Chronicle settings not exposed by Package Manager
+
+Package Manager rewrites Chronicle's configuration file on every start, so it cannot be edited directly. Use
+`chronicle.localConfig` for anything `config.Chronicle` does not expose. Chronicle applies it after the configuration
+Package Manager generates, so any key set here takes precedence.
+
+Keys are Chronicle's own sections and properties, not `config.Chronicle` keys — see the [Chronicle configuration
+reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html).
+
+```yaml
+chronicle:
+  localConfig:
+    Logging:
+      Level: DEBUG
+```
+
+Chronicle refuses to start on a property it does not recognize. Check every property exists in the Chronicle version
+bundled with the Package Manager you are deploying.
+
 {{ template "chart.valuesSection" . }}
 
 {{ template "helm-docs.versionFooter" . }}

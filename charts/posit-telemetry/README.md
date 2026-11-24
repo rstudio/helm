@@ -65,11 +65,11 @@ of either image restarts both. Agents don't queue or retry, so they drop what th
 
 Agents send their data to the server's Service, `http://<release>-posit-telemetry.<namespace>.svc:4318`, or
 `http://<release>.<namespace>.svc:4318` if the release name already contains `posit-telemetry`; `helm install` prints
-it. Connect and Workbench each run a Chronicle agent. Point it at the server, and turn off the Chronicle server that
-otherwise runs beside it, with `chronicle.localConfig` in the product's chart:
+it. Connect, Workbench, and Package Manager each run a Chronicle agent. Point it at the server, and turn off the
+Chronicle server that otherwise runs beside it, with `chronicle.localConfig` in the product's chart:
 
 ```yaml
-# values for the rstudio-connect or rstudio-workbench chart
+# values for the rstudio-connect, rstudio-workbench, or rstudio-pm chart
 chronicle:
   localConfig:
     Server:
@@ -77,11 +77,14 @@ chronicle:
       Address: http://my-release-posit-telemetry.my-namespace.svc:4318
 ```
 
+In Chronicle's own configuration this is `[Server] Enabled = false` with `[Server] Address` set to the server's
+address. Chronicle's `[Agent] RemoteServerAddress` setting is an alternative to those two.
+
 ## TLS
 
 The server speaks plain HTTP. Inside one cluster, agents reach it through its `ClusterIP` Service. For agents outside
-the cluster, enable the Ingress, which is where TLS is terminated, and use its `https://` address as the agents'
-`[Server] Address`:
+the cluster, enable the Ingress, which is where TLS is terminated, and use its `https://` address as the address
+the agents send to:
 
 ```yaml
 ingress:

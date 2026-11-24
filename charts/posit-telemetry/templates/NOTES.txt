@@ -3,6 +3,7 @@ Agents send Opentelemetry data (OTLP HTTP) to:
     http://{{ include "posit-telemetry.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
 
 Set that address as each agent's `[Server] Address`, with `[Server] Enabled = false`.
+Chronicle's `[Agent] RemoteServerAddress` setting is an alternative to those two.
 
 Query Clickhouse with:
 
