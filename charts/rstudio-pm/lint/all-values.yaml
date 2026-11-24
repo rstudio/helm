@@ -30,10 +30,6 @@ config:
       - /opt/R/3.6.2
   Git:
     BuilderDir: "/tmp/git"
-chronicle:
-  localConfig:
-    Logging:
-      Level: DEBUG
 rstudioPMKey: somevalue
 awsAccessKeyId: keyid
 awsSecretAccessKey: keysecret

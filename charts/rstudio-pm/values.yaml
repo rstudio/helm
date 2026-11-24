@@ -243,17 +243,6 @@ config:
   Metrics:
     Enabled: true
 
-# Settings for the Chronicle bundled with Package Manager.
-chronicle:
-  # -- Overrides for the bundled Chronicle, rendered as a `chronicle-local.gcfg` and applied
-  #    after the configuration Package Manager generates. Keys are Chronicle's own `.gcfg`
-  #    sections and properties
-  #    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).
-  #    Use it for anything `config.Chronicle` does not expose.
-  localConfig: {}
-  # Logging:
-  #   Level: DEBUG
-
 # -- sidecar container list
 extraContainers: []
 # -- A map used verbatim as the pod's "affinity" definition

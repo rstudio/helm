@@ -24,11 +24,11 @@ of either image restarts both. Agents don't queue or retry, so they drop what th
 
 Agents send their data to the server's Service, `http://<release>-posit-telemetry.<namespace>.svc:4318`, or
 `http://<release>.<namespace>.svc:4318` if the release name already contains `posit-telemetry`; `helm install` prints
-it. Connect, Workbench, and Package Manager each run a Chronicle agent. Point it at the server, and turn off the
-Chronicle server that otherwise runs beside it, with `chronicle.localConfig` in the product's chart:
+it. Connect and Workbench each run a Chronicle agent. Point it at the server, and turn off the Chronicle server that
+otherwise runs beside it, with `chronicle.localConfig` in the product's chart:
 
 ```yaml
-# values for the rstudio-connect, rstudio-workbench, or rstudio-pm chart
+# values for the rstudio-connect or rstudio-workbench chart
 chronicle:
   localConfig:
     Server:

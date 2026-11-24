@@ -124,14 +124,6 @@ spec:
           - name: rstudio-pm-config
             mountPath: "/etc/rstudio-pm/rstudio-pm.gcfg"
             subPath: "rstudio-pm.gcfg"
-          {{- if .Values.chronicle.localConfig }}
-          {{- /* A single-file mount, so the rest of Chronicle's config dir stays the image's own
-                 writable directory: Package Manager writes its generated config there and
-                 Chronicle creates its lock file and socket in it. */}}
-          - name: rstudio-pm-config
-            mountPath: "/etc/rstudio-pm/chronicle/chronicle-local.gcfg"
-            subPath: "chronicle-local.gcfg"
-          {{- end }}
           {{- if .Values.awsAccessKeyId }}
           - name: aws-creds
             readOnly: true
@@ -190,10 +182,6 @@ spec:
           items:
           - key: rstudio-pm.gcfg
             path: "rstudio-pm.gcfg"
-          {{- if .Values.chronicle.localConfig }}
-          - key: chronicle-local.gcfg
-            path: "chronicle-local.gcfg"
-          {{- end }}
       {{- if .Values.awsAccessKeyId }}
       - name: aws-creds
         secret:

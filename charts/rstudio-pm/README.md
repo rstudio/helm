@@ -1,6 +1,6 @@
 # Posit Package Manager
 
-![Version: 0.20.10](https://img.shields.io/badge/Version-0.20.10-informational?style=flat-square) ![AppVersion: 2026.11.2](https://img.shields.io/badge/AppVersion-2026.11.2-informational?style=flat-square)
+![Version: 0.20.9](https://img.shields.io/badge/Version-0.20.9-informational?style=flat-square) ![AppVersion: 2026.11.2](https://img.shields.io/badge/AppVersion-2026.11.2-informational?style=flat-square)
 
 #### _Official Helm chart for Posit Package Manager_
 
@@ -39,11 +39,11 @@ To ensure a stable production deployment:
 
 ## Installing the chart
 
-To install the chart with the release name `my-release` at version 0.20.10:
+To install the chart with the release name `my-release` at version 0.20.9:
 
 ```{.bash}
 helm repo add rstudio https://helm.rstudio.com
-helm upgrade --install my-release rstudio/rstudio-pm --version=0.20.10
+helm upgrade --install my-release rstudio/rstudio-pm --version=0.20.9
 ```
 
 To explore other chart versions, look at:
@@ -212,36 +212,6 @@ so you can set the database password with something like:
 
 The Helm `config` values are converted into the `rstudio-pm.gcfg` service configuration file via go-templating.
 
-## Chronicle
-
-Package Manager bundles Chronicle and runs it when it is enabled in Package Manager's configuration. Chronicle also
-needs Package Manager's metrics, which this chart enables by default:
-
-```yaml
-config:
-  Chronicle:
-    Enabled: true
-```
-
-### Chronicle settings not exposed by Package Manager
-
-Package Manager rewrites Chronicle's configuration file on every start, so it cannot be edited directly. Use
-`chronicle.localConfig` for anything `config.Chronicle` does not expose. Chronicle applies it after the configuration
-Package Manager generates, so any key set here takes precedence.
-
-Keys are Chronicle's own sections and properties, not `config.Chronicle` keys — see the [Chronicle configuration
-reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html).
-
-```yaml
-chronicle:
-  localConfig:
-    Logging:
-      Level: DEBUG
-```
-
-Chronicle refuses to start on a property it does not recognize. Check every property exists in the Chronicle version
-bundled with the Package Manager you are deploying.
-
 ## Values
 
 | Key | Type | Default | Description |
@@ -250,7 +220,6 @@ bundled with the Package Manager you are deploying.
 | args | bool | `false` | args is the pod's run arguments. By default, it uses the container's default |
 | awsAccessKeyId | bool | `false` | awsAccessKeyId is the access key id for s3 access, used also to gate file creation |
 | awsSecretAccessKey | string | `nil` | awsSecretAccessKey is the secret access key, needs to be filled if access_key_id is |
-| chronicle.localConfig | object | `{}` | Overrides for the bundled Chronicle, rendered as a `chronicle-local.gcfg` and applied    after the configuration Package Manager generates. Keys are Chronicle's own `.gcfg`    sections and properties    ([reference](https://docs.posit.co/chronicle/appendix/library/advanced-configuration.html)).    Use it for anything `config.Chronicle` does not expose. |
 | command | bool | `false` | command is the pod's run command. By default, it uses the container's default |
 | config | object | `{"HTTP":{"Listen":":4242"},"Metrics":{"Enabled":true}}` | config is a nested map of maps that generates the rstudio-pm.gcfg file |
 | enableMigration | bool | `false` | Enable migrations for shared storage (if necessary) using Helm hooks. |
