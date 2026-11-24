@@ -4,6 +4,10 @@
 
 - Add `chronicle.localConfig`, which sets a `chronicle-local.gcfg` for the Chronicle bundled with Package Manager
 
+## 0.20.9
+
+- Bump Package Manager version to 2026.11.2
+
 ## 0.20.8
 
 - Bump Package Manager version to 2026.11.0
