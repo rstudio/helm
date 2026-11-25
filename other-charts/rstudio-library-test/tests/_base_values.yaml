@@ -11,6 +11,8 @@ testConfig:
 
 testIngress: null
 
+testGateway: null
+
 testLicense: null
 
 testRbac: null

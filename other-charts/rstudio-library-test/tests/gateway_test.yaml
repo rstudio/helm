@@ -1,0 +1,259 @@
+suite: Gateway API Helpers
+templates:
+  - templates/test-gateway.yaml
+values:
+  - _base_values.yaml
+
+# Document order in templates/test-gateway.yaml:
+#   0 apiVersion, 1 path types, 2 path (string), 3 path (object),
+#   4 path (object without pathType), 5 route name, 6 backend
+
+tests:
+  # ========================================
+  # API Version Tests
+  # ========================================
+  - it: should return gateway.networking.k8s.io/v1 for the Gateway API version
+    set:
+      testGateway:
+        pathTypes: []
+        path: /
+        pathType: Prefix
+        fullName: rel
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data.apiVersion
+          value: gateway.networking.k8s.io/v1
+        documentIndex: 0
+
+  - it: should render nothing when testGateway is null
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # ========================================
+  # Ingress pathType to Gateway pathType Mapping
+  # ========================================
+  - it: should map Ingress pathType values to Gateway API path match types
+    set:
+      testGateway:
+        pathTypes:
+          - Prefix
+          - Exact
+          - ImplementationSpecific
+        path: /
+        pathType: Prefix
+        fullName: rel
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data["type-0"]
+          value: PathPrefix
+        documentIndex: 1
+      - equal:
+          path: data["type-1"]
+          value: Exact
+        documentIndex: 1
+      - equal:
+          path: data["type-2"]
+          value: ImplementationSpecific
+        documentIndex: 1
+
+  - it: should pass through Gateway API path match types
+    set:
+      testGateway:
+        pathTypes:
+          - PathPrefix
+          - RegularExpression
+        path: /
+        pathType: Prefix
+        fullName: rel
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data["type-0"]
+          value: PathPrefix
+        documentIndex: 1
+      - equal:
+          path: data["type-1"]
+          value: RegularExpression
+        documentIndex: 1
+
+  - it: should fall back to PathPrefix for an unknown or empty pathType
+    set:
+      testGateway:
+        pathTypes:
+          - Unknown
+          - ""
+        path: /
+        pathType: Prefix
+        fullName: rel
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data["type-0"]
+          value: PathPrefix
+        documentIndex: 1
+      - equal:
+          path: data["type-1"]
+          value: PathPrefix
+        documentIndex: 1
+
+  # ========================================
+  # Path Match Body Tests
+  # ========================================
+  - it: should render a path match from a string path as PathPrefix
+    set:
+      testGateway:
+        pathTypes: []
+        path: /api
+        pathType: Prefix
+        fullName: rel
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data["path.yaml"]
+          value: |
+            type: PathPrefix
+            value: "/api"
+        documentIndex: 2
+
+  - it: should render a path match from an object with a pathType
+    set:
+      testGateway:
+        pathTypes: []
+        path: /custom
+        pathType: Exact
+        fullName: rel
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data["path.yaml"]
+          value: |
+            type: Exact
+            value: "/custom"
+        documentIndex: 3
+
+  - it: should default an object path without a pathType to PathPrefix
+    set:
+      testGateway:
+        pathTypes: []
+        path: /no-type
+        pathType: Exact
+        fullName: rel
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data["path.yaml"]
+          value: |
+            type: PathPrefix
+            value: "/no-type"
+        documentIndex: 4
+
+  # ========================================
+  # HTTPRoute Name Tests
+  # ========================================
+  - it: should name the route from the full name and host index
+    set:
+      testGateway:
+        pathTypes: []
+        path: /
+        pathType: Prefix
+        fullName: my-release-rstudio-connect
+        index: 0
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data.name
+          value: my-release-rstudio-connect-gw-0
+        documentIndex: 5
+
+  - it: should use a multi-digit host index in the route name
+    set:
+      testGateway:
+        pathTypes: []
+        path: /
+        pathType: Prefix
+        fullName: rel
+        index: 12
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data.name
+          value: rel-gw-12
+        documentIndex: 5
+
+  - it: should truncate a long full name so the route name stays within 63 characters
+    set:
+      testGateway:
+        pathTypes: []
+        path: /
+        pathType: Prefix
+        fullName: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        index: 3
+        serviceName: svc
+        servicePort: 80
+    asserts:
+      - equal:
+          path: data.name
+          value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-gw-3
+        documentIndex: 5
+      - matchRegex:
+          path: data.name
+          pattern: "^.{1,63}$"
+        documentIndex: 5
+
+  # ========================================
+  # Service backendRef Tests
+  # ========================================
+  - it: should render a backendRef with the service name and numeric port
+    set:
+      testGateway:
+        pathTypes: []
+        path: /
+        pathType: Prefix
+        fullName: rel
+        index: 0
+        serviceName: my-service
+        servicePort: 8080
+    asserts:
+      - equal:
+          path: data["backend.yaml"]
+          value: |
+            - name: my-service
+              port: 8080
+        documentIndex: 6
+
+  - it: should render a string service port as a bare number
+    set:
+      testGateway:
+        pathTypes: []
+        path: /
+        pathType: Prefix
+        fullName: rel
+        index: 0
+        serviceName: my-service
+        servicePort: "9090"
+    asserts:
+      - equal:
+          path: data["backend.yaml"]
+          value: |
+            - name: my-service
+              port: 9090
+        documentIndex: 6
