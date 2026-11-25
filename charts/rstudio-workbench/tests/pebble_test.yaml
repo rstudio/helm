@@ -1,0 +1,227 @@
+suite: Workbench Pebble mode
+templates:
+  - configmap-startup.yaml
+  - configmap-pebble.yaml
+  - configmap-secret.yaml
+  - configmap-general.yaml
+  - configmap-graphite-exporter.yaml
+  - configmap-prestart.yaml
+  - configmap-session.yaml
+  - deployment.yaml
+tests:
+  - it: renders no pebble layers and keeps /startup mounts by default
+    template: deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-rsw-startup
+            mountPath: /startup/base
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PWB_SSSD
+            value: "true"
+  - it: does not render the pebble ConfigMap by default
+    template: configmap-pebble.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: skips the supervisord ConfigMaps in pebble mode
+    template: configmap-startup.yaml
+    set:
+      pebble.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: wraps the workbench and launcher services with the prestart scripts
+    template: configmap-pebble.yaml
+    set:
+      pebble.enabled: true
+    asserts:
+      - matchRegex:
+          path: data['100-chart-workbench.yaml']
+          pattern: "prestart-workbench.bash /usr/local/bin/startup.sh"
+      - matchRegex:
+          path: data['100-chart-workbench.yaml']
+          pattern: "kill-delay: 110s"
+      - matchRegex:
+          path: data['101-chart-launcher.yaml']
+          pattern: "prestart-launcher.bash .*rstudio-launcher"
+      - matchRegex:
+          path: data['102-chart-sssd.yaml']
+          pattern: "(?s)/usr/sbin/sssd\\s+-i -c /etc/sssd/sssd.conf"
+  - it: derives kill-delay from the pod grace period
+    template: configmap-pebble.yaml
+    set:
+      pebble.enabled: true
+      pod.terminationGracePeriodSeconds: 60
+    asserts:
+      - matchRegex:
+          path: data['100-chart-workbench.yaml']
+          pattern: "kill-delay: 50s"
+  - it: disables the launcher service when the launcher is disabled
+    template: configmap-pebble.yaml
+    set:
+      pebble.enabled: true
+      launcher.enabled: false
+    asserts:
+      - matchRegex:
+          path: data['101-chart-launcher.yaml']
+          pattern: "startup: disabled"
+  - it: sets PWB_LAUNCHER=false when the launcher is disabled
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      launcher.enabled: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PWB_LAUNCHER
+            value: "false"
+  - it: omits the sssd layer when sssd is disabled
+    template: configmap-pebble.yaml
+    set:
+      pebble.enabled: true
+      config.sssd.enabled: false
+    asserts:
+      - notExists:
+          path: data['102-chart-sssd.yaml']
+  - it: mounts each layer as an individual file and sets PWB_SSSD
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-custom.yaml: |
+          services:
+            foo:
+              override: replace
+              command: /bin/true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-pebble-layers
+            mountPath: /var/lib/posit-pebble/layers/110-custom.yaml
+            subPath: 110-custom.yaml
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-pebble-layers
+            mountPath: /var/lib/posit-pebble/layers/100-chart-workbench.yaml
+            subPath: 100-chart-workbench.yaml
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PWB_SSSD
+            value: "true"
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: rstudio-rsw-startup
+            mountPath: /startup/base
+  - it: sets PWB_SSSD=false when sssd is disabled
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      config.sssd.enabled: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PWB_SSSD
+            value: "false"
+  - it: fails when supervisord custom startup is set in pebble mode
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      config.startupCustom:
+        foo.conf: "[program:foo]"
+    asserts:
+      - failedTemplate:
+          errorPattern: "not supported when pebble.enabled"
+  - it: fails on custom layer names below 110
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        050-bad.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels with uppercase or underscores
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-Bad_label.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels shorter than 3 characters
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-ab.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels with consecutive hyphens
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-a--bc.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "must match NNN-label.yaml"
+  - it: fails on layer labels reserved by the chart
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-sssd.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "reserved"
+  - it: fails on layer labels reserved by the image
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-product.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "reserved"
+  - it: fails on duplicate layer order numbers
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-one.yaml: "services: {}"
+        110-two.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "same order number"
+  - it: fails on duplicate layer labels
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pebble.layers:
+        110-same.yaml: "services: {}"
+        111-same.yaml: "services: {}"
+    asserts:
+      - failedTemplate:
+          errorPattern: "same label"
+  - it: fails when pod.env sets PWB_SSSD in pebble mode
+    template: deployment.yaml
+    set:
+      pebble.enabled: true
+      pod.env:
+        - name: PWB_SSSD
+          value: "true"
+    asserts:
+      - failedTemplate:
+          errorPattern: "config.sssd.enabled"

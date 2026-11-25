@@ -28,6 +28,9 @@ spec:
         {{- if and .Values.prometheus.legacy .Values.prometheusExporter.enabled }}
         checksum/config-graphite: {{ include (print $.Template.BasePath "/configmap-graphite-exporter.yaml") . | sha256sum }}
         {{- end }}
+        {{- if .Values.pebble.enabled }}
+        checksum/config-pebble: {{ include (print $.Template.BasePath "/configmap-pebble.yaml") . | sha256sum }}
+        {{- end }}
         checksum/config-prestart: {{ include (print $.Template.BasePath "/configmap-prestart.yaml") . | sha256sum }}
         checksum/config-secret: {{ include (print $.Template.BasePath "/configmap-secret.yaml") . | sha256sum }}
         checksum/config-session: {{ include (print $.Template.BasePath "/configmap-session.yaml") . | sha256sum }}

@@ -4,6 +4,7 @@ set -o pipefail
 
 main() {
   local startup_script="${1:-/usr/lib/rstudio-server/bin/rstudio-launcher}"
+  shift $(( $# > 0 ? 1 : 0 ))  # remaining args are passed to the target
 
   # Empty if enabled, set to "disabled" by default
   if [[ -z "${RSTUDIO_LAUNCHER_STARTUP_HEALTH_CHECK}" ]]; then
@@ -40,7 +41,7 @@ main() {
   install -d -m 2775 /var/lib/rstudio-launcher/Local
 
   _logf 'Replacing process with %s' "${startup_script}"
-  exec "${startup_script}"
+  exec "${startup_script}" "${@}"
 }
 
 _logf() {

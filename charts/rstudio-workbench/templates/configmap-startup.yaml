@@ -1,3 +1,4 @@
+{{- if not .Values.pebble.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -54,4 +55,5 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 data:
   {{- include "rstudio-library.config.ini" .Values.config.startupCustom | nindent 2}}
+{{- end }}
 {{- end }}
