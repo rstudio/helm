@@ -7,3 +7,6 @@ metadata:
 data:
   rstudio-pm.gcfg: |
 {{ include "rstudio-pm.config" . | indent 4 }}
+{{- with .Values.chronicle.localConfig }}
+{{ include "rstudio-library.config.ini" (dict "chronicle-local.gcfg" .) | indent 2 }}
+{{- end }}

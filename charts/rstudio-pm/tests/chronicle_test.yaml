@@ -1,0 +1,71 @@
+suite: Bundled Chronicle configuration
+templates:
+  - configmap.yaml
+  - deployment.yaml
+  - secret-aws-creds.yaml
+  - secret-rstudio-pm-key.yaml
+tests:
+  - it: should not emit a chronicle-local.gcfg by default
+    template: configmap.yaml
+    asserts:
+      - notExists:
+          path: 'data["chronicle-local.gcfg"]'
+
+  - it: should not mount a chronicle-local.gcfg by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: 'spec.template.spec.containers[0].volumeMounts[?(@.subPath=="chronicle-local.gcfg")]'
+      - notContains:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pm-config")].configMap.items'
+          content:
+            key: chronicle-local.gcfg
+            path: chronicle-local.gcfg
+
+  - it: should render chronicle.localConfig as a gcfg file with section headers
+    template: configmap.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+          Server:
+            Enabled: false
+            Address: http://telemetry-posit-telemetry.posit.svc:4318
+    asserts:
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: '\[Logging\]\nLevel=DEBUG'
+      - matchRegex:
+          path: 'data["chronicle-local.gcfg"]'
+          pattern: '\[Server\]\nAddress=http://telemetry-posit-telemetry.posit.svc:4318\nEnabled=false'
+      - matchRegex:
+          path: 'data["rstudio-pm.gcfg"]'
+          pattern: '\[HTTP\]\nListen = :4242'
+
+  # Only the one file is mounted. Mounting a volume over the whole directory would hide the
+  # image's directory, which Package Manager and Chronicle both write to.
+  - it: should mount the override as a single file in Chronicle's config dir
+    template: deployment.yaml
+    set:
+      chronicle:
+        localConfig:
+          Logging:
+            Level: DEBUG
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            name: rstudio-pm-config
+            mountPath: /etc/rstudio-pm/chronicle/chronicle-local.gcfg
+            subPath: chronicle-local.gcfg
+      - contains:
+          path: 'spec.template.spec.volumes[?(@.name=="rstudio-pm-config")].configMap.items'
+          content:
+            key: chronicle-local.gcfg
+            path: chronicle-local.gcfg
+      - notContains:
+          path: 'spec.template.spec.containers[0].volumeMounts'
+          content:
+            mountPath: /etc/rstudio-pm/chronicle
+          any: true
