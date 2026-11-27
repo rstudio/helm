@@ -77,7 +77,7 @@ Supporting and miscellaneous charts with varying levels of maintenance, usefulne
 These charts are provided as a convenience to Posit customers. If you have
 questions about these charts, you can ask them in the
 [issues](https://github.com/rstudio/helm/issues/new/choose) in the repository
-or to your support representative, who will route them appropriately.
+or file a [ticket](https://support.posit.co/hc/en-us/requests/new) with Posit Support.
 
 Bugs or feature requests should be opened in an [issue](https://github.com/rstudio/helm/issues/new/choose).
 
