@@ -30,9 +30,13 @@
   {{- if $data }}
     {{- $data = $data | deepCopy }}
   {{- end }}
-  {{- include "rstudio-library.debug.type-check" (dict "name" "config data" "object" $data "expected" "map" "description" "of section headers and configuration" ) }}
-  {{- range $key, $config := $data -}}
-    {{- include "rstudio-library.debug.type-check" (dict "name" (print "[" $key "] section") "object" $config "expected" "map" "description" "of config data" ) }}
+  {{- if not (kindIs "slice" $data) }}
+    {{- include "rstudio-library.debug.type-check" (dict "name" "config data" "object" $data "expected" "map" "description" "of section headers and configuration" ) }}
+  {{- end }}
+  {{- $sections := dict }}
+  {{- include "rstudio-library.profiles.sections" (dict "file" "" "data" $data "out" $sections) }}
+  {{- range $s := $sections.sections -}}
+    {{- $config := $s.section }}
     {{- if hasKey $config "job-json-overrides" -}}
       {{- $overrides := get $config "job-json-overrides" -}}
       {{- include "rstudio-library.debug.type-check" (dict "name" "[*].job-json-overrides" "object" $overrides "expected" "slice" "description" "of job-json-overrides definitions") }}
@@ -87,27 +91,35 @@
 {{/*
   Builds a single profiles configuration file by:
     - Concat "everyone" job-json-overrides (at .data.*.job-json-overrides) to .default
-    - Loop through other parent keys and:
-      - prend "default config" to any user / group definitions
-    - Take the "override dict" that is created here, and mergeOverwrite with the provided .data
+    - Loop through the other sections and:
+      - prepend "default config" to any user / group job-json-overrides
+    - Set the result on a copy of .data, adding a [*] section (at the top, for the list form) if
+      there is none
     - output the ini file
 
+  The file may be a map of sections, or a list of single-key maps to keep their order (see
+  rstudio-library.config.ini). [*] may appear only once, and must be a single map.
+
   Takes a dict:
-    data: the launcher.kubernetes.profiles.conf configuration as a dict (map of maps)
+    data: the launcher.kubernetes.profiles.conf configuration as a map of maps, or a list
     default: optional. the default job-json-overrides to append
     filePath: optional. the default is none
+    file: optional. the file name, used in error messages
 */}}
 {{- define "rstudio-library.profiles.apply-everyone-and-default-to-others" }}
-  {{- $newDict := dict }}
-  {{- $everyoneConfig := dict }}
+  {{- $file := default "" .file }}
   {{- $data := .data }}
   {{- if $data }}
     {{- $data = $data | deepCopy }}
+  {{- else }}
+    {{- $data = dict }}
   {{- end }}
-  {{- if hasKey $data "*" }}
-    {{- $everyoneConfig = get $data "*" }}
+  {{- $s := dict }}
+  {{- include "rstudio-library.profiles.sections" (dict "file" $file "data" $data "out" $s) }}
+  {{- $everyoneConfig := dict }}
+  {{- if $s.hasEveryone }}
+    {{- $everyoneConfig = $s.everyone }}
   {{- end }}
-  {{- include "rstudio-library.debug.type-check" (dict "name" "[*] section" "object" $everyoneConfig "expected" "map" "description" "of config values") }}
   {{- $defaultConfig := default (list) .default }}
   {{- if $defaultConfig }}
     {{- $defaultConfig = $defaultConfig | deepCopy }}
@@ -127,54 +139,103 @@
     {{- end }}
     {{- $defaultConfig = concat $defaultConfig $everyone }}
   {{- end }}
-  {{- /* if default config is defined, ensure that "everyone" is updated by it */ -}}
-  {{- if ge (len $defaultConfig) 1 }}
-    {{- $newDict = mergeOverwrite $newDict (dict "*" (dict "job-json-overrides" $defaultConfig)) }}
-  {{- end }}
-  {{- /* loop over non-everyone config, prepending the default configuration */ -}}
-  {{- $others := omit $data "*" }}
-  {{- range $key, $one := $others }}
-    {{- include "rstudio-library.debug.type-check" (dict "name" (print "[" $key "] section" ) "object" $one "expected" "map" "description" "of config values") }}
-    {{- if hasKey $one "job-json-overrides" }}
+  {{- /* loop over non-everyone sections, prepending the default configuration */ -}}
+  {{- range $section := $s.sections }}
+    {{- $one := $section.section }}
+    {{- if and (ne (toString $section.name) "*") (hasKey $one "job-json-overrides") }}
       {{- $oneConfig := get $one "job-json-overrides" }}
-      {{- include "rstudio-library.debug.type-check" (dict "name" ( print "[" $key "].job-json-overrides" ) "object" $oneConfig "expected" "slice" "description" "of job-json-overrides definitions") }}
+      {{- include "rstudio-library.debug.type-check" (dict "name" ( print "[" $section.name "].job-json-overrides" ) "object" $oneConfig "expected" "slice" "description" "of job-json-overrides definitions") }}
       {{- range $entry := $oneConfig }}
         {{- $_ := set $entry "file" ( print $filePath ($entry.name | nospace) ".json" ) }}
       {{- end }}
-      {{- $oneList := concat $defaultConfig $oneConfig }}
-      {{- $oneDict := dict $key (dict "job-json-overrides" $oneList) }}
-      {{- $newDict = mergeOverwrite $newDict $oneDict }}
+      {{- $_ := set $one "job-json-overrides" (concat $defaultConfig $oneConfig) }}
+    {{- end }}
+  {{- end }}
+  {{- /* if default config is defined, ensure that "everyone" is updated by it */ -}}
+  {{- if ge (len $defaultConfig) 1 }}
+    {{- if $s.hasEveryone }}
+      {{- $_ := set $everyoneConfig "job-json-overrides" $defaultConfig }}
+    {{- else if kindIs "slice" $data }}
+      {{- $data = prepend $data (dict "*" (dict "job-json-overrides" $defaultConfig)) }}
+    {{- else }}
+      {{- $_ := set $data "*" (dict "job-json-overrides" $defaultConfig) }}
     {{- end }}
   {{- end }}
   {{- /* output the configuration file */ -}}
-  {{- $output := mergeOverwrite $data $newDict }}
-  {{- include "rstudio-library.profiles.ini.singleFile" $output }}
+  {{- include "rstudio-library.profiles.ini.render" (dict "file" $file "data" $data) }}
+{{- end }}
+
+{{- /*
+  Lists the sections of a profiles file, checking the rules that the profiles helpers rely on:
+  [*] appears at most once and is a single map, and every other entry is a section (a map, or a
+  list of maps). Sets on .out:
+    .out.sections: as in rstudio-library.config.ini.entries
+    .out.hasEveryone: whether there is a [*] section
+    .out.everyone: the [*] section map, from .data (not a copy)
+
+  Takes a dict:
+    file: the file name, used in error messages
+    data: a map of sections, or a list of single-key maps
+    out: a dict to receive the results
+*/ -}}
+{{- define "rstudio-library.profiles.sections" -}}
+{{- $file := .file }}
+{{- $out := .out }}
+{{- include "rstudio-library.config.ini.entries" (dict "file" $file "content" .data "out" $out) }}
+{{- $count := 0 }}
+{{- range $entry := $out.entries }}
+  {{- if eq (toString $entry.name) "*" }}
+    {{- $count = add1 $count }}
+    {{- if gt $count 1 }}
+      {{- fail (printf "\n\nprofiles file '%s': the [*] section appears more than once. The chart merges its defaults into [*] and adds [*]'s job-json-overrides to the other sections, so [*] must be a single section. Combine the [*] entries into one." $file) }}
+    {{- end }}
+    {{- if kindIs "slice" $entry.value }}
+      {{- fail (printf "\n\nprofiles file '%s': [*] is a list, which would render several [*] sections. The chart merges its defaults into [*] and adds [*]'s job-json-overrides to the other sections, so [*] must be a single map of options." $file) }}
+    {{- end }}
+    {{- include "rstudio-library.debug.type-check" (dict "name" "[*] section" "object" $entry.value "expected" "map" "description" "of config values") }}
+    {{- $_ := set $out "everyone" $entry.value }}
+  {{- else if kindIs "slice" $entry.value }}
+    {{- range $item := $entry.value }}
+      {{- include "rstudio-library.debug.type-check" (dict "name" (print "[" $entry.name "] section" ) "object" $item "expected" "map" "description" "of config values") }}
+    {{- end }}
+  {{- else }}
+    {{- include "rstudio-library.debug.type-check" (dict "name" (print "[" $entry.name "] section" ) "object" $entry.value "expected" "map" "description" "of config values") }}
+  {{- end }}
+{{- end }}
+{{- $_ := set $out "hasEveryone" (eq $count 1) }}
+{{- end }}
+
+{{- /*
+  Renders a profiles file with rstudio-library.config.ini.file, after turning each
+  job-json-overrides list into its "target":"file" string (see
+  rstudio-library.profiles.ini.collapse-array). Modifies .data.
+
+  Takes a dict:
+    file: the file name, used in error messages
+    data: a map of sections, or a list of single-key maps
+*/ -}}
+{{- define "rstudio-library.profiles.ini.render" -}}
+{{- $s := dict }}
+{{- include "rstudio-library.config.ini.entries" (dict "file" .file "content" .data "out" $s) }}
+{{- range $section := $s.sections }}
+  {{- $overrides := get $section.section "job-json-overrides" }}
+  {{- if kindIs "slice" $overrides }}
+    {{- $_ := set $section.section "job-json-overrides" (include "rstudio-library.profiles.ini.collapse-array" $overrides) }}
+  {{- end }}
+{{- end }}
+{{- include "rstudio-library.config.ini.file" (dict "file" .file "content" .data) }}
 {{- end }}
 
 {{/*
-  Builds a single ini file
-  Modified from rstudio-library.config.ini to:
-    - collapse arrays
-    - via rstudio-library.profiles.ini.collapse-array
+  Builds a single profiles ini file with rstudio-library.config.ini.file, after collapsing
+  job-json-overrides via rstudio-library.profiles.ini.collapse-array
 */}}
 {{- define "rstudio-library.profiles.ini.singleFile" -}}
-{{- range $parent, $child := . -}}
-  {{- if kindIs "map" $child }}
-
-  {{ if not ( kindIs "slice" . ) -}}
-  [{{ $parent }}]
-  {{- end }}
-  {{- range $key, $val := $child }}
-  {{- if kindIs "slice" $val }}
-  {{ $key }}={{ include "rstudio-library.profiles.ini.collapse-array" $val }}
-  {{- else }}
-  {{ $key }}={{ $val }}
-  {{- end }}
-  {{- end }}
-  {{- else }}
-  {{ $parent }}={{ $child }}
-  {{- end }}
+{{- $data := . }}
+{{- if $data }}
+  {{- $data = $data | deepCopy }}
 {{- end }}
+{{- include "rstudio-library.profiles.ini.render" (dict "file" "" "data" $data) }}
 {{- end }}
 
 {{- /*
@@ -184,15 +245,19 @@
 */ -}}
 {{- define "rstudio-library.profiles.ini" -}}
 {{- range $file, $keys := . -}}
-{{ $file }}: |
-{{- include "rstudio-library.profiles.ini.singleFile" $keys }}
-
-{{ end }}
-{{ end }}
+{{- printf "%s: |" $file | nindent 0 }}
+{{- $data := $keys }}
+{{- if $data }}
+  {{- $data = $data | deepCopy }}
+{{- end }}
+{{- include "rstudio-library.profiles.ini.render" (dict "file" $file "data" $data) }}
+{{- end }}
+{{- end }}
 
 {{/*
   Takes a dict:
-    - .data : the configuration map of maps
+    - .data : a map of file names to their configuration: a map of sections, or a list of
+      single-key maps to keep their order
     - .jobJsonDefaults : an array of {target:target, name:name, json:json} defaults
     - .filePath : the path from the root of the system to where json overrides files will be mounted
 */}}
@@ -203,9 +268,10 @@
 {{- $data := .data }}
 {{- include "rstudio-library.debug.type-check" (dict "name" "profiles data" "object" $data "expected" "map" "description" "of filenames and config data") }}
 {{- range $file, $keys := $data -}}
-{{- include "rstudio-library.debug.type-check" (dict "name" (print "profiles content for file '" $file "'") "object" $keys "expected" "map" "description" "of section headers and configuration") }}
-{{ $file }}: |
-{{- include "rstudio-library.profiles.apply-everyone-and-default-to-others" (dict "data" $keys "default" $jobJsonDefaults "filePath" $filePath) }}
-
-{{ end }}
+{{- if not (kindIs "slice" $keys) }}
+  {{- include "rstudio-library.debug.type-check" (dict "name" (print "profiles content for file '" $file "'") "object" $keys "expected" "map" "description" "of section headers and configuration") }}
+{{- end }}
+{{- printf "%s: |" $file | nindent 0 }}
+{{- include "rstudio-library.profiles.apply-everyone-and-default-to-others" (dict "data" $keys "default" $jobJsonDefaults "filePath" $filePath "file" $file) }}
+{{- end }}
 {{- end }}
